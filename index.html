@@ -461,6 +461,57 @@
             color: var(--teal);
         }
 
+        .mom-split-display {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #f59e0b;
+        }
+
+        .mom-split-header {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--suite-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .mom-split-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            padding: 0.25rem 0;
+        }
+
+        .mom-split-label {
+            color: var(--gray-700);
+        }
+
+        .mom-split-value {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .mom-split-row.highlight {
+            background: var(--teal);
+            color: var(--white);
+            margin: 0.5rem -0.75rem -0.75rem;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0 0 7px 7px;
+        }
+
+        .mom-split-row.highlight .mom-split-label,
+        .mom-split-row.highlight .mom-split-value {
+            color: var(--white);
+        }
+
+        .mom-split-row.highlight .mom-split-value {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
         .cabin-actions {
             display: flex;
             gap: 0.75rem;
@@ -1296,6 +1347,18 @@
                             <div class="deposit-info">
                                 <span class="deposit-label">Pay today (deposit)</span>
                                 <span class="deposit-amount">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
+                            </div>
+
+                            <div class="mom-split-display">
+                                <div class="mom-split-header">Mom's Cost Split</div>
+                                <div class="mom-split-row">
+                                    <span class="mom-split-label">Mom's Total (tax + tip${AppState.includeDrinks ? ' + drinks' : ''})</span>
+                                    <span class="mom-split-value">${PriceCalculator.formatCurrency(pricing.momTotal)}</span>
+                                </div>
+                                <div class="mom-split-row highlight">
+                                    <span class="mom-split-label">Each Brother Pays</span>
+                                    <span class="mom-split-value">${PriceCalculator.formatCurrency(pricing.perBrotherShare)}</span>
+                                </div>
                             </div>
 
                             <div class="cabin-actions">
