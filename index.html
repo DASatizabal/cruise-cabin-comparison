@@ -575,6 +575,56 @@
             font-weight: 500;
         }
 
+        .breakdown-section-header {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ocean-blue);
+            padding: 1rem 0 0.5rem;
+            margin-top: 0.75rem;
+            border-top: 2px dashed var(--gray-300);
+        }
+
+        .breakdown-value.mom-free {
+            color: var(--teal);
+            font-weight: 700;
+        }
+
+        .breakdown-row.mom-total {
+            font-weight: 600;
+            background: #fef3c7;
+            margin: 0.5rem -1rem 0;
+            padding: 0.625rem 1rem;
+            border-radius: 6px;
+            border-bottom: none;
+        }
+
+        .breakdown-row.mom-total .breakdown-value {
+            color: var(--suite-color);
+            font-weight: 700;
+        }
+
+        .breakdown-row.split-row {
+            background: linear-gradient(135deg, var(--teal) 0%, #0d9488 100%);
+            color: var(--white);
+            margin: 0.5rem -1rem 0;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            border-bottom: none;
+        }
+
+        .breakdown-row.split-row .breakdown-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .breakdown-row.split-row .breakdown-value {
+            color: var(--white);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
         /* Comparison Tray */
         .comparison-tray {
             position: fixed;
@@ -787,6 +837,27 @@
             margin: 0 -1rem;
             padding: 0.625rem 1rem;
             font-weight: 600;
+        }
+
+        .comparison-row.highlight.split {
+            background: linear-gradient(135deg, var(--teal) 0%, #0d9488 100%);
+            color: var(--white);
+        }
+
+        .comparison-row.highlight.split .comparison-label,
+        .comparison-row.highlight.split .comparison-value {
+            color: var(--white);
+        }
+
+        .comparison-section-header {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ocean-blue);
+            padding: 0.75rem 0 0.375rem;
+            margin-top: 0.5rem;
+            border-top: 1px dashed var(--gray-300);
         }
 
         .comparison-label {
@@ -1137,6 +1208,15 @@
                 // Balance due
                 const balance = grandTotal - deposit;
 
+                // Mom's cost (3rd guest): FREE fare + tax + tip + drink (no dinner)
+                const momTax = cabin.tax;
+                const momTip = cabin.tip;
+                const momDrink = includeDrinks ? 85.50 : 0;
+                const momTotal = momTax + momTip + momDrink;
+
+                // Split between brothers (Mom's cost / 2)
+                const perBrotherShare = momTotal / 2;
+
                 return {
                     baseFare,
                     taxes,
@@ -1146,7 +1226,12 @@
                     grandTotal,
                     deposit,
                     balance,
-                    pricePerPerson: cabin.price
+                    pricePerPerson: cabin.price,
+                    momTax,
+                    momTip,
+                    momDrink,
+                    momTotal,
+                    perBrotherShare
                 };
             },
 
@@ -1259,6 +1344,36 @@
                                     <div class="breakdown-row">
                                         <span class="breakdown-label">Balance (due 7/23/2026)</span>
                                         <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.balance)}</span>
+                                    </div>
+
+                                    <div class="breakdown-section-header">Mom's Cost (3rd Guest)</div>
+                                    <div class="breakdown-row">
+                                        <span class="breakdown-label">Cruise Fare</span>
+                                        <span class="breakdown-value mom-free">FREE</span>
+                                    </div>
+                                    <div class="breakdown-row">
+                                        <span class="breakdown-label">Tax</span>
+                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.momTax)}</span>
+                                    </div>
+                                    <div class="breakdown-row">
+                                        <span class="breakdown-label">Gratuity</span>
+                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.momTip)}</span>
+                                    </div>
+                                    ${AppState.includeDrinks ? `
+                                        <div class="breakdown-row">
+                                            <span class="breakdown-label">Drink Package</span>
+                                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.momDrink)}</span>
+                                        </div>
+                                    ` : ''}
+                                    <div class="breakdown-row mom-total">
+                                        <span class="breakdown-label">Mom's Total</span>
+                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.momTotal)}</span>
+                                    </div>
+
+                                    <div class="breakdown-section-header">Split (Mom's Cost / 2)</div>
+                                    <div class="breakdown-row split-row">
+                                        <span class="breakdown-label">Each Brother Pays</span>
+                                        <span class="breakdown-value split-amount">${PriceCalculator.formatCurrency(pricing.perBrotherShare)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -1416,6 +1531,15 @@
                                 <div class="comparison-row">
                                     <span class="comparison-label">Balance Due</span>
                                     <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.balance)}</span>
+                                </div>
+                                <div class="comparison-section-header">Mom's Cost</div>
+                                <div class="comparison-row">
+                                    <span class="comparison-label">Mom's Total</span>
+                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.momTotal)}</span>
+                                </div>
+                                <div class="comparison-row highlight split">
+                                    <span class="comparison-label">Each Brother</span>
+                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.perBrotherShare)}</span>
                                 </div>
                             </div>
                             <div class="comparison-total">
