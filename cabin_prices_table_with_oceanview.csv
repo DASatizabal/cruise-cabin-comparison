@@ -1,0 +1,23 @@
+Room_Type,Price_per_person,Cabin,Total_sq_ft,Balcony_sq_ft,Tax,Tip,Drink Package,Dinner Package
+Inside,359,Inside,135-201,,150,60,85.5,20
+Inside,389,Family Inside,135,,150,60,85.5,20
+Oceanview,530,Family Oceanview,240-372,,150,60,85.5,20
+Balcony,569,Balcony,214-367,38-108,150,60,85.5,20
+Balcony,599,Family Balcony,213-234,38-58,150,60,85.5,20
+Balcony,710,Aft-Facing Balcony,216-426,40-149,150,60,85.5,20
+Club Balcony Suite,650,Club Balcony Suite,249-361,42-101,150,60,85.5,20
+Club Balcony Suite,669,Family Club Balcony Suite,249,42,150,60,85.5,20
+Club Balcony Suite,719,Club Balcony Suite with Larger Balcony,329-439,102-140,150,60,85.5,20
+Suite,939,Family Suite,512-562,45,150,75,85.5,20
+Suite,1280,Penthouse Suite with Balcony,339-342,65-68,150,75,85.5,20
+The Haven,1656,The Haven Suite with Balcony,381,61,150,75,85.5,20
+The Haven,1676,The Haven Penthouse Suite with Balcony,436-449,84-97,150,75,85.5,20
+The Haven,1709,The Haven Forward-Facing Penthouse with Balcony,415-466,27-46,150,75,85.5,20
+The Haven,1729,The Haven Family Villa Suite with Balcony,501,84,150,75,85.5,20
+The Haven,1763,The Haven Courtyard Penthouse with Large Balcony,374-620,43-146,150,75,85.5,20
+The Haven,1863,The Haven Courtyard Penthouse with Balcony,324,54,150,75,85.5,20
+The Haven,1869,The Haven Aft-Facing Penthouse with Balcony,571-595,151-175,150,75,85.5,20
+The Haven,1896,The Haven Aft-Facing Penthouse with Large Balcony,619-668,199-248,150,75,85.5,20
+The Haven,2296,The Haven 2-Bedroom Family Villa with Balcony,538,43,150,75,85.5,20
+The Haven,2723,The Haven 2-Bedroom Family Villa with Large Balcony,622,127,150,75,85.5,20
+,,,,,,,,

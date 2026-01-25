@@ -1031,32 +1031,74 @@
     </footer>
 
     <script>
-        // ==================== CABIN DATA ====================
-        const CABIN_DATA = [
-            { id: 1, roomType: "Inside", price: 389, name: "Inside", sqft: "135-201", balconySqft: null, tax: 150, tip: 60 },
-            { id: 2, roomType: "Inside", price: 409, name: "Family Inside", sqft: "135", balconySqft: null, tax: 150, tip: 60 },
-            { id: 3, roomType: "Oceanview", price: 609, name: "Oceanview with Picture Window", sqft: "160-245", balconySqft: null, tax: 150, tip: 60 },
-            { id: 4, roomType: "Oceanview", price: 679, name: "Family Oceanview", sqft: "240-372", balconySqft: null, tax: 150, tip: 60 },
-            { id: 5, roomType: "Balcony", price: 529, name: "Balcony", sqft: "214-367", balconySqft: "38-108", tax: 150, tip: 60 },
-            { id: 6, roomType: "Balcony", price: 549, name: "Family Balcony", sqft: "213-234", balconySqft: "38-58", tax: 150, tip: 60 },
-            { id: 7, roomType: "Balcony", price: 623, name: "Aft-Facing Balcony", sqft: "216-426", balconySqft: "40-149", tax: 150, tip: 60 },
-            { id: 8, roomType: "Club Balcony Suite", price: 583, name: "Club Balcony Suite", sqft: "249-361", balconySqft: "42-101", tax: 150, tip: 60 },
-            { id: 9, roomType: "Club Balcony Suite", price: 596, name: "Family Club Balcony Suite", sqft: "249", balconySqft: "42", tax: 150, tip: 60 },
-            { id: 10, roomType: "Club Balcony Suite", price: 629, name: "Club Balcony Suite with Larger Balcony", sqft: "329-439", balconySqft: "102-140", tax: 150, tip: 60 },
-            { id: 11, roomType: "Suite", price: 776, name: "Family Suite", sqft: "512-562", balconySqft: "45", tax: 150, tip: 75 },
-            { id: 12, roomType: "Suite", price: 1003, name: "Penthouse Suite with Balcony", sqft: "339-342", balconySqft: "65-68", tax: 150, tip: 75 },
-            { id: 13, roomType: "The Haven", price: 1656, name: "The Haven Suite with Balcony", sqft: "381", balconySqft: "61", tax: 150, tip: 75 },
-            { id: 14, roomType: "The Haven", price: 1676, name: "The Haven Penthouse Suite with Balcony", sqft: "436-449", balconySqft: "84-97", tax: 150, tip: 75 },
-            { id: 15, roomType: "The Haven", price: 1709, name: "The Haven Forward-Facing Penthouse with Balcony", sqft: "415-466", balconySqft: "27-46", tax: 150, tip: 75 },
-            { id: 16, roomType: "The Haven", price: 1729, name: "The Haven Family Villa Suite with Balcony", sqft: "501", balconySqft: "84", tax: 150, tip: 75 },
-            { id: 17, roomType: "The Haven", price: 1763, name: "The Haven Courtyard Penthouse with Large Balcony", sqft: "374-620", balconySqft: "43-146", tax: 150, tip: 75 },
-            { id: 18, roomType: "The Haven", price: 1863, name: "The Haven Courtyard Penthouse with Balcony", sqft: "324", balconySqft: "54", tax: 150, tip: 75 },
-            { id: 19, roomType: "The Haven", price: 1869, name: "The Haven Aft-Facing Penthouse with Balcony", sqft: "571-595", balconySqft: "151-175", tax: 150, tip: 75 },
-            { id: 20, roomType: "The Haven", price: 1896, name: "The Haven Aft-Facing Penthouse with Large Balcony", sqft: "619-668", balconySqft: "199-248", tax: 150, tip: 75 },
-            { id: 21, roomType: "The Haven", price: 2296, name: "The Haven 2-Bedroom Family Villa with Balcony", sqft: "538", balconySqft: "43", tax: 150, tip: 75 },
-            { id: 22, roomType: "The Haven", price: 2723, name: "The Haven 2-Bedroom Family Villa with Large Balcony", sqft: "622", balconySqft: "127", tax: 150, tip: 75 },
-            { id: 23, roomType: "The Haven", price: 3683, name: "The Haven Premier Owner's Suite with Large Balcony", sqft: "2,130", balconySqft: "516", tax: 150, tip: 75 }
-        ];
+        // ==================== CABIN DATA (loaded from CSV) ====================
+        let CABIN_DATA = [];
+
+        // CSV Parser
+        const CSVParser = {
+            async load(url) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Failed to load CSV');
+                    const text = await response.text();
+                    return this.parse(text);
+                } catch (error) {
+                    console.error('Error loading CSV:', error);
+                    return [];
+                }
+            },
+
+            parse(csvText) {
+                const lines = csvText.trim().split('\n');
+                if (lines.length < 2) return [];
+
+                const headers = lines[0].split(',');
+                const cabins = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                    const values = this.parseCSVLine(lines[i]);
+
+                    // Skip empty rows
+                    if (!values[0] || !values[1] || !values[2]) continue;
+
+                    const cabin = {
+                        id: i,
+                        roomType: values[0].trim(),
+                        price: parseFloat(values[1]) || 0,
+                        name: values[2].trim(),
+                        sqft: values[3] ? values[3].trim() : '',
+                        balconySqft: values[4] ? values[4].trim() : null,
+                        tax: parseFloat(values[5]) || 150,
+                        tip: parseFloat(values[6]) || 60
+                    };
+
+                    if (cabin.balconySqft === '') cabin.balconySqft = null;
+                    cabins.push(cabin);
+                }
+
+                return cabins;
+            },
+
+            parseCSVLine(line) {
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(current);
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                values.push(current);
+                return values;
+            }
+        };
 
         const NCL_LINKS = {
             "Inside": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=INSIDE",
@@ -1388,7 +1430,20 @@
 
         // ==================== APP CONTROLLER ====================
         const App = {
-            init() {
+            async init() {
+                // Load cabin data from CSV
+                CABIN_DATA = await CSVParser.load('cabin_prices_table_with_oceanview.csv');
+
+                if (CABIN_DATA.length === 0) {
+                    document.getElementById('cabinGrid').innerHTML = `
+                        <div class="no-results">
+                            <div class="no-results-icon">&#9888;</div>
+                            <p>Failed to load cabin data. Please refresh the page.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
                 this.bindEvents();
                 Renderer.renderGrid();
             },
