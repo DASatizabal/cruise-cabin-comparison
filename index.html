@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCL Cabin Comparison - Norwegian Joy | Nov 20-23, 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-ocean: #0a2540;
+            --ocean-blue: #1e3a5f;
+            --teal: #0d9488;
+            --teal-light: #14b8a6;
+            --gold: #f59e0b;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+
+            /* Room type colors */
+            --inside-color: #6b7280;
+            --oceanview-color: #0ea5e9;
+            --balcony-color: #22c55e;
+            --club-balcony-color: #8b5cf6;
+            --suite-color: #f59e0b;
+            --haven-color: #ec4899;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.5;
+        }
+
+        /* Hero Header */
+        .hero {
+            background: linear-gradient(135deg, var(--deep-ocean) 0%, var(--ocean-blue) 100%);
+            color: var(--white);
+            padding: 2rem 1rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .ship-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .ship-name a {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .ship-name a:hover {
+            color: var(--teal-light);
+        }
+
+        .cruise-dates {
+            font-size: 1.25rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .itinerary-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--teal-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .itinerary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .itinerary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .itinerary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .port-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .port-day {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+            margin-bottom: 0.25rem;
+        }
+
+        .port-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .port-time {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .validity-banner {
+            background: linear-gradient(90deg, var(--gold), #fbbf24);
+            color: var(--gray-900);
+            padding: 0.875rem 1.25rem;
+            border-radius: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.5); }
+        }
+
+        .validity-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Wave Animation */
+        .wave-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23f3f4f6' fill-opacity='1' d='M0,160L48,170.7C96,181,192,203,288,197.3C384,192,480,160,576,165.3C672,171,768,213,864,218.7C960,224,1056,192,1152,165.3C1248,139,1344,117,1392,106.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+            background-size: 50% 100%;
+            animation: wave 15s linear infinite;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Controls Panel */
+        .controls {
+            max-width: 1200px;
+            margin: -2rem auto 2rem;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .controls-panel {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .filter-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 9999px;
+            background: var(--white);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-tab:hover {
+            border-color: var(--teal);
+            color: var(--teal);
+        }
+
+        .filter-tab.active {
+            background: var(--teal);
+            border-color: var(--teal);
+            color: var(--white);
+        }
+
+        .filter-tab[data-filter="Inside"].active { background: var(--inside-color); border-color: var(--inside-color); }
+        .filter-tab[data-filter="Oceanview"].active { background: var(--oceanview-color); border-color: var(--oceanview-color); }
+        .filter-tab[data-filter="Balcony"].active { background: var(--balcony-color); border-color: var(--balcony-color); }
+        .filter-tab[data-filter="Club Balcony Suite"].active { background: var(--club-balcony-color); border-color: var(--club-balcony-color); }
+        .filter-tab[data-filter="Suite"].active { background: var(--suite-color); border-color: var(--suite-color); }
+        .filter-tab[data-filter="The Haven"].active { background: var(--haven-color); border-color: var(--haven-color); }
+
+        .sort-select {
+            padding: 0.5rem 2rem 0.5rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background: var(--white);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.25rem;
+        }
+
+        .package-toggles {
+            display: flex;
+            gap: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+            margin-top: 1rem;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toggle-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .toggle-price {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        /* iOS-style Toggle */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            appearance: none;
+            background: var(--gray-300);
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch:checked {
+            background: var(--teal);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            background: var(--white);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch:checked::before {
+            transform: translateX(22px);
+        }
+
+        /* Cabin Grid */
+        .cabin-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .cabin-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .cabin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cabin Card */
+        .cabin-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .cabin-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+        }
+
+        .cabin-card.selected {
+            outline: 3px solid var(--teal);
+            outline-offset: -3px;
+        }
+
+        .cabin-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .cabin-type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            margin-bottom: 0.75rem;
+        }
+
+        .badge-Inside { background: #f3f4f6; color: var(--inside-color); }
+        .badge-Oceanview { background: #e0f2fe; color: #0369a1; }
+        .badge-Balcony { background: #dcfce7; color: #166534; }
+        .badge-Club-Balcony-Suite { background: #ede9fe; color: #6d28d9; }
+        .badge-Suite { background: #fef3c7; color: #b45309; }
+        .badge-The-Haven { background: #fce7f3; color: #be185d; }
+
+        .cabin-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .cabin-specs {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        .cabin-spec {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .cabin-body {
+            padding: 1.25rem;
+        }
+
+        .price-display {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .price-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray-500);
+            margin-bottom: 0.25rem;
+        }
+
+        .price-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--deep-ocean);
+        }
+
+        .price-amount.flash {
+            animation: price-flash 0.5s ease;
+        }
+
+        @keyframes price-flash {
+            0%, 100% { color: var(--deep-ocean); }
+            50% { color: var(--teal); }
+        }
+
+        .price-per-person {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        .deposit-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .deposit-label {
+            color: var(--gray-600);
+        }
+
+        .deposit-amount {
+            font-weight: 600;
+            color: var(--teal);
+        }
+
+        .cabin-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--teal);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--teal-light);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .btn-compare {
+            background: var(--white);
+            border: 2px solid var(--teal);
+            color: var(--teal);
+        }
+
+        .btn-compare:hover {
+            background: var(--teal);
+            color: var(--white);
+        }
+
+        .btn-compare.selected {
+            background: var(--teal);
+            color: var(--white);
+        }
+
+        .ncl-link {
+            display: block;
+            text-align: center;
+            padding: 0.75rem;
+            color: var(--ocean-blue);
+            font-size: 0.875rem;
+            text-decoration: none;
+            border-top: 1px solid var(--gray-100);
+            transition: background 0.2s;
+        }
+
+        .ncl-link:hover {
+            background: var(--gray-50);
+        }
+
+        /* Breakdown */
+        .breakdown {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .breakdown.open {
+            max-height: 500px;
+        }
+
+        .breakdown-content {
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .breakdown-row:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-row.total {
+            font-weight: 700;
+            font-size: 1rem;
+            padding-top: 0.75rem;
+            border-top: 2px solid var(--gray-300);
+            margin-top: 0.5rem;
+        }
+
+        .breakdown-label {
+            color: var(--gray-600);
+        }
+
+        .breakdown-value {
+            color: var(--gray-900);
+            font-weight: 500;
+        }
+
+        /* Comparison Tray */
+        .comparison-tray {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--deep-ocean);
+            color: var(--white);
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            z-index: 100;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .comparison-tray.visible {
+            transform: translateY(0);
+        }
+
+        .tray-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .tray-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .tray-count {
+            background: var(--teal);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .tray-text {
+            font-size: 0.875rem;
+        }
+
+        .tray-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-tray {
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-compare-now {
+            background: var(--teal);
+            color: var(--white);
+        }
+
+        .btn-compare-now:hover {
+            background: var(--teal-light);
+        }
+
+        .btn-clear {
+            background: transparent;
+            color: var(--gray-300);
+            border: 1px solid var(--gray-600);
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 200;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: 24px 24px 0 0;
+            width: 100%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.visible .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gray-100);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--gray-500);
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-200);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .comparison-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .comparison-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .comparison-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+        @media (max-width: 768px) {
+            .comparison-grid.cols-2,
+            .comparison-grid.cols-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comparison-column {
+            border: 2px solid var(--gray-200);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .comparison-cabin-header {
+            padding: 1rem;
+            background: var(--gray-50);
+            text-align: center;
+        }
+
+        .comparison-cabin-name {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-top: 0.5rem;
+        }
+
+        .comparison-cabin-body {
+            padding: 1rem;
+        }
+
+        .comparison-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.625rem 0;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.875rem;
+        }
+
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-row.highlight {
+            background: var(--gray-50);
+            margin: 0 -1rem;
+            padding: 0.625rem 1rem;
+            font-weight: 600;
+        }
+
+        .comparison-label {
+            color: var(--gray-500);
+        }
+
+        .comparison-value {
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+
+        .comparison-total {
+            text-align: center;
+            padding: 1rem;
+            background: var(--deep-ocean);
+            color: var(--white);
+        }
+
+        .comparison-total-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.8;
+        }
+
+        .comparison-total-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--deep-ocean);
+            color: var(--white);
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .payment-due {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .payment-due-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .payment-due-date {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .footer-note {
+            font-size: 0.875rem;
+            opacity: 0.7;
+            margin-top: 1rem;
+        }
+
+        /* No results */
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-500);
+        }
+
+        .no-results-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Running totals display */
+        .running-totals {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .running-total-item {
+            font-size: 0.875rem;
+        }
+
+        .running-total-label {
+            color: var(--gray-500);
+        }
+
+        .running-total-value {
+            font-weight: 600;
+            color: var(--teal);
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Header -->
+    <header class="hero">
+        <div class="hero-content">
+            <h1 class="ship-name">
+                <a href="https://www.ncl.com/cruise-ships/norwegian-joy" target="_blank" rel="noopener">Norwegian Joy</a>
+            </h1>
+            <p class="cruise-dates">Fri, Nov 20 - Mon, Nov 23, 2026</p>
+            <p class="itinerary-title">3-Day Bahamas Round-trip Miami: Great Stirrup Cay &amp; Nassau</p>
+
+            <div class="itinerary-grid">
+                <div class="port-card">
+                    <div class="port-day">Friday</div>
+                    <div class="port-name">Miami, Florida</div>
+                    <div class="port-time">Embark 4:00 PM</div>
+                </div>
+                <div class="port-card">
+                    <div class="port-day">Saturday</div>
+                    <div class="port-name">Nassau, Bahamas</div>
+                    <div class="port-time">7:00 AM - 5:00 PM</div>
+                </div>
+                <div class="port-card">
+                    <div class="port-day">Sunday</div>
+                    <div class="port-name">Great Stirrup Cay</div>
+                    <div class="port-time">7:00 AM - 5:00 PM (Tender)</div>
+                </div>
+                <div class="port-card">
+                    <div class="port-day">Monday</div>
+                    <div class="port-name">Miami, Florida</div>
+                    <div class="port-time">Debark 7:00 AM</div>
+                </div>
+            </div>
+
+            <div class="validity-banner">
+                <span class="validity-icon">&#9888;</span>
+                <span>Prices valid until <strong>Monday, January 26, 2026 at 11:59 PM</strong></span>
+            </div>
+        </div>
+
+        <div class="wave-container">
+            <div class="wave"></div>
+        </div>
+    </header>
+
+    <!-- Controls Panel -->
+    <section class="controls">
+        <div class="controls-panel">
+            <div class="controls-row">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="All">All</button>
+                    <button class="filter-tab" data-filter="Inside">Inside</button>
+                    <button class="filter-tab" data-filter="Oceanview">Oceanview</button>
+                    <button class="filter-tab" data-filter="Balcony">Balcony</button>
+                    <button class="filter-tab" data-filter="Club Balcony Suite">Club Balcony</button>
+                    <button class="filter-tab" data-filter="Suite">Suite</button>
+                    <button class="filter-tab" data-filter="The Haven">The Haven</button>
+                </div>
+
+                <select class="sort-select" id="sortSelect">
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="sqft-desc">Sq Ft: Large to Small</option>
+                    <option value="sqft-asc">Sq Ft: Small to Large</option>
+                </select>
+            </div>
+
+            <div class="package-toggles">
+                <div class="toggle-container">
+                    <input type="checkbox" class="toggle-switch" id="drinkToggle">
+                    <div>
+                        <div class="toggle-label">Drink Package</div>
+                        <div class="toggle-price">+$256.50 (3 guests x $85.50)</div>
+                    </div>
+                </div>
+
+                <div class="toggle-container">
+                    <input type="checkbox" class="toggle-switch" id="dinnerToggle">
+                    <div>
+                        <div class="toggle-label">Dinner Package</div>
+                        <div class="toggle-price">+$40 (2 guests x $20)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="running-totals" id="runningTotals" style="display: none;">
+                <div class="running-total-item">
+                    <span class="running-total-label">Package additions: </span>
+                    <span class="running-total-value" id="packageTotal">$0</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cabin Grid -->
+    <main class="cabin-grid" id="cabinGrid">
+        <!-- Cabins will be rendered here -->
+    </main>
+
+    <!-- Comparison Tray -->
+    <div class="comparison-tray" id="comparisonTray">
+        <div class="tray-content">
+            <div class="tray-info">
+                <div class="tray-count" id="trayCount">0</div>
+                <div class="tray-text">cabins selected for comparison (max 3)</div>
+            </div>
+            <div class="tray-actions">
+                <button class="btn-tray btn-clear" id="clearComparison">Clear All</button>
+                <button class="btn-tray btn-compare-now" id="compareNow">Compare Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Modal -->
+    <div class="modal-overlay" id="comparisonModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Side-by-Side Comparison</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="comparison-grid" id="comparisonGrid">
+                    <!-- Comparison content will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="payment-due">
+                <div class="payment-due-label">Final Payment Due</div>
+                <div class="payment-due-date">July 23, 2026</div>
+            </div>
+            <p class="footer-note">Deposits are refundable if canceled by July 23, 2026</p>
+            <p class="footer-note" style="margin-top: 0.5rem;">Pricing for 3 guests (3rd guest sails FREE!)</p>
+        </div>
+    </footer>
+
+    <script>
+        // ==================== CABIN DATA ====================
+        const CABIN_DATA = [
+            { id: 1, roomType: "Inside", price: 389, name: "Inside", sqft: "135-201", balconySqft: null, tax: 150, tip: 60 },
+            { id: 2, roomType: "Inside", price: 409, name: "Family Inside", sqft: "135", balconySqft: null, tax: 150, tip: 60 },
+            { id: 3, roomType: "Oceanview", price: 609, name: "Oceanview with Picture Window", sqft: "160-245", balconySqft: null, tax: 150, tip: 60 },
+            { id: 4, roomType: "Oceanview", price: 679, name: "Family Oceanview", sqft: "240-372", balconySqft: null, tax: 150, tip: 60 },
+            { id: 5, roomType: "Balcony", price: 529, name: "Balcony", sqft: "214-367", balconySqft: "38-108", tax: 150, tip: 60 },
+            { id: 6, roomType: "Balcony", price: 549, name: "Family Balcony", sqft: "213-234", balconySqft: "38-58", tax: 150, tip: 60 },
+            { id: 7, roomType: "Balcony", price: 623, name: "Aft-Facing Balcony", sqft: "216-426", balconySqft: "40-149", tax: 150, tip: 60 },
+            { id: 8, roomType: "Club Balcony Suite", price: 583, name: "Club Balcony Suite", sqft: "249-361", balconySqft: "42-101", tax: 150, tip: 60 },
+            { id: 9, roomType: "Club Balcony Suite", price: 596, name: "Family Club Balcony Suite", sqft: "249", balconySqft: "42", tax: 150, tip: 60 },
+            { id: 10, roomType: "Club Balcony Suite", price: 629, name: "Club Balcony Suite with Larger Balcony", sqft: "329-439", balconySqft: "102-140", tax: 150, tip: 60 },
+            { id: 11, roomType: "Suite", price: 776, name: "Family Suite", sqft: "512-562", balconySqft: "45", tax: 150, tip: 75 },
+            { id: 12, roomType: "Suite", price: 1003, name: "Penthouse Suite with Balcony", sqft: "339-342", balconySqft: "65-68", tax: 150, tip: 75 },
+            { id: 13, roomType: "The Haven", price: 1656, name: "The Haven Suite with Balcony", sqft: "381", balconySqft: "61", tax: 150, tip: 75 },
+            { id: 14, roomType: "The Haven", price: 1676, name: "The Haven Penthouse Suite with Balcony", sqft: "436-449", balconySqft: "84-97", tax: 150, tip: 75 },
+            { id: 15, roomType: "The Haven", price: 1709, name: "The Haven Forward-Facing Penthouse with Balcony", sqft: "415-466", balconySqft: "27-46", tax: 150, tip: 75 },
+            { id: 16, roomType: "The Haven", price: 1729, name: "The Haven Family Villa Suite with Balcony", sqft: "501", balconySqft: "84", tax: 150, tip: 75 },
+            { id: 17, roomType: "The Haven", price: 1763, name: "The Haven Courtyard Penthouse with Large Balcony", sqft: "374-620", balconySqft: "43-146", tax: 150, tip: 75 },
+            { id: 18, roomType: "The Haven", price: 1863, name: "The Haven Courtyard Penthouse with Balcony", sqft: "324", balconySqft: "54", tax: 150, tip: 75 },
+            { id: 19, roomType: "The Haven", price: 1869, name: "The Haven Aft-Facing Penthouse with Balcony", sqft: "571-595", balconySqft: "151-175", tax: 150, tip: 75 },
+            { id: 20, roomType: "The Haven", price: 1896, name: "The Haven Aft-Facing Penthouse with Large Balcony", sqft: "619-668", balconySqft: "199-248", tax: 150, tip: 75 },
+            { id: 21, roomType: "The Haven", price: 2296, name: "The Haven 2-Bedroom Family Villa with Balcony", sqft: "538", balconySqft: "43", tax: 150, tip: 75 },
+            { id: 22, roomType: "The Haven", price: 2723, name: "The Haven 2-Bedroom Family Villa with Large Balcony", sqft: "622", balconySqft: "127", tax: 150, tip: 75 },
+            { id: 23, roomType: "The Haven", price: 3683, name: "The Haven Premier Owner's Suite with Large Balcony", sqft: "2,130", balconySqft: "516", tax: 150, tip: 75 }
+        ];
+
+        const NCL_LINKS = {
+            "Inside": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=INSIDE",
+            "Oceanview": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=OCEANVIEW",
+            "Balcony": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=BALCONY",
+            "Club Balcony Suite": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=CLUB_BALCONY_SUITE",
+            "Suite": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=SUITE",
+            "The Haven": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=HAVEN"
+        };
+
+        // ==================== PRICE CALCULATOR ====================
+        const PriceCalculator = {
+            calculate(cabin, includeDrinks = false, includeDinner = false) {
+                // Base fare: price x 2 (3rd guest FREE)
+                const baseFare = cabin.price * 2;
+
+                // Taxes: $150 x 3 guests
+                const taxes = cabin.tax * 3;
+
+                // Tips: tip amount x 3 guests
+                const tips = cabin.tip * 3;
+
+                // Drink package: $85.50 x 3 guests
+                const drinks = includeDrinks ? 85.50 * 3 : 0;
+
+                // Dinner package: $20 x 2 guests (only for paying guests)
+                const dinner = includeDinner ? 20 * 2 : 0;
+
+                // Grand total
+                const grandTotal = baseFare + taxes + tips + drinks + dinner;
+
+                // Deposit: Suite/Haven = 10% of (price x 2), others = $100 flat
+                const isHighTier = cabin.roomType === "Suite" || cabin.roomType === "The Haven";
+                const deposit = isHighTier ? baseFare * 0.10 : 100;
+
+                // Balance due
+                const balance = grandTotal - deposit;
+
+                return {
+                    baseFare,
+                    taxes,
+                    tips,
+                    drinks,
+                    dinner,
+                    grandTotal,
+                    deposit,
+                    balance,
+                    pricePerPerson: cabin.price
+                };
+            },
+
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
+                    maximumFractionDigits: 2
+                }).format(amount);
+            }
+        };
+
+        // ==================== APP STATE ====================
+        const AppState = {
+            currentFilter: 'All',
+            currentSort: 'price-asc',
+            includeDrinks: false,
+            includeDinner: false,
+            selectedCabins: new Set(),
+            openBreakdowns: new Set()
+        };
+
+        // ==================== RENDERER ====================
+        const Renderer = {
+            renderCabinCard(cabin) {
+                const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner);
+                const isSelected = AppState.selectedCabins.has(cabin.id);
+                const isBreakdownOpen = AppState.openBreakdowns.has(cabin.id);
+                const badgeClass = cabin.roomType.replace(/\s+/g, '-');
+
+                return `
+                    <article class="cabin-card ${isSelected ? 'selected' : ''}" data-id="${cabin.id}">
+                        <div class="cabin-header">
+                            <span class="cabin-type-badge badge-${badgeClass}">${cabin.roomType}</span>
+                            <h3 class="cabin-name">${cabin.name}</h3>
+                            <div class="cabin-specs">
+                                <span class="cabin-spec">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                    </svg>
+                                    ${cabin.sqft} sq ft
+                                </span>
+                                ${cabin.balconySqft ? `
+                                    <span class="cabin-spec">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                        </svg>
+                                        ${cabin.balconySqft} sq ft balcony
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <div class="cabin-body">
+                            <div class="price-display">
+                                <div class="price-label">Total for 3 guests</div>
+                                <div class="price-amount" data-cabin-id="${cabin.id}">${PriceCalculator.formatCurrency(pricing.grandTotal)}</div>
+                                <div class="price-per-person">${PriceCalculator.formatCurrency(pricing.pricePerPerson)}/person (3rd guest FREE)</div>
+                            </div>
+
+                            <div class="deposit-info">
+                                <span class="deposit-label">Pay today (deposit)</span>
+                                <span class="deposit-amount">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
+                            </div>
+
+                            <div class="cabin-actions">
+                                <button class="btn btn-secondary toggle-breakdown" data-id="${cabin.id}">
+                                    ${isBreakdownOpen ? 'Hide' : 'View'} Breakdown
+                                </button>
+                                <button class="btn btn-compare ${isSelected ? 'selected' : ''}" data-id="${cabin.id}">
+                                    ${isSelected ? 'Selected' : 'Compare'}
+                                </button>
+                            </div>
+
+                            <div class="breakdown ${isBreakdownOpen ? 'open' : ''}" data-breakdown-id="${cabin.id}">
+                                <div class="breakdown-content">
+                                    <div class="breakdown-row">
+                                        <span class="breakdown-label">Base Fare (${PriceCalculator.formatCurrency(cabin.price)} x 2)</span>
+                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.baseFare)}</span>
+                                    </div>
+                                    <div class="breakdown-row">
+                                        <span class="breakdown-label">Taxes ($150 x 3 guests)</span>
+                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.taxes)}</span>
+                                    </div>
+                                    <div class="breakdown-row">
+                                        <span class="breakdown-label">Gratuities ($${cabin.tip} x 3 guests)</span>
+                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.tips)}</span>
+                                    </div>
+                                    ${AppState.includeDrinks ? `
+                                        <div class="breakdown-row">
+                                            <span class="breakdown-label">Drink Package ($85.50 x 3)</span>
+                                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.drinks)}</span>
+                                        </div>
+                                    ` : ''}
+                                    ${AppState.includeDinner ? `
+                                        <div class="breakdown-row">
+                                            <span class="breakdown-label">Dinner Package ($20 x 2)</span>
+                                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.dinner)}</span>
+                                        </div>
+                                    ` : ''}
+                                    <div class="breakdown-row total">
+                                        <span class="breakdown-label">Grand Total</span>
+                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.grandTotal)}</span>
+                                    </div>
+                                    <div class="breakdown-row">
+                                        <span class="breakdown-label">Deposit (pay today)</span>
+                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
+                                    </div>
+                                    <div class="breakdown-row">
+                                        <span class="breakdown-label">Balance (due 7/23/2026)</span>
+                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.balance)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="${NCL_LINKS[cabin.roomType]}" target="_blank" rel="noopener" class="ncl-link">
+                            View on NCL &rarr;
+                        </a>
+                    </article>
+                `;
+            },
+
+            renderGrid() {
+                const grid = document.getElementById('cabinGrid');
+                let filteredData = CABIN_DATA;
+
+                // Apply filter
+                if (AppState.currentFilter !== 'All') {
+                    filteredData = filteredData.filter(c => c.roomType === AppState.currentFilter);
+                }
+
+                // Apply sort
+                filteredData = [...filteredData].sort((a, b) => {
+                    const priceA = PriceCalculator.calculate(a, AppState.includeDrinks, AppState.includeDinner).grandTotal;
+                    const priceB = PriceCalculator.calculate(b, AppState.includeDrinks, AppState.includeDinner).grandTotal;
+                    const sqftA = parseInt(a.sqft.split('-')[0].replace(/,/g, ''));
+                    const sqftB = parseInt(b.sqft.split('-')[0].replace(/,/g, ''));
+
+                    switch (AppState.currentSort) {
+                        case 'price-asc': return priceA - priceB;
+                        case 'price-desc': return priceB - priceA;
+                        case 'sqft-asc': return sqftA - sqftB;
+                        case 'sqft-desc': return sqftB - sqftA;
+                        default: return 0;
+                    }
+                });
+
+                if (filteredData.length === 0) {
+                    grid.innerHTML = `
+                        <div class="no-results">
+                            <div class="no-results-icon">&#128674;</div>
+                            <p>No cabins found for this filter.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = filteredData.map(cabin => this.renderCabinCard(cabin)).join('');
+            },
+
+            updatePrices() {
+                // Flash animation on price update
+                document.querySelectorAll('.price-amount').forEach(el => {
+                    el.classList.add('flash');
+                    setTimeout(() => el.classList.remove('flash'), 500);
+                });
+
+                this.renderGrid();
+                this.updateRunningTotals();
+            },
+
+            updateRunningTotals() {
+                const totalsEl = document.getElementById('runningTotals');
+                const packageTotalEl = document.getElementById('packageTotal');
+
+                let packageTotal = 0;
+                if (AppState.includeDrinks) packageTotal += 256.50;
+                if (AppState.includeDinner) packageTotal += 40;
+
+                if (packageTotal > 0) {
+                    totalsEl.style.display = 'flex';
+                    packageTotalEl.textContent = PriceCalculator.formatCurrency(packageTotal);
+                } else {
+                    totalsEl.style.display = 'none';
+                }
+            },
+
+            updateComparisonTray() {
+                const tray = document.getElementById('comparisonTray');
+                const count = document.getElementById('trayCount');
+
+                count.textContent = AppState.selectedCabins.size;
+
+                if (AppState.selectedCabins.size > 0) {
+                    tray.classList.add('visible');
+                } else {
+                    tray.classList.remove('visible');
+                }
+            },
+
+            renderComparison() {
+                const grid = document.getElementById('comparisonGrid');
+                const selectedCabins = CABIN_DATA.filter(c => AppState.selectedCabins.has(c.id));
+
+                grid.className = `comparison-grid cols-${selectedCabins.length}`;
+
+                grid.innerHTML = selectedCabins.map(cabin => {
+                    const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner);
+                    const badgeClass = cabin.roomType.replace(/\s+/g, '-');
+
+                    return `
+                        <div class="comparison-column">
+                            <div class="comparison-cabin-header">
+                                <span class="cabin-type-badge badge-${badgeClass}">${cabin.roomType}</span>
+                                <div class="comparison-cabin-name">${cabin.name}</div>
+                            </div>
+                            <div class="comparison-cabin-body">
+                                <div class="comparison-row">
+                                    <span class="comparison-label">Cabin Size</span>
+                                    <span class="comparison-value">${cabin.sqft} sq ft</span>
+                                </div>
+                                ${cabin.balconySqft ? `
+                                    <div class="comparison-row">
+                                        <span class="comparison-label">Balcony</span>
+                                        <span class="comparison-value">${cabin.balconySqft} sq ft</span>
+                                    </div>
+                                ` : `
+                                    <div class="comparison-row">
+                                        <span class="comparison-label">Balcony</span>
+                                        <span class="comparison-value">-</span>
+                                    </div>
+                                `}
+                                <div class="comparison-row">
+                                    <span class="comparison-label">Price/Person</span>
+                                    <span class="comparison-value">${PriceCalculator.formatCurrency(cabin.price)}</span>
+                                </div>
+                                <div class="comparison-row highlight">
+                                    <span class="comparison-label">Base Fare (x2)</span>
+                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.baseFare)}</span>
+                                </div>
+                                <div class="comparison-row">
+                                    <span class="comparison-label">Taxes (3 guests)</span>
+                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.taxes)}</span>
+                                </div>
+                                <div class="comparison-row">
+                                    <span class="comparison-label">Gratuities</span>
+                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.tips)}</span>
+                                </div>
+                                ${AppState.includeDrinks ? `
+                                    <div class="comparison-row">
+                                        <span class="comparison-label">Drink Package</span>
+                                        <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.drinks)}</span>
+                                    </div>
+                                ` : ''}
+                                ${AppState.includeDinner ? `
+                                    <div class="comparison-row">
+                                        <span class="comparison-label">Dinner Package</span>
+                                        <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.dinner)}</span>
+                                    </div>
+                                ` : ''}
+                                <div class="comparison-row highlight">
+                                    <span class="comparison-label">Deposit</span>
+                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
+                                </div>
+                                <div class="comparison-row">
+                                    <span class="comparison-label">Balance Due</span>
+                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.balance)}</span>
+                                </div>
+                            </div>
+                            <div class="comparison-total">
+                                <div class="comparison-total-label">Grand Total</div>
+                                <div class="comparison-total-amount">${PriceCalculator.formatCurrency(pricing.grandTotal)}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        };
+
+        // ==================== APP CONTROLLER ====================
+        const App = {
+            init() {
+                this.bindEvents();
+                Renderer.renderGrid();
+            },
+
+            bindEvents() {
+                // Filter tabs
+                document.querySelectorAll('.filter-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                        e.target.classList.add('active');
+                        AppState.currentFilter = e.target.dataset.filter;
+                        Renderer.renderGrid();
+                    });
+                });
+
+                // Sort select
+                document.getElementById('sortSelect').addEventListener('change', (e) => {
+                    AppState.currentSort = e.target.value;
+                    Renderer.renderGrid();
+                });
+
+                // Package toggles
+                document.getElementById('drinkToggle').addEventListener('change', (e) => {
+                    AppState.includeDrinks = e.target.checked;
+                    Renderer.updatePrices();
+                });
+
+                document.getElementById('dinnerToggle').addEventListener('change', (e) => {
+                    AppState.includeDinner = e.target.checked;
+                    Renderer.updatePrices();
+                });
+
+                // Cabin grid event delegation
+                document.getElementById('cabinGrid').addEventListener('click', (e) => {
+                    // Toggle breakdown
+                    if (e.target.classList.contains('toggle-breakdown')) {
+                        const id = parseInt(e.target.dataset.id);
+                        if (AppState.openBreakdowns.has(id)) {
+                            AppState.openBreakdowns.delete(id);
+                        } else {
+                            AppState.openBreakdowns.add(id);
+                        }
+                        Renderer.renderGrid();
+                    }
+
+                    // Compare button
+                    if (e.target.classList.contains('btn-compare')) {
+                        const id = parseInt(e.target.dataset.id);
+                        if (AppState.selectedCabins.has(id)) {
+                            AppState.selectedCabins.delete(id);
+                        } else if (AppState.selectedCabins.size < 3) {
+                            AppState.selectedCabins.add(id);
+                        }
+                        Renderer.renderGrid();
+                        Renderer.updateComparisonTray();
+                    }
+                });
+
+                // Comparison tray
+                document.getElementById('clearComparison').addEventListener('click', () => {
+                    AppState.selectedCabins.clear();
+                    Renderer.renderGrid();
+                    Renderer.updateComparisonTray();
+                });
+
+                document.getElementById('compareNow').addEventListener('click', () => {
+                    if (AppState.selectedCabins.size > 0) {
+                        Renderer.renderComparison();
+                        document.getElementById('comparisonModal').classList.add('visible');
+                    }
+                });
+
+                // Modal
+                document.getElementById('closeModal').addEventListener('click', () => {
+                    document.getElementById('comparisonModal').classList.remove('visible');
+                });
+
+                document.getElementById('comparisonModal').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal-overlay')) {
+                        document.getElementById('comparisonModal').classList.remove('visible');
+                    }
+                });
+
+                // Keyboard
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        document.getElementById('comparisonModal').classList.remove('visible');
+                    }
+                });
+            }
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => App.init());
+    </script>
+</body>
+</html>
