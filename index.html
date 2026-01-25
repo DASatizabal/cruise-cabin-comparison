@@ -1159,8 +1159,8 @@
                 <div class="toggle-container">
                     <input type="checkbox" class="toggle-switch" id="tipsToggle" checked>
                     <div>
-                        <div class="toggle-label">Pay Tips Before Cruise</div>
-                        <div class="toggle-price" id="tipsToggleDesc">Included in amount due by 7/23/2026</div>
+                        <div class="toggle-label">When to Pay Tips</div>
+                        <div class="toggle-price" id="tipsToggleDesc">Before cruise (by 7/23/2026)</div>
                     </div>
                 </div>
             </div>
@@ -1785,8 +1785,8 @@
                 document.getElementById('tipsToggle').addEventListener('change', (e) => {
                     AppState.tipsBeforeCruise = e.target.checked;
                     document.getElementById('tipsToggleDesc').textContent = e.target.checked
-                        ? 'Included in amount due by 7/23/2026'
-                        : 'Pay onboard at end of cruise';
+                        ? 'Before cruise (by 7/23/2026)'
+                        : 'Onboard (end of cruise)';
                     Renderer.updatePrices();
                 });
 
