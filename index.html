@@ -442,6 +442,13 @@
             color: var(--gray-500);
         }
 
+        .tips-onboard-note {
+            font-size: 0.8rem;
+            color: var(--suite-color);
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
         .deposit-info {
             display: flex;
             justify-content: space-between;
@@ -510,6 +517,27 @@
         .mom-split-row.highlight .mom-split-value {
             font-size: 1rem;
             font-weight: 700;
+        }
+
+        .mom-split-onboard {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(245, 158, 11, 0.3);
+            margin: 0.5rem -0.75rem -0.75rem;
+            border-radius: 0 0 7px 7px;
+            border-top: 1px dashed var(--suite-color);
+        }
+
+        .mom-split-onboard .mom-split-label {
+            color: var(--gray-600);
+            font-style: italic;
+        }
+
+        .mom-split-onboard .mom-split-value {
+            color: var(--suite-color);
+            font-weight: 600;
         }
 
         .cabin-actions {
@@ -587,7 +615,7 @@
         }
 
         .breakdown.open {
-            max-height: 500px;
+            max-height: 1000px;
         }
 
         .breakdown-content {
@@ -674,6 +702,38 @@
             color: var(--white);
             font-weight: 700;
             font-size: 1rem;
+        }
+
+        .breakdown-row.tips-onboard {
+            background: #fef3c7;
+            margin: 0 -1rem;
+            padding: 0.5rem 1rem;
+            font-style: italic;
+        }
+
+        .breakdown-row.tips-onboard .breakdown-label {
+            color: var(--suite-color);
+        }
+
+        .breakdown-row.tips-onboard .breakdown-value {
+            color: var(--suite-color);
+        }
+
+        .breakdown-row.tips-onboard-split {
+            background: #fef3c7;
+            margin: 0.25rem -1rem -1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0 0 8px 8px;
+            font-style: italic;
+        }
+
+        .breakdown-row.tips-onboard-split .breakdown-label {
+            color: var(--suite-color);
+        }
+
+        .breakdown-row.tips-onboard-split .breakdown-value {
+            color: var(--suite-color);
+            font-weight: 600;
         }
 
         /* Comparison Tray */
@@ -1095,6 +1155,14 @@
                         <div class="toggle-price">+$40 (2 guests x $20)</div>
                     </div>
                 </div>
+
+                <div class="toggle-container">
+                    <input type="checkbox" class="toggle-switch" id="tipsToggle" checked>
+                    <div>
+                        <div class="toggle-label">Pay Tips Before Cruise</div>
+                        <div class="toggle-price" id="tipsToggleDesc">Included in amount due by 7/23/2026</div>
+                    </div>
+                </div>
             </div>
 
             <div class="running-totals" id="runningTotals" style="display: none;">
@@ -1233,7 +1301,7 @@
 
         // ==================== PRICE CALCULATOR ====================
         const PriceCalculator = {
-            calculate(cabin, includeDrinks = false, includeDinner = false) {
+            calculate(cabin, includeDrinks = false, includeDinner = false, tipsBeforeCruise = true) {
                 // Base fare: price x 2 (3rd guest FREE)
                 const baseFare = cabin.price * 2;
 
@@ -1249,40 +1317,61 @@
                 // Dinner package: $20 x 2 guests (only for paying guests)
                 const dinner = includeDinner ? 20 * 2 : 0;
 
-                // Grand total
-                const grandTotal = baseFare + taxes + tips + drinks + dinner;
+                // Tips included in pre-cruise payment or paid onboard
+                const tipsPreCruise = tipsBeforeCruise ? tips : 0;
+                const tipsOnboard = tipsBeforeCruise ? 0 : tips;
+
+                // Grand total (due by 7/23/2026) - only includes tips if paying before cruise
+                const grandTotal = baseFare + taxes + tipsPreCruise + drinks + dinner;
+
+                // Full trip cost (including onboard tips if applicable)
+                const fullTripCost = baseFare + taxes + tips + drinks + dinner;
 
                 // Deposit: Suite/Haven = 10% of (price x 2), others = $100 flat
                 const isHighTier = cabin.roomType === "Suite" || cabin.roomType === "The Haven";
                 const deposit = isHighTier ? baseFare * 0.10 : 100;
 
-                // Balance due
+                // Balance due (by 7/23/2026)
                 const balance = grandTotal - deposit;
 
                 // Mom's cost (3rd guest): FREE fare + tax + tip + drink (no dinner)
                 const momTax = cabin.tax;
                 const momTip = cabin.tip;
+                const momTipPreCruise = tipsBeforeCruise ? momTip : 0;
+                const momTipOnboard = tipsBeforeCruise ? 0 : momTip;
                 const momDrink = includeDrinks ? 85.50 : 0;
+                const momTotalPreCruise = momTax + momTipPreCruise + momDrink;
+                const momTotalOnboard = momTipOnboard;
                 const momTotal = momTax + momTip + momDrink;
 
-                // Split between brothers (Mom's cost / 2)
-                const perBrotherShare = momTotal / 2;
+                // Split between brothers (Mom's pre-cruise cost / 2)
+                const perBrotherShare = momTotalPreCruise / 2;
+                const perBrotherShareOnboard = momTotalOnboard / 2;
 
                 return {
                     baseFare,
                     taxes,
                     tips,
+                    tipsPreCruise,
+                    tipsOnboard,
                     drinks,
                     dinner,
                     grandTotal,
+                    fullTripCost,
                     deposit,
                     balance,
                     pricePerPerson: cabin.price,
                     momTax,
                     momTip,
+                    momTipPreCruise,
+                    momTipOnboard,
                     momDrink,
+                    momTotalPreCruise,
+                    momTotalOnboard,
                     momTotal,
-                    perBrotherShare
+                    perBrotherShare,
+                    perBrotherShareOnboard,
+                    tipsBeforeCruise
                 };
             },
 
@@ -1302,6 +1391,7 @@
             currentSort: 'price-asc',
             includeDrinks: false,
             includeDinner: false,
+            tipsBeforeCruise: true,
             selectedCabins: new Set(),
             openBreakdowns: new Set()
         };
@@ -1309,7 +1399,7 @@
         // ==================== RENDERER ====================
         const Renderer = {
             renderCabinCard(cabin) {
-                const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner);
+                const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise);
                 const isSelected = AppState.selectedCabins.has(cabin.id);
                 const isBreakdownOpen = AppState.openBreakdowns.has(cabin.id);
                 const badgeClass = cabin.roomType.replace(/\s+/g, '-');
@@ -1339,9 +1429,12 @@
 
                         <div class="cabin-body">
                             <div class="price-display">
-                                <div class="price-label">Total for 3 guests</div>
+                                <div class="price-label">Due by 7/23/2026</div>
                                 <div class="price-amount" data-cabin-id="${cabin.id}">${PriceCalculator.formatCurrency(pricing.grandTotal)}</div>
                                 <div class="price-per-person">${PriceCalculator.formatCurrency(pricing.pricePerPerson)}/person (3rd guest FREE)</div>
+                                ${!AppState.tipsBeforeCruise ? `
+                                    <div class="tips-onboard-note">+ ${PriceCalculator.formatCurrency(pricing.tipsOnboard)} tips paid onboard</div>
+                                ` : ''}
                             </div>
 
                             <div class="deposit-info">
@@ -1350,15 +1443,21 @@
                             </div>
 
                             <div class="mom-split-display">
-                                <div class="mom-split-header">Mom's Cost Split</div>
+                                <div class="mom-split-header">Mom's Cost Split${!AppState.tipsBeforeCruise ? ' (Pre-Cruise)' : ''}</div>
                                 <div class="mom-split-row">
-                                    <span class="mom-split-label">Mom's Total (tax + tip${AppState.includeDrinks ? ' + drinks' : ''})</span>
-                                    <span class="mom-split-value">${PriceCalculator.formatCurrency(pricing.momTotal)}</span>
+                                    <span class="mom-split-label">Mom's Total (tax${AppState.tipsBeforeCruise ? ' + tip' : ''}${AppState.includeDrinks ? ' + drinks' : ''})</span>
+                                    <span class="mom-split-value">${PriceCalculator.formatCurrency(pricing.momTotalPreCruise)}</span>
                                 </div>
                                 <div class="mom-split-row highlight">
                                     <span class="mom-split-label">Each Brother Pays</span>
                                     <span class="mom-split-value">${PriceCalculator.formatCurrency(pricing.perBrotherShare)}</span>
                                 </div>
+                                ${!AppState.tipsBeforeCruise ? `
+                                    <div class="mom-split-onboard">
+                                        <span class="mom-split-label">+ Mom's tip onboard</span>
+                                        <span class="mom-split-value">${PriceCalculator.formatCurrency(pricing.momTipOnboard)} (${PriceCalculator.formatCurrency(pricing.perBrotherShareOnboard)} each)</span>
+                                    </div>
+                                ` : ''}
                             </div>
 
                             <div class="cabin-actions">
@@ -1380,10 +1479,12 @@
                                         <span class="breakdown-label">Taxes ($150 x 3 guests)</span>
                                         <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.taxes)}</span>
                                     </div>
-                                    <div class="breakdown-row">
-                                        <span class="breakdown-label">Gratuities ($${cabin.tip} x 3 guests)</span>
-                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.tips)}</span>
-                                    </div>
+                                    ${AppState.tipsBeforeCruise ? `
+                                        <div class="breakdown-row">
+                                            <span class="breakdown-label">Gratuities ($${cabin.tip} x 3 guests)</span>
+                                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.tips)}</span>
+                                        </div>
+                                    ` : ''}
                                     ${AppState.includeDrinks ? `
                                         <div class="breakdown-row">
                                             <span class="breakdown-label">Drink Package ($85.50 x 3)</span>
@@ -1397,7 +1498,7 @@
                                         </div>
                                     ` : ''}
                                     <div class="breakdown-row total">
-                                        <span class="breakdown-label">Grand Total</span>
+                                        <span class="breakdown-label">Total Due by 7/23/2026</span>
                                         <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.grandTotal)}</span>
                                     </div>
                                     <div class="breakdown-row">
@@ -1408,8 +1509,18 @@
                                         <span class="breakdown-label">Balance (due 7/23/2026)</span>
                                         <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.balance)}</span>
                                     </div>
+                                    ${!AppState.tipsBeforeCruise ? `
+                                        <div class="breakdown-row tips-onboard">
+                                            <span class="breakdown-label">Gratuities (pay onboard)</span>
+                                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.tipsOnboard)}</span>
+                                        </div>
+                                        <div class="breakdown-row">
+                                            <span class="breakdown-label">Full Trip Cost</span>
+                                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.fullTripCost)}</span>
+                                        </div>
+                                    ` : ''}
 
-                                    <div class="breakdown-section-header">Mom's Cost (3rd Guest)</div>
+                                    <div class="breakdown-section-header">Mom's Cost (3rd Guest)${!AppState.tipsBeforeCruise ? ' - Pre-Cruise' : ''}</div>
                                     <div class="breakdown-row">
                                         <span class="breakdown-label">Cruise Fare</span>
                                         <span class="breakdown-value mom-free">FREE</span>
@@ -1418,10 +1529,12 @@
                                         <span class="breakdown-label">Tax</span>
                                         <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.momTax)}</span>
                                     </div>
-                                    <div class="breakdown-row">
-                                        <span class="breakdown-label">Gratuity</span>
-                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.momTip)}</span>
-                                    </div>
+                                    ${AppState.tipsBeforeCruise ? `
+                                        <div class="breakdown-row">
+                                            <span class="breakdown-label">Gratuity</span>
+                                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.momTip)}</span>
+                                        </div>
+                                    ` : ''}
                                     ${AppState.includeDrinks ? `
                                         <div class="breakdown-row">
                                             <span class="breakdown-label">Drink Package</span>
@@ -1429,15 +1542,21 @@
                                         </div>
                                     ` : ''}
                                     <div class="breakdown-row mom-total">
-                                        <span class="breakdown-label">Mom's Total</span>
-                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.momTotal)}</span>
+                                        <span class="breakdown-label">Mom's Pre-Cruise Total</span>
+                                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.momTotalPreCruise)}</span>
                                     </div>
 
-                                    <div class="breakdown-section-header">Split (Mom's Cost / 2)</div>
+                                    <div class="breakdown-section-header">Split (Mom's Pre-Cruise Cost / 2)</div>
                                     <div class="breakdown-row split-row">
-                                        <span class="breakdown-label">Each Brother Pays</span>
+                                        <span class="breakdown-label">Each Brother Pays (by 7/23)</span>
                                         <span class="breakdown-value split-amount">${PriceCalculator.formatCurrency(pricing.perBrotherShare)}</span>
                                     </div>
+                                    ${!AppState.tipsBeforeCruise ? `
+                                        <div class="breakdown-row tips-onboard-split">
+                                            <span class="breakdown-label">+ Each Brother Onboard Tips</span>
+                                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.perBrotherShareOnboard)}</span>
+                                        </div>
+                                    ` : ''}
                                 </div>
                             </div>
                         </div>
@@ -1460,8 +1579,8 @@
 
                 // Apply sort
                 filteredData = [...filteredData].sort((a, b) => {
-                    const priceA = PriceCalculator.calculate(a, AppState.includeDrinks, AppState.includeDinner).grandTotal;
-                    const priceB = PriceCalculator.calculate(b, AppState.includeDrinks, AppState.includeDinner).grandTotal;
+                    const priceA = PriceCalculator.calculate(a, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise).grandTotal;
+                    const priceB = PriceCalculator.calculate(b, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise).grandTotal;
                     const sqftA = parseInt(a.sqft.split('-')[0].replace(/,/g, ''));
                     const sqftB = parseInt(b.sqft.split('-')[0].replace(/,/g, ''));
 
@@ -1534,7 +1653,7 @@
                 grid.className = `comparison-grid cols-${selectedCabins.length}`;
 
                 grid.innerHTML = selectedCabins.map(cabin => {
-                    const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner);
+                    const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise);
                     const badgeClass = cabin.roomType.replace(/\s+/g, '-');
 
                     return `
@@ -1660,6 +1779,14 @@
 
                 document.getElementById('dinnerToggle').addEventListener('change', (e) => {
                     AppState.includeDinner = e.target.checked;
+                    Renderer.updatePrices();
+                });
+
+                document.getElementById('tipsToggle').addEventListener('change', (e) => {
+                    AppState.tipsBeforeCruise = e.target.checked;
+                    document.getElementById('tipsToggleDesc').textContent = e.target.checked
+                        ? 'Included in amount due by 7/23/2026'
+                        : 'Pay onboard at end of cruise';
                     Renderer.updatePrices();
                 });
 
