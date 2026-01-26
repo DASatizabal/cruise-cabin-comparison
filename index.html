@@ -1486,7 +1486,7 @@
             <div class="section-separator">
                 <div class="section-header">Additional Features</div>
                 <div class="feature-toggle-container" id="fasToggleContainer">
-                    <input type="checkbox" class="toggle-switch" id="fasPlusToggle" disabled>
+                    <input type="checkbox" class="toggle-switch" id="fasPlusToggle">
                     <div class="feature-toggle-info">
                         <div class="feature-toggle-label">Free at Sea Plus</div>
                         <div class="feature-toggle-desc" id="fasPlusDesc">
@@ -1496,7 +1496,7 @@
                             <span id="fasPlusPrice">+$300 total ($150/person for guests 1 &amp; 2)</span>
                             <span id="fasPlusSavings" style="color: var(--teal); margin-left: 0.5rem;"></span>
                         </div>
-                        <div class="feature-disabled-note" id="fasPlusDisabledNote">Requires both Drink Package and Dinner Package to be selected</div>
+                        <div class="feature-disabled-note" id="fasPlusDisabledNote">Enabling will auto-select Drink &amp; Dinner packages if not already selected</div>
                         <a href="#" class="feature-toggle-link" id="fasPlusInfoLink">Regular vs Plus - See cost/benefit breakdown &rarr;</a>
                     </div>
                 </div>
@@ -2373,10 +2373,16 @@
 
                 // Free at Sea Plus toggle
                 document.getElementById('fasPlusToggle').addEventListener('change', (e) => {
-                    // Only allow enabling if both drink and dinner are selected
-                    if (e.target.checked && (!AppState.includeDrinks || !AppState.includeDinner)) {
-                        e.target.checked = false;
-                        return;
+                    // If turning ON and packages are missing, auto-enable them
+                    if (e.target.checked) {
+                        if (!AppState.includeDrinks) {
+                            AppState.includeDrinks = true;
+                            document.getElementById('drinkToggle').checked = true;
+                        }
+                        if (!AppState.includeDinner) {
+                            AppState.includeDinner = true;
+                            document.getElementById('dinnerToggle').checked = true;
+                        }
                     }
 
                     AppState.freeAtSeaPlus = e.target.checked;
@@ -2477,17 +2483,17 @@
                 const disabledNote = document.getElementById('fasPlusDisabledNote');
                 const bothSelected = AppState.includeDrinks && AppState.includeDinner;
 
-                if (bothSelected) {
-                    fasPlusToggle.disabled = false;
-                    fasContainer.classList.remove('disabled-state');
-                    disabledNote.style.display = 'none';
-                } else {
-                    // Disable and uncheck Free at Sea Plus
-                    fasPlusToggle.disabled = true;
+                // If drink or dinner is turned off while FAS Plus is on, turn off FAS Plus
+                if (!bothSelected && AppState.freeAtSeaPlus) {
                     fasPlusToggle.checked = false;
                     AppState.freeAtSeaPlus = false;
-                    fasContainer.classList.add('disabled-state');
                     fasContainer.classList.remove('enabled');
+                }
+
+                // Show/hide the note based on whether packages are selected
+                if (bothSelected) {
+                    disabledNote.style.display = 'none';
+                } else {
                     disabledNote.style.display = 'block';
                 }
 
