@@ -1071,6 +1071,291 @@
             font-weight: 600;
             color: var(--teal);
         }
+
+        /* Section Separators */
+        .section-separator {
+            border-top: 2px solid var(--gray-200);
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+        }
+
+        .section-header {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ocean-blue);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Radio-style toggles for deposit options */
+        .radio-toggle-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .radio-toggle-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: var(--gray-50);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .radio-toggle-container:hover {
+            background: var(--gray-100);
+        }
+
+        .radio-toggle-container.selected {
+            background: rgba(13, 148, 136, 0.1);
+            border-color: var(--teal);
+        }
+
+        .radio-toggle-container.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .radio-toggle-container.disabled:hover {
+            background: var(--gray-50);
+        }
+
+        .radio-toggle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--gray-400);
+            background: var(--white);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radio-toggle-container.selected .radio-toggle {
+            border-color: var(--teal);
+            background: var(--teal);
+        }
+
+        .radio-toggle-container.selected .radio-toggle::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--white);
+        }
+
+        .radio-toggle-info {
+            flex: 1;
+        }
+
+        .radio-toggle-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .radio-toggle-desc {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            line-height: 1.4;
+        }
+
+        .radio-toggle-price {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--teal);
+            margin-top: 0.25rem;
+        }
+
+        .radio-toggle-note {
+            font-size: 0.7rem;
+            color: var(--suite-color);
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+
+        /* Additional Features Section */
+        .feature-toggle-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: var(--gray-50);
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .feature-toggle-container.enabled {
+            background: rgba(13, 148, 136, 0.1);
+            border-color: var(--teal);
+        }
+
+        .feature-toggle-container.disabled-state {
+            opacity: 0.5;
+        }
+
+        .feature-toggle-info {
+            flex: 1;
+        }
+
+        .feature-toggle-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-toggle-desc {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            line-height: 1.4;
+        }
+
+        .feature-toggle-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--ocean-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .feature-toggle-link:hover {
+            text-decoration: underline;
+            color: var(--teal);
+        }
+
+        .feature-disabled-note {
+            font-size: 0.7rem;
+            color: var(--suite-color);
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+
+        /* Free at Sea Plus Modal */
+        .fas-plus-modal {
+            max-width: 700px;
+        }
+
+        .fas-plus-content {
+            padding: 1.5rem;
+        }
+
+        .fas-plus-intro {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .fas-plus-note {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--gray-700);
+            margin-bottom: 1.5rem;
+        }
+
+        .cost-benefit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cost-benefit-table th {
+            background: var(--deep-ocean);
+            color: var(--white);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .cost-benefit-table td {
+            padding: 0.625rem 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .cost-benefit-table tr:nth-child(even) td {
+            background: var(--gray-50);
+        }
+
+        .cost-benefit-table .highlight-row td {
+            background: rgba(13, 148, 136, 0.15);
+            font-weight: 600;
+        }
+
+        .cost-benefit-table .total-row td {
+            background: var(--teal);
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        .table-section-header {
+            background: var(--ocean-blue) !important;
+            color: var(--white);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .price-positive {
+            color: #dc2626;
+        }
+
+        .price-negative {
+            color: var(--teal);
+        }
+
+        .fas-links {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .fas-links-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .fas-links a {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--ocean-blue);
+            margin-bottom: 0.25rem;
+        }
+
+        .fas-links a:hover {
+            color: var(--teal);
+        }
+
+        /* Responsive adjustments for toggle sections */
+        @media (max-width: 768px) {
+            .package-toggles {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .radio-toggle-group {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1165,6 +1450,58 @@
                 </div>
             </div>
 
+            <!-- Deposit Options Section -->
+            <div class="section-separator" id="depositSection">
+                <div class="section-header">Deposit Options</div>
+                <div class="radio-toggle-group" id="depositOptions">
+                    <div class="radio-toggle-container selected" data-deposit="regular">
+                        <div class="radio-toggle"></div>
+                        <div class="radio-toggle-info">
+                            <div class="radio-toggle-label">Regular Deposit</div>
+                            <div class="radio-toggle-desc">Standard NCL deposit: $100 flat for most cabins, or 10% of fare for Suite/Haven.</div>
+                            <div class="radio-toggle-price" id="regularDepositPrice">$100 or 10% for Suite/Haven</div>
+                        </div>
+                    </div>
+                    <div class="radio-toggle-container" data-deposit="credit150" id="credit150Container">
+                        <div class="radio-toggle"></div>
+                        <div class="radio-toggle-info">
+                            <div class="radio-toggle-label">$150 Credit Deposit</div>
+                            <div class="radio-toggle-desc">Pay $150 deposit and receive $150 credit toward your cruise. Cruise can be cancelled and the $300 credit is transferable to another sailing or another person.</div>
+                            <div class="radio-toggle-price">Pay $150 today, save $150 on total</div>
+                            <div class="radio-toggle-note">* Not available for Suite/Haven (regular deposit applies)</div>
+                        </div>
+                    </div>
+                    <div class="radio-toggle-container" data-deposit="credit250">
+                        <div class="radio-toggle"></div>
+                        <div class="radio-toggle-info">
+                            <div class="radio-toggle-label">$250 Credit Deposit</div>
+                            <div class="radio-toggle-desc">Pay $250 deposit and receive $250 credit toward your cruise. Non-refundable &amp; Non-transferable.</div>
+                            <div class="radio-toggle-price">Pay $250 today, save $250 on total</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Features Section -->
+            <div class="section-separator">
+                <div class="section-header">Additional Features</div>
+                <div class="feature-toggle-container" id="fasToggleContainer">
+                    <input type="checkbox" class="toggle-switch" id="fasPlusToggle" disabled>
+                    <div class="feature-toggle-info">
+                        <div class="feature-toggle-label">Free at Sea Plus</div>
+                        <div class="feature-toggle-desc" id="fasPlusDesc">
+                            Upgrade to premium drinks, Starbucks, unlimited bar at Great Stirrup Cay, and prepaid gratuities for guests 1 &amp; 2.
+                        </div>
+                        <div class="feature-toggle-price" style="margin-top: 0.25rem;">
+                            <span id="fasPlusPrice">+$300 total ($150/person for guests 1 &amp; 2)</span>
+                            <span id="fasPlusSavings" style="color: var(--teal); margin-left: 0.5rem;"></span>
+                        </div>
+                        <div class="feature-disabled-note" id="fasPlusDisabledNote">Requires both Drink Package and Dinner Package to be selected</div>
+                        <a href="#" class="feature-toggle-link" id="fasPlusInfoLink">Regular vs Plus - See cost/benefit breakdown &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
             <div class="running-totals" id="runningTotals" style="display: none;">
                 <div class="running-total-item">
                     <span class="running-total-label">Package additions: </span>
@@ -1208,6 +1545,140 @@
         </div>
     </div>
 
+    <!-- Free at Sea Plus Info Modal -->
+    <div class="modal-overlay" id="fasPlusModal">
+        <div class="modal fas-plus-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Free at Sea Plus - Cost/Benefit Analysis</h2>
+                <button class="modal-close" id="closeFasPlusModal">&times;</button>
+            </div>
+            <div class="fas-plus-content">
+                <div class="fas-plus-intro">
+                    <strong>Free at Sea Plus</strong> is an upgrade package that adds premium perks on top of the standard Free at Sea benefits.
+                    It costs <strong>$49.99/person/day</strong>, totaling approximately <strong>$300 for a 3-day cruise (2 guests)</strong>.
+                </div>
+
+                <div class="fas-plus-note">
+                    <strong>Important:</strong> Free at Sea Plus applies ONLY to Guests 1 &amp; 2. It does NOT affect the 3rd guest (Mom) costs or how much is being split between brothers.
+                </div>
+
+                <table class="cost-benefit-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Cost/Savings</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="table-section-header">
+                            <td colspan="3">Package Cost</td>
+                        </tr>
+                        <tr>
+                            <td>Free at Sea Plus (3 days × 2 guests)</td>
+                            <td class="price-positive">+$300.00</td>
+                            <td>$49.99/day × 3 days × 2 people</td>
+                        </tr>
+                        <tr class="table-section-header">
+                            <td colspan="3">Savings &amp; Value</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td>Prepaid Gratuities (Guests 1 &amp; 2)</td>
+                            <td class="price-negative" id="fasTipsSavings">-$120 to -$150</td>
+                            <td>$60-$75/person × 2 (varies by cabin type)</td>
+                        </tr>
+                        <tr>
+                            <td>Unlimited Bar at Great Stirrup Cay</td>
+                            <td class="price-negative">-$50 to -$100+</td>
+                            <td>Standard packages NOT valid on island after March 2026</td>
+                        </tr>
+                        <tr>
+                            <td>Unlimited Starbucks (1 drink per visit)</td>
+                            <td class="price-negative">-$20 to -$40+</td>
+                            <td>~$6-8 per specialty drink × multiple visits</td>
+                        </tr>
+                        <tr>
+                            <td>Premium Top-Shelf Spirits</td>
+                            <td class="price-negative">-$15 to -$50+</td>
+                            <td>Patrón Añejo, Macallan 12-Year, etc.</td>
+                        </tr>
+                        <tr>
+                            <td>Energy Drinks &amp; Fresh Juices</td>
+                            <td class="price-negative">-$20 to -$40</td>
+                            <td>Energy drinks ~$6.25 each</td>
+                        </tr>
+                        <tr>
+                            <td>Bottled Water (Bars &amp; Restaurants)</td>
+                            <td class="price-negative">-$15 to -$30</td>
+                            <td>$4.50 per bottle × multiple days</td>
+                        </tr>
+                        <tr class="table-section-header">
+                            <td colspan="3">Great Stirrup Cay Drink Prices (If No Plus Package)</td>
+                        </tr>
+                        <tr>
+                            <td>Cocktails</td>
+                            <td>$12.50+ each</td>
+                            <td>Plus 20% gratuity</td>
+                        </tr>
+                        <tr>
+                            <td>Beer</td>
+                            <td>$7.50+ each</td>
+                            <td>Plus 20% gratuity</td>
+                        </tr>
+                        <tr>
+                            <td>Soda</td>
+                            <td>$3.50 each</td>
+                            <td>Plus 20% gratuity</td>
+                        </tr>
+                        <tr>
+                            <td>Example: 4 cocktails + 4 beers on island</td>
+                            <td class="price-positive">~$96 + tip</td>
+                            <td>Per couple, a moderate day at the island</td>
+                        </tr>
+                        <tr class="table-section-header">
+                            <td colspan="3">Premium Drink Examples (Included with Plus)</td>
+                        </tr>
+                        <tr>
+                            <td>Patrón Añejo Tequila</td>
+                            <td>$15+ per drink</td>
+                            <td>Top-shelf, included with Plus</td>
+                        </tr>
+                        <tr>
+                            <td>The Macallan 12-Year Scotch</td>
+                            <td>$15+ per drink</td>
+                            <td>Top-shelf, included with Plus</td>
+                        </tr>
+                        <tr>
+                            <td>Premium Wines by the Glass</td>
+                            <td>$12-18+ per glass</td>
+                            <td>50+ premium selections</td>
+                        </tr>
+                        <tr>
+                            <td>40% off Wine Bottles</td>
+                            <td>Varies</td>
+                            <td>Significant savings on dinner wine</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td><strong>Net Cost After Tip Savings</strong></td>
+                            <td id="fasNetCost"><strong>$150-$180</strong></td>
+                            <td>Plus all the extras above</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="fas-plus-note">
+                    <strong>Bottom Line:</strong> If you plan to enjoy drinks at Great Stirrup Cay, want Starbucks, or appreciate top-shelf spirits, Free at Sea Plus can easily pay for itself. The prepaid gratuities alone save $120-$150 for guests 1 &amp; 2.
+                </div>
+
+                <div class="fas-links">
+                    <div class="fas-links-title">Official NCL Resources:</div>
+                    <a href="https://www.ncl.com/content/dam/ncl/us/en/promo/cruise-deals/Free_at_sea_Plus_ver_11042025.pdf" target="_blank" rel="noopener">Free at Sea Plus Comparison PDF (NCL)</a>
+                    <a href="https://www.ncl.com/faq/what-is-included-in-free-at-sea-plus-and-how-much-does-it-cost-" target="_blank" rel="noopener">What is included in Free at Sea Plus? (NCL FAQ)</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
@@ -1215,7 +1686,7 @@
                 <div class="payment-due-label">Final Payment Due</div>
                 <div class="payment-due-date">July 23, 2026</div>
             </div>
-            <p class="footer-note">Deposits are refundable if canceled by July 23, 2026</p>
+            <p class="footer-note">Regular deposits are refundable if canceled by July 23, 2026. Credit deposits have different terms.</p>
             <p class="footer-note" style="margin-top: 0.5rem;">Pricing for 3 guests (3rd guest sails FREE!)</p>
         </div>
     </footer>
@@ -1301,7 +1772,7 @@
 
         // ==================== PRICE CALCULATOR ====================
         const PriceCalculator = {
-            calculate(cabin, includeDrinks = false, includeDinner = false, tipsBeforeCruise = true) {
+            calculate(cabin, includeDrinks = false, includeDinner = false, tipsBeforeCruise = true, depositOption = 'regular', freeAtSeaPlus = false) {
                 // Base fare: price x 2 (3rd guest FREE)
                 const baseFare = cabin.price * 2;
 
@@ -1317,24 +1788,55 @@
                 // Dinner package: $20 x 2 guests (only for paying guests)
                 const dinner = includeDinner ? 20 * 2 : 0;
 
-                // Tips included in pre-cruise payment or paid onboard
-                const tipsPreCruise = tipsBeforeCruise ? tips : 0;
-                const tipsOnboard = tipsBeforeCruise ? 0 : tips;
+                // Free at Sea Plus: $300 total ($150/person for guests 1 & 2)
+                // Also includes prepaid gratuities for guests 1 & 2
+                const isHighTier = cabin.roomType === "Suite" || cabin.roomType === "The Haven";
+                const fasPlusCost = freeAtSeaPlus ? 300 : 0;
+                const fasPlusTipsSavings = freeAtSeaPlus ? (cabin.tip * 2) : 0; // Tips for guests 1 & 2 included
 
-                // Grand total (due by 7/23/2026) - only includes tips if paying before cruise
-                const grandTotal = baseFare + taxes + tipsPreCruise + drinks + dinner;
+                // Calculate tips for guests 1 & 2 vs guest 3 (Mom)
+                const tipsGuests12 = cabin.tip * 2;
+                const tipsMom = cabin.tip;
+
+                // If Free at Sea Plus, guests 1 & 2 tips are included in the package
+                const tipsGuests12Actual = freeAtSeaPlus ? 0 : tipsGuests12;
+                const totalTips = tipsGuests12Actual + tipsMom;
+
+                // Tips included in pre-cruise payment or paid onboard
+                const tipsPreCruise = tipsBeforeCruise ? totalTips : 0;
+                const tipsOnboard = tipsBeforeCruise ? 0 : totalTips;
+
+                // Deposit credit amount
+                let depositCredit = 0;
+                if (depositOption === 'credit150' && !isHighTier) {
+                    depositCredit = 150;
+                } else if (depositOption === 'credit250') {
+                    depositCredit = 250;
+                }
+
+                // Grand total (due by 7/23/2026) - reduced by deposit credit
+                const grandTotalBeforeCredit = baseFare + taxes + tipsPreCruise + drinks + dinner + fasPlusCost;
+                const grandTotal = grandTotalBeforeCredit - depositCredit;
 
                 // Full trip cost (including onboard tips if applicable)
-                const fullTripCost = baseFare + taxes + tips + drinks + dinner;
+                const fullTripCost = baseFare + taxes + totalTips + drinks + dinner + fasPlusCost - depositCredit;
 
-                // Deposit: Suite/Haven = 10% of (price x 2), others = $100 flat
-                const isHighTier = cabin.roomType === "Suite" || cabin.roomType === "The Haven";
-                const deposit = isHighTier ? baseFare * 0.10 : 100;
+                // Deposit calculation based on option
+                let deposit;
+                if (depositOption === 'credit150' && !isHighTier) {
+                    deposit = 150;
+                } else if (depositOption === 'credit250') {
+                    deposit = 250;
+                } else {
+                    // Regular deposit: Suite/Haven = 10% of (price x 2), others = $100 flat
+                    deposit = isHighTier ? baseFare * 0.10 : 100;
+                }
 
                 // Balance due (by 7/23/2026)
                 const balance = grandTotal - deposit;
 
                 // Mom's cost (3rd guest): FREE fare + tax + tip + drink (no dinner)
+                // Free at Sea Plus does NOT affect Mom's costs
                 const momTax = cabin.tax;
                 const momTip = cabin.tip;
                 const momTipPreCruise = tipsBeforeCruise ? momTip : 0;
@@ -1345,18 +1847,26 @@
                 const momTotal = momTax + momTip + momDrink;
 
                 // Split between brothers (Mom's pre-cruise cost / 2)
+                // Deposit credits and Free at Sea Plus do NOT affect this split
                 const perBrotherShare = momTotalPreCruise / 2;
                 const perBrotherShareOnboard = momTotalOnboard / 2;
 
                 return {
                     baseFare,
                     taxes,
-                    tips,
+                    tips: totalTips,
+                    tipsGuests12,
+                    tipsGuests12Actual,
+                    tipsMom,
                     tipsPreCruise,
                     tipsOnboard,
                     drinks,
                     dinner,
+                    fasPlusCost,
+                    fasPlusTipsSavings,
+                    depositCredit,
                     grandTotal,
+                    grandTotalBeforeCredit,
                     fullTripCost,
                     deposit,
                     balance,
@@ -1371,7 +1881,9 @@
                     momTotal,
                     perBrotherShare,
                     perBrotherShareOnboard,
-                    tipsBeforeCruise
+                    tipsBeforeCruise,
+                    isHighTier,
+                    freeAtSeaPlus
                 };
             },
 
@@ -1392,6 +1904,8 @@
             includeDrinks: false,
             includeDinner: false,
             tipsBeforeCruise: true,
+            depositOption: 'regular', // 'regular', 'credit150', 'credit250'
+            freeAtSeaPlus: false,
             selectedCabins: new Set(),
             openBreakdowns: new Set()
         };
@@ -1399,7 +1913,7 @@
         // ==================== RENDERER ====================
         const Renderer = {
             renderCabinCard(cabin) {
-                const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise);
+                const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise, AppState.depositOption, AppState.freeAtSeaPlus);
                 const isSelected = AppState.selectedCabins.has(cabin.id);
                 const isBreakdownOpen = AppState.openBreakdowns.has(cabin.id);
                 const badgeClass = cabin.roomType.replace(/\s+/g, '-');
@@ -1481,8 +1995,8 @@
                                     </div>
                                     ${AppState.tipsBeforeCruise ? `
                                         <div class="breakdown-row">
-                                            <span class="breakdown-label">Gratuities ($${cabin.tip} x 3 guests)</span>
-                                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.tips)}</span>
+                                            <span class="breakdown-label">Gratuities${AppState.freeAtSeaPlus ? ' (Mom only - FAS+ covers guests 1&2)' : ` ($${cabin.tip} x 3 guests)`}</span>
+                                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.tipsPreCruise)}</span>
                                         </div>
                                     ` : ''}
                                     ${AppState.includeDrinks ? `
@@ -1495,6 +2009,22 @@
                                         <div class="breakdown-row">
                                             <span class="breakdown-label">Dinner Package ($20 x 2)</span>
                                             <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.dinner)}</span>
+                                        </div>
+                                    ` : ''}
+                                    ${AppState.freeAtSeaPlus ? `
+                                        <div class="breakdown-row">
+                                            <span class="breakdown-label">Free at Sea Plus ($150 x 2 guests)</span>
+                                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.fasPlusCost)}</span>
+                                        </div>
+                                        <div class="breakdown-row" style="color: var(--teal);">
+                                            <span class="breakdown-label">↳ Includes tips for guests 1&2</span>
+                                            <span class="breakdown-value">-${PriceCalculator.formatCurrency(pricing.fasPlusTipsSavings)}</span>
+                                        </div>
+                                    ` : ''}
+                                    ${pricing.depositCredit > 0 ? `
+                                        <div class="breakdown-row" style="color: var(--teal);">
+                                            <span class="breakdown-label">Deposit Credit Applied</span>
+                                            <span class="breakdown-value">-${PriceCalculator.formatCurrency(pricing.depositCredit)}</span>
                                         </div>
                                     ` : ''}
                                     <div class="breakdown-row total">
@@ -1579,8 +2109,8 @@
 
                 // Apply sort
                 filteredData = [...filteredData].sort((a, b) => {
-                    const priceA = PriceCalculator.calculate(a, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise).grandTotal;
-                    const priceB = PriceCalculator.calculate(b, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise).grandTotal;
+                    const priceA = PriceCalculator.calculate(a, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise, AppState.depositOption, AppState.freeAtSeaPlus).grandTotal;
+                    const priceB = PriceCalculator.calculate(b, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise, AppState.depositOption, AppState.freeAtSeaPlus).grandTotal;
                     const sqftA = parseInt(a.sqft.split('-')[0].replace(/,/g, ''));
                     const sqftB = parseInt(b.sqft.split('-')[0].replace(/,/g, ''));
 
@@ -1624,10 +2154,24 @@
                 let packageTotal = 0;
                 if (AppState.includeDrinks) packageTotal += 256.50;
                 if (AppState.includeDinner) packageTotal += 40;
+                if (AppState.freeAtSeaPlus) packageTotal += 300;
 
-                if (packageTotal > 0) {
+                // Calculate credit
+                let creditAmount = 0;
+                if (AppState.depositOption === 'credit150') creditAmount = 150;
+                else if (AppState.depositOption === 'credit250') creditAmount = 250;
+
+                if (packageTotal > 0 || creditAmount > 0) {
                     totalsEl.style.display = 'flex';
-                    packageTotalEl.textContent = PriceCalculator.formatCurrency(packageTotal);
+                    let totalText = '';
+                    if (packageTotal > 0) {
+                        totalText = `+${PriceCalculator.formatCurrency(packageTotal)}`;
+                    }
+                    if (creditAmount > 0) {
+                        if (totalText) totalText += ' ';
+                        totalText += `(Deposit credit: -${PriceCalculator.formatCurrency(creditAmount)})`;
+                    }
+                    packageTotalEl.textContent = totalText || '$0';
                 } else {
                     totalsEl.style.display = 'none';
                 }
@@ -1653,7 +2197,7 @@
                 grid.className = `comparison-grid cols-${selectedCabins.length}`;
 
                 grid.innerHTML = selectedCabins.map(cabin => {
-                    const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise);
+                    const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise, AppState.depositOption, AppState.freeAtSeaPlus);
                     const badgeClass = cabin.roomType.replace(/\s+/g, '-');
 
                     return `
@@ -1704,6 +2248,18 @@
                                     <div class="comparison-row">
                                         <span class="comparison-label">Dinner Package</span>
                                         <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.dinner)}</span>
+                                    </div>
+                                ` : ''}
+                                ${AppState.freeAtSeaPlus ? `
+                                    <div class="comparison-row">
+                                        <span class="comparison-label">Free at Sea Plus</span>
+                                        <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.fasPlusCost)}</span>
+                                    </div>
+                                ` : ''}
+                                ${pricing.depositCredit > 0 ? `
+                                    <div class="comparison-row" style="color: var(--teal);">
+                                        <span class="comparison-label">Deposit Credit</span>
+                                        <span class="comparison-value">-${PriceCalculator.formatCurrency(pricing.depositCredit)}</span>
                                     </div>
                                 ` : ''}
                                 <div class="comparison-row highlight">
@@ -1774,11 +2330,13 @@
                 // Package toggles
                 document.getElementById('drinkToggle').addEventListener('change', (e) => {
                     AppState.includeDrinks = e.target.checked;
+                    this.updateFasPlusAvailability();
                     Renderer.updatePrices();
                 });
 
                 document.getElementById('dinnerToggle').addEventListener('change', (e) => {
                     AppState.includeDinner = e.target.checked;
+                    this.updateFasPlusAvailability();
                     Renderer.updatePrices();
                 });
 
@@ -1788,6 +2346,68 @@
                         ? 'Before cruise (by 7/23/2026)'
                         : 'Onboard (end of cruise)';
                     Renderer.updatePrices();
+                });
+
+                // Deposit option radio toggles
+                document.querySelectorAll('.radio-toggle-container').forEach(container => {
+                    container.addEventListener('click', (e) => {
+                        const depositType = container.dataset.deposit;
+
+                        // Check if this option is disabled
+                        if (container.classList.contains('disabled')) {
+                            return;
+                        }
+
+                        // Update state
+                        AppState.depositOption = depositType;
+
+                        // Update UI - remove selected from all, add to clicked
+                        document.querySelectorAll('.radio-toggle-container').forEach(c => {
+                            c.classList.remove('selected');
+                        });
+                        container.classList.add('selected');
+
+                        Renderer.updatePrices();
+                    });
+                });
+
+                // Free at Sea Plus toggle
+                document.getElementById('fasPlusToggle').addEventListener('change', (e) => {
+                    // Only allow enabling if both drink and dinner are selected
+                    if (e.target.checked && (!AppState.includeDrinks || !AppState.includeDinner)) {
+                        e.target.checked = false;
+                        return;
+                    }
+
+                    AppState.freeAtSeaPlus = e.target.checked;
+
+                    // Update container styling
+                    const container = document.getElementById('fasToggleContainer');
+                    if (e.target.checked) {
+                        container.classList.add('enabled');
+                    } else {
+                        container.classList.remove('enabled');
+                    }
+
+                    Renderer.updatePrices();
+                    this.updateFasPlusSavingsDisplay();
+                });
+
+                // Free at Sea Plus info link
+                document.getElementById('fasPlusInfoLink').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.getElementById('fasPlusModal').classList.add('visible');
+                });
+
+                // Free at Sea Plus modal close
+                document.getElementById('closeFasPlusModal').addEventListener('click', () => {
+                    document.getElementById('fasPlusModal').classList.remove('visible');
+                });
+
+                document.getElementById('fasPlusModal').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal-overlay')) {
+                        document.getElementById('fasPlusModal').classList.remove('visible');
+                    }
                 });
 
                 // Cabin grid event delegation
@@ -1845,9 +2465,48 @@
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
                         document.getElementById('comparisonModal').classList.remove('visible');
+                        document.getElementById('fasPlusModal').classList.remove('visible');
                     }
                 });
-            }
+            },
+
+            // Update Free at Sea Plus availability based on drink/dinner selection
+            updateFasPlusAvailability() {
+                const fasPlusToggle = document.getElementById('fasPlusToggle');
+                const fasContainer = document.getElementById('fasToggleContainer');
+                const disabledNote = document.getElementById('fasPlusDisabledNote');
+                const bothSelected = AppState.includeDrinks && AppState.includeDinner;
+
+                if (bothSelected) {
+                    fasPlusToggle.disabled = false;
+                    fasContainer.classList.remove('disabled-state');
+                    disabledNote.style.display = 'none';
+                } else {
+                    // Disable and uncheck Free at Sea Plus
+                    fasPlusToggle.disabled = true;
+                    fasPlusToggle.checked = false;
+                    AppState.freeAtSeaPlus = false;
+                    fasContainer.classList.add('disabled-state');
+                    fasContainer.classList.remove('enabled');
+                    disabledNote.style.display = 'block';
+                }
+
+                this.updateFasPlusSavingsDisplay();
+            },
+
+            // Update Free at Sea Plus savings display in the toggle area
+            updateFasPlusSavingsDisplay() {
+                const savingsEl = document.getElementById('fasPlusSavings');
+                if (AppState.freeAtSeaPlus && CABIN_DATA.length > 0) {
+                    // Get the typical tip amount from a standard cabin
+                    const tipAmount = CABIN_DATA[0].tip;
+                    const savings = tipAmount * 2;
+                    savingsEl.textContent = `(saves ${PriceCalculator.formatCurrency(savings)} in tips)`;
+                } else {
+                    savingsEl.textContent = '';
+                }
+            },
+
         };
 
         // Initialize app
