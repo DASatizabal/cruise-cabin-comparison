@@ -1126,7 +1126,7 @@
     <!-- Hero Header -->
     <header class="hero">
         <div class="hero-content">
-            <span class="version-badge">v2.1.0</span>
+            <span class="version-badge">v2.1.1</span>
             <h1 class="ship-name">
                 <a href="https://www.ncl.com/cruise-ships/norwegian-joy" target="_blank" rel="noopener">Norwegian Joy</a>
             </h1>
@@ -1824,8 +1824,13 @@
                     filteredData = filteredData.filter(c => c.roomType === AppState.currentFilter);
                 }
 
-                // Apply sort
+                // Apply sort, pushing dimmed cabins (exceeding max guests) to the bottom
+                const totalGuests = AppState.adultCount + AppState.childCount;
                 filteredData = [...filteredData].sort((a, b) => {
+                    const aDimmed = totalGuests > a.maxGuests ? 1 : 0;
+                    const bDimmed = totalGuests > b.maxGuests ? 1 : 0;
+                    if (aDimmed !== bDimmed) return aDimmed - bDimmed;
+
                     const priceA = PriceCalculator.calculate(a, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise).grandTotal;
                     const priceB = PriceCalculator.calculate(b, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise).grandTotal;
                     const sqftA = parseInt(a.sqft.split('-')[0].replace(/,/g, ''));
