@@ -1327,9 +1327,9 @@
                 // Full trip cost (including onboard tips if applicable)
                 const fullTripCost = baseFare + taxes + tips + drinks + dinner;
 
-                // Deposit: Suite/Haven = 10% of (price x 2), others = $100 flat
+                // Deposit: Suite/Haven = 10% of total fare, others = $100 flat
                 const isHighTier = cabin.roomType === "Suite" || cabin.roomType === "The Haven";
-                const deposit = isHighTier ? baseFare * 0.10 : 100;
+                const deposit = isHighTier ? Math.round(baseFare * 0.10) : 100;
 
                 // Balance due (by 7/23/2026)
                 const balance = grandTotal - deposit;
