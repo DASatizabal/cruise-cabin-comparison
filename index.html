@@ -1120,13 +1120,275 @@
             font-weight: 600;
             color: var(--teal);
         }
+
+        /* Deposit Options */
+        .deposit-options-section {
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+            margin-top: 1rem;
+        }
+
+        .deposit-options-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.75rem;
+        }
+
+        .deposit-radio-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .deposit-radio-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .deposit-radio-label:hover:not(.disabled) {
+            border-color: var(--teal);
+        }
+
+        .deposit-radio-label.active {
+            border-color: var(--teal);
+            background: rgba(13, 148, 136, 0.05);
+        }
+
+        .deposit-radio-label.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .deposit-radio-label input[type="radio"] {
+            margin-top: 0.2rem;
+            accent-color: var(--teal);
+        }
+
+        .deposit-radio-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .deposit-radio-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .deposit-radio-desc {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        /* Free at Sea Plus */
+        .fas-plus-section {
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+            margin-top: 1rem;
+        }
+
+        .fas-plus-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .fas-plus-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .fas-plus-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .fas-plus-desc {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        .fas-plus-savings {
+            font-size: 0.75rem;
+            color: var(--teal);
+            font-weight: 600;
+        }
+
+        .fas-plus-requires {
+            font-size: 0.7rem;
+            color: var(--suite-color);
+            font-weight: 500;
+        }
+
+        .fas-plus-info-btn {
+            background: none;
+            border: 2px solid var(--teal);
+            color: var(--teal);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .fas-plus-info-btn:hover {
+            background: var(--teal);
+            color: var(--white);
+        }
+
+        .toggle-switch.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* FAS Plus Info Modal */
+        .fas-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fas-modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .fas-modal {
+            background: var(--white);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .fas-modal-overlay.visible .fas-modal {
+            transform: scale(1);
+        }
+
+        .fas-modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .fas-modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .fas-modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gray-100);
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fas-modal-close:hover {
+            background: var(--gray-200);
+        }
+
+        .fas-modal-body {
+            padding: 1.5rem;
+        }
+
+        .fas-modal-body p {
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .cost-benefit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .cost-benefit-table th {
+            background: var(--gray-50);
+            padding: 0.6rem 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .cost-benefit-table td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .cost-benefit-table tr.total-row td {
+            font-weight: 700;
+            border-top: 2px solid var(--gray-300);
+            color: var(--gray-900);
+        }
+
+        .cost-benefit-table .savings {
+            color: var(--teal);
+            font-weight: 600;
+        }
+
+        .obc-badge {
+            display: inline-block;
+            background: var(--gold);
+            color: var(--gray-900);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            margin-left: 0.25rem;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
     <!-- Hero Header -->
     <header class="hero">
         <div class="hero-content">
-            <span class="version-badge">v2.1.1</span>
+            <span class="version-badge">v2.2.0</span>
             <h1 class="ship-name">
                 <a href="https://www.ncl.com/cruise-ships/norwegian-joy" target="_blank" rel="noopener">Norwegian Joy</a>
             </h1>
@@ -1238,6 +1500,43 @@
                 </div>
             </div>
 
+            <!-- Free at Sea Plus -->
+            <div class="fas-plus-section" id="fasPlusSection">
+                <div class="fas-plus-toggle">
+                    <input type="checkbox" class="toggle-switch" id="fasPlusToggle">
+                    <div class="fas-plus-info">
+                        <div class="fas-plus-title">
+                            Free at Sea Plus
+                            <button class="fas-plus-info-btn" id="fasPlusInfoBtn" title="What's included?">?</button>
+                        </div>
+                        <div class="fas-plus-desc" id="fasPlusDesc">+$300 (2 guests x $150) &mdash; Includes prepaid gratuities</div>
+                        <div class="fas-plus-requires" id="fasPlusRequires" style="display: none;">Requires Drink + Dinner packages</div>
+                        <div class="fas-plus-savings" id="fasPlusSavings" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deposit Options -->
+            <div class="deposit-options-section" id="depositOptionsSection">
+                <div class="deposit-options-title">Deposit Option</div>
+                <div class="deposit-radio-group" id="depositRadioGroup">
+                    <label class="deposit-radio-label active" data-option="regular">
+                        <input type="radio" name="depositOption" value="regular" checked>
+                        <div class="deposit-radio-info">
+                            <span class="deposit-radio-name">Regular Deposit</span>
+                            <span class="deposit-radio-desc">Suite/Haven: 10% of fare | Others: $100</span>
+                        </div>
+                    </label>
+                    <label class="deposit-radio-label" data-option="credit150">
+                        <input type="radio" name="depositOption" value="credit150">
+                        <div class="deposit-radio-info">
+                            <span class="deposit-radio-name">+$150 Onboard Credit</span>
+                            <span class="deposit-radio-desc">Pay $150 extra on deposit, get $150 OBC (not for Suite/Haven)</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
             <div class="running-totals" id="runningTotals" style="display: none;">
                 <div class="running-total-item">
                     <span class="running-total-label">Package additions: </span>
@@ -1277,6 +1576,26 @@
                 <div class="comparison-grid" id="comparisonGrid">
                     <!-- Comparison content will be rendered here -->
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAS Plus Info Modal -->
+    <div class="fas-modal-overlay" id="fasPlusModal">
+        <div class="fas-modal">
+            <div class="fas-modal-header">
+                <h3 class="fas-modal-title">Free at Sea Plus &mdash; Cost vs Benefit</h3>
+                <button class="fas-modal-close" id="closeFasModal">&times;</button>
+            </div>
+            <div class="fas-modal-body">
+                <p>
+                    Free at Sea Plus is a <strong>$150/person upgrade</strong> for guests 1 &amp; 2
+                    that includes <strong>prepaid gratuities</strong>. Compare the cost of FAS Plus
+                    vs paying gratuities separately below.
+                </p>
+                <table class="cost-benefit-table" id="costBenefitTable">
+                    <!-- Populated dynamically -->
+                </table>
             </div>
         </div>
     </div>
@@ -1466,9 +1785,15 @@
 
                     const tax = TAX_PER_PERSON;
 
-                    // Tips: guests aged 3+ pay
+                    // Tips: guests aged 3+ pay (FAS Plus covers guests 1&2)
                     const tipEligible = guest.age >= 3;
-                    const tip = tipEligible ? tipPerPerson : 0;
+                    let tip = tipEligible ? tipPerPerson : 0;
+                    let fasPlusFee = 0;
+
+                    if (AppState.freeAtSeaPlus && position <= 2) {
+                        fasPlusFee = 150;
+                        tip = 0; // Tips included in FAS Plus
+                    }
 
                     // Drink package
                     let drink = 0;
@@ -1493,8 +1818,8 @@
                     const tipPreCruise = tipsBeforeCruise ? tip : 0;
                     const tipOnboard = tipsBeforeCruise ? 0 : tip;
 
-                    const guestTotal = fare + tax + tipPreCruise + drink + dinner;
-                    const guestFullCost = fare + tax + tip + drink + dinner;
+                    const guestTotal = fare + tax + tipPreCruise + drink + dinner + fasPlusFee;
+                    const guestFullCost = fare + tax + tip + drink + dinner + fasPlusFee;
 
                     return {
                         position,
@@ -1509,6 +1834,7 @@
                         tipOnboard,
                         drink,
                         dinner,
+                        fasPlusFee,
                         total: guestTotal,
                         fullCost: guestFullCost
                     };
@@ -1520,9 +1846,10 @@
                 const tipsOnboard = tipsBeforeCruise ? 0 : tips;
                 const drinks = guestDetails.reduce((sum, g) => sum + g.drink, 0);
                 const dinner = guestDetails.reduce((sum, g) => sum + g.dinner, 0);
+                const fasPlusCost = guestDetails.reduce((sum, g) => sum + g.fasPlusFee, 0);
 
-                const grandTotal = totalFare + taxes + tipsPreCruise + drinks + dinner;
-                const fullTripCost = totalFare + taxes + tips + drinks + dinner;
+                const grandTotal = totalFare + taxes + tipsPreCruise + drinks + dinner + fasPlusCost;
+                const fullTripCost = totalFare + taxes + tips + drinks + dinner + fasPlusCost;
 
                 // Original (undiscounted) totals for strikethrough display
                 const originalTotalFare = cabin.isSolo
@@ -1535,7 +1862,14 @@
                 const originalPerPersonAvg = effectiveGuests > 0 ? originalTotalFare / effectiveGuests : 0;
 
                 // Deposit (based on discounted fare)
-                const deposit = isHighTier ? Math.round(discountedBase * 0.10) : 100;
+                let deposit = isHighTier ? Math.round(discountedBase * 0.10) : 100;
+                let onboardCredit = 0;
+
+                if (AppState.depositOption === 'credit150' && !isHighTier) {
+                    deposit += 150;
+                    onboardCredit = 150;
+                }
+
                 const balance = grandTotal - deposit;
 
                 // Per-person average
@@ -1555,6 +1889,8 @@
                     tipsOnboard,
                     drinks,
                     dinner,
+                    fasPlusCost,
+                    onboardCredit,
                     grandTotal,
                     fullTripCost,
                     deposit,
@@ -1564,7 +1900,8 @@
                     effectiveGuests,
                     exceedsMax,
                     guestDetails,
-                    tipsBeforeCruise
+                    tipsBeforeCruise,
+                    isHighTier
                 };
             },
 
@@ -1589,7 +1926,9 @@
             openBreakdowns: new Set(),
             adultCount: 2,
             childCount: 0,
-            childAges: []
+            childAges: [],
+            depositOption: 'regular',
+            freeAtSeaPlus: false
         };
 
         // ==================== RENDERER ====================
@@ -1649,7 +1988,7 @@
                             </div>
 
                             <div class="deposit-info">
-                                <span class="deposit-label">Pay today (deposit)</span>
+                                <span class="deposit-label">Pay today (deposit)${pricing.onboardCredit > 0 ? ' <span class="obc-badge">+$' + pricing.onboardCredit + ' OBC</span>' : ''}</span>
                                 <span class="deposit-amount">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
                             </div>
 
@@ -1724,13 +2063,22 @@
                     `;
                 }
 
+                if (pricing.fasPlusCost > 0) {
+                    html += `
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">Free at Sea Plus ($150 x ${pricing.guestDetails.filter(g => g.fasPlusFee > 0).length} guests)</span>
+                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.fasPlusCost)}</span>
+                        </div>
+                    `;
+                }
+
                 html += `
                     <div class="breakdown-row total">
                         <span class="breakdown-label">Total Due by 7/23/2026</span>
                         <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.grandTotal)}</span>
                     </div>
                     <div class="breakdown-row">
-                        <span class="breakdown-label">Deposit (pay today)</span>
+                        <span class="breakdown-label">Deposit (pay today)${pricing.onboardCredit > 0 ? ' <span class="obc-badge">+$' + pricing.onboardCredit + ' OBC</span>' : ''}</span>
                         <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
                     </div>
                     <div class="breakdown-row">
@@ -1764,7 +2112,10 @@
                     }
                     items.push(`${PriceCalculator.formatCurrency(gd.tax)} tax`);
 
-                    if (gd.tip > 0) {
+                    if (gd.fasPlusFee > 0) {
+                        items.push(`${PriceCalculator.formatCurrency(gd.fasPlusFee)} FAS+`);
+                        items.push(`$0 tip (incl.)`);
+                    } else if (gd.tip > 0) {
                         items.push(`${PriceCalculator.formatCurrency(AppState.tipsBeforeCruise ? gd.tip : 0)} tip${!AppState.tipsBeforeCruise ? ' (onboard: ' + PriceCalculator.formatCurrency(gd.tip) + ')' : ''}`);
                     } else {
                         items.push(`$0 tip`);
@@ -1931,6 +2282,11 @@
                     });
                 }
 
+                if (AppState.freeAtSeaPlus) {
+                    const fasGuests = Math.min(guests.length, 2);
+                    packageTotal += fasGuests * 150;
+                }
+
                 if (packageTotal > 0) {
                     totalsEl.style.display = 'flex';
                     packageTotalEl.textContent = PriceCalculator.formatCurrency(packageTotal);
@@ -2008,6 +2364,12 @@
                                     <span class="comparison-label">Gratuities</span>
                                     <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.tips)}</span>
                                 </div>
+                                ${pricing.fasPlusCost > 0 ? `
+                                    <div class="comparison-row">
+                                        <span class="comparison-label">Free at Sea Plus</span>
+                                        <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.fasPlusCost)}</span>
+                                    </div>
+                                ` : ''}
                                 ${AppState.includeDrinks ? `
                                     <div class="comparison-row">
                                         <span class="comparison-label">Drink Package</span>
@@ -2021,7 +2383,7 @@
                                     </div>
                                 ` : ''}
                                 <div class="comparison-row highlight">
-                                    <span class="comparison-label">Deposit</span>
+                                    <span class="comparison-label">Deposit${pricing.onboardCredit > 0 ? ' <span class="obc-badge">+$' + pricing.onboardCredit + ' OBC</span>' : ''}</span>
                                     <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
                                 </div>
                                 <div class="comparison-row">
@@ -2056,6 +2418,8 @@
 
                 this.bindEvents();
                 Renderer.updateToggleLabels();
+                this.updateFasPlusAvailability();
+                this.updateFasPlusDisplay();
                 Renderer.renderGrid();
             },
 
@@ -2070,6 +2434,109 @@
                 document.getElementById('adultInc').disabled = AppState.adultCount >= 8;
                 document.getElementById('childDec').disabled = AppState.childCount <= 0;
                 document.getElementById('childInc').disabled = (AppState.adultCount + AppState.childCount) >= 8;
+            },
+
+            updateFasPlusAvailability() {
+                const fasPlusToggle = document.getElementById('fasPlusToggle');
+                const requiresEl = document.getElementById('fasPlusRequires');
+
+                if (!AppState.includeDrinks || !AppState.includeDinner) {
+                    // Disable FAS Plus if drink or dinner is off
+                    if (AppState.freeAtSeaPlus) {
+                        AppState.freeAtSeaPlus = false;
+                        fasPlusToggle.checked = false;
+                    }
+                    fasPlusToggle.classList.add('disabled');
+                    fasPlusToggle.disabled = true;
+                    requiresEl.style.display = 'block';
+                } else {
+                    fasPlusToggle.classList.remove('disabled');
+                    fasPlusToggle.disabled = false;
+                    requiresEl.style.display = 'none';
+                }
+                this.updateFasPlusDisplay();
+                Renderer.updatePrices();
+            },
+
+            updateFasPlusDisplay() {
+                const descEl = document.getElementById('fasPlusDesc');
+                const savingsEl = document.getElementById('fasPlusSavings');
+                const guests = PriceCalculator.buildGuestList();
+                const fasGuestCount = Math.min(guests.length, 2);
+                const fasCost = fasGuestCount * 150;
+
+                descEl.textContent = `+${PriceCalculator.formatCurrency(fasCost)} (${fasGuestCount} guest${fasGuestCount !== 1 ? 's' : ''} x $150) \u2014 Includes prepaid gratuities`;
+
+                if (AppState.freeAtSeaPlus) {
+                    // Calculate tip savings
+                    let tipSavings = 0;
+                    guests.slice(0, 2).forEach(g => {
+                        if (g.age >= 3) {
+                            // Use a representative tip rate (we don't know the cabin here)
+                            // Show generic savings message instead
+                            tipSavings += 60; // minimum tip rate
+                        }
+                    });
+                    if (tipSavings > 0) {
+                        savingsEl.style.display = 'block';
+                        savingsEl.textContent = `Includes $${tipSavings}-$${Math.round(tipSavings * 75/60)} in prepaid gratuities (varies by cabin)`;
+                    } else {
+                        savingsEl.style.display = 'none';
+                    }
+                } else {
+                    savingsEl.style.display = 'none';
+                }
+            },
+
+            populateCostBenefitTable() {
+                const table = document.getElementById('costBenefitTable');
+                const guests = PriceCalculator.buildGuestList();
+                const fasGuestCount = Math.min(guests.length, 2);
+                const fasCost = fasGuestCount * 150;
+
+                // Show comparison for different cabin tiers
+                const tiers = [
+                    { label: 'Inside/Oceanview/Balcony/Club Balcony', tipPerDay: 20 },
+                    { label: 'Suite/The Haven', tipPerDay: 25 }
+                ];
+
+                let html = `
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Without FAS Plus</th>
+                            <th>With FAS Plus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+
+                tiers.forEach(tier => {
+                    const tipTotal = tier.tipPerDay * CRUISE_NIGHTS * fasGuestCount;
+                    const netCost = fasCost - tipTotal;
+
+                    html += `
+                        <tr><td colspan="3" style="font-weight:600;color:var(--ocean-blue);padding-top:1rem;">${tier.label}</td></tr>
+                        <tr>
+                            <td>Gratuities (${fasGuestCount} guests x $${tier.tipPerDay}/day x ${CRUISE_NIGHTS} nights)</td>
+                            <td>${PriceCalculator.formatCurrency(tipTotal)}</td>
+                            <td>$0 (included)</td>
+                        </tr>
+                        <tr>
+                            <td>FAS Plus Fee (${fasGuestCount} guests x $150)</td>
+                            <td>$0</td>
+                            <td>${PriceCalculator.formatCurrency(fasCost)}</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td>Net Difference</td>
+                            <td>${PriceCalculator.formatCurrency(tipTotal)}</td>
+                            <td>${PriceCalculator.formatCurrency(fasCost)} <span class="${netCost <= 0 ? 'savings' : ''}">(${netCost <= 0 ? 'save' : 'extra'} ${PriceCalculator.formatCurrency(Math.abs(netCost))})</span></td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody>';
+                table.innerHTML = html;
             },
 
             renderChildAgeInputs() {
@@ -2136,6 +2603,7 @@
                     if (AppState.adultCount > 1) {
                         AppState.adultCount--;
                         this.updateGuestDisplay();
+                        this.updateFasPlusDisplay();
                         Renderer.updatePrices();
                     }
                 });
@@ -2144,6 +2612,7 @@
                     if (AppState.adultCount + AppState.childCount < 8) {
                         AppState.adultCount++;
                         this.updateGuestDisplay();
+                        this.updateFasPlusDisplay();
                         Renderer.updatePrices();
                     }
                 });
@@ -2154,6 +2623,7 @@
                         AppState.childAges.pop();
                         this.updateGuestDisplay();
                         this.renderChildAgeInputs();
+                        this.updateFasPlusDisplay();
                         Renderer.updatePrices();
                     }
                 });
@@ -2164,6 +2634,7 @@
                         AppState.childAges.push(10);
                         this.updateGuestDisplay();
                         this.renderChildAgeInputs();
+                        this.updateFasPlusDisplay();
                         Renderer.updatePrices();
                     }
                 });
@@ -2171,12 +2642,12 @@
                 // Package toggles
                 document.getElementById('drinkToggle').addEventListener('change', (e) => {
                     AppState.includeDrinks = e.target.checked;
-                    Renderer.updatePrices();
+                    this.updateFasPlusAvailability();
                 });
 
                 document.getElementById('dinnerToggle').addEventListener('change', (e) => {
                     AppState.includeDinner = e.target.checked;
-                    Renderer.updatePrices();
+                    this.updateFasPlusAvailability();
                 });
 
                 document.getElementById('tipsToggle').addEventListener('change', (e) => {
@@ -2185,6 +2656,50 @@
                         ? 'Before cruise (by 7/23/2026)'
                         : 'Onboard (end of cruise)';
                     Renderer.updatePrices();
+                });
+
+                // FAS Plus toggle
+                document.getElementById('fasPlusToggle').addEventListener('change', (e) => {
+                    if (!AppState.includeDrinks || !AppState.includeDinner) {
+                        // Auto-enable drink + dinner when FAS Plus is turned on
+                        if (e.target.checked) {
+                            AppState.includeDrinks = true;
+                            AppState.includeDinner = true;
+                            document.getElementById('drinkToggle').checked = true;
+                            document.getElementById('dinnerToggle').checked = true;
+                        }
+                    }
+                    AppState.freeAtSeaPlus = e.target.checked;
+                    this.updateFasPlusDisplay();
+                    Renderer.updatePrices();
+                });
+
+                // FAS Plus info button
+                document.getElementById('fasPlusInfoBtn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.populateCostBenefitTable();
+                    document.getElementById('fasPlusModal').classList.add('visible');
+                });
+
+                document.getElementById('closeFasModal').addEventListener('click', () => {
+                    document.getElementById('fasPlusModal').classList.remove('visible');
+                });
+
+                document.getElementById('fasPlusModal').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('fas-modal-overlay')) {
+                        document.getElementById('fasPlusModal').classList.remove('visible');
+                    }
+                });
+
+                // Deposit option radio buttons
+                document.querySelectorAll('input[name="depositOption"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        AppState.depositOption = e.target.value;
+                        document.querySelectorAll('.deposit-radio-label').forEach(label => {
+                            label.classList.toggle('active', label.dataset.option === e.target.value);
+                        });
+                        Renderer.updatePrices();
+                    });
                 });
 
                 // Cabin grid event delegation
@@ -2240,6 +2755,7 @@
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
                         document.getElementById('comparisonModal').classList.remove('visible');
+                        document.getElementById('fasPlusModal').classList.remove('visible');
                     }
                 });
 
