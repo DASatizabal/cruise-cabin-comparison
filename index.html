@@ -1388,7 +1388,7 @@
     <!-- Hero Header -->
     <header class="hero">
         <div class="hero-content">
-            <span class="version-badge">v2.2.1</span>
+            <span class="version-badge">v2.2.2</span>
             <h1 class="ship-name">
                 <a href="https://www.ncl.com/cruise-ships/norwegian-joy" target="_blank" rel="noopener">Norwegian Joy</a>
             </h1>
@@ -1877,7 +1877,7 @@
                 const originalPerPersonAvg = effectiveGuests > 0 ? originalTotalFare / effectiveGuests : 0;
 
                 // Deposit (based on discounted fare) - credit does not change the deposit amount
-                const deposit = isHighTier ? Math.round(discountedBase * 0.10) : 100;
+                const deposit = isHighTier ? Math.round(totalFare * 0.10) : 100;
                 const balance = grandTotal - deposit;
 
                 // Per-person average
