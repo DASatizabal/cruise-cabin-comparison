@@ -1531,7 +1531,7 @@
                         <input type="radio" name="depositOption" value="credit150">
                         <div class="deposit-radio-info">
                             <span class="deposit-radio-name">$150 Credit Deposit</span>
-                            <span class="deposit-radio-desc">Pay $150 deposit, receive $150 credit toward your cruise (not for Suite/Haven)</span>
+                            <span class="deposit-radio-desc">Pay $150 deposit, receive $150 credit toward your cruise</span>
                         </div>
                     </label>
                 </div>
@@ -1858,7 +1858,7 @@
 
                 // Deposit credit reduces what you owe
                 let depositCredit = 0;
-                if (AppState.depositOption === 'credit150' && !isHighTier) {
+                if (AppState.depositOption === 'credit150') {
                     depositCredit = 150;
                 }
 
