@@ -1371,7 +1371,7 @@
             font-weight: 600;
         }
 
-        .obc-badge {
+        .credit-badge {
             display: inline-block;
             background: var(--gold);
             color: var(--gray-900);
@@ -1388,7 +1388,7 @@
     <!-- Hero Header -->
     <header class="hero">
         <div class="hero-content">
-            <span class="version-badge">v2.2.0</span>
+            <span class="version-badge">v2.2.1</span>
             <h1 class="ship-name">
                 <a href="https://www.ncl.com/cruise-ships/norwegian-joy" target="_blank" rel="noopener">Norwegian Joy</a>
             </h1>
@@ -1510,7 +1510,7 @@
                             <button class="fas-plus-info-btn" id="fasPlusInfoBtn" title="What's included?">?</button>
                         </div>
                         <div class="fas-plus-desc" id="fasPlusDesc">+$300 (2 guests x $150) &mdash; Includes prepaid gratuities</div>
-                        <div class="fas-plus-requires" id="fasPlusRequires" style="display: none;">Requires Drink + Dinner packages</div>
+                        <div class="fas-plus-requires" id="fasPlusRequires" style="display: none;">Enabling will auto-select Drink &amp; Dinner packages if not already selected</div>
                         <div class="fas-plus-savings" id="fasPlusSavings" style="display: none;"></div>
                     </div>
                 </div>
@@ -1530,8 +1530,8 @@
                     <label class="deposit-radio-label" data-option="credit150">
                         <input type="radio" name="depositOption" value="credit150">
                         <div class="deposit-radio-info">
-                            <span class="deposit-radio-name">+$150 Onboard Credit</span>
-                            <span class="deposit-radio-desc">Pay $150 extra on deposit, get $150 OBC (not for Suite/Haven)</span>
+                            <span class="deposit-radio-name">$150 Credit Deposit</span>
+                            <span class="deposit-radio-desc">Pay $150 deposit, receive $150 credit toward your cruise (not for Suite/Haven)</span>
                         </div>
                     </label>
                 </div>
@@ -1584,18 +1584,26 @@
     <div class="fas-modal-overlay" id="fasPlusModal">
         <div class="fas-modal">
             <div class="fas-modal-header">
-                <h3 class="fas-modal-title">Free at Sea Plus &mdash; Cost vs Benefit</h3>
+                <h3 class="fas-modal-title">Free at Sea Plus &mdash; Cost/Benefit Analysis</h3>
                 <button class="fas-modal-close" id="closeFasModal">&times;</button>
             </div>
             <div class="fas-modal-body">
                 <p>
-                    Free at Sea Plus is a <strong>$150/person upgrade</strong> for guests 1 &amp; 2
-                    that includes <strong>prepaid gratuities</strong>. Compare the cost of FAS Plus
-                    vs paying gratuities separately below.
+                    Free at Sea Plus is an upgrade package that adds premium perks on top of the standard
+                    Free at Sea benefits. It costs <strong>$49.99/person/day</strong>, totaling approximately
+                    <strong>$300 for a 3-day cruise (2 guests)</strong>.
+                </p>
+                <p style="background: #fef3c7; padding: 0.75rem; border-radius: 8px; font-size: 0.8rem;">
+                    Free at Sea Plus applies ONLY to Guests 1 &amp; 2.
                 </p>
                 <table class="cost-benefit-table" id="costBenefitTable">
                     <!-- Populated dynamically -->
                 </table>
+                <p style="margin-top: 1.5rem; font-size: 0.8rem;">
+                    <strong>Resources:</strong><br>
+                    <a href="https://www.ncl.com/content/dam/ncl/us/en/promo/cruise-deals/Free_at_sea_Plus_ver_11042025.pdf" target="_blank" rel="noopener" style="color: var(--teal);">Free at Sea Plus Comparison (PDF)</a><br>
+                    <a href="https://www.ncl.com/faq/what-is-included-in-free-at-sea-plus-and-how-much-does-it-cost-" target="_blank" rel="noopener" style="color: var(--teal);">What is included in Free at Sea Plus? (NCL FAQ)</a>
+                </p>
             </div>
         </div>
     </div>
@@ -1848,8 +1856,15 @@
                 const dinner = guestDetails.reduce((sum, g) => sum + g.dinner, 0);
                 const fasPlusCost = guestDetails.reduce((sum, g) => sum + g.fasPlusFee, 0);
 
-                const grandTotal = totalFare + taxes + tipsPreCruise + drinks + dinner + fasPlusCost;
-                const fullTripCost = totalFare + taxes + tips + drinks + dinner + fasPlusCost;
+                // Deposit credit reduces what you owe
+                let depositCredit = 0;
+                if (AppState.depositOption === 'credit150' && !isHighTier) {
+                    depositCredit = 150;
+                }
+
+                const grandTotalBeforeCredit = totalFare + taxes + tipsPreCruise + drinks + dinner + fasPlusCost;
+                const grandTotal = grandTotalBeforeCredit - depositCredit;
+                const fullTripCost = totalFare + taxes + tips + drinks + dinner + fasPlusCost - depositCredit;
 
                 // Original (undiscounted) totals for strikethrough display
                 const originalTotalFare = cabin.isSolo
@@ -1861,15 +1876,8 @@
                     : discountedBase + Math.max(0, effectiveGuests - 2) * discountedExtra;
                 const originalPerPersonAvg = effectiveGuests > 0 ? originalTotalFare / effectiveGuests : 0;
 
-                // Deposit (based on discounted fare)
-                let deposit = isHighTier ? Math.round(discountedBase * 0.10) : 100;
-                let onboardCredit = 0;
-
-                if (AppState.depositOption === 'credit150' && !isHighTier) {
-                    deposit += 150;
-                    onboardCredit = 150;
-                }
-
+                // Deposit (based on discounted fare) - credit does not change the deposit amount
+                const deposit = isHighTier ? Math.round(discountedBase * 0.10) : 100;
                 const balance = grandTotal - deposit;
 
                 // Per-person average
@@ -1890,7 +1898,8 @@
                     drinks,
                     dinner,
                     fasPlusCost,
-                    onboardCredit,
+                    depositCredit,
+                    grandTotalBeforeCredit,
                     grandTotal,
                     fullTripCost,
                     deposit,
@@ -1988,7 +1997,7 @@
                             </div>
 
                             <div class="deposit-info">
-                                <span class="deposit-label">Pay today (deposit)${pricing.onboardCredit > 0 ? ' <span class="obc-badge">+$' + pricing.onboardCredit + ' OBC</span>' : ''}</span>
+                                <span class="deposit-label">Pay today (deposit)${pricing.depositCredit > 0 ? ' <span class="credit-badge">-$' + pricing.depositCredit + ' credit</span>' : ''}</span>
                                 <span class="deposit-amount">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
                             </div>
 
@@ -2072,13 +2081,26 @@
                     `;
                 }
 
+                if (pricing.depositCredit > 0) {
+                    html += `
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">Subtotal</span>
+                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.grandTotalBeforeCredit)}</span>
+                        </div>
+                        <div class="breakdown-row" style="color: var(--teal);">
+                            <span class="breakdown-label">Deposit Credit</span>
+                            <span class="breakdown-value">-${PriceCalculator.formatCurrency(pricing.depositCredit)}</span>
+                        </div>
+                    `;
+                }
+
                 html += `
                     <div class="breakdown-row total">
                         <span class="breakdown-label">Total Due by 7/23/2026</span>
                         <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.grandTotal)}</span>
                     </div>
                     <div class="breakdown-row">
-                        <span class="breakdown-label">Deposit (pay today)${pricing.onboardCredit > 0 ? ' <span class="obc-badge">+$' + pricing.onboardCredit + ' OBC</span>' : ''}</span>
+                        <span class="breakdown-label">Deposit (pay today)</span>
                         <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
                     </div>
                     <div class="breakdown-row">
@@ -2383,7 +2405,7 @@
                                     </div>
                                 ` : ''}
                                 <div class="comparison-row highlight">
-                                    <span class="comparison-label">Deposit${pricing.onboardCredit > 0 ? ' <span class="obc-badge">+$' + pricing.onboardCredit + ' OBC</span>' : ''}</span>
+                                    <span class="comparison-label">Deposit${pricing.depositCredit > 0 ? ' <span class="credit-badge">-$' + pricing.depositCredit + ' credit</span>' : ''}</span>
                                     <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
                                 </div>
                                 <div class="comparison-row">
@@ -2439,21 +2461,21 @@
             updateFasPlusAvailability() {
                 const fasPlusToggle = document.getElementById('fasPlusToggle');
                 const requiresEl = document.getElementById('fasPlusRequires');
+                const bothSelected = AppState.includeDrinks && AppState.includeDinner;
 
-                if (!AppState.includeDrinks || !AppState.includeDinner) {
-                    // Disable FAS Plus if drink or dinner is off
-                    if (AppState.freeAtSeaPlus) {
-                        AppState.freeAtSeaPlus = false;
-                        fasPlusToggle.checked = false;
-                    }
-                    fasPlusToggle.classList.add('disabled');
-                    fasPlusToggle.disabled = true;
-                    requiresEl.style.display = 'block';
-                } else {
-                    fasPlusToggle.classList.remove('disabled');
-                    fasPlusToggle.disabled = false;
-                    requiresEl.style.display = 'none';
+                // If drink or dinner is turned off while FAS Plus is on, turn off FAS Plus
+                if (!bothSelected && AppState.freeAtSeaPlus) {
+                    fasPlusToggle.checked = false;
+                    AppState.freeAtSeaPlus = false;
                 }
+
+                // Show/hide the note (toggle always stays enabled)
+                if (bothSelected) {
+                    requiresEl.style.display = 'none';
+                } else {
+                    requiresEl.style.display = 'block';
+                }
+
                 this.updateFasPlusDisplay();
                 Renderer.updatePrices();
             },
@@ -2494,12 +2516,6 @@
                 const fasGuestCount = Math.min(guests.length, 2);
                 const fasCost = fasGuestCount * 150;
 
-                // Show comparison for different cabin tiers
-                const tiers = [
-                    { label: 'Inside/Oceanview/Balcony/Club Balcony', tipPerDay: 20 },
-                    { label: 'Suite/The Haven', tipPerDay: 25 }
-                ];
-
                 let html = `
                     <thead>
                         <tr>
@@ -2509,33 +2525,96 @@
                         </tr>
                     </thead>
                     <tbody>
+                    <tr><td colspan="3" style="font-weight:600;color:var(--ocean-blue);padding-top:0.5rem;">Package Cost</td></tr>
+                    <tr>
+                        <td>Free at Sea Plus (${CRUISE_NIGHTS} days x ${fasGuestCount} guests)</td>
+                        <td>$0</td>
+                        <td>+${PriceCalculator.formatCurrency(fasCost)}</td>
+                    </tr>
+                    <tr><td colspan="3" style="font-weight:600;color:var(--teal);padding-top:1rem;">Savings &amp; Value</td></tr>
                 `;
+
+                // Tip savings per cabin tier
+                const tiers = [
+                    { label: 'Standard cabins ($20/day)', tipPerDay: 20 },
+                    { label: 'Suite/Haven ($25/day)', tipPerDay: 25 }
+                ];
 
                 tiers.forEach(tier => {
                     const tipTotal = tier.tipPerDay * CRUISE_NIGHTS * fasGuestCount;
-                    const netCost = fasCost - tipTotal;
-
                     html += `
-                        <tr><td colspan="3" style="font-weight:600;color:var(--ocean-blue);padding-top:1rem;">${tier.label}</td></tr>
                         <tr>
-                            <td>Gratuities (${fasGuestCount} guests x $${tier.tipPerDay}/day x ${CRUISE_NIGHTS} nights)</td>
-                            <td>${PriceCalculator.formatCurrency(tipTotal)}</td>
-                            <td>$0 (included)</td>
-                        </tr>
-                        <tr>
-                            <td>FAS Plus Fee (${fasGuestCount} guests x $150)</td>
-                            <td>$0</td>
-                            <td>${PriceCalculator.formatCurrency(fasCost)}</td>
-                        </tr>
-                        <tr class="total-row">
-                            <td>Net Difference</td>
-                            <td>${PriceCalculator.formatCurrency(tipTotal)}</td>
-                            <td>${PriceCalculator.formatCurrency(fasCost)} <span class="${netCost <= 0 ? 'savings' : ''}">(${netCost <= 0 ? 'save' : 'extra'} ${PriceCalculator.formatCurrency(Math.abs(netCost))})</span></td>
+                            <td>Prepaid Gratuities - ${tier.label}</td>
+                            <td>$0 (pay separately)</td>
+                            <td class="savings">-${PriceCalculator.formatCurrency(tipTotal)} (included)</td>
                         </tr>
                     `;
                 });
 
-                html += '</tbody>';
+                html += `
+                    <tr>
+                        <td>Unlimited Bar at Great Stirrup Cay</td>
+                        <td>$0 (standard packages NOT valid on island after March 2026)</td>
+                        <td class="savings">-$50 to -$100+ value</td>
+                    </tr>
+                    <tr>
+                        <td>Unlimited Starbucks (1 drink per visit)</td>
+                        <td>$0</td>
+                        <td class="savings">-$20 to -$40+ (~$6-8 per specialty drink)</td>
+                    </tr>
+                    <tr>
+                        <td>Premium Top-Shelf Spirits (Patr&oacute;n A&ntilde;ejo, Macallan 12-Year, etc.)</td>
+                        <td>$0</td>
+                        <td class="savings">-$15 to -$50+ ($15+ per drink)</td>
+                    </tr>
+                    <tr>
+                        <td>Energy Drinks &amp; Fresh Juices</td>
+                        <td>$0</td>
+                        <td class="savings">-$20 to -$40 (~$6.25 each)</td>
+                    </tr>
+                    <tr>
+                        <td>Bottled Water (Bars &amp; Restaurants)</td>
+                        <td>$0</td>
+                        <td class="savings">-$15 to -$30 ($4.50 per bottle)</td>
+                    </tr>
+                    <tr><td colspan="3" style="font-weight:600;color:var(--ocean-blue);padding-top:1rem;">Great Stirrup Cay Drink Prices (If No Plus Package)</td></tr>
+                    <tr>
+                        <td>Cocktails</td>
+                        <td>$12.50+ each (plus 20% gratuity)</td>
+                        <td class="savings">Included</td>
+                    </tr>
+                    <tr>
+                        <td>Beer</td>
+                        <td>$7.50+ each (plus 20% gratuity)</td>
+                        <td class="savings">Included</td>
+                    </tr>
+                    <tr>
+                        <td>Soda</td>
+                        <td>$3.50 each (plus 20% gratuity)</td>
+                        <td class="savings">Included</td>
+                    </tr>
+                    <tr>
+                        <td><em>Example: 4 cocktails + 4 beers on island</em></td>
+                        <td><em>~$96 + tip per couple</em></td>
+                        <td class="savings"><em>$0</em></td>
+                    </tr>
+                `;
+
+                // Net cost summary
+                const tipSavingsLow = 20 * CRUISE_NIGHTS * fasGuestCount;
+                const tipSavingsHigh = 25 * CRUISE_NIGHTS * fasGuestCount;
+                const netLow = fasCost - tipSavingsHigh;
+                const netHigh = fasCost - tipSavingsLow;
+
+                html += `
+                    <tr class="total-row" style="background: rgba(13,148,136,0.1);">
+                        <td>Net Cost After Tip Savings</td>
+                        <td>&mdash;</td>
+                        <td>${PriceCalculator.formatCurrency(netLow)}-${PriceCalculator.formatCurrency(netHigh)} + all the extras above</td>
+                    </tr>
+                    </tbody>
+                `;
+
                 table.innerHTML = html;
             },
 
