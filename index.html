@@ -1004,100 +1004,48 @@
             font-weight: 700;
         }
 
-        /* Child Age Modal */
-        .child-age-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-            z-index: 300;
+        /* Inline Child Age Inputs */
+        .child-ages-inline {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .child-age-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .child-age-card-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        .child-age-card-row {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            color: var(--gray-500);
         }
 
-        .child-age-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .child-age-modal {
-            background: var(--white);
-            border-radius: 16px;
-            padding: 1.5rem;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            transform: scale(0.9);
-            transition: transform 0.3s;
-        }
-
-        .child-age-overlay.visible .child-age-modal {
-            transform: scale(1);
-        }
-
-        .child-age-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: 1rem;
-        }
-
-        .child-age-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--gray-100);
-        }
-
-        .child-age-row:last-of-type {
-            border-bottom: none;
-        }
-
-        .child-age-input {
-            width: 70px;
-            padding: 0.5rem;
+        .child-age-inline-input {
+            width: 50px;
+            padding: 0.35rem;
             border: 2px solid var(--gray-200);
-            border-radius: 8px;
-            font-size: 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
             text-align: center;
             font-weight: 600;
+            color: var(--gray-900);
         }
 
-        .child-age-input:focus {
+        .child-age-inline-input:focus {
             outline: none;
             border-color: var(--teal);
-        }
-
-        .child-age-hint {
-            font-size: 0.75rem;
-            color: var(--gray-400);
-            margin-top: 0.75rem;
-        }
-
-        .child-age-actions {
-            margin-top: 1rem;
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .child-age-save {
-            padding: 0.625rem 1.5rem;
-            background: var(--teal);
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .child-age-save:hover {
-            background: var(--teal-light);
         }
 
         /* Footer */
@@ -1178,7 +1126,7 @@
     <!-- Hero Header -->
     <header class="hero">
         <div class="hero-content">
-            <span class="version-badge">v2.0.5</span>
+            <span class="version-badge">v2.1.0</span>
             <h1 class="ship-name">
                 <a href="https://www.ncl.com/cruise-ships/norwegian-joy" target="_blank" rel="noopener">Norwegian Joy</a>
             </h1>
@@ -1259,6 +1207,9 @@
                     </div>
                 </div>
                 <div class="guest-total" id="guestTotal">Total: 2 guests</div>
+                <div class="child-ages-inline" id="childAgesInline">
+                    <!-- Generated dynamically when children are added -->
+                </div>
             </div>
 
             <div class="package-toggles">
@@ -1326,20 +1277,6 @@
                 <div class="comparison-grid" id="comparisonGrid">
                     <!-- Comparison content will be rendered here -->
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Child Age Modal -->
-    <div class="child-age-overlay" id="childAgeOverlay">
-        <div class="child-age-modal">
-            <div class="child-age-title">Enter Children's Ages</div>
-            <div id="childAgeInputs">
-                <!-- Generated dynamically -->
-            </div>
-            <div class="child-age-hint">Ages determine drink, tip, and dinner eligibility</div>
-            <div class="child-age-actions">
-                <button class="child-age-save" id="childAgeSave">Save</button>
             </div>
         </div>
     </div>
@@ -2130,38 +2067,46 @@
                 document.getElementById('childInc').disabled = (AppState.adultCount + AppState.childCount) >= 8;
             },
 
-            showChildAgeModal() {
-                const overlay = document.getElementById('childAgeOverlay');
-                const inputs = document.getElementById('childAgeInputs');
+            renderChildAgeInputs() {
+                const container = document.getElementById('childAgesInline');
+
+                if (AppState.childCount === 0) {
+                    container.innerHTML = '';
+                    return;
+                }
+
+                // Ensure childAges array matches childCount
+                while (AppState.childAges.length < AppState.childCount) {
+                    AppState.childAges.push(10);
+                }
 
                 let html = '';
                 for (let i = 0; i < AppState.childCount; i++) {
-                    const existingAge = AppState.childAges[i] !== undefined ? AppState.childAges[i] : 10;
                     html += `
-                        <div class="child-age-row">
-                            <span>Child ${i + 1}</span>
-                            <input type="number" class="child-age-input" data-index="${i}"
-                                   min="0" max="20" value="${existingAge}">
+                        <div class="child-age-card">
+                            <span class="child-age-card-label">Child ${i + 1}</span>
+                            <div class="child-age-card-row">
+                                Age: <input type="number" class="child-age-inline-input" data-index="${i}"
+                                       min="0" max="20" value="${AppState.childAges[i]}">
+                            </div>
                         </div>
                     `;
                 }
 
-                inputs.innerHTML = html;
-                overlay.classList.add('visible');
-            },
+                container.innerHTML = html;
 
-            saveChildAges() {
-                const inputs = document.querySelectorAll('.child-age-input');
-                AppState.childAges = [];
-                inputs.forEach(input => {
-                    let age = parseInt(input.value) || 0;
-                    if (age < 0) age = 0;
-                    if (age > 20) age = 20;
-                    AppState.childAges.push(age);
+                // Bind change events
+                container.querySelectorAll('.child-age-inline-input').forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        let age = parseInt(e.target.value) || 0;
+                        if (age < 0) age = 0;
+                        if (age > 20) age = 20;
+                        e.target.value = age;
+                        AppState.childAges[idx] = age;
+                        Renderer.updatePrices();
+                    });
                 });
-
-                document.getElementById('childAgeOverlay').classList.remove('visible');
-                Renderer.updatePrices();
             },
 
             bindEvents() {
@@ -2203,6 +2148,7 @@
                         AppState.childCount--;
                         AppState.childAges.pop();
                         this.updateGuestDisplay();
+                        this.renderChildAgeInputs();
                         Renderer.updatePrices();
                     }
                 });
@@ -2210,15 +2156,11 @@
                 document.getElementById('childInc').addEventListener('click', () => {
                     if (AppState.adultCount + AppState.childCount < 8) {
                         AppState.childCount++;
-                        // Show age modal for new child
-                        this.showChildAgeModal();
+                        AppState.childAges.push(10);
                         this.updateGuestDisplay();
+                        this.renderChildAgeInputs();
+                        Renderer.updatePrices();
                     }
-                });
-
-                // Child age modal save
-                document.getElementById('childAgeSave').addEventListener('click', () => {
-                    this.saveChildAges();
                 });
 
                 // Package toggles
@@ -2289,20 +2231,10 @@
                     }
                 });
 
-                // Child age overlay - close on background click
-                document.getElementById('childAgeOverlay').addEventListener('click', (e) => {
-                    if (e.target.classList.contains('child-age-overlay')) {
-                        this.saveChildAges();
-                    }
-                });
-
                 // Keyboard
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
                         document.getElementById('comparisonModal').classList.remove('visible');
-                        if (document.getElementById('childAgeOverlay').classList.contains('visible')) {
-                            this.saveChildAges();
-                        }
                     }
                 });
 
