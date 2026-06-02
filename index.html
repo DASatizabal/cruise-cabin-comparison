@@ -589,6 +589,18 @@
             margin-top: 0.25rem;
         }
 
+        .tips-included-note {
+            font-size: 0.8rem;
+            color: var(--teal);
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        .toggle-container.toggle-disabled {
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
         .deposit-info {
             display: flex;
             justify-content: space-between;
@@ -1423,7 +1435,7 @@
     <!-- Hero Header -->
     <header class="hero">
         <div class="hero-content">
-            <span class="version-badge">v2.3.0</span>
+            <span class="version-badge">v2.4.0</span>
             <h1 class="ship-name">
                 <a href="https://www.ncl.com/cruise-ships/norwegian-joy" target="_blank" rel="noopener">Norwegian Joy</a>
             </h1>
@@ -1526,7 +1538,7 @@
                     </div>
                 </div>
 
-                <div class="toggle-container">
+                <div class="toggle-container" id="tipsToggleContainer">
                     <input type="checkbox" class="toggle-switch" id="tipsToggle" checked>
                     <div>
                         <div class="toggle-label">When to Pay Tips</div>
@@ -1851,6 +1863,10 @@
                 const tipPerPerson = this.getTipPerPerson(cabin.roomType);
                 const isHighTier = cabin.roomType === "Suite" || cabin.roomType === "The Haven";
 
+                // Free at Sea Plus includes prepaid gratuities, so the "when to pay tips"
+                // choice no longer applies — any remaining (guest 3+) tips are treated as prepaid.
+                const tipsPrepaid = AppState.freeAtSeaPlus || tipsBeforeCruise;
+
                 // Per-guest calculations
                 const guestDetails = guests.map((guest, idx) => {
                     const position = idx + 1; // 1-indexed
@@ -1886,9 +1902,11 @@
                     const tipEligible = guest.age >= 3;
                     let tip = tipEligible ? tipPerPerson : 0;
                     let fasPlusFee = 0;
+                    let fasPlusTipCovered = 0;
 
                     if (AppState.freeAtSeaPlus && position <= 2) {
                         fasPlusFee = 150;
+                        fasPlusTipCovered = tip; // gratuities now prepaid via FAS Plus
                         tip = 0; // Tips included in FAS Plus
                     }
 
@@ -1912,8 +1930,8 @@
                         // under 13 in position 1-2: free (kids' menu)
                     }
 
-                    const tipPreCruise = tipsBeforeCruise ? tip : 0;
-                    const tipOnboard = tipsBeforeCruise ? 0 : tip;
+                    const tipPreCruise = tipsPrepaid ? tip : 0;
+                    const tipOnboard = tipsPrepaid ? 0 : tip;
 
                     const guestTotal = fare + tax + tipPreCruise + drink + dinner + fasPlusFee;
                     const guestFullCost = fare + tax + tip + drink + dinner + fasPlusFee;
@@ -1932,6 +1950,7 @@
                         drink,
                         dinner,
                         fasPlusFee,
+                        fasPlusTipCovered,
                         total: guestTotal,
                         fullCost: guestFullCost
                     };
@@ -1939,11 +1958,12 @@
 
                 const taxes = guestDetails.reduce((sum, g) => sum + g.tax, 0);
                 const tips = guestDetails.reduce((sum, g) => sum + g.tip, 0);
-                const tipsPreCruise = tipsBeforeCruise ? tips : 0;
-                const tipsOnboard = tipsBeforeCruise ? 0 : tips;
+                const tipsPreCruise = tipsPrepaid ? tips : 0;
+                const tipsOnboard = tipsPrepaid ? 0 : tips;
                 const drinks = guestDetails.reduce((sum, g) => sum + g.drink, 0);
                 const dinner = guestDetails.reduce((sum, g) => sum + g.dinner, 0);
                 const fasPlusCost = guestDetails.reduce((sum, g) => sum + g.fasPlusFee, 0);
+                const fasPlusTipsIncluded = guestDetails.reduce((sum, g) => sum + g.fasPlusTipCovered, 0);
 
                 // Deposit credit reduces what you owe
                 let depositCredit = 0;
@@ -1987,6 +2007,7 @@
                     drinks,
                     dinner,
                     fasPlusCost,
+                    fasPlusTipsIncluded,
                     depositCredit,
                     grandTotalBeforeCredit,
                     grandTotal,
@@ -2091,7 +2112,9 @@
                                 <div class="price-label">${isDimmed ? 'Price (if ' + cabin.maxGuests + ' guests)' : 'Total Due by 7/23/2026'}</div>
                                 <div class="price-amount" data-cabin-id="${cabin.id}">${PriceCalculator.formatCurrency(pricing.grandTotal)}</div>
                                 <div class="price-per-person">${perPersonText}</div>
-                                ${!AppState.tipsBeforeCruise && pricing.tipsOnboard > 0 ? `
+                                ${AppState.freeAtSeaPlus && pricing.fasPlusTipsIncluded > 0 ? `
+                                    <div class="tips-included-note">${PriceCalculator.formatCurrency(pricing.fasPlusTipsIncluded)} tips included with Free at Sea Plus</div>
+                                ` : !AppState.tipsBeforeCruise && pricing.tipsOnboard > 0 ? `
                                     <div class="tips-onboard-note">+ ${PriceCalculator.formatCurrency(pricing.tipsOnboard)} tips paid onboard</div>
                                 ` : ''}
                             </div>
@@ -2146,7 +2169,7 @@
                     </div>
                 `;
 
-                if (AppState.tipsBeforeCruise) {
+                if (pricing.tipsPreCruise > 0) {
                     html += `
                         <div class="breakdown-row">
                             <span class="breakdown-label">Gratuities ($${tipRate}/day x ${CRUISE_NIGHTS} nights x ${pricing.guestDetails.filter(g => g.tip > 0).length} guests)</span>
@@ -2174,9 +2197,12 @@
                 }
 
                 if (pricing.fasPlusCost > 0) {
+                    const fasIncl = pricing.fasPlusTipsIncluded > 0
+                        ? ` <span style="color:var(--teal);font-weight:600;font-size:0.75rem;">incl. ${PriceCalculator.formatCurrency(pricing.fasPlusTipsIncluded)} gratuities</span>`
+                        : '';
                     html += `
                         <div class="breakdown-row">
-                            <span class="breakdown-label">Free at Sea Plus ($150 x ${pricing.guestDetails.filter(g => g.fasPlusFee > 0).length} guests)</span>
+                            <span class="breakdown-label">Free at Sea Plus ($150 x ${pricing.guestDetails.filter(g => g.fasPlusFee > 0).length} guests)${fasIncl}</span>
                             <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.fasPlusCost)}</span>
                         </div>
                     `;
@@ -2239,7 +2265,8 @@
                         items.push(`${PriceCalculator.formatCurrency(gd.fasPlusFee)} FAS+`);
                         items.push(`$0 tip (incl.)`);
                     } else if (gd.tip > 0) {
-                        items.push(`${PriceCalculator.formatCurrency(AppState.tipsBeforeCruise ? gd.tip : 0)} tip${!AppState.tipsBeforeCruise ? ' (onboard: ' + PriceCalculator.formatCurrency(gd.tip) + ')' : ''}`);
+                        const tipsPrepaid = AppState.freeAtSeaPlus || AppState.tipsBeforeCruise;
+                        items.push(`${PriceCalculator.formatCurrency(tipsPrepaid ? gd.tip : 0)} tip${!tipsPrepaid ? ' (onboard: ' + PriceCalculator.formatCurrency(gd.tip) + ')' : ''}`);
                     } else {
                         items.push(`$0 tip`);
                     }
@@ -2487,13 +2514,15 @@
                                     <span class="comparison-label">Taxes</span>
                                     <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.taxes)}</span>
                                 </div>
-                                <div class="comparison-row">
-                                    <span class="comparison-label">Gratuities</span>
-                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.tips)}</span>
-                                </div>
+                                ${pricing.tips > 0 ? `
+                                    <div class="comparison-row">
+                                        <span class="comparison-label">Gratuities</span>
+                                        <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.tips)}</span>
+                                    </div>
+                                ` : ''}
                                 ${pricing.fasPlusCost > 0 ? `
                                     <div class="comparison-row">
-                                        <span class="comparison-label">Free at Sea Plus</span>
+                                        <span class="comparison-label">Free at Sea Plus${pricing.fasPlusTipsIncluded > 0 ? ' <span style="color:var(--teal);font-size:0.75rem;">incl. ' + PriceCalculator.formatCurrency(pricing.fasPlusTipsIncluded) + ' tips</span>' : ''}</span>
                                         <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.fasPlusCost)}</span>
                                     </div>
                                 ` : ''}
@@ -2588,7 +2617,29 @@
                 }
 
                 this.updateFasPlusDisplay();
+                this.updateTipsToggleState();
                 Renderer.updatePrices();
+            },
+
+            // FAS Plus includes prepaid gratuities, so the "When to Pay Tips" toggle is
+            // deselected and grayed out while it's active.
+            updateTipsToggleState() {
+                const toggle = document.getElementById('tipsToggle');
+                const container = document.getElementById('tipsToggleContainer');
+                const desc = document.getElementById('tipsToggleDesc');
+                if (AppState.freeAtSeaPlus) {
+                    toggle.checked = false;
+                    toggle.disabled = true;
+                    container.classList.add('toggle-disabled');
+                    desc.textContent = 'Included with Free at Sea Plus';
+                } else {
+                    toggle.disabled = false;
+                    container.classList.remove('toggle-disabled');
+                    toggle.checked = AppState.tipsBeforeCruise;
+                    desc.textContent = AppState.tipsBeforeCruise
+                        ? 'Before cruise (by 7/23/2026)'
+                        : 'Onboard (end of cruise)';
+                }
             },
 
             updateFasPlusDisplay() {
@@ -2861,6 +2912,7 @@
                     }
                     AppState.freeAtSeaPlus = e.target.checked;
                     this.updateFasPlusDisplay();
+                    this.updateTipsToggleState();
                     Renderer.updatePrices();
                 });
 
