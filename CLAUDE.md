@@ -8,13 +8,14 @@ Cabin Selector is a single-page app for analyzing and selecting cruise cabin opt
 
 ## Data Structure
 
-The `cabin_base_price_20260130.csv` file contains cabin pricing with the following columns:
+The active pricing file is `cabin_base_price_20260602.csv` (loaded in `index.html`; the older `cabin_base_price_20260130.csv` is kept for reference). Columns:
 - **Cabin Type**: Room category (Inside, Oceanview, Balcony, Club Balcony Suite, Suite, The Haven)
 - **Cabin Category**: Specific cabin name/description
 - **Cabin Base Price**: Total base price for 2 guests (solo cabins = 1 guest)
 - **Up To Guests**: Maximum occupancy (1-8)
 - **Sq Ft Total**: Cabin square footage (may be ranges like "214 - 367")
 - **Balcony Size**: Balcony square footage ("N/A" for no balcony)
+- **Per Person**: Advertised per-person price (base ÷ 4 / quad occupancy); the literal value `(sold out)` marks a cabin as unavailable — the parser sets `cabin.soldOut`, and the UI shows a "Sold Out" banner and disables Compare
 
 ## Pricing Logic
 

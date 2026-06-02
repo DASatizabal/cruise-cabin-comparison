@@ -465,6 +465,41 @@
             font-weight: 500;
         }
 
+        .cabin-card.sold-out {
+            opacity: 0.6;
+        }
+
+        .cabin-card.sold-out:hover {
+            transform: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sold-out-note {
+            background: #b91c1c;
+            color: #fff;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .price-amount.sold-out-price {
+            color: #b91c1c;
+        }
+
+        .btn-compare:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--gray-100);
+            color: var(--gray-500);
+        }
+
+        .btn-compare:disabled:hover {
+            background: var(--gray-100);
+        }
+
         .cabin-header {
             padding: 1.25rem;
             border-bottom: 1px solid var(--gray-100);
@@ -1420,7 +1455,7 @@
 
             <div class="validity-banner">
                 <span class="validity-icon">&#9888;</span>
-                <span>Prices valid as of <strong>January 30, 2026</strong></span>
+                <span>Prices valid as of <strong id="pricesValidDate">June 2, 2026</strong></span>
             </div>
         </div>
 
@@ -1629,6 +1664,56 @@
         const PROMO_DISCOUNT = 0.50; // 50% off all cruises
         const FREE_GUEST_POSITIONS = [3, 4]; // 3rd & 4th guest sail free
 
+        // Resolves the most recent cabin_base_price_YYYYMMDD.csv without hardcoding a filename.
+        // GitHub Pages has no directory listing, so we probe dates backward from today
+        // (newest-first, in parallel batches) and use the first file that exists.
+        const PriceData = {
+            FILE_PREFIX: 'cabin_base_price_',
+            FALLBACK: 'cabin_base_price_20260602.csv', // safety net if probing finds nothing
+
+            stampFor(date) {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}${m}${d}`;
+            },
+
+            // Parse YYYYMMDD out of a resolved filename into a display string like "June 2, 2026".
+            displayDate(url) {
+                const m = url.match(/(\d{4})(\d{2})(\d{2})\.csv$/);
+                if (!m) return null;
+                const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+                return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            },
+
+            async exists(url) {
+                try {
+                    const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+                    return res.ok;
+                } catch (e) {
+                    return false;
+                }
+            },
+
+            async resolveLatest({ maxDaysBack = 730, batchSize = 21 } = {}) {
+                const today = new Date();
+                for (let start = 0; start <= maxDaysBack; start += batchSize) {
+                    const batch = [];
+                    for (let i = start; i < start + batchSize && i <= maxDaysBack; i++) {
+                        const d = new Date(today);
+                        d.setDate(d.getDate() - i);
+                        batch.push({ daysBack: i, url: `${this.FILE_PREFIX}${this.stampFor(d)}.csv` });
+                    }
+                    const results = await Promise.all(
+                        batch.map(async b => ({ ...b, ok: await this.exists(b.url) }))
+                    );
+                    const hits = results.filter(r => r.ok).sort((a, b) => a.daysBack - b.daysBack);
+                    if (hits.length) return hits[0].url; // newest = smallest daysBack
+                }
+                return this.FALLBACK;
+            }
+        };
+
         // CSV Parser for new format
         const CSVParser = {
             async load(url) {
@@ -1661,12 +1746,16 @@
                         basePrice: parseFloat(values[2]) || 0,
                         maxGuests: parseInt(values[3]) || 2,
                         sqft: values[4] ? values[4].trim() : '',
-                        balconySqft: values[5] ? values[5].trim() : null
+                        balconySqft: values[5] ? values[5].trim() : null,
+                        perPerson: values[6] ? values[6].trim() : ''
                     };
 
                     if (cabin.balconySqft === 'N/A' || cabin.balconySqft === '') {
                         cabin.balconySqft = null;
                     }
+
+                    // A "(sold out)" per-person value marks the cabin unavailable
+                    cabin.soldOut = cabin.perPerson.toLowerCase() === '(sold out)';
 
                     // Determine if solo cabin
                     cabin.isSolo = cabin.maxGuests === 1;
@@ -1954,8 +2043,8 @@
                 const perPersonText = `<span class="original-price">${PriceCalculator.formatCurrency(pricing.originalPerPersonAvg)}</span>${PriceCalculator.formatCurrency(pricing.perPersonAvg)}/person${avgSuffix}`;
 
                 return `
-                    <article class="cabin-card ${isSelected ? 'selected' : ''} ${isDimmed ? 'dimmed' : ''}" data-id="${cabin.id}">
-                        ${isDimmed ? `<div class="max-guests-note">Max ${cabin.maxGuests} guest${cabin.maxGuests !== 1 ? 's' : ''}</div>` : ''}
+                    <article class="cabin-card ${isSelected ? 'selected' : ''} ${isDimmed && !cabin.soldOut ? 'dimmed' : ''} ${cabin.soldOut ? 'sold-out' : ''}" data-id="${cabin.id}">
+                        ${cabin.soldOut ? `<div class="sold-out-note">Sold Out</div>` : isDimmed ? `<div class="max-guests-note">Max ${cabin.maxGuests} guest${cabin.maxGuests !== 1 ? 's' : ''}</div>` : ''}
                         <div class="cabin-header">
                             <span class="cabin-type-badge badge-${badgeClass}">${cabin.roomType}</span>
                             <h3 class="cabin-name">${cabin.name}</h3>
@@ -1987,6 +2076,17 @@
                         </div>
 
                         <div class="cabin-body">
+                            ${cabin.soldOut ? `
+                            <div class="price-display">
+                                <div class="price-label">Availability</div>
+                                <div class="price-amount sold-out-price">Sold Out</div>
+                                <div class="price-per-person">Not currently available to book</div>
+                            </div>
+
+                            <div class="cabin-actions">
+                                <button class="btn btn-compare" data-id="${cabin.id}" disabled>Sold Out</button>
+                            </div>
+                            ` : `
                             <div class="price-display">
                                 <div class="price-label">${isDimmed ? 'Price (if ' + cabin.maxGuests + ' guests)' : 'Total Due by 7/23/2026'}</div>
                                 <div class="price-amount" data-cabin-id="${cabin.id}">${PriceCalculator.formatCurrency(pricing.grandTotal)}</div>
@@ -2015,6 +2115,7 @@
                                     ${this.renderBreakdown(cabin, pricing)}
                                 </div>
                             </div>
+                            `}
                         </div>
 
                         <a href="${NCL_LINKS[cabin.roomType]}" target="_blank" rel="noopener" class="ncl-link">
@@ -2197,9 +2298,13 @@
                     filteredData = filteredData.filter(c => c.roomType === AppState.currentFilter);
                 }
 
-                // Apply sort, pushing dimmed cabins (exceeding max guests) to the bottom
+                // Apply sort: sold-out cabins to the very bottom, then dimmed (exceeding max guests)
                 const totalGuests = AppState.adultCount + AppState.childCount;
                 filteredData = [...filteredData].sort((a, b) => {
+                    const aSold = a.soldOut ? 1 : 0;
+                    const bSold = b.soldOut ? 1 : 0;
+                    if (aSold !== bSold) return aSold - bSold;
+
                     const aDimmed = totalGuests > a.maxGuests ? 1 : 0;
                     const bDimmed = totalGuests > b.maxGuests ? 1 : 0;
                     if (aDimmed !== bDimmed) return aDimmed - bDimmed;
@@ -2426,7 +2531,13 @@
         // ==================== APP CONTROLLER ====================
         const App = {
             async init() {
-                CABIN_DATA = await CSVParser.load('cabin_base_price_20260130.csv');
+                const latestFile = await PriceData.resolveLatest();
+                CABIN_DATA = await CSVParser.load(latestFile);
+
+                // Keep the "Prices valid as of" banner in sync with the resolved file's date
+                const validDate = PriceData.displayDate(latestFile);
+                const validEl = document.getElementById('pricesValidDate');
+                if (validDate && validEl) validEl.textContent = validDate;
 
                 if (CABIN_DATA.length === 0) {
                     document.getElementById('cabinGrid').innerHTML = `
@@ -2795,6 +2906,8 @@
 
                     if (e.target.classList.contains('btn-compare')) {
                         const id = parseInt(e.target.dataset.id);
+                        const cabin = CABIN_DATA.find(c => c.id === id);
+                        if (cabin && cabin.soldOut) return; // sold-out cabins can't be compared
                         if (AppState.selectedCabins.has(id)) {
                             AppState.selectedCabins.delete(id);
                         } else if (AppState.selectedCabins.size < 3) {
