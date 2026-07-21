@@ -8,7 +8,7 @@ Cabin Selector is a single-page app for analyzing and selecting cruise cabin opt
 
 ## Data Structure
 
-The active pricing file is `cabin_base_price_20260602.csv` (loaded in `index.html`; the older `cabin_base_price_20260130.csv` is kept for reference). Columns:
+The active pricing file is `cabin_base_price_20260721.csv` (loaded in `index.html`; older files like `cabin_base_price_20260602.csv` are kept for reference). Columns:
 - **Cabin Type**: Room category (Inside, Oceanview, Balcony, Club Balcony Suite, Suite, The Haven)
 - **Cabin Category**: Specific cabin name/description
 - **Cabin Base Price**: Total base price for 2 guests (solo cabins = 1 guest)

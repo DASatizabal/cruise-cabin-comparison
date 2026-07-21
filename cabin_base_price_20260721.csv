@@ -1,0 +1,31 @@
+Cabin Type, Cabin Category, Cabin Base Price, Up To Guests, Sq Ft Total, Balcony Size, Per Person
+Balcony, Aft-Facing Balcony, 2296, 3, 216 - 426, 40 - 149, 724
+Balcony, Balcony, 1416, 4, 214 - 367, 38 - 108, 504
+Balcony, Family Balcony, 1816, 4, 213 - 234, 38 - 58, 604
+Balcony, Guarantee Balcony, 1476, 4, 218, 42, 519
+Balcony, Solo Balcony, 2278, 1, 214 - 367, 38 - 90,
+Club Balcony Suite, Club Balcony Suite, 1568, 4, 249 - 361, 42 - 101, 542
+Club Balcony Suite, Club Balcony Suite with Larger Balcony, 1848, 4, 329 - 439, 102 - 140, 612
+Club Balcony Suite, Family Club Balcony Suite, 1648, 4, 249, 42, 562
+Club Balcony Suite, Guarantee Club Balcony Suite, 1676, 4, , , 569
+Inside, Family Inside, 1156, 4, 135, N/A, 439
+Inside, Guarantee Inside, 996, 4, 135, N/A, 399
+Inside, Inside, 1036, 4, 135 - 201, N/A, 409
+Inside, Solo Inside, 1438, 1, 135 - 201, N/A,
+Oceanview, Family Oceanview, 1716, 5, 240 - 372, N/A, 579
+Oceanview, Guarantee Oceanview, 1356, 2, 160, N/A, 489
+Oceanview, Oceanview with Picture Window, 1396, 2, 160 - 245, N/A, 499
+Oceanview, Solo Oceanview, 1658, 1, 160 - 245, N/A,
+Suite, Family Suite, 2736, 6, 512 - 562, 45, 834
+Suite, Penthouse Suite with Balcony, 3376, 3, 339 - 342, 65 - 68, 994
+The Haven, The Haven 2-Bedroom Family Villa with Balcony, 10696, 6, 538, 43, 2824
+The Haven, The Haven 2-Bedroom Family Villa with Large Balcony, 11176, 6, 622, 127, 2944
+The Haven, The Haven Aft-Facing Penthouse with Balcony, 7296, 4, 571 - 595, 151 - 175, 1974
+The Haven, The Haven Aft-Facing Penthouse with Large Balcony, 7416, 4, 619 - 668, 199 - 248, 2004
+The Haven, The Haven Courtyard Penthouse with Balcony, 7256, 3, 324, 54, 1964
+The Haven, The Haven Courtyard Penthouse with Large Balcony, 7416, 3, 374 - 620, 43 - 146, 2004
+The Haven, The Haven Family Villa Suite with Balcony, 6656, 5, 501, 84, 1814
+The Haven, The Haven Forward-Facing Penthouse with Balcony, 6576, 4, 415 - 466, 27 - 46, 1794
+The Haven, The Haven Penthouse Suite with Balcony, 6416, 3, 436 - 449, 84 - 97, 1754
+The Haven, The Haven Premier Owner's Suite with Large Balcony, 21196, 8, 2130, 516,
+The Haven, The Haven Suite with Balcony, 6336, 4, 381, 61, 1734
