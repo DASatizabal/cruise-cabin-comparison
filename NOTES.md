@@ -33,7 +33,9 @@ Briefing carried over from the Deck Finder project (public repo DASatizabal/deck
 
 ## Current project direction
 
-- Turn this app into a decision guide for the family comparing two NCL sailings, both round trip from Miami:
-  - Jun 11, 2027, Norwegian Getaway, 3 nights (Great Stirrup Cay, Nassau).
-  - Jun 14, 2027, Norwegian Aura, 5 nights (Puerto Plata, Great Stirrup Cay, 2 sea days).
+- Turn this app into a decision guide that presents the family with three options, all NCL, all round trip from Miami:
+  1. 3 nights: Jun 11 to Jun 14, 2027, Norwegian Getaway (Great Stirrup Cay, Nassau).
+  2. 5 nights: Jun 14 to Jun 19, 2027, Norwegian Aura (Puerto Plata, Great Stirrup Cay, 2 sea days).
+  3. 8 nights: both cruises back to back, Jun 11 to Jun 19, 2027. Leave the Getaway in Miami on the morning of Jun 14 and board the Aura that afternoon.
+- The 8-night option is two separate bookings on two different ships, so its price is the sum of both. It still needs only the same 2 sailing lookups from CruiseFeed.
 - Pull cabins, prices, and availability as close to real time as possible, using CruiseFeed without spending the free allowance carelessly.
