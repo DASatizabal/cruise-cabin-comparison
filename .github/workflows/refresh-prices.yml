@@ -1,0 +1,71 @@
+name: Refresh prices
+
+# Daily: read both NCL sailing pages at 2, 3, 4 and 5 guests (8 page loads, free).
+# Mondays: also run the CruiseFeed cross check, only if the CRUISEFEED_KEY repo secret exists.
+# Scheduled runs only happen on the default branch (main). The push trigger below lets
+# this branch test the workflow on GitHub's runners before it is merged.
+on:
+  schedule:
+    - cron: "17 10 * * *"   # 10:17 UTC, about 6:17 AM Miami time in summer
+  workflow_dispatch:
+    inputs:
+      cruisefeed:
+        description: "Also run the CruiseFeed cross check"
+        type: boolean
+        default: false
+  push:
+    branches: [claude/cabin-selector-improvements-08QHA]
+    paths:
+      - tools/fetch_prices.py
+      - tools/check_prices.py
+      - .github/workflows/refresh-prices.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-prices
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decide whether to run the CruiseFeed cross check
+        id: cf
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.cruisefeed }}" = "true" ]; then
+            echo "flag=--cruisefeed" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "schedule" ] && [ "$(date -u +%u)" = "1" ]; then
+            echo "flag=--cruisefeed" >> "$GITHUB_OUTPUT"
+          else
+            echo "flag=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch prices from NCL into a new file
+        env:
+          CRUISEFEED_KEY: ${{ secrets.CRUISEFEED_KEY }}
+        run: python3 tools/fetch_prices.py --out data/prices.new.json --previous data/prices.json ${{ steps.cf.outputs.flag }}
+
+      - name: Format check (keeps the old file if this fails)
+        run: python3 tools/check_prices.py data/prices.new.json
+
+      - name: Replace the data file and commit
+        run: |
+          mv data/prices.new.json data/prices.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/prices.json
+          if git diff --cached --quiet; then
+            echo "No change to commit."
+            exit 0
+          fi
+          git commit -m "Refresh prices $(date -u +%Y-%m-%d)"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((2 ** i))
+          done
+          exit 1

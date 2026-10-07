@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NCL Cabin Comparison - Norwegian Joy | Nov 20-23, 2026</title>
+    <title>June 2027 Family Cruise</title>
+    <meta name="description" content="Three Norwegian Cruise Line options from Miami in June 2027: 3 nights, 5 nights, or 8 nights back to back.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -13,39 +14,31 @@
             --ocean-blue: #1e3a5f;
             --teal: #0d9488;
             --teal-light: #14b8a6;
+            --teal-wash: rgba(13, 148, 136, 0.1);
             --gold: #f59e0b;
+            --gold-wash: #fef3c7;
+            --red: #b91c1c;
+            --red-wash: #fef2f2;
             --white: #ffffff;
             --gray-50: #f9fafb;
             --gray-100: #f3f4f6;
             --gray-200: #e5e7eb;
             --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
             --gray-500: #6b7280;
             --gray-600: #4b5563;
             --gray-700: #374151;
             --gray-800: #1f2937;
             --gray-900: #111827;
-
-            /* Room type colors */
-            --inside-color: #6b7280;
-            --oceanview-color: #0ea5e9;
-            --balcony-color: #22c55e;
-            --club-balcony-color: #8b5cf6;
-            --suite-color: #f59e0b;
-            --haven-color: #ec4899;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--gray-100);
             color: var(--gray-800);
             line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
         }
 
         /* Hero Header */
@@ -74,100 +67,33 @@
             letter-spacing: 0.025em;
         }
 
-        .ship-name {
-            font-size: 2.5rem;
+        .hero-title {
+            font-size: 2.25rem;
             font-weight: 700;
-            margin-bottom: 0.25rem;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            padding-right: 3rem;
         }
 
-        .ship-name a {
-            color: var(--white);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .ship-name a:hover {
-            color: var(--teal-light);
-        }
-
-        .cruise-dates {
-            font-size: 1.25rem;
+        .hero-subtitle {
+            font-size: 1.1rem;
             font-weight: 300;
             opacity: 0.9;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1.25rem;
         }
 
-        .itinerary-title {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--teal-light);
-            margin-bottom: 1.5rem;
-        }
-
-        .itinerary-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .itinerary-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        .as-of {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 9999px;
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
         }
 
         @media (max-width: 480px) {
-            .itinerary-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .port-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 1rem;
-            backdrop-filter: blur(10px);
-        }
-
-        .port-day {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            opacity: 0.7;
-            margin-bottom: 0.25rem;
-        }
-
-        .port-name {
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .port-time {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-
-        .validity-banner {
-            background: linear-gradient(90deg, var(--gold), #fbbf24);
-            color: var(--gray-900);
-            padding: 0.875rem 1.25rem;
-            border-radius: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            animation: pulse-glow 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
-            50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.5); }
-        }
-
-        .validity-icon {
-            font-size: 1.25rem;
+            .hero-title { font-size: 1.75rem; }
         }
 
         /* Wave Animation */
@@ -196,481 +122,262 @@
             100% { transform: translateX(-50%); }
         }
 
-        /* Controls Panel */
-        .controls {
-            max-width: 1200px;
-            margin: 0.5rem auto 2rem;
-            padding: 0 1rem;
-            position: relative;
-            z-index: 10;
+        @media (prefers-reduced-motion: reduce) {
+            .wave { animation: none; }
         }
 
-        .controls-panel {
+        /* Layout */
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .panel {
             background: var(--white);
             border-radius: 16px;
-            padding: 1.5rem;
+            padding: 1.25rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-top: 1.5rem;
         }
 
-        .controls-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            align-items: flex-start;
+        .panel-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ocean-blue);
+            margin-bottom: 0.6rem;
         }
 
-        .filter-tabs {
+        .controls-grid {
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 800px) {
+            .controls-grid { grid-template-columns: auto 1fr; gap: 2rem; }
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-top: 0.5rem;
+        }
+
+        /* Segmented buttons */
+        .seg {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
-            flex: 1;
         }
 
-        .filter-tab {
-            padding: 0.5rem 1rem;
+        .seg button {
+            min-width: 3rem;
+            padding: 0.6rem 1rem;
             border: 2px solid var(--gray-200);
             border-radius: 9999px;
             background: var(--white);
-            font-size: 0.875rem;
-            font-weight: 500;
+            font: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gray-700);
             cursor: pointer;
             transition: all 0.2s;
-            white-space: nowrap;
         }
 
-        .filter-tab:hover {
-            border-color: var(--teal);
-            color: var(--teal);
-        }
+        .seg button:hover { border-color: var(--teal); color: var(--teal); }
 
-        .filter-tab.active {
+        .seg button[aria-pressed="true"] {
             background: var(--teal);
             border-color: var(--teal);
             color: var(--white);
         }
 
-        .filter-tab[data-filter="Inside"].active { background: var(--inside-color); border-color: var(--inside-color); }
-        .filter-tab[data-filter="Oceanview"].active { background: var(--oceanview-color); border-color: var(--oceanview-color); }
-        .filter-tab[data-filter="Balcony"].active { background: var(--balcony-color); border-color: var(--balcony-color); }
-        .filter-tab[data-filter="Club Balcony Suite"].active { background: var(--club-balcony-color); border-color: var(--club-balcony-color); }
-        .filter-tab[data-filter="Suite"].active { background: var(--suite-color); border-color: var(--suite-color); }
-        .filter-tab[data-filter="The Haven"].active { background: var(--haven-color); border-color: var(--haven-color); }
+        .seg.small button { padding: 0.45rem 0.85rem; font-size: 0.85rem; }
 
-        .sort-select {
-            padding: 0.5rem 2rem 0.5rem 1rem;
-            border: 2px solid var(--gray-200);
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            background: var(--white);
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.5rem center;
-            background-size: 1.25rem;
-        }
-
-        /* Guest Count Section */
-        .guest-section {
-            display: flex;
-            gap: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--gray-200);
-            margin-top: 1rem;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .guest-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .guest-input-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--gray-600);
-        }
-
-        .stepper {
-            display: flex;
-            align-items: center;
-            gap: 0;
-            border: 2px solid var(--gray-200);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .stepper-btn {
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: var(--gray-50);
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            color: var(--gray-700);
-            transition: background 0.15s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .stepper-btn:hover:not(:disabled) {
-            background: var(--gray-200);
-        }
-
-        .stepper-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .stepper-value {
-            width: 36px;
-            text-align: center;
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            border-left: 1px solid var(--gray-200);
-            border-right: 1px solid var(--gray-200);
-            height: 36px;
-            line-height: 36px;
-        }
-
-        .guest-total {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--gray-500);
-            padding-bottom: 0.4rem;
-        }
-
-        .package-toggles {
-            display: flex;
-            gap: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--gray-200);
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .toggle-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--gray-700);
-        }
-
-        .toggle-price {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-        }
-
-        /* iOS-style Toggle */
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 28px;
-            appearance: none;
-            background: var(--gray-300);
-            border-radius: 9999px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .toggle-switch:checked {
-            background: var(--teal);
-        }
-
-        .toggle-switch::before {
-            content: '';
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            background: var(--white);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s;
-        }
-
-        .toggle-switch:checked::before {
-            transform: translateX(22px);
-        }
-
-        /* Cabin Grid */
-        .cabin-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem 2rem;
+        /* Option cards */
+        .options {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
+            gap: 1.25rem;
+            margin-top: 1.5rem;
         }
 
-        @media (max-width: 1024px) {
-            .cabin-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        @media (min-width: 1000px) {
+            .options { grid-template-columns: repeat(3, 1fr); align-items: start; }
         }
 
-        @media (max-width: 640px) {
-            .cabin-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Cabin Card */
-        .cabin-card {
+        .card {
             background: var(--white);
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
-            position: relative;
         }
 
-        .cabin-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
-        }
+        .card.featured { outline: 3px solid var(--teal); outline-offset: -3px; }
 
-        .cabin-card.selected {
-            outline: 3px solid var(--teal);
-            outline-offset: -3px;
-        }
-
-        .cabin-card.dimmed {
-            opacity: 0.5;
-        }
-
-        .cabin-card.dimmed:hover {
-            transform: none;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .max-guests-note {
-            background: var(--gray-100);
-            color: var(--gray-500);
-            text-align: center;
-            padding: 0.5rem;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .cabin-card.sold-out {
-            opacity: 0.6;
-        }
-
-        .cabin-card.sold-out:hover {
-            transform: none;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .sold-out-note {
-            background: #b91c1c;
-            color: #fff;
-            text-align: center;
-            padding: 0.5rem;
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        .price-amount.sold-out-price {
-            color: #b91c1c;
-        }
-
-        .btn-compare:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background: var(--gray-100);
-            color: var(--gray-500);
-        }
-
-        .btn-compare:disabled:hover {
-            background: var(--gray-100);
-        }
-
-        .cabin-header {
-            padding: 1.25rem;
+        .card-head {
+            padding: 1.1rem 1.25rem;
             border-bottom: 1px solid var(--gray-100);
         }
 
-        .cabin-type-badge {
+        .option-badge {
             display: inline-block;
-            padding: 0.25rem 0.75rem;
+            padding: 0.2rem 0.75rem;
             border-radius: 9999px;
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.025em;
+            letter-spacing: 0.03em;
+            background: var(--teal-wash);
+            color: var(--teal);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            line-height: 1.25;
+        }
+
+        .card-dates {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin-top: 0.15rem;
+        }
+
+        .stops {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            margin-top: 0.6rem;
+        }
+
+        .stop {
+            font-size: 0.75rem;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border-radius: 9999px;
+            padding: 0.15rem 0.6rem;
+        }
+
+        .card-body { padding: 1.1rem 1.25rem 1.25rem; }
+
+        .cabin-line {
+            font-size: 0.85rem;
+            color: var(--gray-600);
             margin-bottom: 0.75rem;
         }
 
-        .badge-Inside { background: #f3f4f6; color: var(--inside-color); }
-        .badge-Oceanview { background: #e0f2fe; color: #0369a1; }
-        .badge-Balcony { background: #dcfce7; color: #166534; }
-        .badge-Club-Balcony-Suite { background: #ede9fe; color: #6d28d9; }
-        .badge-Suite { background: #fef3c7; color: #b45309; }
-        .badge-The-Haven { background: #fce7f3; color: #be185d; }
+        .cabin-line strong { color: var(--gray-900); }
 
-        .cabin-name {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            margin-bottom: 0.5rem;
-            line-height: 1.3;
-        }
-
-        .cabin-specs {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.875rem;
-            color: var(--gray-500);
-            flex-wrap: wrap;
-        }
-
-        .cabin-spec {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .cabin-body {
-            padding: 1.25rem;
-        }
-
-        .price-display {
-            text-align: center;
-            margin-bottom: 1rem;
+        .price-total {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: var(--deep-ocean);
+            line-height: 1.1;
         }
 
         .price-label {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--gray-500);
-            margin-bottom: 0.25rem;
-        }
-
-        .price-amount {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--deep-ocean);
-        }
-
-        .price-amount.flash {
-            animation: price-flash 0.5s ease;
-        }
-
-        @keyframes price-flash {
-            0%, 100% { color: var(--deep-ocean); }
-            50% { color: var(--teal); }
-        }
-
-        .price-per-person {
-            font-size: 0.875rem;
+            letter-spacing: 0.04em;
             color: var(--gray-500);
         }
 
-        .tips-onboard-note {
-            font-size: 0.8rem;
-            color: var(--suite-color);
-            font-weight: 500;
-            margin-top: 0.25rem;
-        }
-
-        .tips-included-note {
-            font-size: 0.8rem;
-            color: var(--teal);
+        .price-pp {
+            font-size: 1rem;
             font-weight: 600;
-            margin-top: 0.25rem;
+            color: var(--gray-700);
+            margin-top: 0.15rem;
         }
 
-        .toggle-container.toggle-disabled {
-            opacity: 0.45;
-            pointer-events: none;
+        .tax-note {
+            font-size: 0.78rem;
+            color: var(--gray-500);
+            margin-top: 0.15rem;
         }
 
-        .deposit-info {
+        .rows { margin-top: 0.9rem; border-top: 1px solid var(--gray-200); }
+
+        .row {
             display: flex;
             justify-content: space-between;
-            padding: 0.75rem;
+            gap: 1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.875rem;
+        }
+
+        .row .k { color: var(--gray-600); }
+        .row .v { font-weight: 600; color: var(--gray-900); text-align: right; white-space: nowrap; }
+        .row.muted .v { color: var(--gray-500); font-weight: 500; white-space: normal; }
+
+        .addon {
+            margin-top: 0.75rem;
             background: var(--gray-50);
             border-radius: 8px;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-        }
-
-        .deposit-label {
-            color: var(--gray-600);
-        }
-
-        .deposit-amount {
-            font-weight: 600;
-            color: var(--teal);
-        }
-
-        .cabin-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            text-align: center;
-            text-decoration: none;
-        }
-
-        .btn-primary {
-            background: var(--teal);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            background: var(--teal-light);
-        }
-
-        .btn-secondary {
-            background: var(--gray-100);
+            padding: 0.6rem 0.75rem;
+            font-size: 0.82rem;
             color: var(--gray-700);
         }
 
-        .btn-secondary:hover {
-            background: var(--gray-200);
+        .addon strong { color: var(--gray-900); }
+
+        .notice {
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
         }
 
-        .btn-compare {
+        .notice.bad { background: var(--red-wash); color: var(--red); }
+        .notice.info { background: var(--gold-wash); color: var(--gray-800); }
+
+        .ship-pick { margin-bottom: 0.9rem; }
+
+        .ship-pick label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin: 0.5rem 0 0.25rem;
+        }
+
+        .ship-pick select {
+            width: 100%;
+            padding: 0.55rem 0.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font: inherit;
+            font-size: 0.9rem;
             background: var(--white);
-            border: 2px solid var(--teal);
-            color: var(--teal);
+            color: var(--gray-900);
         }
 
-        .btn-compare:hover {
-            background: var(--teal);
-            color: var(--white);
+        details.days {
+            margin-top: 0.9rem;
+            font-size: 0.85rem;
         }
 
-        .btn-compare.selected {
-            background: var(--teal);
-            color: var(--white);
+        details.days summary {
+            cursor: pointer;
+            color: var(--ocean-blue);
+            font-weight: 600;
         }
+
+        details.days ol { list-style: none; margin-top: 0.5rem; }
+
+        details.days li {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.3rem 0;
+            border-bottom: 1px dashed var(--gray-200);
+        }
+
+        details.days li span:last-child { color: var(--gray-500); white-space: nowrap; }
 
         .ncl-link {
             display: block;
@@ -680,2336 +387,422 @@
             font-size: 0.875rem;
             text-decoration: none;
             border-top: 1px solid var(--gray-100);
-            transition: background 0.2s;
         }
 
-        .ncl-link:hover {
-            background: var(--gray-50);
-        }
+        .ncl-link:hover { background: var(--gray-50); }
 
-        /* Breakdown */
-        .breakdown {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .breakdown.open {
-            max-height: 2000px;
-        }
-
-        .breakdown-content {
-            padding: 1rem;
-            background: var(--gray-50);
-            border-radius: 8px;
-            margin-top: 1rem;
-        }
-
-        .breakdown-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            font-size: 0.875rem;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .breakdown-row:last-child {
-            border-bottom: none;
-        }
-
-        .breakdown-row.total {
-            font-weight: 700;
-            font-size: 1rem;
-            padding-top: 0.75rem;
-            border-top: 2px solid var(--gray-300);
-            margin-top: 0.5rem;
-        }
-
-        .breakdown-label {
-            color: var(--gray-600);
-        }
-
-        .breakdown-value {
-            color: var(--gray-900);
-            font-weight: 500;
-        }
-
-        .breakdown-section-header {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--ocean-blue);
-            padding: 1rem 0 0.5rem;
-            margin-top: 0.75rem;
-            border-top: 2px dashed var(--gray-300);
-        }
-
-        .breakdown-row.tips-onboard {
-            background: #fef3c7;
-            margin: 0 -1rem;
-            padding: 0.5rem 1rem;
-            font-style: italic;
-        }
-
-        .breakdown-row.tips-onboard .breakdown-label {
-            color: var(--suite-color);
-        }
-
-        .breakdown-row.tips-onboard .breakdown-value {
-            color: var(--suite-color);
-        }
-
-        .guest-breakdown-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            font-size: 0.825rem;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .guest-breakdown-row:last-child {
-            border-bottom: none;
-        }
-
-        .guest-breakdown-label {
-            color: var(--gray-700);
-            font-weight: 500;
-        }
-
-        .guest-breakdown-detail {
-            color: var(--gray-500);
-            font-size: 0.75rem;
-            margin-top: 0.125rem;
-        }
-
-        .guest-breakdown-value {
-            font-weight: 600;
-            color: var(--gray-900);
-            white-space: nowrap;
-        }
-
-        .original-price {
-            text-decoration: line-through;
-            color: var(--gray-400);
-            font-size: 0.8em;
-            font-weight: 400;
-            margin-right: 0.35rem;
-        }
-
-        .free-tag {
-            display: inline-block;
-            background: var(--teal);
-            color: var(--white);
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 0.1rem 0.4rem;
-            border-radius: 4px;
-            margin-left: 0.25rem;
-            vertical-align: middle;
-        }
-
-        /* Comparison Tray */
-        .comparison-tray {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--deep-ocean);
-            color: var(--white);
-            padding: 1rem;
-            transform: translateY(100%);
-            transition: transform 0.3s;
-            z-index: 100;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .comparison-tray.visible {
-            transform: translateY(0);
-        }
-
-        .tray-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-
-        .tray-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .tray-count {
-            background: var(--teal);
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-
-        .tray-text {
-            font-size: 0.875rem;
-        }
-
-        .tray-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .btn-tray {
-            padding: 0.625rem 1.25rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-        }
-
-        .btn-compare-now {
-            background: var(--teal);
-            color: var(--white);
-        }
-
-        .btn-compare-now:hover {
-            background: var(--teal-light);
-        }
-
-        .btn-clear {
-            background: transparent;
-            color: var(--gray-300);
-            border: 1px solid var(--gray-600);
-        }
-
-        .btn-clear:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-            z-index: 200;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-        }
-
-        .modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal {
-            background: var(--white);
-            border-radius: 24px 24px 0 0;
-            width: 100%;
-            max-width: 1000px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: translateY(100%);
-            transition: transform 0.3s;
-        }
-
-        .modal-overlay.visible .modal {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            position: sticky;
-            top: 0;
-            background: var(--white);
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--gray-200);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .modal-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--gray-900);
-        }
-
-        .modal-close {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            background: var(--gray-100);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--gray-500);
-            transition: background 0.2s;
-        }
-
-        .modal-close:hover {
-            background: var(--gray-200);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        .comparison-grid {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .comparison-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-        .comparison-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-
-        @media (max-width: 768px) {
-            .comparison-grid.cols-2,
-            .comparison-grid.cols-3 {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .comparison-column {
-            border: 2px solid var(--gray-200);
+        /* 8 night explainer */
+        .explainer {
+            background: linear-gradient(135deg, #ecfeff 0%, #f0fdfa 100%);
+            border: 1px solid var(--teal-light);
             border-radius: 16px;
-            overflow: hidden;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
         }
 
-        .comparison-cabin-header {
-            padding: 1rem;
-            background: var(--gray-50);
-            text-align: center;
+        .explainer h2 {
+            font-size: 1.1rem;
+            color: var(--deep-ocean);
+            margin-bottom: 0.6rem;
         }
 
-        .comparison-cabin-name {
-            font-weight: 600;
-            color: var(--gray-900);
-            margin-top: 0.5rem;
-        }
+        .explainer ul { padding-left: 1.2rem; }
+        .explainer li { margin: 0.35rem 0; }
 
-        .comparison-cabin-body {
-            padding: 1rem;
-        }
+        /* Comparison table */
+        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-        .comparison-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.625rem 0;
-            border-bottom: 1px solid var(--gray-100);
+        table.compare {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 0.875rem;
+            min-width: 520px;
         }
 
-        .comparison-row:last-child {
-            border-bottom: none;
+        table.compare th, table.compare td {
+            padding: 0.6rem 0.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            text-align: right;
+            vertical-align: top;
         }
 
-        .comparison-row.highlight {
-            background: var(--gray-50);
-            margin: 0 -1rem;
-            padding: 0.625rem 1rem;
-            font-weight: 600;
-        }
-
-        .comparison-label {
-            color: var(--gray-500);
-        }
-
-        .comparison-value {
-            font-weight: 500;
-            color: var(--gray-900);
-        }
-
-        .comparison-total {
-            text-align: center;
-            padding: 1rem;
-            background: var(--deep-ocean);
-            color: var(--white);
-        }
-
-        .comparison-total-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            opacity: 0.8;
-        }
-
-        .comparison-total-amount {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        /* Inline Child Age Inputs */
-        .child-ages-inline {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .child-age-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.2rem;
-        }
-
-        .child-age-card-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--gray-600);
-        }
-
-        .child-age-card-row {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            font-size: 0.8rem;
-            color: var(--gray-500);
-        }
-
-        .child-age-inline-input {
-            width: 50px;
-            padding: 0.35rem;
-            border: 2px solid var(--gray-200);
-            border-radius: 6px;
-            font-size: 0.875rem;
-            text-align: center;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .child-age-inline-input:focus {
-            outline: none;
-            border-color: var(--teal);
-        }
+        table.compare th:first-child, table.compare td:first-child { text-align: left; }
+        table.compare thead th { color: var(--gray-600); font-weight: 600; font-size: 0.8rem; }
+        table.compare tbody tr { cursor: pointer; }
+        table.compare tbody tr:hover { background: var(--gray-50); }
+        table.compare tr.selected { background: var(--teal-wash); }
+        table.compare .pp { display: block; font-size: 0.75rem; color: var(--gray-500); font-weight: 400; }
+        table.compare .na { color: var(--gray-500); font-size: 0.8rem; }
 
         /* Footer */
         .footer {
             background: var(--deep-ocean);
             color: var(--white);
             padding: 2rem 1rem;
+            margin-top: 2rem;
+            font-size: 0.875rem;
+        }
+
+        .footer p { opacity: 0.8; margin-top: 0.5rem; }
+        .footer a { color: var(--teal-light); }
+
+        .loading, .load-error {
             text-align: center;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .payment-due {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            display: inline-block;
-            margin-bottom: 1rem;
-        }
-
-        .payment-due-label {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-
-        .payment-due-date {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .footer-note {
-            font-size: 0.875rem;
-            opacity: 0.7;
-            margin-top: 1rem;
-        }
-
-        /* No results */
-        .no-results {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--gray-500);
-        }
-
-        .no-results-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Running totals display */
-        .running-totals {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--gray-200);
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .running-total-item {
-            font-size: 0.875rem;
-        }
-
-        .running-total-label {
-            color: var(--gray-500);
-        }
-
-        .running-total-value {
-            font-weight: 600;
-            color: var(--teal);
-        }
-
-        /* Deposit Options */
-        .deposit-options-section {
-            padding-top: 1rem;
-            border-top: 1px solid var(--gray-200);
-            margin-top: 1rem;
-        }
-
-        .deposit-options-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--gray-700);
-            margin-bottom: 0.75rem;
-        }
-
-        .deposit-radio-group {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .deposit-radio-label {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--gray-200);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .deposit-radio-label:hover:not(.disabled) {
-            border-color: var(--teal);
-        }
-
-        .deposit-radio-label.active {
-            border-color: var(--teal);
-            background: rgba(13, 148, 136, 0.05);
-        }
-
-        .deposit-radio-label.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .deposit-radio-label input[type="radio"] {
-            margin-top: 0.2rem;
-            accent-color: var(--teal);
-        }
-
-        .deposit-radio-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.15rem;
-        }
-
-        .deposit-radio-name {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--gray-800);
-        }
-
-        .deposit-radio-desc {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-        }
-
-        /* Free at Sea Plus */
-        .fas-plus-section {
-            padding-top: 1rem;
-            border-top: 1px solid var(--gray-200);
-            margin-top: 1rem;
-        }
-
-        .fas-plus-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .fas-plus-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.15rem;
-        }
-
-        .fas-plus-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--gray-700);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .fas-plus-desc {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-        }
-
-        .fas-plus-savings {
-            font-size: 0.75rem;
-            color: var(--teal);
-            font-weight: 600;
-        }
-
-        .fas-plus-requires {
-            font-size: 0.7rem;
-            color: var(--suite-color);
-            font-weight: 500;
-        }
-
-        .fas-plus-info-btn {
-            background: none;
-            border: 2px solid var(--teal);
-            color: var(--teal);
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .fas-plus-info-btn:hover {
-            background: var(--teal);
-            color: var(--white);
-        }
-
-        .toggle-switch.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        /* FAS Plus Info Modal */
-        .fas-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .fas-modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .fas-modal {
-            background: var(--white);
-            border-radius: 16px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: scale(0.9);
-            transition: transform 0.3s;
-        }
-
-        .fas-modal-overlay.visible .fas-modal {
-            transform: scale(1);
-        }
-
-        .fas-modal-header {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--gray-200);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .fas-modal-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--gray-900);
-        }
-
-        .fas-modal-close {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: none;
-            background: var(--gray-100);
-            cursor: pointer;
-            font-size: 1.25rem;
-            color: var(--gray-500);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .fas-modal-close:hover {
-            background: var(--gray-200);
-        }
-
-        .fas-modal-body {
-            padding: 1.5rem;
-        }
-
-        .fas-modal-body p {
+            padding: 3rem 1rem;
             color: var(--gray-600);
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-            line-height: 1.6;
-        }
-
-        .cost-benefit-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            margin-top: 1rem;
-        }
-
-        .cost-benefit-table th {
-            background: var(--gray-50);
-            padding: 0.6rem 0.75rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--gray-700);
-            border-bottom: 2px solid var(--gray-200);
-        }
-
-        .cost-benefit-table td {
-            padding: 0.5rem 0.75rem;
-            border-bottom: 1px solid var(--gray-100);
-            color: var(--gray-700);
-        }
-
-        .cost-benefit-table tr.total-row td {
-            font-weight: 700;
-            border-top: 2px solid var(--gray-300);
-            color: var(--gray-900);
-        }
-
-        .cost-benefit-table .savings {
-            color: var(--teal);
-            font-weight: 600;
-        }
-
-        .credit-badge {
-            display: inline-block;
-            background: var(--gold);
-            color: var(--gray-900);
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 0.1rem 0.4rem;
-            border-radius: 4px;
-            margin-left: 0.25rem;
-            vertical-align: middle;
         }
     </style>
 </head>
 <body>
-    <!-- Hero Header -->
     <header class="hero">
         <div class="hero-content">
-            <span class="version-badge">v2.5.0</span>
-            <h1 class="ship-name">
-                <a href="https://www.ncl.com/cruise-ships/norwegian-joy" target="_blank" rel="noopener">Norwegian Joy</a>
-            </h1>
-            <p class="cruise-dates">Fri, Nov 20 - Mon, Nov 23, 2026</p>
-            <p class="itinerary-title">3-Day Bahamas Round-trip Miami: Great Stirrup Cay &amp; Nassau</p>
-
-            <div class="itinerary-grid">
-                <div class="port-card">
-                    <div class="port-day">Friday</div>
-                    <div class="port-name">Miami, Florida</div>
-                    <div class="port-time">Embark 4:00 PM</div>
-                </div>
-                <div class="port-card">
-                    <div class="port-day">Saturday</div>
-                    <div class="port-name">Nassau, Bahamas</div>
-                    <div class="port-time">7:00 AM - 5:00 PM</div>
-                </div>
-                <div class="port-card">
-                    <div class="port-day">Sunday</div>
-                    <div class="port-name">Great Stirrup Cay</div>
-                    <div class="port-time">7:00 AM - 5:00 PM</div>
-                </div>
-                <div class="port-card">
-                    <div class="port-day">Monday</div>
-                    <div class="port-name">Miami, Florida</div>
-                    <div class="port-time">Debark 7:00 AM</div>
-                </div>
-            </div>
-
-            <div class="validity-banner">
-                <span class="validity-icon">&#9888;</span>
-                <span>Prices valid as of <strong id="pricesValidDate">June 2, 2026</strong></span>
-            </div>
+            <span class="version-badge" id="versionBadge"></span>
+            <h1 class="hero-title">Our June 2027 Family Cruise</h1>
+            <p class="hero-subtitle">Three choices, all Norwegian Cruise Line, all round trip from Miami: 3 nights, 5 nights, or both back to back for 8 nights.</p>
+            <span class="as-of">Prices as of <strong id="asOf">loading...</strong></span>
         </div>
-
-        <div class="wave-container">
-            <div class="wave"></div>
-        </div>
+        <div class="wave-container"><div class="wave"></div></div>
     </header>
 
-    <!-- Controls Panel -->
-    <section class="controls">
-        <div class="controls-panel">
-            <div class="controls-row">
-                <div class="filter-tabs">
-                    <button class="filter-tab active" data-filter="All">All</button>
-                    <button class="filter-tab" data-filter="Inside">Inside</button>
-                    <button class="filter-tab" data-filter="Oceanview">Oceanview</button>
-                    <button class="filter-tab" data-filter="Balcony">Balcony</button>
-                    <button class="filter-tab" data-filter="Club Balcony Suite">Club Balcony</button>
-                    <button class="filter-tab" data-filter="Suite">Suite</button>
-                    <button class="filter-tab" data-filter="The Haven">The Haven</button>
+    <main class="wrap">
+        <section class="panel" aria-label="Choose guests and cabin type">
+            <div class="controls-grid">
+                <div>
+                    <div class="panel-title">People in each cabin</div>
+                    <div class="seg" id="guestButtons" role="group" aria-label="People in each cabin"></div>
                 </div>
-
-                <select class="sort-select" id="sortSelect">
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="sqft-desc">Sq Ft: Large to Small</option>
-                    <option value="sqft-asc">Sq Ft: Small to Large</option>
-                </select>
-            </div>
-
-            <div class="guest-section">
-                <div class="guest-input-group">
-                    <label class="guest-input-label">Adults (21+)</label>
-                    <div class="stepper">
-                        <button class="stepper-btn" id="adultDec">-</button>
-                        <div class="stepper-value" id="adultCount">2</div>
-                        <button class="stepper-btn" id="adultInc">+</button>
-                    </div>
-                </div>
-                <div class="guest-input-group">
-                    <label class="guest-input-label">Children (0-20)</label>
-                    <div class="stepper">
-                        <button class="stepper-btn" id="childDec">-</button>
-                        <div class="stepper-value" id="childCount">0</div>
-                        <button class="stepper-btn" id="childInc">+</button>
-                    </div>
-                </div>
-                <div class="guest-total" id="guestTotal">Total: 2 guests</div>
-                <div class="child-ages-inline" id="childAgesInline">
-                    <!-- Generated dynamically when children are added -->
+                <div>
+                    <div class="panel-title">Cabin type</div>
+                    <div class="seg small" id="typeButtons" role="group" aria-label="Cabin type"></div>
+                    <p class="hint">Prices are for one cabin with that many people in it.</p>
                 </div>
             </div>
+        </section>
 
-            <div class="package-toggles">
-                <div class="toggle-container">
-                    <input type="checkbox" class="toggle-switch" id="drinkToggle">
-                    <div>
-                        <div class="toggle-label">Drink Package</div>
-                        <div class="toggle-price" id="drinkToggleDesc">+$171 (2 adults x $85.50)</div>
-                    </div>
-                </div>
-
-                <div class="toggle-container">
-                    <input type="checkbox" class="toggle-switch" id="dinnerToggle">
-                    <div>
-                        <div class="toggle-label">Dinner Package</div>
-                        <div class="toggle-price" id="dinnerToggleDesc">+$40 (2 guests x $20)</div>
-                    </div>
-                </div>
-
-                <div class="toggle-container" id="tipsToggleContainer">
-                    <input type="checkbox" class="toggle-switch" id="tipsToggle" checked>
-                    <div>
-                        <div class="toggle-label">When to Pay Tips</div>
-                        <div class="toggle-price" id="tipsToggleDesc">Before cruise (by 7/23/2026)</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Free at Sea Plus -->
-            <div class="fas-plus-section" id="fasPlusSection">
-                <div class="fas-plus-toggle">
-                    <input type="checkbox" class="toggle-switch" id="fasPlusToggle">
-                    <div class="fas-plus-info">
-                        <div class="fas-plus-title">
-                            Free at Sea Plus
-                            <button class="fas-plus-info-btn" id="fasPlusInfoBtn" title="What's included?">?</button>
-                        </div>
-                        <div class="fas-plus-desc" id="fasPlusDesc">+$300 (2 guests x $150) &mdash; Includes prepaid gratuities</div>
-                        <div class="fas-plus-requires" id="fasPlusRequires" style="display: none;">Enabling will auto-select Drink &amp; Dinner packages if not already selected</div>
-                        <div class="fas-plus-savings" id="fasPlusSavings" style="display: none;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Deposit Options -->
-            <div class="deposit-options-section" id="depositOptionsSection">
-                <div class="deposit-options-title">Deposit Option</div>
-                <div class="deposit-radio-group" id="depositRadioGroup">
-                    <label class="deposit-radio-label active" data-option="regular">
-                        <input type="radio" name="depositOption" value="regular" checked>
-                        <div class="deposit-radio-info">
-                            <span class="deposit-radio-name">Regular Deposit</span>
-                            <span class="deposit-radio-desc">Suite/Haven: 10% of fare | Others: $100</span>
-                        </div>
-                    </label>
-                    <label class="deposit-radio-label" data-option="credit150">
-                        <input type="radio" name="depositOption" value="credit150">
-                        <div class="deposit-radio-info">
-                            <span class="deposit-radio-name">$150 Credit Deposit</span>
-                            <span class="deposit-radio-desc">Pay $150 deposit, receive $150 credit toward your cruise</span>
-                        </div>
-                    </label>
-                </div>
-            </div>
-
-            <div class="running-totals" id="runningTotals" style="display: none;">
-                <div class="running-total-item">
-                    <span class="running-total-label">Package additions: </span>
-                    <span class="running-total-value" id="packageTotal">$0</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Cabin Grid -->
-    <main class="cabin-grid" id="cabinGrid">
-        <!-- Cabins will be rendered here -->
+        <div id="app"><div class="loading">Loading prices...</div></div>
     </main>
 
-    <!-- Comparison Tray -->
-    <div class="comparison-tray" id="comparisonTray">
-        <div class="tray-content">
-            <div class="tray-info">
-                <div class="tray-count" id="trayCount">0</div>
-                <div class="tray-text">cabins selected for comparison (max 3)</div>
-            </div>
-            <div class="tray-actions">
-                <button class="btn-tray btn-clear" id="clearComparison">Clear All</button>
-                <button class="btn-tray btn-compare-now" id="compareNow">Compare Now</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Comparison Modal -->
-    <div class="modal-overlay" id="comparisonModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Side-by-Side Comparison</h2>
-                <button class="modal-close" id="closeModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="comparison-grid" id="comparisonGrid">
-                    <!-- Comparison content will be rendered here -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- FAS Plus Info Modal -->
-    <div class="fas-modal-overlay" id="fasPlusModal">
-        <div class="fas-modal">
-            <div class="fas-modal-header">
-                <h3 class="fas-modal-title">Free at Sea Plus &mdash; Cost/Benefit Analysis</h3>
-                <button class="fas-modal-close" id="closeFasModal">&times;</button>
-            </div>
-            <div class="fas-modal-body">
-                <p>
-                    Free at Sea Plus is an upgrade package that adds premium perks on top of the standard
-                    Free at Sea benefits. It costs <strong>$49.99/person/day</strong>, totaling approximately
-                    <strong>$300 for a 3-day cruise (2 guests)</strong>.
-                </p>
-                <p style="background: #fef3c7; padding: 0.75rem; border-radius: 8px; font-size: 0.8rem;">
-                    Free at Sea Plus applies ONLY to Guests 1 &amp; 2.
-                </p>
-                <table class="cost-benefit-table" id="costBenefitTable">
-                    <!-- Populated dynamically -->
-                </table>
-                <p style="margin-top: 1.5rem; font-size: 0.8rem;">
-                    <strong>Resources:</strong><br>
-                    <a href="https://www.ncl.com/content/dam/ncl/us/en/promo/cruise-deals/Free_at_sea_Plus_ver_11042025.pdf" target="_blank" rel="noopener" style="color: var(--teal);">Free at Sea Plus Comparison (PDF)</a><br>
-                    <a href="https://www.ncl.com/faq/what-is-included-in-free-at-sea-plus-and-how-much-does-it-cost-" target="_blank" rel="noopener" style="color: var(--teal);">What is included in Free at Sea Plus? (NCL FAQ)</a>
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
     <footer class="footer">
-        <div class="footer-content">
-            <div class="payment-due">
-                <div class="payment-due-label">Final Payment Due</div>
-                <div class="payment-due-date">July 23, 2026</div>
-            </div>
-            <p class="footer-note">Deposits are refundable if canceled by July 23, 2026</p>
+        <div class="wrap">
+            <strong>About these prices</strong>
+            <p>Prices come from Norwegian Cruise Line's website and are checked once a day. NCL's prices already include taxes, fees and port expenses. They change often, so check NCL before booking.</p>
+            <p id="crossCheck"></p>
+            <p id="footerVersion"></p>
         </div>
     </footer>
 
     <script>
-        // ==================== CABIN DATA (loaded from CSV) ====================
-        let CABIN_DATA = [];
+        const APP_VERSION = "3.0.0";
+        const DATA_URL = "data/prices.json";
+        const GUEST_COUNTS = [2, 3, 4, 5];
+        const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
+        const STORE_KEY = "cruise-decision-guide";
 
-        const CRUISE_NIGHTS = 3;
-        const TAX_PER_PERSON = 150;
-        const EXTRA_GUEST_FARE = 438;
-        const PROMO_DISCOUNT = 0.50; // 50% off all cruises
-        const FREE_GUEST_POSITIONS = [3, 4]; // 3rd & 4th guest sail free
+        let DATA = null, G = null, A = null;   // data file, Getaway sailing, Aura sailing
+        const state = { guests: 2, type: "balcony", mode: "same", getawayType: "balcony", auraType: "balcony" };
 
-        // Resolves the most recent cabin_base_price_YYYYMMDD.csv without hardcoding a filename.
-        // GitHub Pages has no directory listing, so we probe dates backward from today
-        // (newest-first, in parallel batches) and use the first file that exists.
-        const PriceData = {
-            FILE_PREFIX: 'cabin_base_price_',
-            FALLBACK: 'cabin_base_price_20260721.csv', // safety net if probing finds nothing
+        // ---------- helpers ----------
+        const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const money = n => "$" + Math.round(n).toLocaleString("en-US");
+        const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const fmtDay = iso => { const d = new Date(iso + "T12:00:00Z"); return `${DAYS[d.getUTCDay()]}, ${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`; };
+        const fmtTime = hhmm => { if (!hhmm) return ""; let [h, m] = hhmm.split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12; return `${h}:${String(m).padStart(2, "0")} ${ap}`; };
+        const guestWord = n => n === 1 ? "guest" : "guests";
+        const addonGuests = n => n === 3 ? "guest 3" : n === 4 ? "guests 3 and 4" : `guests 3 to ${n}`;
 
-            stampFor(date) {
-                const y = date.getFullYear();
-                const m = String(date.getMonth() + 1).padStart(2, '0');
-                const d = String(date.getDate()).padStart(2, '0');
-                return `${y}${m}${d}`;
-            },
+        function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+        function restore() {
+            try {
+                const s = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+                if (s && GUEST_COUNTS.includes(s.guests)) Object.assign(state, s);
+            } catch (e) {}
+        }
 
-            // Parse YYYYMMDD out of a resolved filename into a display string like "June 2, 2026".
-            displayDate(url) {
-                const m = url.match(/(\d{4})(\d{2})(\d{2})\.csv$/);
-                if (!m) return null;
-                const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-                return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            },
+        // Studio cabins only fit one guest, so they are hidden everywhere.
+        const cats = s => s.categories.filter(c => c.match !== "studio");
+        const hasType = (s, key) => cats(s).some(c => c.match === key);
+        const otherShip = s => s === G ? A : G;
+        function typeName(key) {
+            for (const s of [A, G]) { const c = cats(s).find(c => c.match === key); if (c) return c.title; }
+            return key;
+        }
+        function allTypes() {
+            const keys = new Set([...cats(G), ...cats(A)].map(c => c.match));
+            return TYPE_ORDER.filter(k => keys.has(k));
+        }
 
-            async exists(url) {
-                try {
-                    const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
-                    return res.ok;
-                } catch (e) {
-                    return false;
-                }
-            },
-
-            async resolveLatest({ maxDaysBack = 730, batchSize = 21 } = {}) {
-                const today = new Date();
-                for (let start = 0; start <= maxDaysBack; start += batchSize) {
-                    const batch = [];
-                    for (let i = start; i < start + batchSize && i <= maxDaysBack; i++) {
-                        const d = new Date(today);
-                        d.setDate(d.getDate() - i);
-                        batch.push({ daysBack: i, url: `${this.FILE_PREFIX}${this.stampFor(d)}.csv` });
-                    }
-                    const results = await Promise.all(
-                        batch.map(async b => ({ ...b, ok: await this.exists(b.url) }))
-                    );
-                    const hits = results.filter(r => r.ok).sort((a, b) => a.daysBack - b.daysBack);
-                    if (hits.length) return hits[0].url; // newest = smallest daysBack
-                }
-                return this.FALLBACK;
+        // Like for like matching. Mini-suite rule: if both ships have a mini-suite, match it;
+        // if only one does, the ship without one uses its Balcony instead.
+        function pick(s, key) {
+            const c = cats(s).find(c => c.match === key);
+            if (c) return { cat: c };
+            if (key === "mini_suite" && hasType(otherShip(s), "mini_suite")) {
+                const b = cats(s).find(c => c.match === "balcony");
+                if (b) return { cat: b, note: `The ${s.ship_short} has no ${typeName("mini_suite")}, so this uses its Balcony.` };
             }
-        };
+            return { missing: true };
+        }
 
-        // CSV Parser for new format
-        const CSVParser = {
-            async load(url) {
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error('Failed to load CSV');
-                    const text = await response.text();
-                    return this.parse(text);
-                } catch (error) {
-                    console.error('Error loading CSV:', error);
-                    return [];
-                }
-            },
+        // Price of one cabin type for n guests: { ok, e } or { ok: false, reason }
+        function price(s, cat, n) {
+            const e = cat.by_guests[String(n)];
+            if (e && e.available) return { ok: true, e };
+            const reason = e && e.status === "SOLD_OUT" ? `Sold out on the ${s.ship_short}` : `Not available for ${n} guests on the ${s.ship_short}`;
+            return { ok: false, reason };
+        }
 
-            parse(csvText) {
-                const lines = csvText.trim().split('\n');
-                if (lines.length < 2) return [];
+        const taxEstimate = s => s.taxes_per_guest_estimate.amount;
+        const fasRow = () => `<div class="row muted"><span class="k">Free at Sea charge</span><span class="v">not yet available</span></div>`;
 
-                const cabins = [];
+        function priceBlock({ total, n, nights, taxPerGuest, addon, extraRows = "" }) {
+            const perNight = total / nights;
+            return `
+                <div class="price-label">Total for ${n} ${guestWord(n)}</div>
+                <div class="price-total">${money(total)}</div>
+                <div class="price-pp">${money(total / n)} per person</div>
+                <div class="tax-note">Includes about ${money(taxPerGuest)} per guest in taxes</div>
+                <div class="rows">
+                    ${extraRows}
+                    <div class="row"><span class="k">Cost per night</span><span class="v">${money(perNight)} (${money(perNight / n)} per person)</span></div>
+                    ${fasRow()}
+                </div>
+                ${n > 2 && addon != null ? `<div class="addon">Estimated add-on (NCL's cheapest cabin for that party size): <strong>${addon >= 0 ? "+" : "-"}${money(Math.abs(addon))}</strong> for ${addonGuests(n)}</div>` : ""}`;
+        }
 
-                for (let i = 1; i < lines.length; i++) {
-                    const values = this.parseCSVLine(lines[i]);
+        function daysList(s) {
+            return `<details class="days"><summary>Day by day</summary><ol>${s.ports.map(d => `
+                <li><span>${fmtDay(d.date)}: ${d.sea ? "At sea" : esc(d.port)}</span><span>${d.sea ? "" : [d.arrive && "arrive " + fmtTime(d.arrive), d.depart && "leave " + fmtTime(d.depart)].filter(Boolean).join(", ")}</span></li>`).join("")}</ol></details>`;
+        }
 
-                    if (!values[0] || !values[1] || !values[2]) continue;
+        function stops(s) {
+            const names = s.ports.filter((d, i) => !d.sea && i > 0 && i < s.ports.length - 1).map(d => d.port.split(",")[0]);
+            const seaDays = s.ports.filter(d => d.sea).length;
+            return `<div class="stops">${names.map(p => `<span class="stop">${esc(p)}</span>`).join("")}${seaDays ? `<span class="stop">${seaDays} sea ${seaDays === 1 ? "day" : "days"}</span>` : ""}</div>`;
+        }
 
-                    const cabin = {
-                        id: i,
-                        roomType: values[0].trim(),
-                        name: values[1].trim(),
-                        basePrice: parseFloat(values[2]) || 0,
-                        maxGuests: parseInt(values[3]) || 2,
-                        sqft: values[4] ? values[4].trim() : '',
-                        balconySqft: values[5] ? values[5].trim() : null,
-                        perPerson: values[6] ? values[6].trim() : ''
-                    };
-
-                    if (cabin.balconySqft === 'N/A' || cabin.balconySqft === '') {
-                        cabin.balconySqft = null;
-                    }
-
-                    // A "(sold out)" per-person value marks the cabin unavailable
-                    cabin.soldOut = cabin.perPerson.toLowerCase() === '(sold out)';
-
-                    // Determine if solo cabin
-                    cabin.isSolo = cabin.maxGuests === 1;
-
-                    cabins.push(cabin);
-                }
-
-                return cabins;
-            },
-
-            parseCSVLine(line) {
-                const values = [];
-                let current = '';
-                let inQuotes = false;
-
-                for (let i = 0; i < line.length; i++) {
-                    const char = line[i];
-                    if (char === '"') {
-                        inQuotes = !inQuotes;
-                    } else if (char === ',' && !inQuotes) {
-                        values.push(current);
-                        current = '';
-                    } else {
-                        current += char;
-                    }
-                }
-                values.push(current);
-                return values;
+        // ---------- cards ----------
+        function singleCard(s, label) {
+            const n = state.guests;
+            const p = pick(s, state.type);
+            let body;
+            if (p.missing) {
+                body = `<div class="notice bad">${esc(typeName(state.type))}: not offered on the ${esc(s.ship_short)}</div>`;
+            } else {
+                const r = price(s, p.cat, n);
+                body = `<div class="cabin-line">Cabin: <strong>${esc(p.cat.title)}</strong></div>` + (r.ok
+                    ? priceBlock({ total: r.e.cabin_total, n, nights: s.nights, taxPerGuest: taxEstimate(s), addon: r.e.addon_vs_2 })
+                    : `<div class="notice bad">${esc(r.reason)}</div>`);
             }
-        };
+            return `
+                <article class="card">
+                    <div class="card-head">
+                        <span class="option-badge">${label}</span>
+                        <h2 class="card-title">${esc(s.ship)}</h2>
+                        <div class="card-dates">${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)</div>
+                        ${stops(s)}
+                    </div>
+                    <div class="card-body">${body}${daysList(s)}</div>
+                    <a class="ncl-link" href="${esc(s.url)}" target="_blank" rel="noopener">See this sailing on NCL &rarr;</a>
+                </article>`;
+        }
 
-        const NCL_LINKS = {
-            "Inside": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=INSIDE",
-            "Oceanview": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=OCEANVIEW",
-            "Balcony": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=BALCONY",
-            "Club Balcony Suite": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=CLUB_BALCONY_SUITE",
-            "Suite": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=SUITE",
-            "The Haven": "https://www.ncl.com/cruise-ships/norwegian-joy/staterooms/options#filter=HAVEN"
-        };
+        function shipSelect(s, field) {
+            const n = state.guests;
+            const options = TYPE_ORDER.flatMap(k => cats(s).filter(c => c.match === k)).map(c => {
+                const r = price(s, c, n);
+                const text = r.ok ? `${c.title}: ${money(r.e.cabin_total)}` : `${c.title}: ${r.reason.replace(` on the ${s.ship_short}`, "").toLowerCase()}`;
+                return `<option value="${esc(c.match)}" ${state[field] === c.match ? "selected" : ""}>${esc(text)}</option>`;
+            }).join("");
+            return `<label for="${field}">${esc(s.ship_short)} cabin (${s.nights} nights)</label><select id="${field}" data-field="${field}">${options}</select>`;
+        }
 
-        // ==================== PRICE CALCULATOR ====================
-        const PriceCalculator = {
-            getTipPerPersonPerDay(roomType) {
-                if (roomType === 'The Haven' || roomType === 'Suite') return 25;
-                return 20;
-            },
-
-            getTipPerPerson(roomType) {
-                return this.getTipPerPersonPerDay(roomType) * CRUISE_NIGHTS;
-            },
-
-            /**
-             * Build guest list with positions.
-             * Adults fill first, then children sorted by age descending.
-             */
-            buildGuestList() {
-                const guests = [];
-                for (let i = 0; i < AppState.adultCount; i++) {
-                    guests.push({ type: 'adult', age: 21, label: 'Adult' });
+        function eightCard() {
+            const n = state.guests, nights = G.nights + A.nights;
+            const toggle = `
+                <div class="seg small" role="group" aria-label="Cabins for 8 nights" style="margin-bottom:0.9rem">
+                    <button type="button" data-mode="same" aria-pressed="${state.mode === "same"}">Same cabin on both ships</button>
+                    <button type="button" data-mode="different" aria-pressed="${state.mode === "different"}">Different cabin on each ship</button>
+                </div>`;
+            let picks, body = "", ok = true;
+            if (state.mode === "same") {
+                picks = [[G, pick(G, state.type)], [A, pick(A, state.type)]];
+                const missing = picks.filter(([, p]) => p.missing);
+                if (missing.length) {
+                    ok = false;
+                    for (const [s] of missing) {
+                        const other = otherShip(s);
+                        body += `<div class="notice bad">${esc(typeName(state.type))}: not offered on the ${esc(s.ship_short)}</div>`;
+                        if (hasType(other, state.type)) body += `<div class="notice info">Switch to Different cabins to pair an ${esc(other.ship_short)} ${esc(typeName(state.type))} with any ${esc(s.ship_short)} cabin.</div>`;
+                    }
                 }
-                // Sort children oldest-first for position assignment
-                const sortedAges = [...AppState.childAges].sort((a, b) => b - a);
-                for (let i = 0; i < sortedAges.length; i++) {
-                    guests.push({ type: 'child', age: sortedAges[i], label: `Age ${sortedAges[i]}` });
-                }
-                return guests;
-            },
-
-            calculate(cabin, includeDrinks, includeDinner, tipsBeforeCruise) {
-                const totalGuests = AppState.adultCount + AppState.childCount;
-                const effectiveGuests = cabin.isSolo ? 1 : Math.min(totalGuests, cabin.maxGuests);
-                const exceedsMax = totalGuests > cabin.maxGuests;
-
-                // Build guest list (capped at cabin max)
-                const allGuests = this.buildGuestList();
-                const guests = allGuests.slice(0, effectiveGuests);
-
-                // Base fare (with 50% off promo + 3rd/4th guest free)
-                const discountedBase = cabin.basePrice * (1 - PROMO_DISCOUNT);
-                const discountedExtra = EXTRA_GUEST_FARE * (1 - PROMO_DISCOUNT);
-                let totalFare;
-                if (cabin.isSolo) {
-                    totalFare = discountedBase;
-                } else {
-                    // Count how many extra guests (position 3+) actually pay
-                    let paidExtras = 0;
-                    for (let p = 3; p <= effectiveGuests; p++) {
-                        if (!FREE_GUEST_POSITIONS.includes(p)) paidExtras++;
-                    }
-                    totalFare = discountedBase + paidExtras * discountedExtra;
-                }
-
-                const tipPerPerson = this.getTipPerPerson(cabin.roomType);
-                const isHighTier = cabin.roomType === "Suite" || cabin.roomType === "The Haven";
-
-                // Free at Sea Plus includes prepaid gratuities, so the "when to pay tips"
-                // choice no longer applies — any remaining (guest 3+) tips are treated as prepaid.
-                const tipsPrepaid = AppState.freeAtSeaPlus || tipsBeforeCruise;
-
-                // Per-guest calculations
-                const guestDetails = guests.map((guest, idx) => {
-                    const position = idx + 1; // 1-indexed
-
-                    // Fare: 50% off promo + 3rd/4th guest free
-                    let fare, originalFare, discountedFareBeforeFree;
-                    const isFreeGuest = FREE_GUEST_POSITIONS.includes(position);
-                    if (cabin.isSolo) {
-                        fare = discountedBase;
-                        originalFare = cabin.basePrice;
-                        discountedFareBeforeFree = discountedBase;
-                    } else if (effectiveGuests === 1) {
-                        fare = discountedBase;
-                        originalFare = cabin.basePrice;
-                        discountedFareBeforeFree = discountedBase;
-                    } else if (position <= 2) {
-                        fare = discountedBase / 2;
-                        originalFare = cabin.basePrice / 2;
-                        discountedFareBeforeFree = discountedBase / 2;
-                    } else if (isFreeGuest) {
-                        fare = 0;
-                        originalFare = EXTRA_GUEST_FARE;
-                        discountedFareBeforeFree = discountedExtra;
-                    } else {
-                        fare = discountedExtra;
-                        originalFare = EXTRA_GUEST_FARE;
-                        discountedFareBeforeFree = discountedExtra;
-                    }
-
-                    const tax = TAX_PER_PERSON;
-
-                    // Tips: guests aged 3+ pay (FAS Plus covers guests 1&2)
-                    const tipEligible = guest.age >= 3;
-                    let tip = tipEligible ? tipPerPerson : 0;
-                    let fasPlusFee = 0;
-                    let fasPlusTipCovered = 0;
-
-                    if (AppState.freeAtSeaPlus && position <= 2) {
-                        fasPlusFee = 150;
-                        fasPlusTipCovered = tip; // gratuities now prepaid via FAS Plus
-                        tip = 0; // Tips included in FAS Plus
-                    }
-
-                    // Drink package
-                    let drink = 0;
-                    if (includeDrinks) {
-                        if (guest.age >= 21) {
-                            drink = 85.50;
-                        } else if (position <= 2) {
-                            drink = 37.50; // juice/soda substitute
-                        }
-                        // position 3+ and under 21: $0
-                    }
-
-                    // Dinner package: only first 2 guests
-                    let dinner = 0;
-                    if (includeDinner && position <= 2) {
-                        if (guest.age >= 13) {
-                            dinner = 20;
-                        }
-                        // under 13 in position 1-2: free (kids' menu)
-                    }
-
-                    const tipPreCruise = tipsPrepaid ? tip : 0;
-                    const tipOnboard = tipsPrepaid ? 0 : tip;
-
-                    const guestTotal = fare + tax + tipPreCruise + drink + dinner + fasPlusFee;
-                    const guestFullCost = fare + tax + tip + drink + dinner + fasPlusFee;
-
-                    return {
-                        position,
-                        guest,
-                        fare,
-                        originalFare,
-                        discountedFareBeforeFree,
-                        isFreeGuest,
-                        tax,
-                        tip,
-                        tipPreCruise,
-                        tipOnboard,
-                        drink,
-                        dinner,
-                        fasPlusFee,
-                        fasPlusTipCovered,
-                        total: guestTotal,
-                        fullCost: guestFullCost
-                    };
-                });
-
-                const taxes = guestDetails.reduce((sum, g) => sum + g.tax, 0);
-                const tips = guestDetails.reduce((sum, g) => sum + g.tip, 0);
-                const tipsPreCruise = tipsPrepaid ? tips : 0;
-                const tipsOnboard = tipsPrepaid ? 0 : tips;
-                const drinks = guestDetails.reduce((sum, g) => sum + g.drink, 0);
-                const dinner = guestDetails.reduce((sum, g) => sum + g.dinner, 0);
-                const fasPlusCost = guestDetails.reduce((sum, g) => sum + g.fasPlusFee, 0);
-                const fasPlusTipsIncluded = guestDetails.reduce((sum, g) => sum + g.fasPlusTipCovered, 0);
-
-                // Deposit credit reduces what you owe
-                let depositCredit = 0;
-                if (AppState.depositOption === 'credit150') {
-                    depositCredit = 150;
-                }
-
-                const grandTotalBeforeCredit = totalFare + taxes + tipsPreCruise + drinks + dinner + fasPlusCost;
-                const grandTotal = grandTotalBeforeCredit - depositCredit;
-                const fullTripCost = totalFare + taxes + tips + drinks + dinner + fasPlusCost - depositCredit;
-
-                // Original (undiscounted) totals for strikethrough display
-                const originalTotalFare = cabin.isSolo
-                    ? cabin.basePrice
-                    : cabin.basePrice + Math.max(0, effectiveGuests - 2) * EXTRA_GUEST_FARE;
-                // 50% off but without free guest promo (intermediate strikethrough)
-                const discountedTotalFare = cabin.isSolo
-                    ? discountedBase
-                    : discountedBase + Math.max(0, effectiveGuests - 2) * discountedExtra;
-                const originalPerPersonAvg = effectiveGuests > 0 ? originalTotalFare / effectiveGuests : 0;
-
-                // Deposit (based on discounted fare) - credit does not change the deposit amount
-                const deposit = isHighTier ? Math.round(totalFare * 0.10) : 100;
-                const balance = grandTotal - deposit;
-
-                // Per-person average
-                const perPersonAvg = effectiveGuests > 0 ? grandTotal / effectiveGuests : 0;
-                const allSameCost = guestDetails.length > 1
-                    ? guestDetails.every(g => Math.abs(g.total - guestDetails[0].total) < 0.01)
-                    : true;
-
-                return {
-                    totalFare,
-                    originalTotalFare,
-                    discountedTotalFare,
-                    originalPerPersonAvg,
-                    taxes,
-                    tips,
-                    tipsPreCruise,
-                    tipsOnboard,
-                    drinks,
-                    dinner,
-                    fasPlusCost,
-                    fasPlusTipsIncluded,
-                    depositCredit,
-                    grandTotalBeforeCredit,
-                    grandTotal,
-                    fullTripCost,
-                    deposit,
-                    balance,
-                    perPersonAvg,
-                    allSameCost,
-                    effectiveGuests,
-                    exceedsMax,
-                    guestDetails,
-                    tipsBeforeCruise,
-                    isHighTier
-                };
-            },
-
-            formatCurrency(amount) {
-                return new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
-                    maximumFractionDigits: 2
-                }).format(amount);
+            } else {
+                picks = [[G, pick(G, state.getawayType)], [A, pick(A, state.auraType)]];
+                body += `<div class="ship-pick">${shipSelect(G, "getawayType")}${shipSelect(A, "auraType")}</div>`;
+                if (picks.some(([, p]) => p.missing)) ok = false;
             }
-        };
-
-        // ==================== APP STATE ====================
-        const AppState = {
-            currentFilter: 'All',
-            currentSort: 'price-asc',
-            includeDrinks: false,
-            includeDinner: false,
-            tipsBeforeCruise: true,
-            selectedCabins: new Set(),
-            openBreakdowns: new Set(),
-            adultCount: 2,
-            childCount: 0,
-            childAges: [],
-            depositOption: 'regular',
-            freeAtSeaPlus: false
-        };
-
-        // ==================== RENDERER ====================
-        const Renderer = {
-            renderCabinCard(cabin) {
-                const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise);
-                const isSelected = AppState.selectedCabins.has(cabin.id);
-                const isBreakdownOpen = AppState.openBreakdowns.has(cabin.id);
-                const badgeClass = cabin.roomType.replace(/\s+/g, '-');
-                const totalGuests = AppState.adultCount + AppState.childCount;
-                const isDimmed = totalGuests > cabin.maxGuests;
-
-                const avgSuffix = pricing.allSameCost ? '' : ' (avg)';
-                const perPersonText = `<span class="original-price">${PriceCalculator.formatCurrency(pricing.originalPerPersonAvg)}</span>${PriceCalculator.formatCurrency(pricing.perPersonAvg)}/person${avgSuffix}`;
-
-                return `
-                    <article class="cabin-card ${isSelected ? 'selected' : ''} ${isDimmed && !cabin.soldOut ? 'dimmed' : ''} ${cabin.soldOut ? 'sold-out' : ''}" data-id="${cabin.id}">
-                        ${cabin.soldOut ? `<div class="sold-out-note">Sold Out</div>` : isDimmed ? `<div class="max-guests-note">Max ${cabin.maxGuests} guest${cabin.maxGuests !== 1 ? 's' : ''}</div>` : ''}
-                        <div class="cabin-header">
-                            <span class="cabin-type-badge badge-${badgeClass}">${cabin.roomType}</span>
-                            <h3 class="cabin-name">${cabin.name}</h3>
-                            <div class="cabin-specs">
-                                <span class="cabin-spec">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                                    </svg>
-                                    ${cabin.sqft} sq ft
-                                </span>
-                                ${cabin.balconySqft ? `
-                                    <span class="cabin-spec">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                        </svg>
-                                        ${cabin.balconySqft} sq ft balcony
-                                    </span>
-                                ` : ''}
-                                <span class="cabin-spec">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="9" cy="7" r="4"/>
-                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                    </svg>
-                                    Up to ${cabin.maxGuests}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="cabin-body">
-                            ${cabin.soldOut ? `
-                            <div class="price-display">
-                                <div class="price-label">Availability</div>
-                                <div class="price-amount sold-out-price">Sold Out</div>
-                                <div class="price-per-person">Not currently available to book</div>
-                            </div>
-
-                            <div class="cabin-actions">
-                                <button class="btn btn-compare" data-id="${cabin.id}" disabled>Sold Out</button>
-                            </div>
-                            ` : `
-                            <div class="price-display">
-                                <div class="price-label">${isDimmed ? 'Price (if ' + cabin.maxGuests + ' guests)' : 'Total Due by 7/23/2026'}</div>
-                                <div class="price-amount" data-cabin-id="${cabin.id}">${PriceCalculator.formatCurrency(pricing.grandTotal)}</div>
-                                <div class="price-per-person">${perPersonText}</div>
-                                ${AppState.freeAtSeaPlus && pricing.fasPlusTipsIncluded > 0 ? `
-                                    <div class="tips-included-note">${PriceCalculator.formatCurrency(pricing.fasPlusTipsIncluded)} tips included with Free at Sea Plus</div>
-                                ` : !AppState.tipsBeforeCruise && pricing.tipsOnboard > 0 ? `
-                                    <div class="tips-onboard-note">+ ${PriceCalculator.formatCurrency(pricing.tipsOnboard)} tips paid onboard</div>
-                                ` : ''}
-                            </div>
-
-                            <div class="deposit-info">
-                                <span class="deposit-label">Pay today (deposit)${pricing.depositCredit > 0 ? ' <span class="credit-badge">-$' + pricing.depositCredit + ' credit</span>' : ''}</span>
-                                <span class="deposit-amount">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
-                            </div>
-
-                            <div class="cabin-actions">
-                                <button class="btn btn-secondary toggle-breakdown" data-id="${cabin.id}">
-                                    ${isBreakdownOpen ? 'Hide' : 'View'} Breakdown
-                                </button>
-                                <button class="btn btn-compare ${isSelected ? 'selected' : ''}" data-id="${cabin.id}">
-                                    ${isSelected ? 'Selected' : 'Compare'}
-                                </button>
-                            </div>
-
-                            <div class="breakdown ${isBreakdownOpen ? 'open' : ''}" data-breakdown-id="${cabin.id}">
-                                <div class="breakdown-content">
-                                    ${this.renderBreakdown(cabin, pricing)}
-                                </div>
-                            </div>
-                            `}
-                        </div>
-
-                        <a href="${NCL_LINKS[cabin.roomType]}" target="_blank" rel="noopener" class="ncl-link">
-                            View on NCL &rarr;
-                        </a>
-                    </article>
-                `;
-            },
-
-            renderBreakdown(cabin, pricing) {
-                const tipRate = PriceCalculator.getTipPerPersonPerDay(cabin.roomType);
-                let html = '';
-
-                // Summary section
-                const hasFreeGuests = pricing.guestDetails.some(g => g.isFreeGuest);
-                const promoLabels = hasFreeGuests ? '50% OFF + 3rd/4th FREE' : '50% OFF';
-                const fareStrikethrough = hasFreeGuests && pricing.discountedTotalFare !== pricing.totalFare
-                    ? `<span class="original-price">${PriceCalculator.formatCurrency(pricing.originalTotalFare)}</span><span class="original-price">${PriceCalculator.formatCurrency(pricing.discountedTotalFare)}</span> ${PriceCalculator.formatCurrency(pricing.totalFare)}`
-                    : `<span class="original-price">${PriceCalculator.formatCurrency(pricing.originalTotalFare)}</span> ${PriceCalculator.formatCurrency(pricing.totalFare)}`;
-                html += `
-                    <div class="breakdown-row">
-                        <span class="breakdown-label">Base Fare (${cabin.isSolo ? '1 guest' : pricing.effectiveGuests + ' guests'}) <span style="color:var(--teal);font-weight:600;font-size:0.75rem;">${promoLabels}</span></span>
-                        <span class="breakdown-value">${fareStrikethrough}</span>
-                    </div>
-                    <div class="breakdown-row">
-                        <span class="breakdown-label">Taxes ($${TAX_PER_PERSON} x ${pricing.effectiveGuests})</span>
-                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.taxes)}</span>
-                    </div>
-                `;
-
-                if (pricing.tipsPreCruise > 0) {
-                    html += `
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">Gratuities ($${tipRate}/day x ${CRUISE_NIGHTS} nights x ${pricing.guestDetails.filter(g => g.tip > 0).length} guests)</span>
-                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.tips)}</span>
-                        </div>
-                    `;
+            if (ok) {
+                const results = picks.map(([s, p]) => [s, p, price(s, p.cat, n)]);
+                const blocked = results.filter(([, , r]) => !r.ok);
+                if (state.mode === "same") {
+                    body += `<div class="cabin-line">Matched: <strong>${esc(results[0][1].cat.title)}</strong> on the Getaway, <strong>${esc(results[1][1].cat.title)}</strong> on the Aura</div>`;
+                    for (const [, p] of results) if (p.note) body += `<div class="notice info">${esc(p.note)}</div>`;
                 }
-
-                if (AppState.includeDrinks) {
-                    html += `
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">Drink Package</span>
-                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.drinks)}</span>
-                        </div>
-                    `;
-                }
-
-                if (AppState.includeDinner) {
-                    html += `
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">Dinner Package</span>
-                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.dinner)}</span>
-                        </div>
-                    `;
-                }
-
-                if (pricing.fasPlusCost > 0) {
-                    const fasIncl = pricing.fasPlusTipsIncluded > 0
-                        ? ` <span style="color:var(--teal);font-weight:600;font-size:0.75rem;">incl. ${PriceCalculator.formatCurrency(pricing.fasPlusTipsIncluded)} gratuities</span>`
-                        : '';
-                    html += `
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">Free at Sea Plus ($150 x ${pricing.guestDetails.filter(g => g.fasPlusFee > 0).length} guests)${fasIncl}</span>
-                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.fasPlusCost)}</span>
-                        </div>
-                    `;
-                }
-
-                if (pricing.depositCredit > 0) {
-                    html += `
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">Subtotal</span>
-                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.grandTotalBeforeCredit)}</span>
-                        </div>
-                        <div class="breakdown-row" style="color: var(--teal);">
-                            <span class="breakdown-label">Deposit Credit</span>
-                            <span class="breakdown-value">-${PriceCalculator.formatCurrency(pricing.depositCredit)}</span>
-                        </div>
-                    `;
-                }
-
-                html += `
-                    <div class="breakdown-row total">
-                        <span class="breakdown-label">Total Due by 7/23/2026</span>
-                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.grandTotal)}</span>
-                    </div>
-                    <div class="breakdown-row">
-                        <span class="breakdown-label">Deposit (pay today)</span>
-                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
-                    </div>
-                    <div class="breakdown-row">
-                        <span class="breakdown-label">Balance (due 7/23/2026)</span>
-                        <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.balance)}</span>
-                    </div>
-                `;
-
-                if (!AppState.tipsBeforeCruise && pricing.tipsOnboard > 0) {
-                    html += `
-                        <div class="breakdown-row tips-onboard">
-                            <span class="breakdown-label">Gratuities (pay onboard)</span>
-                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.tipsOnboard)}</span>
-                        </div>
-                        <div class="breakdown-row">
-                            <span class="breakdown-label">Full Trip Cost</span>
-                            <span class="breakdown-value">${PriceCalculator.formatCurrency(pricing.fullTripCost)}</span>
-                        </div>
-                    `;
-                }
-
-                // Per-guest breakdown
-                html += `<div class="breakdown-section-header">Per-Guest Breakdown</div>`;
-
-                pricing.guestDetails.forEach(gd => {
-                    const items = [];
-                    if (gd.isFreeGuest) {
-                        items.push(`<span class="original-price">${PriceCalculator.formatCurrency(gd.originalFare)}</span><span class="original-price">${PriceCalculator.formatCurrency(gd.discountedFareBeforeFree)}</span>FREE fare`);
+                if (blocked.length) {
+                    if (blocked.length === 1) {
+                        const [bs, bp] = blocked[0];
+                        const [os] = results.find(([s]) => s !== bs);
+                        body += `<div class="notice bad">${esc(bp.cat.title)} is available for ${n} guests on the ${esc(os.ship_short)} but not on the ${esc(bs.ship_short)}.</div>`;
                     } else {
-                        items.push(`<span class="original-price">${PriceCalculator.formatCurrency(gd.originalFare)}</span>${PriceCalculator.formatCurrency(gd.fare)} fare`);
+                        body += `<div class="notice bad">Not available for ${n} guests on either ship.</div>`;
                     }
-                    items.push(`${PriceCalculator.formatCurrency(gd.tax)} tax`);
-
-                    if (gd.fasPlusFee > 0) {
-                        items.push(`${PriceCalculator.formatCurrency(gd.fasPlusFee)} FAS+`);
-                        items.push(`$0 tip (incl.)`);
-                    } else if (gd.tip > 0) {
-                        const tipsPrepaid = AppState.freeAtSeaPlus || AppState.tipsBeforeCruise;
-                        items.push(`${PriceCalculator.formatCurrency(tipsPrepaid ? gd.tip : 0)} tip${!tipsPrepaid ? ' (onboard: ' + PriceCalculator.formatCurrency(gd.tip) + ')' : ''}`);
-                    } else {
-                        items.push(`$0 tip`);
-                    }
-
-                    if (AppState.includeDrinks) {
-                        if (gd.drink > 0) {
-                            if (gd.guest.age < 21 && gd.position <= 2) {
-                                items.push(`${PriceCalculator.formatCurrency(gd.drink)} soda/juice`);
-                            } else {
-                                items.push(`${PriceCalculator.formatCurrency(gd.drink)} drink`);
-                            }
-                        } else {
-                            items.push(`$0 drink`);
-                        }
-                    }
-
-                    if (AppState.includeDinner) {
-                        if (gd.position <= 2) {
-                            if (gd.dinner > 0) {
-                                items.push(`${PriceCalculator.formatCurrency(gd.dinner)} dinner`);
-                            } else {
-                                items.push(`$0 dinner`);
-                            }
-                        }
-                    }
-
-                    // Build free tags
-                    const freeTags = [];
-                    if (gd.isFreeGuest) freeTags.push('Cruise Fare');
-                    if (gd.tip === 0 && gd.guest.age < 3) freeTags.push('Tips');
-                    if (AppState.includeDrinks && gd.drink === 0 && gd.position > 2 && gd.guest.age < 21) freeTags.push('Drinks');
-                    if (AppState.includeDinner && gd.dinner === 0 && gd.position <= 2 && gd.guest.age < 13) freeTags.push('Dinner');
-
-                    const freeTagsHtml = freeTags.map(t => `<span class="free-tag">FREE ${t}</span>`).join(' ');
-
-                    html += `
-                        <div class="guest-breakdown-row">
-                            <div>
-                                <div class="guest-breakdown-label">Guest ${gd.position} (${gd.guest.label}) ${freeTagsHtml}</div>
-                                <div class="guest-breakdown-detail">${items.join(' + ')}</div>
-                            </div>
-                            <div class="guest-breakdown-value">${PriceCalculator.formatCurrency(gd.total)}</div>
-                        </div>
-                    `;
-                });
-
-                return html;
-            },
-
-            renderGrid() {
-                const grid = document.getElementById('cabinGrid');
-                let filteredData = CABIN_DATA;
-
-                // Apply filter
-                if (AppState.currentFilter !== 'All') {
-                    filteredData = filteredData.filter(c => c.roomType === AppState.currentFilter);
-                }
-
-                // Apply sort: sold-out cabins to the very bottom, then dimmed (exceeding max guests)
-                const totalGuests = AppState.adultCount + AppState.childCount;
-                filteredData = [...filteredData].sort((a, b) => {
-                    const aSold = a.soldOut ? 1 : 0;
-                    const bSold = b.soldOut ? 1 : 0;
-                    if (aSold !== bSold) return aSold - bSold;
-
-                    const aDimmed = totalGuests > a.maxGuests ? 1 : 0;
-                    const bDimmed = totalGuests > b.maxGuests ? 1 : 0;
-                    if (aDimmed !== bDimmed) return aDimmed - bDimmed;
-
-                    const priceA = PriceCalculator.calculate(a, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise).grandTotal;
-                    const priceB = PriceCalculator.calculate(b, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise).grandTotal;
-                    const sqftA = parseInt(a.sqft.split('-')[0].replace(/,/g, ''));
-                    const sqftB = parseInt(b.sqft.split('-')[0].replace(/,/g, ''));
-
-                    switch (AppState.currentSort) {
-                        case 'price-asc': return priceA - priceB;
-                        case 'price-desc': return priceB - priceA;
-                        case 'sqft-asc': return sqftA - sqftB;
-                        case 'sqft-desc': return sqftB - sqftA;
-                        default: return 0;
-                    }
-                });
-
-                if (filteredData.length === 0) {
-                    grid.innerHTML = `
-                        <div class="no-results">
-                            <div class="no-results-icon">&#128674;</div>
-                            <p>No cabins found for this filter.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                grid.innerHTML = filteredData.map(cabin => this.renderCabinCard(cabin)).join('');
-            },
-
-            updatePrices() {
-                document.querySelectorAll('.price-amount').forEach(el => {
-                    el.classList.add('flash');
-                    setTimeout(() => el.classList.remove('flash'), 500);
-                });
-
-                this.renderGrid();
-                this.updateToggleLabels();
-                this.updateRunningTotals();
-            },
-
-            updateToggleLabels() {
-                // Drink toggle
-                const guests = PriceCalculator.buildGuestList();
-                const totalGuests = AppState.adultCount + AppState.childCount;
-
-                let drinkTotal = 0;
-                let drinkParts = [];
-                const adultsCount = guests.filter(g => g.age >= 21).length;
-                const under21Pos1or2 = guests.filter((g, i) => g.age < 21 && i < 2).length;
-
-                if (adultsCount > 0) {
-                    drinkTotal += adultsCount * 85.50;
-                    drinkParts.push(`${adultsCount} adult${adultsCount > 1 ? 's' : ''} x $85.50`);
-                }
-                if (under21Pos1or2 > 0) {
-                    drinkTotal += under21Pos1or2 * 37.50;
-                    drinkParts.push(`${under21Pos1or2} child x $37.50 soda`);
-                }
-
-                document.getElementById('drinkToggleDesc').textContent = drinkParts.length > 0
-                    ? `+${PriceCalculator.formatCurrency(drinkTotal)} (${drinkParts.join(', ')})`
-                    : 'No eligible guests';
-
-                // Dinner toggle
-                const dinnerEligible = Math.min(totalGuests, 2);
-                const dinnerGuests = guests.slice(0, 2);
-                let dinnerTotal = 0;
-                dinnerGuests.forEach(g => {
-                    if (g.age >= 13) dinnerTotal += 20;
-                });
-                if (dinnerTotal > 0) {
-                    document.getElementById('dinnerToggleDesc').textContent =
-                        `+${PriceCalculator.formatCurrency(dinnerTotal)} (first ${dinnerEligible} guests x $20)`;
-                } else if (dinnerEligible > 0) {
-                    document.getElementById('dinnerToggleDesc').textContent =
-                        `FREE for children under 13`;
                 } else {
-                    document.getElementById('dinnerToggleDesc').textContent = 'No eligible guests';
-                }
-            },
-
-            updateRunningTotals() {
-                const totalsEl = document.getElementById('runningTotals');
-                const packageTotalEl = document.getElementById('packageTotal');
-
-                // Calculate based on current guest config
-                const guests = PriceCalculator.buildGuestList();
-                let packageTotal = 0;
-
-                if (AppState.includeDrinks) {
-                    guests.forEach((g, i) => {
-                        if (g.age >= 21) packageTotal += 85.50;
-                        else if (i < 2) packageTotal += 37.50;
+                    const total = results.reduce((t, [, , r]) => t + r.e.cabin_total, 0);
+                    const addons = results.map(([, , r]) => r.e.addon_vs_2);
+                    const extraRows = results.map(([s, p, r]) => `<div class="row"><span class="k">${esc(s.ship_short)} (${s.nights} nights), ${esc(p.cat.title)}</span><span class="v">${money(r.e.cabin_total)}</span></div>`).join("");
+                    body += priceBlock({
+                        total, n, nights,
+                        taxPerGuest: taxEstimate(G) + taxEstimate(A),
+                        addon: addons.every(a => a != null) ? addons[0] + addons[1] : null,
+                        extraRows,
                     });
                 }
-
-                if (AppState.includeDinner) {
-                    guests.slice(0, 2).forEach(g => {
-                        if (g.age >= 13) packageTotal += 20;
-                    });
-                }
-
-                if (AppState.freeAtSeaPlus) {
-                    const fasGuests = Math.min(guests.length, 2);
-                    packageTotal += fasGuests * 150;
-                }
-
-                if (packageTotal > 0) {
-                    totalsEl.style.display = 'flex';
-                    packageTotalEl.textContent = PriceCalculator.formatCurrency(packageTotal);
-                } else {
-                    totalsEl.style.display = 'none';
-                }
-            },
-
-            updateComparisonTray() {
-                const tray = document.getElementById('comparisonTray');
-                const count = document.getElementById('trayCount');
-
-                count.textContent = AppState.selectedCabins.size;
-
-                if (AppState.selectedCabins.size > 0) {
-                    tray.classList.add('visible');
-                } else {
-                    tray.classList.remove('visible');
-                }
-            },
-
-            renderComparison() {
-                const grid = document.getElementById('comparisonGrid');
-                const selectedCabins = CABIN_DATA.filter(c => AppState.selectedCabins.has(c.id));
-
-                grid.className = `comparison-grid cols-${selectedCabins.length}`;
-
-                grid.innerHTML = selectedCabins.map(cabin => {
-                    const pricing = PriceCalculator.calculate(cabin, AppState.includeDrinks, AppState.includeDinner, AppState.tipsBeforeCruise);
-                    const badgeClass = cabin.roomType.replace(/\s+/g, '-');
-
-                    const perPersonText = pricing.allSameCost
-                        ? PriceCalculator.formatCurrency(pricing.perPersonAvg)
-                        : `${PriceCalculator.formatCurrency(pricing.perPersonAvg)} (avg)`;
-
-                    return `
-                        <div class="comparison-column">
-                            <div class="comparison-cabin-header">
-                                <span class="cabin-type-badge badge-${badgeClass}">${cabin.roomType}</span>
-                                <div class="comparison-cabin-name">${cabin.name}</div>
-                            </div>
-                            <div class="comparison-cabin-body">
-                                <div class="comparison-row">
-                                    <span class="comparison-label">Cabin Size</span>
-                                    <span class="comparison-value">${cabin.sqft} sq ft</span>
-                                </div>
-                                ${cabin.balconySqft ? `
-                                    <div class="comparison-row">
-                                        <span class="comparison-label">Balcony</span>
-                                        <span class="comparison-value">${cabin.balconySqft} sq ft</span>
-                                    </div>
-                                ` : `
-                                    <div class="comparison-row">
-                                        <span class="comparison-label">Balcony</span>
-                                        <span class="comparison-value">-</span>
-                                    </div>
-                                `}
-                                <div class="comparison-row">
-                                    <span class="comparison-label">Max Guests</span>
-                                    <span class="comparison-value">${cabin.maxGuests}</span>
-                                </div>
-                                <div class="comparison-row">
-                                    <span class="comparison-label">Per Person</span>
-                                    <span class="comparison-value">${perPersonText}</span>
-                                </div>
-                                <div class="comparison-row highlight">
-                                    <span class="comparison-label">Base Fare</span>
-                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.totalFare)}</span>
-                                </div>
-                                <div class="comparison-row">
-                                    <span class="comparison-label">Taxes</span>
-                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.taxes)}</span>
-                                </div>
-                                ${pricing.tips > 0 ? `
-                                    <div class="comparison-row">
-                                        <span class="comparison-label">Gratuities</span>
-                                        <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.tips)}</span>
-                                    </div>
-                                ` : ''}
-                                ${pricing.fasPlusCost > 0 ? `
-                                    <div class="comparison-row">
-                                        <span class="comparison-label">Free at Sea Plus${pricing.fasPlusTipsIncluded > 0 ? ' <span style="color:var(--teal);font-size:0.75rem;">incl. ' + PriceCalculator.formatCurrency(pricing.fasPlusTipsIncluded) + ' tips</span>' : ''}</span>
-                                        <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.fasPlusCost)}</span>
-                                    </div>
-                                ` : ''}
-                                ${AppState.includeDrinks ? `
-                                    <div class="comparison-row">
-                                        <span class="comparison-label">Drink Package</span>
-                                        <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.drinks)}</span>
-                                    </div>
-                                ` : ''}
-                                ${AppState.includeDinner ? `
-                                    <div class="comparison-row">
-                                        <span class="comparison-label">Dinner Package</span>
-                                        <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.dinner)}</span>
-                                    </div>
-                                ` : ''}
-                                <div class="comparison-row highlight">
-                                    <span class="comparison-label">Deposit${pricing.depositCredit > 0 ? ' <span class="credit-badge">-$' + pricing.depositCredit + ' credit</span>' : ''}</span>
-                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.deposit)}</span>
-                                </div>
-                                <div class="comparison-row">
-                                    <span class="comparison-label">Balance Due</span>
-                                    <span class="comparison-value">${PriceCalculator.formatCurrency(pricing.balance)}</span>
-                                </div>
-                            </div>
-                            <div class="comparison-total">
-                                <div class="comparison-total-label">Grand Total</div>
-                                <div class="comparison-total-amount">${PriceCalculator.formatCurrency(pricing.grandTotal)}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
             }
-        };
+            return `
+                <article class="card featured">
+                    <div class="card-head">
+                        <span class="option-badge">Option 3: 8 nights</span>
+                        <h2 class="card-title">Getaway, then Aura</h2>
+                        <div class="card-dates">${fmtDay(G.depart)} to ${fmtDay(A.return)}, 2027 (${nights} nights)</div>
+                        <div class="stops"><span class="stop">Both trips back to back</span><span class="stop">Change ships in Miami</span></div>
+                    </div>
+                    <div class="card-body">${toggle}${body}</div>
+                </article>`;
+        }
 
-        // ==================== APP CONTROLLER ====================
-        const App = {
-            async init() {
-                const latestFile = await PriceData.resolveLatest();
-                CABIN_DATA = await CSVParser.load(latestFile);
+        function explainer() {
+            const gsc = [G, A].every(s => s.ports.some(d => (d.port || "").startsWith("Great Stirrup")));
+            return `
+                <section class="explainer" aria-label="What the 8 night trip looks like">
+                    <h2>What the 8 night trip looks like</h2>
+                    <ul>
+                        <li>On the morning of ${fmtDay(G.return)}, you leave the Getaway in Miami with your luggage (it arrives at ${fmtTime(G.ports[G.ports.length - 1].arrive)}).</li>
+                        <li>That afternoon you board the Aura in Miami (it sails at ${fmtTime(A.ports[0].depart)}).</li>
+                        <li>${esc(A.terminal.text)}</li>
+                        <li>These are two separate bookings on two different ships, so the 8 night price is the two prices added together.</li>
+                        ${gsc ? "<li>You visit Great Stirrup Cay twice, once on each ship.</li>" : ""}
+                    </ul>
+                </section>`;
+        }
 
-                // Keep the "Prices valid as of" banner in sync with the resolved file's date
-                const validDate = PriceData.displayDate(latestFile);
-                const validEl = document.getElementById('pricesValidDate');
-                if (validDate && validEl) validEl.textContent = validDate;
+        function compareTable() {
+            const n = state.guests;
+            const cell = (s, key) => {
+                const p = pick(s, key);
+                if (p.missing) return { html: `<span class="na">Not offered</span>` };
+                const r = price(s, p.cat, n);
+                return r.ok ? { html: `${money(r.e.cabin_total)}<span class="pp">${money(r.e.price_pp)} pp</span>`, total: r.e.cabin_total } : { html: `<span class="na">${r.reason.startsWith("Sold") ? "Sold out" : "Not available"}</span>` };
+            };
+            const rows = allTypes().map(key => {
+                const g = cell(G, key), a = cell(A, key);
+                const both = g.total != null && a.total != null
+                    ? `${money(g.total + a.total)}<span class="pp">${money((g.total + a.total) / n)} pp</span>`
+                    : `<span class="na">Not available</span>`;
+                return `<tr data-type="${key}" class="${key === state.type ? "selected" : ""}"><td><strong>${esc(typeName(key))}</strong></td><td>${g.html}</td><td>${a.html}</td><td>${both}</td></tr>`;
+            }).join("");
+            return `
+                <section class="panel" aria-label="All cabin types">
+                    <div class="panel-title">All cabin types for ${n} ${guestWord(n)}, total per cabin</div>
+                    <div class="table-scroll">
+                        <table class="compare">
+                            <thead><tr><th>Cabin type</th><th>3 nights<br>Getaway</th><th>5 nights<br>Aura</th><th>8 nights<br>same cabin</th></tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                    <p class="hint">Tap a row to pick that cabin type. NCL's prices already include taxes.</p>
+                </section>`;
+        }
 
-                if (CABIN_DATA.length === 0) {
-                    document.getElementById('cabinGrid').innerHTML = `
-                        <div class="no-results">
-                            <div class="no-results-icon">&#9888;</div>
-                            <p>Failed to load cabin data. Please refresh the page.</p>
-                        </div>
-                    `;
-                    return;
-                }
+        // ---------- render ----------
+        function renderControls() {
+            document.getElementById("guestButtons").innerHTML = GUEST_COUNTS.map(n =>
+                `<button type="button" data-guests="${n}" aria-pressed="${state.guests === n}">${n}</button>`).join("");
+            document.getElementById("typeButtons").innerHTML = allTypes().map(k =>
+                `<button type="button" data-type="${k}" aria-pressed="${state.type === k}">${esc(typeName(k))}</button>`).join("");
+        }
 
-                this.bindEvents();
-                Renderer.updateToggleLabels();
-                this.updateFasPlusAvailability();
-                this.updateFasPlusDisplay();
-                Renderer.renderGrid();
-            },
+        function render() {
+            if (!allTypes().includes(state.type)) state.type = "balcony";
+            for (const [f, s] of [["getawayType", G], ["auraType", A]]) if (!hasType(s, state[f])) state[f] = cats(s)[0].match;
+            renderControls();
+            document.getElementById("app").innerHTML = `
+                <div class="options">
+                    ${singleCard(G, "Option 1: 3 nights")}
+                    ${singleCard(A, "Option 2: 5 nights")}
+                    ${eightCard()}
+                </div>
+                ${explainer()}
+                ${compareTable()}`;
+            save();
+        }
 
-            updateGuestDisplay() {
-                const total = AppState.adultCount + AppState.childCount;
-                document.getElementById('adultCount').textContent = AppState.adultCount;
-                document.getElementById('childCount').textContent = AppState.childCount;
-                document.getElementById('guestTotal').textContent = `Total: ${total} guest${total !== 1 ? 's' : ''}`;
-
-                // Update stepper button states
-                document.getElementById('adultDec').disabled = AppState.adultCount <= 1;
-                document.getElementById('adultInc').disabled = AppState.adultCount >= 8;
-                document.getElementById('childDec').disabled = AppState.childCount <= 0;
-                document.getElementById('childInc').disabled = (AppState.adultCount + AppState.childCount) >= 8;
-            },
-
-            updateFasPlusAvailability() {
-                const fasPlusToggle = document.getElementById('fasPlusToggle');
-                const requiresEl = document.getElementById('fasPlusRequires');
-                const bothSelected = AppState.includeDrinks && AppState.includeDinner;
-
-                // If drink or dinner is turned off while FAS Plus is on, turn off FAS Plus
-                if (!bothSelected && AppState.freeAtSeaPlus) {
-                    fasPlusToggle.checked = false;
-                    AppState.freeAtSeaPlus = false;
-                }
-
-                // Show/hide the note (toggle always stays enabled)
-                if (bothSelected) {
-                    requiresEl.style.display = 'none';
-                } else {
-                    requiresEl.style.display = 'block';
-                }
-
-                this.updateFasPlusDisplay();
-                this.updateTipsToggleState();
-                Renderer.updatePrices();
-            },
-
-            // FAS Plus includes prepaid gratuities, so the "When to Pay Tips" toggle is
-            // deselected and grayed out while it's active.
-            updateTipsToggleState() {
-                const toggle = document.getElementById('tipsToggle');
-                const container = document.getElementById('tipsToggleContainer');
-                const desc = document.getElementById('tipsToggleDesc');
-                if (AppState.freeAtSeaPlus) {
-                    toggle.checked = false;
-                    toggle.disabled = true;
-                    container.classList.add('toggle-disabled');
-                    desc.textContent = 'Included with Free at Sea Plus';
-                } else {
-                    toggle.disabled = false;
-                    container.classList.remove('toggle-disabled');
-                    toggle.checked = AppState.tipsBeforeCruise;
-                    desc.textContent = AppState.tipsBeforeCruise
-                        ? 'Before cruise (by 7/23/2026)'
-                        : 'Onboard (end of cruise)';
-                }
-            },
-
-            updateFasPlusDisplay() {
-                const descEl = document.getElementById('fasPlusDesc');
-                const savingsEl = document.getElementById('fasPlusSavings');
-                const guests = PriceCalculator.buildGuestList();
-                const fasGuestCount = Math.min(guests.length, 2);
-                const fasCost = fasGuestCount * 150;
-
-                descEl.textContent = `+${PriceCalculator.formatCurrency(fasCost)} (${fasGuestCount} guest${fasGuestCount !== 1 ? 's' : ''} x $150) \u2014 Includes prepaid gratuities`;
-
-                if (AppState.freeAtSeaPlus) {
-                    // Calculate tip savings
-                    let tipSavings = 0;
-                    guests.slice(0, 2).forEach(g => {
-                        if (g.age >= 3) {
-                            // Use a representative tip rate (we don't know the cabin here)
-                            // Show generic savings message instead
-                            tipSavings += 60; // minimum tip rate
-                        }
-                    });
-                    if (tipSavings > 0) {
-                        savingsEl.style.display = 'block';
-                        savingsEl.textContent = `Includes $${tipSavings}-$${Math.round(tipSavings * 75/60)} in prepaid gratuities (varies by cabin)`;
-                    } else {
-                        savingsEl.style.display = 'none';
-                    }
-                } else {
-                    savingsEl.style.display = 'none';
-                }
-            },
-
-            populateCostBenefitTable() {
-                const table = document.getElementById('costBenefitTable');
-                const guests = PriceCalculator.buildGuestList();
-                const fasGuestCount = Math.min(guests.length, 2);
-                const fasCost = fasGuestCount * 150;
-
-                let html = `
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Without FAS Plus</th>
-                            <th>With FAS Plus</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <tr><td colspan="3" style="font-weight:600;color:var(--ocean-blue);padding-top:0.5rem;">Package Cost</td></tr>
-                    <tr>
-                        <td>Free at Sea Plus (${CRUISE_NIGHTS} days x ${fasGuestCount} guests)</td>
-                        <td>$0</td>
-                        <td>+${PriceCalculator.formatCurrency(fasCost)}</td>
-                    </tr>
-                    <tr><td colspan="3" style="font-weight:600;color:var(--teal);padding-top:1rem;">Savings &amp; Value</td></tr>
-                `;
-
-                // Tip savings per cabin tier
-                const tiers = [
-                    { label: 'Standard cabins ($20/day)', tipPerDay: 20 },
-                    { label: 'Suite/Haven ($25/day)', tipPerDay: 25 }
-                ];
-
-                tiers.forEach(tier => {
-                    const tipTotal = tier.tipPerDay * CRUISE_NIGHTS * fasGuestCount;
-                    html += `
-                        <tr>
-                            <td>Prepaid Gratuities - ${tier.label}</td>
-                            <td>$0 (pay separately)</td>
-                            <td class="savings">-${PriceCalculator.formatCurrency(tipTotal)} (included)</td>
-                        </tr>
-                    `;
+        function renderMeta() {
+            const d = new Date(DATA.saved_at);
+            document.getElementById("asOf").textContent = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
+            const cf = DATA.cruisefeed || {};
+            let text = "";
+            if (cf.status === "checked") {
+                const parts = Object.entries(cf.sailings || {}).map(([id, v]) => {
+                    const s = DATA.sailings.find(x => x.id === id);
+                    return v.price_amount != null ? `${s ? s.ship_short : id} from ${money(v.price_amount)} per person` : `${s ? s.ship_short : id}: ${v.error || "no price"}`;
                 });
-
-                html += `
-                    <tr>
-                        <td>Unlimited Bar at Great Stirrup Cay</td>
-                        <td>$0 (standard packages NOT valid on island after March 2026)</td>
-                        <td class="savings">-$50 to -$100+ value</td>
-                    </tr>
-                    <tr>
-                        <td>Unlimited Starbucks (1 drink per visit)</td>
-                        <td>$0</td>
-                        <td class="savings">-$20 to -$40+ (~$6-8 per specialty drink)</td>
-                    </tr>
-                    <tr>
-                        <td>Premium Top-Shelf Spirits (Patr&oacute;n A&ntilde;ejo, Macallan 12-Year, etc.)</td>
-                        <td>$0</td>
-                        <td class="savings">-$15 to -$50+ ($15+ per drink)</td>
-                    </tr>
-                    <tr>
-                        <td>Energy Drinks &amp; Fresh Juices</td>
-                        <td>$0</td>
-                        <td class="savings">-$20 to -$40 (~$6.25 each)</td>
-                    </tr>
-                    <tr>
-                        <td>Bottled Water (Bars &amp; Restaurants)</td>
-                        <td>$0</td>
-                        <td class="savings">-$15 to -$30 ($4.50 per bottle)</td>
-                    </tr>
-                    <tr><td colspan="3" style="font-weight:600;color:var(--ocean-blue);padding-top:1rem;">Great Stirrup Cay Drink Prices (If No Plus Package)</td></tr>
-                    <tr>
-                        <td>Cocktails</td>
-                        <td>$12.50+ each (plus 20% gratuity)</td>
-                        <td class="savings">Included</td>
-                    </tr>
-                    <tr>
-                        <td>Beer</td>
-                        <td>$7.50+ each (plus 20% gratuity)</td>
-                        <td class="savings">Included</td>
-                    </tr>
-                    <tr>
-                        <td>Soda</td>
-                        <td>$3.50 each (plus 20% gratuity)</td>
-                        <td class="savings">Included</td>
-                    </tr>
-                    <tr>
-                        <td><em>Example: 4 cocktails + 4 beers on island</em></td>
-                        <td><em>~$96 + tip per couple</em></td>
-                        <td class="savings"><em>$0</em></td>
-                    </tr>
-                `;
-
-                // Net cost summary
-                const tipSavingsLow = 20 * CRUISE_NIGHTS * fasGuestCount;
-                const tipSavingsHigh = 25 * CRUISE_NIGHTS * fasGuestCount;
-                const netLow = fasCost - tipSavingsHigh;
-                const netHigh = fasCost - tipSavingsLow;
-
-                html += `
-                    <tr class="total-row" style="background: rgba(13,148,136,0.1);">
-                        <td>Net Cost After Tip Savings</td>
-                        <td>&mdash;</td>
-                        <td>${PriceCalculator.formatCurrency(netLow)}-${PriceCalculator.formatCurrency(netHigh)} + all the extras above</td>
-                    </tr>
-                    </tbody>
-                `;
-
-                table.innerHTML = html;
-            },
-
-            renderChildAgeInputs() {
-                const container = document.getElementById('childAgesInline');
-
-                if (AppState.childCount === 0) {
-                    container.innerHTML = '';
-                    return;
-                }
-
-                // Ensure childAges array matches childCount
-                while (AppState.childAges.length < AppState.childCount) {
-                    AppState.childAges.push(10);
-                }
-
-                let html = '';
-                for (let i = 0; i < AppState.childCount; i++) {
-                    html += `
-                        <div class="child-age-card">
-                            <span class="child-age-card-label">Child ${i + 1}</span>
-                            <div class="child-age-card-row">
-                                Age: <input type="number" class="child-age-inline-input" data-index="${i}"
-                                       min="0" max="20" value="${AppState.childAges[i]}">
-                            </div>
-                        </div>
-                    `;
-                }
-
-                container.innerHTML = html;
-
-                // Bind change events
-                container.querySelectorAll('.child-age-inline-input').forEach(input => {
-                    input.addEventListener('change', (e) => {
-                        const idx = parseInt(e.target.dataset.index);
-                        let age = parseInt(e.target.value) || 0;
-                        if (age < 0) age = 0;
-                        if (age > 20) age = 20;
-                        e.target.value = age;
-                        AppState.childAges[idx] = age;
-                        Renderer.updatePrices();
-                    });
-                });
-            },
-
-            bindEvents() {
-                // Filter tabs
-                document.querySelectorAll('.filter-tab').forEach(tab => {
-                    tab.addEventListener('click', (e) => {
-                        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-                        e.target.classList.add('active');
-                        AppState.currentFilter = e.target.dataset.filter;
-                        Renderer.renderGrid();
-                    });
-                });
-
-                // Sort select
-                document.getElementById('sortSelect').addEventListener('change', (e) => {
-                    AppState.currentSort = e.target.value;
-                    Renderer.renderGrid();
-                });
-
-                // Guest count steppers
-                document.getElementById('adultDec').addEventListener('click', () => {
-                    if (AppState.adultCount > 1) {
-                        AppState.adultCount--;
-                        this.updateGuestDisplay();
-                        this.updateFasPlusDisplay();
-                        Renderer.updatePrices();
-                    }
-                });
-
-                document.getElementById('adultInc').addEventListener('click', () => {
-                    if (AppState.adultCount + AppState.childCount < 8) {
-                        AppState.adultCount++;
-                        this.updateGuestDisplay();
-                        this.updateFasPlusDisplay();
-                        Renderer.updatePrices();
-                    }
-                });
-
-                document.getElementById('childDec').addEventListener('click', () => {
-                    if (AppState.childCount > 0) {
-                        AppState.childCount--;
-                        AppState.childAges.pop();
-                        this.updateGuestDisplay();
-                        this.renderChildAgeInputs();
-                        this.updateFasPlusDisplay();
-                        Renderer.updatePrices();
-                    }
-                });
-
-                document.getElementById('childInc').addEventListener('click', () => {
-                    if (AppState.adultCount + AppState.childCount < 8) {
-                        AppState.childCount++;
-                        AppState.childAges.push(10);
-                        this.updateGuestDisplay();
-                        this.renderChildAgeInputs();
-                        this.updateFasPlusDisplay();
-                        Renderer.updatePrices();
-                    }
-                });
-
-                // Package toggles
-                document.getElementById('drinkToggle').addEventListener('change', (e) => {
-                    AppState.includeDrinks = e.target.checked;
-                    this.updateFasPlusAvailability();
-                });
-
-                document.getElementById('dinnerToggle').addEventListener('change', (e) => {
-                    AppState.includeDinner = e.target.checked;
-                    this.updateFasPlusAvailability();
-                });
-
-                document.getElementById('tipsToggle').addEventListener('change', (e) => {
-                    AppState.tipsBeforeCruise = e.target.checked;
-                    document.getElementById('tipsToggleDesc').textContent = e.target.checked
-                        ? 'Before cruise (by 7/23/2026)'
-                        : 'Onboard (end of cruise)';
-                    Renderer.updatePrices();
-                });
-
-                // FAS Plus toggle
-                document.getElementById('fasPlusToggle').addEventListener('change', (e) => {
-                    if (!AppState.includeDrinks || !AppState.includeDinner) {
-                        // Auto-enable drink + dinner when FAS Plus is turned on
-                        if (e.target.checked) {
-                            AppState.includeDrinks = true;
-                            AppState.includeDinner = true;
-                            document.getElementById('drinkToggle').checked = true;
-                            document.getElementById('dinnerToggle').checked = true;
-                        }
-                    }
-                    AppState.freeAtSeaPlus = e.target.checked;
-                    this.updateFasPlusDisplay();
-                    this.updateTipsToggleState();
-                    Renderer.updatePrices();
-                });
-
-                // FAS Plus info button
-                document.getElementById('fasPlusInfoBtn').addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.populateCostBenefitTable();
-                    document.getElementById('fasPlusModal').classList.add('visible');
-                });
-
-                document.getElementById('closeFasModal').addEventListener('click', () => {
-                    document.getElementById('fasPlusModal').classList.remove('visible');
-                });
-
-                document.getElementById('fasPlusModal').addEventListener('click', (e) => {
-                    if (e.target.classList.contains('fas-modal-overlay')) {
-                        document.getElementById('fasPlusModal').classList.remove('visible');
-                    }
-                });
-
-                // Deposit option radio buttons
-                document.querySelectorAll('input[name="depositOption"]').forEach(radio => {
-                    radio.addEventListener('change', (e) => {
-                        AppState.depositOption = e.target.value;
-                        document.querySelectorAll('.deposit-radio-label').forEach(label => {
-                            label.classList.toggle('active', label.dataset.option === e.target.value);
-                        });
-                        Renderer.updatePrices();
-                    });
-                });
-
-                // Cabin grid event delegation
-                document.getElementById('cabinGrid').addEventListener('click', (e) => {
-                    if (e.target.classList.contains('toggle-breakdown')) {
-                        const id = parseInt(e.target.dataset.id);
-                        if (AppState.openBreakdowns.has(id)) {
-                            AppState.openBreakdowns.delete(id);
-                        } else {
-                            AppState.openBreakdowns.add(id);
-                        }
-                        Renderer.renderGrid();
-                    }
-
-                    if (e.target.classList.contains('btn-compare')) {
-                        const id = parseInt(e.target.dataset.id);
-                        const cabin = CABIN_DATA.find(c => c.id === id);
-                        if (cabin && cabin.soldOut) return; // sold-out cabins can't be compared
-                        if (AppState.selectedCabins.has(id)) {
-                            AppState.selectedCabins.delete(id);
-                        } else if (AppState.selectedCabins.size < 3) {
-                            AppState.selectedCabins.add(id);
-                        }
-                        Renderer.renderGrid();
-                        Renderer.updateComparisonTray();
-                    }
-                });
-
-                // Comparison tray
-                document.getElementById('clearComparison').addEventListener('click', () => {
-                    AppState.selectedCabins.clear();
-                    Renderer.renderGrid();
-                    Renderer.updateComparisonTray();
-                });
-
-                document.getElementById('compareNow').addEventListener('click', () => {
-                    if (AppState.selectedCabins.size > 0) {
-                        Renderer.renderComparison();
-                        document.getElementById('comparisonModal').classList.add('visible');
-                    }
-                });
-
-                // Comparison Modal
-                document.getElementById('closeModal').addEventListener('click', () => {
-                    document.getElementById('comparisonModal').classList.remove('visible');
-                });
-
-                document.getElementById('comparisonModal').addEventListener('click', (e) => {
-                    if (e.target.classList.contains('modal-overlay')) {
-                        document.getElementById('comparisonModal').classList.remove('visible');
-                    }
-                });
-
-                // Keyboard
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        document.getElementById('comparisonModal').classList.remove('visible');
-                        document.getElementById('fasPlusModal').classList.remove('visible');
-                    }
-                });
-
-                // Initial stepper state
-                this.updateGuestDisplay();
+                text = `CruiseFeed cross check on ${cf.checked_at.slice(0, 10)}: ${parts.join("; ")}.`;
+            } else if (cf.warning) {
+                text = `CruiseFeed cross check: ${cf.warning}`;
             }
-        };
+            document.getElementById("crossCheck").textContent = text;
+        }
 
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', () => App.init());
+        // ---------- events ----------
+        document.addEventListener("click", e => {
+            const b = e.target.closest("button[data-guests], button[data-type], button[data-mode], tr[data-type]");
+            if (!b || !DATA) return;
+            if (b.dataset.guests) state.guests = Number(b.dataset.guests);
+            else if (b.dataset.mode) state.mode = b.dataset.mode;
+            else if (b.dataset.type) {
+                state.type = b.dataset.type;
+                // Keep the "different cabins" picks in step with the main choice where possible.
+                if (hasType(G, state.type)) state.getawayType = state.type;
+                if (hasType(A, state.type)) state.auraType = state.type;
+            }
+            render();
+        });
+
+        document.addEventListener("change", e => {
+            const sel = e.target.closest("select[data-field]");
+            if (!sel) return;
+            state[sel.dataset.field] = sel.value;
+            render();
+        });
+
+        // ---------- start ----------
+        document.getElementById("versionBadge").textContent = "v" + APP_VERSION;
+        document.getElementById("footerVersion").textContent = "Version " + APP_VERSION;
+        restore();
+        fetch(DATA_URL, { cache: "no-cache" })
+            .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+            .then(d => {
+                DATA = d;
+                G = d.sailings.find(s => s.id.startsWith("getaway"));
+                A = d.sailings.find(s => s.id.startsWith("aura"));
+                if (!G || !A) throw new Error("a sailing is missing");
+                renderMeta();
+                render();
+            })
+            .catch(err => {
+                document.getElementById("asOf").textContent = "unavailable";
+                document.getElementById("app").innerHTML = `<div class="load-error">The prices could not be loaded (${esc(err.message)}). Please refresh the page.</div>`;
+            });
     </script>
 </body>
 </html>

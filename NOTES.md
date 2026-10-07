@@ -54,6 +54,8 @@ Add a toggle with two choices. Show the 8-night total for whichever choice is ac
 
 ### 2. Price refresh: option A (scheduled job on the AI PC), NCL as the primary source
 
+Superseded on 2026-10-07: the refresh now runs as a GitHub Actions workflow on GitHub's own runners. See "Refresh plan" below. The AI PC is the fallback if NCL blocks GitHub's runners.
+
 - Daily: read NCL's sailing page for each sailing (header `Accept: */*`). This is free.
 - Weekly: call CruiseFeed for both sailings, 2-guest price only, as a cross check.
 - Budget guard: call `/v1/stats` first. If remaining is below 150, skip CruiseFeed and log a warning in the data file. The allowance may already be well under 1,000, because Deck Finder used some.
@@ -70,9 +72,9 @@ Add a toggle with two choices. Show the 8-night total for whichever choice is ac
 
 5. Every cabin category must be checked at 2, 3, 4, and 5 guests. For each, record whether it is available and its price. Some categories only hold 2.
 6. Record the price of guests 3, 4, and 5 separately from the first two, so the page can show the add-on cost.
-7. Taxes and fees are per guest: Getaway $200, Aura $210, so the 8-night option is $410 per guest. Store these per sailing with a source and date. If NCL shows a different amount, use NCL's number and flag it.
+7. Taxes and fees are per guest: Getaway $200, Aura $210, so the 8-night option is $410 per guest. Store these per sailing with a source and date. If NCL shows a different amount, use NCL's number and flag it. (Updated 2026-10-07: NCL's prices already include taxes. See decision 5 below.)
 8. The Free at Sea drink and food package is per guest and differs by ship. Find each ship's price on the NCL page. If it can't be found, leave it empty and say so. Do not guess.
-9. Total for an option = cabin price for that party size + (taxes x guests) + (Free at Sea x guests), summed across both ships for 8 nights. Show taxes and Free at Sea as their own lines. Include cost per night.
+9. Total for an option = cabin price for that party size + (taxes x guests) + (Free at Sea x guests), summed across both ships for 8 nights. Show taxes and Free at Sea as their own lines. Include cost per night. (Updated 2026-10-07: taxes are not added on top, and Free at Sea is a placeholder. See decisions 5 and 8 below.)
 10. Port: both ships are expected to use Terminal B (Pearl of Miami), NCL's dedicated PortMiami terminal. Try to confirm the terminal for each sailing from NCL's pages. If it can't be confirmed, show "Expected: Terminal B (confirm on your eDocs)" on the page.
 
 ## NCL probe results (2026-10-06, from a Claude Code cloud session)
@@ -87,6 +89,49 @@ Add a toggle with two choices. Show the 8-night total for whichever choice is ac
 - Specific categories (like "Family Balcony" or a category code like BA) are not on the cruise page. They live in NCL's booking app (`/booking`), which is a JavaScript app shell. Not probed further.
 - Guests: add `?numberOfGuests=N` to the cruise page URL. The page then reports `guestCount` N and per person prices for N guests. `guestCount=N` works the same. One page fetch per guest count, so 4 fetches per sailing per day (8 total).
 - The per person "from" price for a category can be a different specific cabin at a different guest count, because the cheapest cabin may not hold that many people. Seen: Getaway Oceanview went from $429 pp at 2 guests to $466 pp at 3. Aura Haven went from $2,602 pp at 3 to $2,799 pp at 4. So "cabin total at N minus cabin total at 2" is an estimate of the add-on cost, not an exact one.
-- Taxes: the grid header says "PP / INCLUDES TAXES, FEES AND PORT EXPENSES". NCL's prices already include taxes, and the page does not itemize them. Adding $200 or $210 per guest on top would count taxes twice. Waiting for the owner's decision.
+- Taxes: the grid header says "PP / INCLUDES TAXES, FEES AND PORT EXPENSES". NCL's prices already include taxes, and the page does not itemize them. Adding $200 or $210 per guest on top would count taxes twice. Decided 2026-10-07: use NCL's price as the total and show the tax amount only as a note.
 - Free at Sea: the page lists the four offers (open bar, specialty dining, excursion credits, Wi-Fi) and says "Simply pay the package gratuities in advance", but gives no dollar amount for that per guest charge on either ship. Leave it empty until a source is found.
 - Terminal: neither page names a terminal. `/api/cruises/v1/route-events/<packageId>` gives port times but no terminal. Show "Expected: Terminal B (confirm on your eDocs)".
+
+## Booking flow probe (2026-10-06, Getaway Jun 11 at 2 guests, from a Claude Code cloud session)
+
+No login, no reservation, no cabin hold. Not used by the daily job (decision 3 below). A separate local session on the AI PC is rerunning this in a real browser.
+
+- The booking app is an Angular app at `https://www.ncl.com/booking`. Its calls are POST requests with JSON bodies to `https://www.ncl.com/booking/api/<name>`.
+- The four calls tried:
+  1. `vacation-availability`: works. Returns the sailing and a `state` object.
+  2. `pricing`: works. Returns about 2 MB: every sailing of the itinerary from Oct 2026 to Nov 2027, with broad cabin type prices (`metaPrice[].price`, `basePrice`, `status`) and the list of specific categories (`subMetas[].code`). The specific categories have no prices.
+  3. `meta-availability`: failed with HTTP 500 "An unexpected error happened" on three body shapes (`{"state":...}` with `metaId` set, and `{"sailing":..., "metaId":"BALCONY" or "OCEANVIEW" or "GETAWAY.BALCONY.R1-2020-rev23", "state":...}`). This is the call the app makes after picking a cabin type, and where specific category prices most likely come from.
+  4. `quote`: failed with HTTP 400 "At least one of the required parameters is missing(metasSelection)". `metasSelection` is not in the app's code, so the server probably builds it from choices saved in the state by the earlier steps.
+- State object: there is no session token. Each response returns `state`, and the next request sends it back in the body as `{"state": ...}`. The starting body that works for `vacation-availability`:
+  `{"state":{"staterooms":[{"itineraryCode":"GETAWAY3MIANPINASMIA","numberOfGuests":2,"sailing":{"sailingId":24223992}}]}}`
+  The returned state adds `shipCode`, `metaId`, `sailing.departureDate`, `sailing.departureDateFormatted` ("2027-06-11"), `selectedStateroomId` "1", `agencyId`, `userFareCodes` ["BF"] and `updatedProperties`.
+- `sailingId` in the booking app is NCL's packageId (24223992 for the Getaway Jun 11 sailing), not the sailId (60533). Using no sailing, or the wrong id, returns error 42 "The date you selected is no longer available".
+- `pricing` body: `{"guestSelections":[{"selectedStateroomId":"1","numberOfGuests":2}],"selectedMonthFilters":[],"state":<state>}`.
+- Specific categories for the Getaway Jun 11 sailing (from `pricing`): Inside IA/IB/IC/IF, Family Inside I4, Solo Inside IT, Sailaway Inside IX; Oceanview with Picture Window OA/OB, Family Oceanview O4/O5, Solo Oceanview OT, Sailaway Oceanview OX; Balcony BA/BB/BF, Large Balcony B6, Family Balcony B4, Aft-Facing Balcony B1, Solo Balcony BT, Sailaway Balcony BX; Club Balcony Suite MA/MB, Club Balcony Suite with Larger Balcony M6, Family Club Balcony Suite M4, Aft-Facing Club Balcony Suite M1, Sail Away Club Balcony Suite MX; The Haven HF, HA, H7, H2, HI, H6, H3, HG; Studio T1 (not available).
+- Bot protection: Akamai Bot Manager. The booking page sets the cookies `_abck` and `bm_sz` (plus `ak_*` location cookies and `akaas_www_ncl_com_as`). Nothing returned 403 or a challenge page. The app is built to send `X-XSRF-TOKEN`, but NCL never set an `XSRF-TOKEN` cookie, so none was sent.
+- Where it failed: `meta-availability` (HTTP 500). The cause is unknown: a wrong body shape, a skipped step, or Akamai quietly refusing a client that never ran its sensor script. A real browser run that records the `meta-availability` and `quote` request bodies will tell.
+- Avoid `api/recommended-cabin` (its config name is `recommendedCabinHoldUrl`, so it likely holds a cabin) and `api/book`.
+- Free at Sea: no dollar amount for the per guest charge in any response. It most likely appears in `quote`.
+
+## Decisions (2026-10-07)
+
+1. Branch: keep working on `claude/cabin-selector-improvements-08QHA`. Do not merge to `main` until the owner says so.
+2. Build the decision guide with broad cabin types only.
+3. Do not use NCL's booking app in the daily job.
+4. Do not write a Playwright script here. The AI PC session is running the booking flow test.
+5. Taxes: use NCL's price as the total. Do not add taxes on top. Under each total show "Includes about $200 per guest in taxes" (Getaway), "Includes about $210 per guest in taxes" (Aura), "Includes about $410 per guest in taxes" (8 nights).
+6. Add-on cost label: "Estimated add-on (NCL's cheapest cabin for that party size)".
+7. Same cabin mode, Suite: the Getaway has no Suite on this sailing. Show "Not offered on the Getaway" and "Switch to Different cabins to pair an Aura Suite with any Getaway cabin."
+8. Free at Sea: leave empty and show "Free at Sea charge: not yet available".
+9. Hide Studio on both ships (it fits one guest).
+
+## Refresh plan (built in 3.0.0)
+
+- `.github/workflows/refresh-prices.yml` on GitHub's own runners, not the AI PC.
+- Daily (10:17 UTC): `tools/fetch_prices.py` loads both sailing pages at 2, 3, 4 and 5 guests (8 page loads, free) and writes `data/prices.new.json`.
+- Weekly (Mondays, and manual runs with the box ticked): CruiseFeed cross check, 2-guest price only, only when the `CRUISEFEED_KEY` repo secret exists. It calls `/v1/stats` first and skips CruiseFeed when fewer than 150 results remain or the number can't be read. Then `/v1/ship-names` (free) to confirm the exact ship names, then one `/v1/cruises` lookup per sailing (2 results a week, about 9 a month). The result or warning is stored in the data file's `cruisefeed` block and shown in the page footer.
+- `tools/check_prices.py` checks the new file. If it fails (bad format or a missing sailing), the workflow fails and `data/prices.json` stays as it was.
+- The workflow commits `data/prices.json` every day, because `saved_at` changes even when prices don't. That keeps "Prices as of" honest.
+- Scheduled runs only fire on the default branch (`main`), so the daily schedule starts after the merge. Until then, pushes to this branch that change the fetch tools or the workflow run it once, to test GitHub's runners.
+- If NCL blocks GitHub's runners, fall back to the AI PC (a self-hosted runner or a scheduled Python job running the same script).

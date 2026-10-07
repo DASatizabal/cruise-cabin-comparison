@@ -1,0 +1,564 @@
+{
+ "schema_version": 1,
+ "saved_at": "2026-10-07T01:10:16Z",
+ "source": "NCL website sailing pages, one page per guest count (2 to 5)",
+ "guest_counts": [
+  2,
+  3,
+  4,
+  5
+ ],
+ "cruisefeed": {
+  "checked_at": null,
+  "remaining": null,
+  "status": "never_run",
+  "warning": "Not checked yet. It runs weekly once the CRUISEFEED_KEY repo secret is added.",
+  "sailings": {}
+ },
+ "sailings": [
+  {
+   "id": "getaway-2027-06-11",
+   "ship": "Norwegian Getaway",
+   "ship_short": "Getaway",
+   "itinerary_code": "GETAWAY3MIANPINASMIA",
+   "package_id": 24223992,
+   "depart": "2027-06-11",
+   "return": "2027-06-14",
+   "nights": 3,
+   "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
+   "source": "NCL website",
+   "saved_at": "2026-10-07",
+   "prices_include_taxes": true,
+   "taxes_per_guest_estimate": {
+    "source": "owner estimate",
+    "date": "2026-10-06",
+    "amount": 200
+   },
+   "free_at_sea_per_guest": null,
+   "terminal": {
+    "confirmed": false,
+    "text": "Expected: Terminal B (confirm on your eDocs)"
+   },
+   "ports": [
+    {
+     "date": "2027-06-11",
+     "port": "Miami, Florida",
+     "arrive": null,
+     "depart": "16:00"
+    },
+    {
+     "date": "2027-06-12",
+     "port": "Great Stirrup Cay, Bahamas",
+     "arrive": "07:00",
+     "depart": "17:00"
+    },
+    {
+     "date": "2027-06-13",
+     "port": "Nassau, Bahamas",
+     "arrive": "07:00",
+     "depart": "17:00"
+    },
+    {
+     "date": "2027-06-14",
+     "port": "Miami, Florida",
+     "arrive": "07:00",
+     "depart": null
+    }
+   ],
+   "categories": [
+    {
+     "code": "STUDIO",
+     "title": "Studio",
+     "match": "studio",
+     "by_guests": {
+      "2": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      },
+      "3": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      },
+      "4": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      },
+      "5": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      }
+     }
+    },
+    {
+     "code": "INSIDE",
+     "title": "Inside",
+     "match": "inside",
+     "by_guests": {
+      "2": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 399,
+       "base_pp": 598,
+       "cabin_total": 798
+      },
+      "3": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 382,
+       "base_pp": 565,
+       "cabin_total": 1146,
+       "addon_vs_2": 348
+      },
+      "4": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 374,
+       "base_pp": 548,
+       "cabin_total": 1496,
+       "addon_vs_2": 698
+      },
+      "5": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      }
+     }
+    },
+    {
+     "code": "OCEANVIEW",
+     "title": "Oceanview",
+     "match": "oceanview",
+     "by_guests": {
+      "2": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 429,
+       "base_pp": 658,
+       "cabin_total": 858
+      },
+      "3": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 466,
+       "base_pp": 731,
+       "cabin_total": 1398,
+       "addon_vs_2": 540
+      },
+      "4": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 439,
+       "base_pp": 678,
+       "cabin_total": 1756,
+       "addon_vs_2": 898
+      },
+      "5": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 427,
+       "base_pp": 654,
+       "cabin_total": 2135,
+       "addon_vs_2": 1277
+      }
+     }
+    },
+    {
+     "code": "BALCONY",
+     "title": "Balcony",
+     "match": "balcony",
+     "by_guests": {
+      "2": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 469,
+       "base_pp": 738,
+       "cabin_total": 938
+      },
+      "3": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 436,
+       "base_pp": 671,
+       "cabin_total": 1308,
+       "addon_vs_2": 370
+      },
+      "4": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 419,
+       "base_pp": 638,
+       "cabin_total": 1676,
+       "addon_vs_2": 738
+      },
+      "5": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      }
+     }
+    },
+    {
+     "code": "MINISUITE",
+     "title": "Club Balcony Suite",
+     "match": "mini_suite",
+     "by_guests": {
+      "2": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 519,
+       "base_pp": 838,
+       "cabin_total": 1038
+      },
+      "3": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 472,
+       "base_pp": 745,
+       "cabin_total": 1416,
+       "addon_vs_2": 378
+      },
+      "4": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 449,
+       "base_pp": 698,
+       "cabin_total": 1796,
+       "addon_vs_2": 758
+      },
+      "5": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      }
+     }
+    },
+    {
+     "code": "HAVEN",
+     "title": "The Haven",
+     "match": "haven",
+     "by_guests": {
+      "2": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1849,
+       "base_pp": 3498,
+       "cabin_total": 3698
+      },
+      "3": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1469,
+       "base_pp": 2738,
+       "cabin_total": 4407,
+       "addon_vs_2": 709
+      },
+      "4": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1334,
+       "base_pp": 2468,
+       "cabin_total": 5336,
+       "addon_vs_2": 1638
+      },
+      "5": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1257,
+       "base_pp": 2314,
+       "cabin_total": 6285,
+       "addon_vs_2": 2587
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "aura-2027-06-14",
+   "ship": "Norwegian Aura",
+   "ship_short": "Aura",
+   "itinerary_code": "AURA5MIAPOPNPIMIA",
+   "package_id": 25729291,
+   "depart": "2027-06-14",
+   "return": "2027-06-19",
+   "nights": 5,
+   "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
+   "source": "NCL website",
+   "saved_at": "2026-10-07",
+   "prices_include_taxes": true,
+   "taxes_per_guest_estimate": {
+    "source": "owner estimate",
+    "date": "2026-10-06",
+    "amount": 210
+   },
+   "free_at_sea_per_guest": null,
+   "terminal": {
+    "confirmed": false,
+    "text": "Expected: Terminal B (confirm on your eDocs)"
+   },
+   "ports": [
+    {
+     "date": "2027-06-14",
+     "port": "Miami, Florida",
+     "arrive": null,
+     "depart": "16:00"
+    },
+    {
+     "date": "2027-06-15",
+     "sea": true
+    },
+    {
+     "date": "2027-06-16",
+     "port": "Puerto Plata, Dominican Republic",
+     "arrive": "07:00",
+     "depart": "16:00"
+    },
+    {
+     "date": "2027-06-17",
+     "sea": true
+    },
+    {
+     "date": "2027-06-18",
+     "port": "Great Stirrup Cay, Bahamas",
+     "arrive": "08:00",
+     "depart": "17:00"
+    },
+    {
+     "date": "2027-06-19",
+     "port": "Miami, Florida",
+     "arrive": "07:00",
+     "depart": null
+    }
+   ],
+   "categories": [
+    {
+     "code": "STUDIO",
+     "title": "Studio",
+     "match": "studio",
+     "by_guests": {
+      "2": {
+       "status": "SOLD_OUT",
+       "available": false
+      },
+      "3": {
+       "status": "SOLD_OUT",
+       "available": false
+      },
+      "4": {
+       "status": "SOLD_OUT",
+       "available": false
+      },
+      "5": {
+       "status": "SOLD_OUT",
+       "available": false
+      }
+     }
+    },
+    {
+     "code": "INSIDE",
+     "title": "Inside",
+     "match": "inside",
+     "by_guests": {
+      "2": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1229,
+       "base_pp": 2248,
+       "cabin_total": 2458
+      },
+      "3": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1156,
+       "base_pp": 2101,
+       "cabin_total": 3468,
+       "addon_vs_2": 1010
+      },
+      "4": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1064,
+       "base_pp": 1918,
+       "cabin_total": 4256,
+       "addon_vs_2": 1798
+      },
+      "5": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      }
+     }
+    },
+    {
+     "code": "OCEANVIEW",
+     "title": "Oceanview",
+     "match": "oceanview",
+     "by_guests": {
+      "2": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1439,
+       "base_pp": 2668,
+       "cabin_total": 2878
+      },
+      "3": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1296,
+       "base_pp": 2381,
+       "cabin_total": 3888,
+       "addon_vs_2": 1010
+      },
+      "4": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1249,
+       "base_pp": 2288,
+       "cabin_total": 4996,
+       "addon_vs_2": 2118
+      },
+      "5": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      }
+     }
+    },
+    {
+     "code": "BALCONY",
+     "title": "Balcony",
+     "match": "balcony",
+     "by_guests": {
+      "2": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1689,
+       "base_pp": 3168,
+       "cabin_total": 3378
+      },
+      "3": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1402,
+       "base_pp": 2595,
+       "cabin_total": 4206,
+       "addon_vs_2": 828
+      },
+      "4": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1284,
+       "base_pp": 2358,
+       "cabin_total": 5136,
+       "addon_vs_2": 1758
+      },
+      "5": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      }
+     }
+    },
+    {
+     "code": "MINISUITE",
+     "title": "Club Balcony Suite",
+     "match": "mini_suite",
+     "by_guests": {
+      "2": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 2029,
+       "base_pp": 3848,
+       "cabin_total": 4058
+      },
+      "3": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1729,
+       "base_pp": 3248,
+       "cabin_total": 5187,
+       "addon_vs_2": 1129
+      },
+      "4": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1494,
+       "base_pp": 2778,
+       "cabin_total": 5976,
+       "addon_vs_2": 1918
+      },
+      "5": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      }
+     }
+    },
+    {
+     "code": "SUITE",
+     "title": "Suite",
+     "match": "suite",
+     "by_guests": {
+      "2": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 2359,
+       "base_pp": 4508,
+       "cabin_total": 4718
+      },
+      "3": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1836,
+       "base_pp": 3461,
+       "cabin_total": 5508,
+       "addon_vs_2": 790
+      },
+      "4": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 1574,
+       "base_pp": 2938,
+       "cabin_total": 6296,
+       "addon_vs_2": 1578
+      },
+      "5": {
+       "status": "NOT_AVAILABLE",
+       "available": false
+      }
+     }
+    },
+    {
+     "code": "HAVEN",
+     "title": "The Haven",
+     "match": "haven",
+     "by_guests": {
+      "2": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 3509,
+       "base_pp": 6808,
+       "cabin_total": 7018
+      },
+      "3": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 2602,
+       "base_pp": 4995,
+       "cabin_total": 7806,
+       "addon_vs_2": 788
+      },
+      "4": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 2799,
+       "base_pp": 5388,
+       "cabin_total": 11196,
+       "addon_vs_2": 4178
+      },
+      "5": {
+       "status": "AVAILABLE",
+       "available": true,
+       "price_pp": 2897,
+       "base_pp": 5584,
+       "cabin_total": 14485,
+       "addon_vs_2": 7467
+      }
+     }
+    }
+   ]
+  }
+ ]
+}
