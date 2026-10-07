@@ -2,6 +2,33 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.0.0] - 2026-10-07
+
+Prices now come from NCL's booking system, cabin by cabin, with every line of the total shown. The data file format changed (schema 2), so this is a major version.
+
+### Added
+- Specific cabin categories (for example Family Balcony B4) under each cabin type, with prices for the current party, cheapest first. Tap one to choose it.
+- Guest counters for "Adults (21+)" and "Kids (under 21)", with an age dropdown for each kid. Adults plus kids must total 2 to 5 with at least 1 adult; anything else is blocked with a plain message.
+- Each total shows its own lines: cruise fare, NCL's taxes, fees and port expenses, Unlimited Open Bar and Specialty Dining gratuities, then the total, per person price and cost per night.
+- Free at Sea gratuities by age: 21 and over pay Open Bar and Specialty Dining, 13 to 20 pay Specialty Dining only, 12 and under pay neither. The page shows who is charged, for example "Unlimited Open Bar: 2 guests x $96".
+- Real added cost for guests 3, 4 and 5 in the same category (fare and taxes).
+- Full tables of every cabin on each ship for the current party. Unavailable cabins are greyed out with the reason: "Sold out", "Holds only X guests" or "Sold out for this party size".
+- Guarantee categories (IX, OX, BX, MX) are labeled "Guarantee: NCL picks your cabin location".
+- Daily cross checks in the data file: extra guest price consistency (logged) and fare plus taxes plus gratuities against NCL's price summary (fails the run when off by more than $5).
+- The fetch script refuses any address containing "manage-cabin" or "hold".
+
+### Changed
+- `tools/fetch_prices.py` reads NCL's vacation-builder API (stateroom-types-availability and price-summary) and the route-events itinerary, with 2 seconds between calls, instead of the public sailing pages.
+- Same cabin mode matches by broad type and defaults to the cheapest available category on each ship. Different cabins mode picks any available category on each ship.
+- `tools/check_prices.py` checks the new data format.
+
+### Removed
+- CruiseFeed: the weekly cross check, the workflow option, the footer message and the repo secret steps.
+- The "Includes about $200 per guest in taxes" notes and the "Free at Sea charge: not yet available" placeholder (both are now real lines).
+- The "Estimated add-on" label (replaced by the real added cost).
+- The 2 to 5 guest buttons (replaced by the adult and kid counters).
+- The old Norwegian Joy CSV files (still in git history).
+
 ## [3.0.0] - 2026-10-07
 
 The page is now a decision guide for the family's June 2027 cruise. It replaces the Norwegian Joy (Nov 2026) cabin selector, which stays available on `main` until this branch is merged and in git history after that.

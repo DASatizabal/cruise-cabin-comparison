@@ -1,19 +1,81 @@
 {
- "schema_version": 1,
- "saved_at": "2026-10-07T01:11:32Z",
- "source": "NCL website sailing pages, one page per guest count (2 to 5)",
+ "schema_version": 2,
+ "saved_at": "2026-10-07T01:37:56Z",
+ "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
   3,
   4,
   5
  ],
- "cruisefeed": {
-  "checked_at": null,
-  "remaining": null,
-  "status": "never_run",
-  "warning": "Not checked yet. It runs weekly once the CRUISEFEED_KEY repo secret is added.",
-  "sailings": {}
+ "checks": {
+  "extra_guest_mismatches": [],
+  "formula": [
+   {
+    "sailing": "getaway-2027-06-11",
+    "guests": 2,
+    "category": "IX",
+    "expected": 990,
+    "ncl_total": 990,
+    "ok": true
+   },
+   {
+    "sailing": "getaway-2027-06-11",
+    "guests": 3,
+    "category": "IX",
+    "expected": 1455,
+    "ncl_total": 1455,
+    "ok": true
+   },
+   {
+    "sailing": "getaway-2027-06-11",
+    "guests": 4,
+    "category": "IX",
+    "expected": 1920,
+    "ncl_total": 1920,
+    "ok": true
+   },
+   {
+    "sailing": "getaway-2027-06-11",
+    "guests": 5,
+    "category": "O5",
+    "expected": 2715,
+    "ncl_total": 2715,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 2,
+    "category": "IF",
+    "expected": 2858,
+    "ncl_total": 2858,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 3,
+    "category": "I4",
+    "expected": 4068,
+    "ncl_total": 4067,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 4,
+    "category": "I4",
+    "expected": 5056,
+    "ncl_total": 5056,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 5,
+    "category": "H6",
+    "expected": 15485,
+    "ncl_total": 15485,
+    "ok": true
+   }
+  ]
  },
  "sailings": [
   {
@@ -21,20 +83,24 @@
    "ship": "Norwegian Getaway",
    "ship_short": "Getaway",
    "itinerary_code": "GETAWAY3MIANPINASMIA",
-   "package_id": 24223992,
+   "package_id": "24223992",
    "depart": "2027-06-11",
    "return": "2027-06-14",
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
-   "source": "NCL website",
+   "source": "NCL vacation-builder API",
    "saved_at": "2026-10-07",
-   "prices_include_taxes": true,
-   "taxes_per_guest_estimate": {
-    "source": "owner estimate",
-    "date": "2026-10-06",
-    "amount": 200
+   "taxes_per_guest": 200,
+   "gratuities": {
+    "open_bar": {
+     "title": "Unlimited Open Bar",
+     "per_guest": 96
+    },
+    "specialty_dining": {
+     "title": "Specialty Dining - 1 Meal",
+     "per_guest": 20
+    }
    },
-   "free_at_sea_per_guest": null,
    "terminal": {
     "confirmed": false,
     "text": "Expected: Terminal B (confirm on your eDocs)"
@@ -65,207 +131,1368 @@
      "depart": null
     }
    ],
-   "categories": [
+   "price_summaries": [
+    {
+     "guests": 2,
+     "category": "IX",
+     "fare_code": "ALL4CHO",
+     "fare_total": 358,
+     "fare_per_guest": [
+      179,
+      179
+     ],
+     "taxes_per_guest": [
+      200,
+      200
+     ],
+     "open_bar": {
+      "title": "Unlimited Open Bar",
+      "per_guest": [
+       96,
+       96
+      ]
+     },
+     "specialty_dining": {
+      "title": "Specialty Dining - 1 Meal",
+      "per_guest": [
+       20,
+       20
+      ]
+     },
+     "grand_total": 990
+    },
+    {
+     "guests": 3,
+     "category": "IX",
+     "fare_code": "ALL4CHO",
+     "fare_total": 507,
+     "fare_per_guest": [
+      179,
+      179,
+      149
+     ],
+     "taxes_per_guest": [
+      200,
+      200,
+      200
+     ],
+     "open_bar": {
+      "title": "Unlimited Open Bar",
+      "per_guest": [
+       96,
+       96,
+       96
+      ]
+     },
+     "specialty_dining": {
+      "title": "Specialty Dining - 1 Meal",
+      "per_guest": [
+       20,
+       20,
+       20
+      ]
+     },
+     "grand_total": 1455
+    },
+    {
+     "guests": 4,
+     "category": "IX",
+     "fare_code": "ALL4CHO",
+     "fare_total": 656,
+     "fare_per_guest": [
+      179,
+      179,
+      149,
+      149
+     ],
+     "taxes_per_guest": [
+      200,
+      200,
+      200,
+      200
+     ],
+     "open_bar": {
+      "title": "Unlimited Open Bar",
+      "per_guest": [
+       96,
+       96,
+       96,
+       96
+      ]
+     },
+     "specialty_dining": {
+      "title": "Specialty Dining - 1 Meal",
+      "per_guest": [
+       20,
+       20,
+       20,
+       20
+      ]
+     },
+     "grand_total": 1920
+    },
+    {
+     "guests": 5,
+     "category": "O5",
+     "fare_code": "ALL4CHO",
+     "fare_total": 1135,
+     "fare_per_guest": [
+      329,
+      329,
+      159,
+      159,
+      159
+     ],
+     "taxes_per_guest": [
+      200,
+      200,
+      200,
+      200,
+      200
+     ],
+     "open_bar": {
+      "title": "Unlimited Open Bar",
+      "per_guest": [
+       96,
+       96,
+       96,
+       96,
+       96
+      ]
+     },
+     "specialty_dining": {
+      "title": "Specialty Dining - 1 Meal",
+      "per_guest": [
+       20,
+       20,
+       20,
+       20,
+       20
+      ]
+     },
+     "grand_total": 2715
+    }
+   ],
+   "types": [
     {
      "code": "STUDIO",
      "title": "Studio",
      "match": "studio",
-     "by_guests": {
-      "2": {
-       "status": "NOT_AVAILABLE",
-       "available": false
-      },
-      "3": {
-       "status": "NOT_AVAILABLE",
-       "available": false
-      },
-      "4": {
-       "status": "NOT_AVAILABLE",
-       "available": false
-      },
-      "5": {
-       "status": "NOT_AVAILABLE",
-       "available": false
+     "categories": [
+      {
+       "code": "T1",
+       "title": "Solo Studio",
+       "guarantee": false,
+       "solo": true,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 2 guests"
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 3 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 4 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 5 guests"
+        }
+       }
       }
-     }
+     ]
     },
     {
      "code": "INSIDE",
      "title": "Inside",
      "match": "inside",
-     "by_guests": {
-      "2": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 399,
-       "base_pp": 598,
-       "cabin_total": 798
+     "categories": [
+      {
+       "code": "IX",
+       "title": "Guarantee Inside",
+       "guarantee": true,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 379,
+         "cabin_total": 758
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 369,
+         "cabin_total": 1107,
+         "added_vs_2": 349
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 364,
+         "cabin_total": 1456,
+         "added_vs_2": 698
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "3": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 382,
-       "base_pp": 565,
-       "cabin_total": 1146,
-       "addon_vs_2": 348
+      {
+       "code": "IF",
+       "title": "Inside",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 399,
+         "cabin_total": 798
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 382,
+         "cabin_total": 1146,
+         "added_vs_2": 348
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 374,
+         "cabin_total": 1496,
+         "added_vs_2": 698
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "4": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 374,
-       "base_pp": 548,
-       "cabin_total": 1496,
-       "addon_vs_2": 698
+      {
+       "code": "IC",
+       "title": "Inside",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 409,
+         "cabin_total": 818
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 389,
+         "cabin_total": 1167,
+         "added_vs_2": 349
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 379,
+         "cabin_total": 1516,
+         "added_vs_2": 698
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "5": {
-       "status": "NOT_AVAILABLE",
-       "available": false
+      {
+       "code": "IB",
+       "title": "Inside",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 419,
+         "cabin_total": 838
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 396,
+         "cabin_total": 1188,
+         "added_vs_2": 350
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 384,
+         "cabin_total": 1536,
+         "added_vs_2": 698
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "IA",
+       "title": "Inside",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 3,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 429,
+         "cabin_total": 858
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 402,
+         "cabin_total": 1206,
+         "added_vs_2": 348
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        }
+       }
+      },
+      {
+       "code": "I4",
+       "title": "Family Inside",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 439,
+         "cabin_total": 878
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 409,
+         "cabin_total": 1227,
+         "added_vs_2": 349
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 394,
+         "cabin_total": 1576,
+         "added_vs_2": 698
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "IT",
+       "title": "Solo Inside",
+       "guarantee": false,
+       "solo": true,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 2 guests"
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 3 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 4 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 5 guests"
+        }
+       }
       }
-     }
+     ]
     },
     {
      "code": "OCEANVIEW",
      "title": "Oceanview",
      "match": "oceanview",
-     "by_guests": {
-      "2": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 429,
-       "base_pp": 658,
-       "cabin_total": 858
+     "categories": [
+      {
+       "code": "OX",
+       "title": "Guarantee Oceanview",
+       "guarantee": true,
+       "solo": false,
+       "capacity": 2,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 409,
+         "cabin_total": 818
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        }
+       }
       },
-      "3": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 466,
-       "base_pp": 731,
-       "cabin_total": 1398,
-       "addon_vs_2": 540
+      {
+       "code": "OB",
+       "title": "Oceanview with Picture Window",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 2,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 429,
+         "cabin_total": 858
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        }
+       }
       },
-      "4": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 439,
-       "base_pp": 678,
-       "cabin_total": 1756,
-       "addon_vs_2": 898
+      {
+       "code": "OA",
+       "title": "Oceanview with Picture Window",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 2,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 439,
+         "cabin_total": 878
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        }
+       }
       },
-      "5": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 427,
-       "base_pp": 654,
-       "cabin_total": 2135,
-       "addon_vs_2": 1277
+      {
+       "code": "O4",
+       "title": "Family Oceanview",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 519,
+         "cabin_total": 1038
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 466,
+         "cabin_total": 1398,
+         "added_vs_2": 360
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 439,
+         "cabin_total": 1756,
+         "added_vs_2": 718
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "O5",
+       "title": "Family Oceanview",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 5,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 529,
+         "cabin_total": 1058
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 472,
+         "cabin_total": 1416,
+         "added_vs_2": 358
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 444,
+         "cabin_total": 1776,
+         "added_vs_2": 718
+        },
+        "5": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 427,
+         "cabin_total": 2135,
+         "added_vs_2": 1077
+        }
+       }
+      },
+      {
+       "code": "OT",
+       "title": "Solo Oceanview",
+       "guarantee": false,
+       "solo": true,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 2 guests"
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 3 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 4 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 5 guests"
+        }
+       }
       }
-     }
+     ]
     },
     {
      "code": "BALCONY",
      "title": "Balcony",
      "match": "balcony",
-     "by_guests": {
-      "2": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 469,
-       "base_pp": 738,
-       "cabin_total": 938
+     "categories": [
+      {
+       "code": "BX",
+       "title": "Guarantee Balcony",
+       "guarantee": true,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 449,
+         "cabin_total": 898
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 422,
+         "cabin_total": 1266,
+         "added_vs_2": 368
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 409,
+         "cabin_total": 1636,
+         "added_vs_2": 738
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "3": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 436,
-       "base_pp": 671,
-       "cabin_total": 1308,
-       "addon_vs_2": 370
+      {
+       "code": "BF",
+       "title": "Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 469,
+         "cabin_total": 938
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 436,
+         "cabin_total": 1308,
+         "added_vs_2": 370
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 419,
+         "cabin_total": 1676,
+         "added_vs_2": 738
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "4": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 419,
-       "base_pp": 638,
-       "cabin_total": 1676,
-       "addon_vs_2": 738
+      {
+       "code": "BB",
+       "title": "Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 479,
+         "cabin_total": 958
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 442,
+         "cabin_total": 1326,
+         "added_vs_2": 368
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 424,
+         "cabin_total": 1696,
+         "added_vs_2": 738
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "5": {
-       "status": "NOT_AVAILABLE",
-       "available": false
+      {
+       "code": "BA",
+       "title": "Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 489,
+         "cabin_total": 978
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 449,
+         "cabin_total": 1347,
+         "added_vs_2": 369
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 429,
+         "cabin_total": 1716,
+         "added_vs_2": 738
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "B4",
+       "title": "Family Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 499,
+         "cabin_total": 998
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 456,
+         "cabin_total": 1368,
+         "added_vs_2": 370
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 434,
+         "cabin_total": 1736,
+         "added_vs_2": 738
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "B6",
+       "title": "Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 519,
+         "cabin_total": 1038
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 469,
+         "cabin_total": 1407,
+         "added_vs_2": 369
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 444,
+         "cabin_total": 1776,
+         "added_vs_2": 738
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "B1",
+       "title": "Aft-Facing Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 3,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 599,
+         "cabin_total": 1198
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 522,
+         "cabin_total": 1566,
+         "added_vs_2": 368
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        }
+       }
+      },
+      {
+       "code": "BT",
+       "title": "Solo Balcony",
+       "guarantee": false,
+       "solo": true,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 2 guests"
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 3 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 4 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 5 guests"
+        }
+       }
       }
-     }
+     ]
     },
     {
      "code": "MINISUITE",
      "title": "Club Balcony Suite",
      "match": "mini_suite",
-     "by_guests": {
-      "2": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 519,
-       "base_pp": 838,
-       "cabin_total": 1038
+     "categories": [
+      {
+       "code": "MX",
+       "title": "Guarantee Club Balcony Suite",
+       "guarantee": true,
+       "solo": false,
+       "capacity": 3,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 499,
+         "cabin_total": 998
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 459,
+         "cabin_total": 1377,
+         "added_vs_2": 379
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        }
+       }
       },
-      "3": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 472,
-       "base_pp": 745,
-       "cabin_total": 1416,
-       "addon_vs_2": 378
+      {
+       "code": "MB",
+       "title": "Club Balcony Suite",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 519,
+         "cabin_total": 1038
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 472,
+         "cabin_total": 1416,
+         "added_vs_2": 378
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 449,
+         "cabin_total": 1796,
+         "added_vs_2": 758
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "4": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 449,
-       "base_pp": 698,
-       "cabin_total": 1796,
-       "addon_vs_2": 758
+      {
+       "code": "MA",
+       "title": "Club Balcony Suite",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 529,
+         "cabin_total": 1058
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 479,
+         "cabin_total": 1437,
+         "added_vs_2": 379
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 454,
+         "cabin_total": 1816,
+         "added_vs_2": 758
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "5": {
-       "status": "NOT_AVAILABLE",
-       "available": false
+      {
+       "code": "M4",
+       "title": "Family Club Balcony Suite",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 539,
+         "cabin_total": 1078
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 486,
+         "cabin_total": 1458,
+         "added_vs_2": 380
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 459,
+         "cabin_total": 1836,
+         "added_vs_2": 758
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "M6",
+       "title": "Club Balcony Suite with Larger Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 589,
+         "cabin_total": 1178
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 519,
+         "cabin_total": 1557,
+         "added_vs_2": 379
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 484,
+         "cabin_total": 1936,
+         "added_vs_2": 758
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "M1",
+       "title": "Aft-Facing Club Balcony Suite",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 2,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 819,
+         "cabin_total": 1638
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        }
+       }
       }
-     }
+     ]
     },
     {
      "code": "HAVEN",
      "title": "The Haven",
      "match": "haven",
-     "by_guests": {
-      "2": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1849,
-       "base_pp": 3498,
-       "cabin_total": 3698
+     "categories": [
+      {
+       "code": "HI",
+       "title": "The Haven Penthouse Suite with Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 2,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1849,
+         "cabin_total": 3698
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        }
+       }
       },
-      "3": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1469,
-       "base_pp": 2738,
-       "cabin_total": 4407,
-       "addon_vs_2": 709
+      {
+       "code": "HG",
+       "title": "The Haven Forward-Facing Penthouse with Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 3,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1979,
+         "cabin_total": 3958
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1469,
+         "cabin_total": 4407,
+         "added_vs_2": 449
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        }
+       }
       },
-      "4": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1334,
-       "base_pp": 2468,
-       "cabin_total": 5336,
-       "addon_vs_2": 1638
+      {
+       "code": "HF",
+       "title": "The Haven Courtyard Penthouse with Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 3,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2029,
+         "cabin_total": 4058
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1502,
+         "cabin_total": 4506,
+         "added_vs_2": 448
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        }
+       }
       },
-      "5": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1257,
-       "base_pp": 2314,
-       "cabin_total": 6285,
-       "addon_vs_2": 2587
+      {
+       "code": "HA",
+       "title": "The Haven Aft-Facing Penthouse with Master Bedroom & Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2219,
+         "cabin_total": 4438
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1629,
+         "cabin_total": 4887,
+         "added_vs_2": 449
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1334,
+         "cabin_total": 5336,
+         "added_vs_2": 898
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "H7",
+       "title": "The Haven Aft-Facing Penthouse with Master Bedroom & Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2269,
+         "cabin_total": 4538
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1662,
+         "cabin_total": 4986,
+         "added_vs_2": 448
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1359,
+         "cabin_total": 5436,
+         "added_vs_2": 898
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "H6",
+       "title": "The Haven 2-Bedroom Family Villa with Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 6,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2469,
+         "cabin_total": 4938
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1796,
+         "cabin_total": 5388,
+         "added_vs_2": 450
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1459,
+         "cabin_total": 5836,
+         "added_vs_2": 898
+        },
+        "5": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1257,
+         "cabin_total": 6285,
+         "added_vs_2": 1347
+        }
+       }
+      },
+      {
+       "code": "H3",
+       "title": "The Haven Deluxe Owner's Suite with Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2919,
+         "cabin_total": 5838
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2096,
+         "cabin_total": 6288,
+         "added_vs_2": 450
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1684,
+         "cabin_total": 6736,
+         "added_vs_2": 898
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "H2",
+       "title": "The Haven Deluxe Owner's Suite with Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 3969,
+         "cabin_total": 7938
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2796,
+         "cabin_total": 8388,
+         "added_vs_2": 450
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2209,
+         "cabin_total": 8836,
+         "added_vs_2": 898
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       }
-     }
+     ]
     }
    ]
   },
@@ -274,20 +1501,24 @@
    "ship": "Norwegian Aura",
    "ship_short": "Aura",
    "itinerary_code": "AURA5MIAPOPNPIMIA",
-   "package_id": 25729291,
+   "package_id": "25729291",
    "depart": "2027-06-14",
    "return": "2027-06-19",
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
-   "source": "NCL website",
+   "source": "NCL vacation-builder API",
    "saved_at": "2026-10-07",
-   "prices_include_taxes": true,
-   "taxes_per_guest_estimate": {
-    "source": "owner estimate",
-    "date": "2026-10-06",
-    "amount": 210
+   "taxes_per_guest": 210,
+   "gratuities": {
+    "open_bar": {
+     "title": "Unlimited Open Bar",
+     "per_guest": 160
+    },
+    "specialty_dining": {
+     "title": "Specialty Dining - 2 Meals",
+     "per_guest": 40
+    }
    },
-   "free_at_sea_per_guest": null,
    "terminal": {
     "confirmed": false,
     "text": "Expected: Terminal B (confirm on your eDocs)"
@@ -326,237 +1557,1434 @@
      "depart": null
     }
    ],
-   "categories": [
+   "price_summaries": [
+    {
+     "guests": 2,
+     "category": "IF",
+     "fare_code": "ALL4CHO",
+     "fare_total": 2038,
+     "fare_per_guest": [
+      1019,
+      1019
+     ],
+     "taxes_per_guest": [
+      210,
+      210
+     ],
+     "open_bar": {
+      "title": "Unlimited Open Bar",
+      "per_guest": [
+       160,
+       160
+      ]
+     },
+     "specialty_dining": {
+      "title": "Specialty Dining - 2 Meals",
+      "per_guest": [
+       40,
+       40
+      ]
+     },
+     "grand_total": 2858
+    },
+    {
+     "guests": 3,
+     "category": "I4",
+     "fare_code": "ALL4CHO",
+     "fare_total": 2837,
+     "fare_per_guest": [
+      1129,
+      1129,
+      579
+     ],
+     "taxes_per_guest": [
+      210,
+      210,
+      210
+     ],
+     "open_bar": {
+      "title": "Unlimited Open Bar",
+      "per_guest": [
+       160,
+       160,
+       160
+      ]
+     },
+     "specialty_dining": {
+      "title": "Specialty Dining - 2 Meals",
+      "per_guest": [
+       40,
+       40,
+       40
+      ]
+     },
+     "grand_total": 4067
+    },
+    {
+     "guests": 4,
+     "category": "I4",
+     "fare_code": "ALL4CHO",
+     "fare_total": 3416,
+     "fare_per_guest": [
+      1129,
+      1129,
+      579,
+      579
+     ],
+     "taxes_per_guest": [
+      210,
+      210,
+      210,
+      210
+     ],
+     "open_bar": {
+      "title": "Unlimited Open Bar",
+      "per_guest": [
+       160,
+       160,
+       160,
+       160
+      ]
+     },
+     "specialty_dining": {
+      "title": "Specialty Dining - 2 Meals",
+      "per_guest": [
+       40,
+       40,
+       40,
+       40
+      ]
+     },
+     "grand_total": 5056
+    },
+    {
+     "guests": 5,
+     "category": "H6",
+     "fare_code": "CHOALL4M",
+     "fare_total": 13435,
+     "fare_per_guest": [
+      5849,
+      5849,
+      579,
+      579,
+      579
+     ],
+     "taxes_per_guest": [
+      210,
+      210,
+      210,
+      210,
+      210
+     ],
+     "open_bar": {
+      "title": "Unlimited Open Bar",
+      "per_guest": [
+       160,
+       160,
+       160,
+       160,
+       160
+      ]
+     },
+     "specialty_dining": {
+      "title": "Specialty Dining - 2 Meals",
+      "per_guest": [
+       40,
+       40,
+       40,
+       40,
+       40
+      ]
+     },
+     "grand_total": 15485
+    }
+   ],
+   "types": [
     {
      "code": "STUDIO",
      "title": "Studio",
      "match": "studio",
-     "by_guests": {
-      "2": {
-       "status": "SOLD_OUT",
-       "available": false
-      },
-      "3": {
-       "status": "SOLD_OUT",
-       "available": false
-      },
-      "4": {
-       "status": "SOLD_OUT",
-       "available": false
-      },
-      "5": {
-       "status": "SOLD_OUT",
-       "available": false
+     "categories": [
+      {
+       "code": "T1",
+       "title": "Solo Studio",
+       "guarantee": false,
+       "solo": true,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 2 guests"
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 3 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 4 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Not available for 5 guests"
+        }
+       }
       }
-     }
+     ]
     },
     {
      "code": "INSIDE",
      "title": "Inside",
      "match": "inside",
-     "by_guests": {
-      "2": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1229,
-       "base_pp": 2248,
-       "cabin_total": 2458
+     "categories": [
+      {
+       "code": "IF",
+       "title": "Inside",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1229,
+         "cabin_total": 2458
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Sold out for this party size"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Sold out for this party size"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "3": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1156,
-       "base_pp": 2101,
-       "cabin_total": 3468,
-       "addon_vs_2": 1010
+      {
+       "code": "IB",
+       "title": "Inside",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 2,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1239,
+         "cabin_total": 2478
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        }
+       }
       },
-      "4": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1064,
-       "base_pp": 1918,
-       "cabin_total": 4256,
-       "addon_vs_2": 1798
+      {
+       "code": "IA",
+       "title": "Inside",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 3,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1259,
+         "cabin_total": 2518
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Sold out for this party size"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        }
+       }
       },
-      "5": {
-       "status": "NOT_AVAILABLE",
-       "available": false
+      {
+       "code": "I4",
+       "title": "Family Inside",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1339,
+         "cabin_total": 2678
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1156,
+         "cabin_total": 3468,
+         "added_vs_2": 790
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1064,
+         "cabin_total": 4256,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "IT",
+       "title": "Solo Inside",
+       "guarantee": false,
+       "solo": true,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "3": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "4": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "5": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        }
+       }
+      },
+      {
+       "code": "IX",
+       "title": "Guarantee Inside",
+       "guarantee": true,
+       "solo": false,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "3": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "4": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "5": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        }
+       }
       }
-     }
+     ]
     },
     {
      "code": "OCEANVIEW",
      "title": "Oceanview",
      "match": "oceanview",
-     "by_guests": {
-      "2": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1439,
-       "base_pp": 2668,
-       "cabin_total": 2878
+     "categories": [
+      {
+       "code": "OB",
+       "title": "Oceanview with Round Window",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 2,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1439,
+         "cabin_total": 2878
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        }
+       }
       },
-      "3": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1296,
-       "base_pp": 2381,
-       "cabin_total": 3888,
-       "addon_vs_2": 1010
+      {
+       "code": "OA",
+       "title": "Large Oceanview with Round Window",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 3,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1549,
+         "cabin_total": 3098
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1296,
+         "cabin_total": 3888,
+         "added_vs_2": 790
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        }
+       }
       },
-      "4": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1249,
-       "base_pp": 2288,
-       "cabin_total": 4996,
-       "addon_vs_2": 2118
+      {
+       "code": "O4",
+       "title": "Family Oceanview",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1709,
+         "cabin_total": 3418
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1402,
+         "cabin_total": 4206,
+         "added_vs_2": 788
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1249,
+         "cabin_total": 4996,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "5": {
-       "status": "NOT_AVAILABLE",
-       "available": false
+      {
+       "code": "OT",
+       "title": "Solo Oceanview",
+       "guarantee": false,
+       "solo": true,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "3": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "4": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "5": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        }
+       }
+      },
+      {
+       "code": "OX",
+       "title": "Guarantee Oceanview",
+       "guarantee": true,
+       "solo": false,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "3": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "4": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "5": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        }
+       }
       }
-     }
+     ]
     },
     {
      "code": "BALCONY",
      "title": "Balcony",
      "match": "balcony",
-     "by_guests": {
-      "2": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1689,
-       "base_pp": 3168,
-       "cabin_total": 3378
+     "categories": [
+      {
+       "code": "BF",
+       "title": "Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1689,
+         "cabin_total": 3378
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Sold out for this party size"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Sold out for this party size"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "3": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1402,
-       "base_pp": 2595,
-       "cabin_total": 4206,
-       "addon_vs_2": 828
+      {
+       "code": "BB",
+       "title": "Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 3,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1709,
+         "cabin_total": 3418
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1402,
+         "cabin_total": 4206,
+         "added_vs_2": 788
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        }
+       }
       },
-      "4": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1284,
-       "base_pp": 2358,
-       "cabin_total": 5136,
-       "addon_vs_2": 1758
+      {
+       "code": "BA",
+       "title": "Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 3,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1749,
+         "cabin_total": 3498
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1429,
+         "cabin_total": 4287,
+         "added_vs_2": 789
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        }
+       }
       },
-      "5": {
-       "status": "NOT_AVAILABLE",
-       "available": false
+      {
+       "code": "B4",
+       "title": "Family Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1779,
+         "cabin_total": 3558
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1449,
+         "cabin_total": 4347,
+         "added_vs_2": 789
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1284,
+         "cabin_total": 5136,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "B1",
+       "title": "Aft-Facing Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2959,
+         "cabin_total": 5918
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2236,
+         "cabin_total": 6708,
+         "added_vs_2": 790
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1874,
+         "cabin_total": 7496,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "BT",
+       "title": "Solo Balcony",
+       "guarantee": false,
+       "solo": true,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "3": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "4": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "5": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        }
+       }
+      },
+      {
+       "code": "BX",
+       "title": "Guarantee Balcony",
+       "guarantee": true,
+       "solo": false,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "3": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "4": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "5": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        }
+       }
       }
-     }
+     ]
     },
     {
      "code": "MINISUITE",
      "title": "Club Balcony Suite",
      "match": "mini_suite",
-     "by_guests": {
-      "2": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 2029,
-       "base_pp": 3848,
-       "cabin_total": 4058
+     "categories": [
+      {
+       "code": "MB",
+       "title": "Forward-Facing Club Balcony Suite",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 2,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2029,
+         "cabin_total": 4058
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        }
+       }
       },
-      "3": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1729,
-       "base_pp": 3248,
-       "cabin_total": 5187,
-       "addon_vs_2": 1129
+      {
+       "code": "MA",
+       "title": "Club Balcony Suite",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 2,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2129,
+         "cabin_total": 4258
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        }
+       }
       },
-      "4": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1494,
-       "base_pp": 2778,
-       "cabin_total": 5976,
-       "addon_vs_2": 1918
+      {
+       "code": "M4",
+       "title": "Family Club Balcony Suite",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2199,
+         "cabin_total": 4398
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1729,
+         "cabin_total": 5187,
+         "added_vs_2": 789
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1494,
+         "cabin_total": 5976,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "5": {
-       "status": "NOT_AVAILABLE",
-       "available": false
+      {
+       "code": "M2",
+       "title": "Forward-Facing Club Balcony Suite with Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2509,
+         "cabin_total": 5018
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1936,
+         "cabin_total": 5808,
+         "added_vs_2": 790
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1649,
+         "cabin_total": 6596,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "MX",
+       "title": "Guarantee Club Balcony Suite",
+       "guarantee": true,
+       "solo": false,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "3": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "4": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "5": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        }
+       }
       }
-     }
+     ]
     },
     {
      "code": "SUITE",
      "title": "Suite",
      "match": "suite",
-     "by_guests": {
-      "2": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 2359,
-       "base_pp": 4508,
-       "cabin_total": 4718
+     "categories": [
+      {
+       "code": "SL",
+       "title": "Forward-Facing Suite with Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2359,
+         "cabin_total": 4718
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1836,
+         "cabin_total": 5508,
+         "added_vs_2": 790
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1574,
+         "cabin_total": 6296,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "3": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1836,
-       "base_pp": 3461,
-       "cabin_total": 5508,
-       "addon_vs_2": 790
+      {
+       "code": "SK",
+       "title": "Forward-Facing Suite with Master Bedroom & Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2509,
+         "cabin_total": 5018
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1936,
+         "cabin_total": 5808,
+         "added_vs_2": 790
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1649,
+         "cabin_total": 6596,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "4": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 1574,
-       "base_pp": 2938,
-       "cabin_total": 6296,
-       "addon_vs_2": 1578
+      {
+       "code": "SR",
+       "title": "Family Suite with Master Bedroom & Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2609,
+         "cabin_total": 5218
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2002,
+         "cabin_total": 6006,
+         "added_vs_2": 788
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1699,
+         "cabin_total": 6796,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "5": {
-       "status": "NOT_AVAILABLE",
-       "available": false
+      {
+       "code": "SI",
+       "title": "Aft-Facing Suite with Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 2,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2909,
+         "cabin_total": 5818
+        },
+        "3": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 2 guests"
+        }
+       }
+      },
+      {
+       "code": "SJ",
+       "title": "Family Suite with Master Bedroom & Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 3059,
+         "cabin_total": 6118
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2302,
+         "cabin_total": 6906,
+         "added_vs_2": 788
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1924,
+         "cabin_total": 7696,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "SH",
+       "title": "Aft-Facing Suite with Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "3": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "4": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "5": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        }
+       }
       }
-     }
+     ]
     },
     {
      "code": "HAVEN",
      "title": "The Haven",
      "match": "haven",
-     "by_guests": {
-      "2": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 3509,
-       "base_pp": 6808,
-       "cabin_total": 7018
+     "categories": [
+      {
+       "code": "HE",
+       "title": "The Haven Penthouse with Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 3,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 3509,
+         "cabin_total": 7018
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2602,
+         "cabin_total": 7806,
+         "added_vs_2": 788
+        },
+        "4": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 3 guests"
+        }
+       }
       },
-      "3": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 2602,
-       "base_pp": 4995,
-       "cabin_total": 7806,
-       "addon_vs_2": 788
+      {
+       "code": "H5",
+       "title": "The Haven Owner’s Suite with Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 4809,
+         "cabin_total": 9618
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 3469,
+         "cabin_total": 10407,
+         "added_vs_2": 789
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2799,
+         "cabin_total": 11196,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "4": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 2799,
-       "base_pp": 5388,
-       "cabin_total": 11196,
-       "addon_vs_2": 4178
+      {
+       "code": "HB",
+       "title": "The Haven Aft-Facing Penthouse with Master Bedroom & Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 4909,
+         "cabin_total": 9818
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 3536,
+         "cabin_total": 10608,
+         "added_vs_2": 790
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2849,
+         "cabin_total": 11396,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
       },
-      "5": {
-       "status": "AVAILABLE",
-       "available": true,
-       "price_pp": 2897,
-       "base_pp": 5584,
-       "cabin_total": 14485,
-       "addon_vs_2": 7467
+      {
+       "code": "H6",
+       "title": "The Haven 2-Bedroom Family Villa with Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 6,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 6059,
+         "cabin_total": 12118
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 4302,
+         "cabin_total": 12906,
+         "added_vs_2": 788
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 3424,
+         "cabin_total": 13696,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2897,
+         "cabin_total": 14485,
+         "added_vs_2": 2367
+        }
+       }
+      },
+      {
+       "code": "H4",
+       "title": "The Haven Aft-Facing Owner's Suite with Master Bedroom & Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 7009,
+         "cabin_total": 14018
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 4936,
+         "cabin_total": 14808,
+         "added_vs_2": 790
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 3899,
+         "cabin_total": 15596,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       }
+      },
+      {
+       "code": "H3",
+       "title": "The Haven Deluxe Owner's Suite with Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 6,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 9009,
+         "cabin_total": 18018
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 6269,
+         "cabin_total": 18807,
+         "added_vs_2": 789
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 4899,
+         "cabin_total": 19596,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 4077,
+         "cabin_total": 20385,
+         "added_vs_2": 2367
+        }
+       }
+      },
+      {
+       "code": "H2",
+       "title": "The Haven Premier Owner's Suite with Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 8,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 12009,
+         "cabin_total": 24018
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 8269,
+         "cabin_total": 24807,
+         "added_vs_2": 789
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 6399,
+         "cabin_total": 25596,
+         "added_vs_2": 1578
+        },
+        "5": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 5277,
+         "cabin_total": 26385,
+         "added_vs_2": 2367
+        }
+       }
+      },
+      {
+       "code": "H8",
+       "title": "The Haven 2-Bedroom Duplex Suite with Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "3": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "4": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "5": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        }
+       }
+      },
+      {
+       "code": "HA",
+       "title": "The Haven Aft-Facing Penthouse with Large Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": null,
+       "by_guests": {
+        "2": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "3": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "4": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        },
+        "5": {
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
+        }
+       }
       }
-     }
+     ]
     }
    ]
   }

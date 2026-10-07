@@ -451,6 +451,106 @@
             padding: 3rem 1rem;
             color: var(--gray-600);
         }
+
+        /* Guest counters */
+        .counters { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+
+        .counter { display: flex; align-items: center; gap: 0.6rem; }
+
+        .counter-label { font-size: 0.9rem; font-weight: 600; color: var(--gray-800); min-width: 7.5rem; }
+
+        .counter button {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            border: 2px solid var(--gray-200);
+            background: var(--white);
+            font: inherit;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--teal);
+            cursor: pointer;
+        }
+
+        .counter button:hover { border-color: var(--teal); }
+
+        .counter-value { font-size: 1.25rem; font-weight: 700; min-width: 1.5rem; text-align: center; }
+
+        .kid-ages { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; }
+
+        .kid-ages label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.2rem; }
+
+        .kid-ages select {
+            padding: 0.45rem 0.6rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font: inherit;
+            font-size: 0.9rem;
+            background: var(--white);
+        }
+
+        .kid-ages select.unset { border-color: var(--gold); }
+
+        .guest-msg { min-height: 1.2rem; margin-top: 0.6rem; font-size: 0.85rem; color: var(--red); }
+
+        .guest-summary { margin-top: 0.4rem; font-size: 0.85rem; color: var(--gray-600); }
+
+        /* Specific category lists */
+        .cat-name { font-weight: 700; color: var(--gray-900); }
+        .cat-meta { font-size: 0.78rem; color: var(--gray-500); margin-top: 0.1rem; }
+        .gty { color: #92400e; }
+
+        .cat-list { list-style: none; margin-top: 0.9rem; }
+
+        .cat-list-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--ocean-blue);
+            margin-top: 0.9rem;
+        }
+
+        .cat-list button {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+            width: 100%;
+            text-align: left;
+            padding: 0.55rem 0.7rem;
+            margin-top: 0.4rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            background: var(--white);
+            font: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .cat-list button:hover { border-color: var(--teal); }
+        .cat-list button[aria-pressed="true"] { border-color: var(--teal); background: var(--teal-wash); }
+        .cat-list .price { font-weight: 700; white-space: nowrap; }
+
+        .row.total { border-top: 2px solid var(--gray-300); font-size: 1rem; }
+        .row.total .k { color: var(--gray-900); font-weight: 700; }
+        .row.sub .k { padding-left: 0.75rem; }
+        .ship-head { font-size: 0.8rem; font-weight: 700; color: var(--ocean-blue); padding-top: 0.6rem; }
+
+        /* Full cabin tables */
+        table.cabins { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        table.cabins td { padding: 0.5rem 0.4rem; border-bottom: 1px solid var(--gray-200); vertical-align: top; }
+        table.cabins td:last-child { text-align: right; white-space: nowrap; }
+        table.cabins tr.group td { background: var(--gray-50); font-weight: 700; color: var(--ocean-blue); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+        table.cabins tr.pickable { cursor: pointer; }
+        table.cabins tr.pickable:hover { background: var(--gray-50); }
+        table.cabins tr.chosen { background: var(--teal-wash); }
+        table.cabins tr.off td { color: var(--gray-500); }
+        table.cabins tr.off .cat-name { color: var(--gray-500); font-weight: 500; }
+        .pp-small { display: block; font-size: 0.75rem; color: var(--gray-500); font-weight: 400; }
+
+        .tables { display: grid; gap: 1.25rem; }
+        @media (min-width: 900px) { .tables { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
 <body>
@@ -465,16 +565,32 @@
     </header>
 
     <main class="wrap">
-        <section class="panel" aria-label="Choose guests and cabin type">
+        <section class="panel" aria-label="Who is in the cabin and which cabin type">
             <div class="controls-grid">
                 <div>
-                    <div class="panel-title">People in each cabin</div>
-                    <div class="seg" id="guestButtons" role="group" aria-label="People in each cabin"></div>
+                    <div class="panel-title">Who is in the cabin</div>
+                    <div class="counters">
+                        <div class="counter">
+                            <span class="counter-label">Adults (21+)</span>
+                            <button type="button" data-count="adults" data-step="-1" aria-label="One fewer adult">&minus;</button>
+                            <span class="counter-value" id="adultCount">2</span>
+                            <button type="button" data-count="adults" data-step="1" aria-label="One more adult">+</button>
+                        </div>
+                        <div class="counter">
+                            <span class="counter-label">Kids (under 21)</span>
+                            <button type="button" data-count="kids" data-step="-1" aria-label="One fewer kid">&minus;</button>
+                            <span class="counter-value" id="kidCount">0</span>
+                            <button type="button" data-count="kids" data-step="1" aria-label="One more kid">+</button>
+                        </div>
+                    </div>
+                    <div class="kid-ages" id="kidAges"></div>
+                    <div class="guest-msg" id="guestMsg" role="status" aria-live="polite"></div>
+                    <div class="guest-summary" id="guestSummary"></div>
                 </div>
                 <div>
                     <div class="panel-title">Cabin type</div>
                     <div class="seg small" id="typeButtons" role="group" aria-label="Cabin type"></div>
-                    <p class="hint">Prices are for one cabin with that many people in it.</p>
+                    <p class="hint">Prices are for one cabin with everyone above in it.</p>
                 </div>
             </div>
         </section>
@@ -485,21 +601,27 @@
     <footer class="footer">
         <div class="wrap">
             <strong>About these prices</strong>
-            <p>Prices come from Norwegian Cruise Line's website and are checked once a day. NCL's prices already include taxes, fees and port expenses. They change often, so check NCL before booking.</p>
-            <p id="crossCheck"></p>
+            <p>Prices come from Norwegian Cruise Line's booking system and are checked once a day. They change often, so check NCL before booking.</p>
+            <p>Each total is the cruise fare, NCL's government taxes, fees and port expenses, and the Free at Sea gratuities: Unlimited Open Bar for guests 21 and over, Specialty Dining for guests 13 and over, and nothing for kids 12 and under. How NCL prices kids is still being checked.</p>
             <p id="footerVersion"></p>
         </div>
     </footer>
 
     <script>
-        const APP_VERSION = "3.0.0";
+        const APP_VERSION = "4.0.0";
         const DATA_URL = "data/prices.json";
-        const GUEST_COUNTS = [2, 3, 4, 5];
+        const MIN_GUESTS = 2, MAX_GUESTS = 5;
         const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
-        const STORE_KEY = "cruise-decision-guide";
+        const STORE_KEY = "cruise-decision-guide-v4";
+        const GUARANTEE_TEXT = "Guarantee: NCL picks your cabin location";
 
         let DATA = null, G = null, A = null;   // data file, Getaway sailing, Aura sailing
-        const state = { guests: 2, type: "balcony", mode: "same", getawayType: "balcony", auraType: "balcony" };
+        const state = {
+            adults: 2, kids: [],            // kids: ages 0 to 20, or null until chosen
+            type: "balcony", mode: "same",
+            pickG: null, pickA: null,       // chosen category code per ship (same cabin type)
+            diffG: null, diffA: null,       // chosen category code per ship (different cabins)
+        };
 
         // ---------- helpers ----------
         const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -508,66 +630,138 @@
         const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const fmtDay = iso => { const d = new Date(iso + "T12:00:00Z"); return `${DAYS[d.getUTCDay()]}, ${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`; };
         const fmtTime = hhmm => { if (!hhmm) return ""; let [h, m] = hhmm.split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12; return `${h}:${String(m).padStart(2, "0")} ${ap}`; };
-        const guestWord = n => n === 1 ? "guest" : "guests";
-        const addonGuests = n => n === 3 ? "guest 3" : n === 4 ? "guests 3 and 4" : `guests 3 to ${n}`;
+        const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+        const guests = () => state.adults + state.kids.length;
+        const agesKnown = () => state.kids.every(a => Number.isInteger(a));
 
         function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
         function restore() {
             try {
                 const s = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
-                if (s && GUEST_COUNTS.includes(s.guests)) Object.assign(state, s);
+                if (!s || !Number.isInteger(s.adults) || !Array.isArray(s.kids)) return;
+                const kids = s.kids.map(a => Number.isInteger(a) && a >= 0 && a <= 20 ? a : null);
+                if (s.adults < 1 || s.adults + kids.length < MIN_GUESTS || s.adults + kids.length > MAX_GUESTS) return;
+                Object.assign(state, s, { kids });
             } catch (e) {}
         }
 
-        // Studio cabins only fit one guest, so they are hidden everywhere.
-        const cats = s => s.categories.filter(c => c.match !== "studio");
-        const hasType = (s, key) => cats(s).some(c => c.match === key);
+        // ---------- data access ----------
+        // Solo cabins (T1, IT, OT, BT) and Studio only fit one guest, so they are hidden everywhere.
+        const types = s => s.types.filter(t => t.match !== "studio");
+        const catsOf = t => t.categories.filter(c => !c.solo);
+        const allCats = s => types(s).flatMap(t => catsOf(t).map(c => Object.assign({ typeTitle: t.title, typeMatch: t.match }, c)));
+        const findCat = (s, code) => allCats(s).find(c => c.code === code);
+        const typeOf = (s, key) => types(s).find(t => t.match === key);
+        const hasType = (s, key) => !!typeOf(s, key);
         const otherShip = s => s === G ? A : G;
-        function typeName(key) {
-            for (const s of [A, G]) { const c = cats(s).find(c => c.match === key); if (c) return c.title; }
-            return key;
-        }
-        function allTypes() {
-            const keys = new Set([...cats(G), ...cats(A)].map(c => c.match));
-            return TYPE_ORDER.filter(k => keys.has(k));
-        }
+        const entry = (c, n) => c.by_guests[String(n)];
+        const isAvail = (c, n) => entry(c, n).available;
+        function typeName(key) { for (const s of [A, G]) { const t = typeOf(s, key); if (t) return t.title; } return key; }
+        function allTypes() { const keys = new Set([...types(G), ...types(A)].map(t => t.match)); return TYPE_ORDER.filter(k => keys.has(k)); }
+        const catLabel = c => `${c.title} (${c.code})`;
 
-        // Like for like matching. Mini-suite rule: if both ships have a mini-suite, match it;
-        // if only one does, the ship without one uses its Balcony instead.
-        function pick(s, key) {
-            const c = cats(s).find(c => c.match === key);
-            if (c) return { cat: c };
+        // Like for like matching by broad type. Mini-suite rule: if both ships have a mini-suite,
+        // match them; if only one does, the ship without one uses its Balcony instead.
+        function typeFor(s, key) {
+            const t = typeOf(s, key);
+            if (t) return { t };
             if (key === "mini_suite" && hasType(otherShip(s), "mini_suite")) {
-                const b = cats(s).find(c => c.match === "balcony");
-                if (b) return { cat: b, note: `The ${s.ship_short} has no ${typeName("mini_suite")}, so this uses its Balcony.` };
+                const b = typeOf(s, "balcony");
+                if (b) return { t: b, note: `The ${s.ship_short} has no ${typeName("mini_suite")}, so this uses its Balcony cabins.` };
             }
             return { missing: true };
         }
 
-        // Price of one cabin type for n guests: { ok, e } or { ok: false, reason }
-        function price(s, cat, n) {
-            const e = cat.by_guests[String(n)];
-            if (e && e.available) return { ok: true, e };
-            const reason = e && e.status === "SOLD_OUT" ? `Sold out on the ${s.ship_short}` : `Not available for ${n} guests on the ${s.ship_short}`;
-            return { ok: false, reason };
+        // Available categories of a broad type for the party, cheapest first.
+        function availableIn(t, n) {
+            return catsOf(t).filter(c => isAvail(c, n)).sort((a, b) => entry(a, n).cabin_total - entry(b, n).cabin_total);
         }
 
-        const taxEstimate = s => s.taxes_per_guest_estimate.amount;
-        const fasRow = () => `<div class="row muted"><span class="k">Free at Sea charge</span><span class="v">not yet available</span></div>`;
+        function noneAvailableText(s, t, n) {
+            const reasons = catsOf(t).map(c => entry(c, n).reason || "");
+            if (reasons.length && reasons.every(r => r.startsWith("Holds only"))) return `No ${t.title} cabin on the ${s.ship_short} holds ${n} guests.`;
+            if (reasons.length && reasons.every(r => r === "Sold out")) return `${t.title} is sold out on the ${s.ship_short}.`;
+            return `No ${t.title} cabin on the ${s.ship_short} is available for ${n} guests.`;
+        }
 
-        function priceBlock({ total, n, nights, taxPerGuest, addon, extraRows = "" }) {
+        // The chosen category for a ship in "same type" mode: the saved pick if it is still
+        // available in this type for this party, otherwise the cheapest available one.
+        function chosenInType(s, t, n) {
+            const list = availableIn(t, n);
+            const saved = s === G ? state.pickG : state.pickA;
+            return list.find(c => c.code === saved) || list[0] || null;
+        }
+
+        // ---------- cost ----------
+        function cost(s, c) {
+            const n = guests();
+            const e = entry(c, n);
+            const taxes = s.taxes_per_guest * n;
+            const teens = state.kids.filter(a => Number.isInteger(a) && a >= 13).length;
+            const barCount = state.adults;
+            const diningCount = state.adults + teens;
+            const bar = { title: s.gratuities.open_bar.title, count: barCount, pp: s.gratuities.open_bar.per_guest };
+            const dining = { title: s.gratuities.specialty_dining.title, count: diningCount, pp: s.gratuities.specialty_dining.per_guest };
+            bar.total = bar.count * bar.pp;
+            dining.total = dining.count * dining.pp;
+            return { n, cabin: e.cabin_total, fare: e.cabin_total - taxes, taxes, bar, dining, total: e.cabin_total + bar.total + dining.total };
+        }
+
+        function addedCostLine(c) {
+            const n = guests();
+            if (n <= 2) return "";
+            const parts = [];
+            for (let k = 3; k <= n; k++) {
+                const prev = entry(c, k - 1), cur = entry(c, k);
+                if (prev.available && cur.available) parts.push(`guest ${k} +${money(cur.cabin_total - prev.cabin_total)}`);
+            }
+            return parts.length ? `<div class="addon">Added cost in ${esc(catLabel(c))} (fare and taxes): <strong>${parts.join(", ")}</strong></div>` : "";
+        }
+
+        function lineRows(s, k, indent = false) {
+            const cls = indent ? "row sub" : "row";
+            const gr = x => x.count
+                ? `<div class="${cls}"><span class="k">${esc(x.title)}: ${plural(x.count, "guest", "guests")} x ${money(x.pp)}</span><span class="v">${money(x.total)}</span></div>`
+                : `<div class="${cls} muted"><span class="k">${esc(x.title)}</span><span class="v">no one charged</span></div>`;
+            return `
+                <div class="${cls}"><span class="k">Cruise fare</span><span class="v">${money(k.fare)}</span></div>
+                <div class="${cls}"><span class="k">Taxes, fees and port expenses: ${k.n} x ${money(s.taxes_per_guest)}</span><span class="v">${money(k.taxes)}</span></div>
+                ${gr(k.bar)}${gr(k.dining)}`;
+        }
+
+        function totalBlock(total, nights, rowsHtml) {
+            const n = guests();
+            if (!agesKnown()) {
+                return `<div class="notice info">Choose every kid's age above to see the full total. Free at Sea charges depend on age.</div><div class="rows">${rowsHtml}</div>`;
+            }
             const perNight = total / nights;
             return `
-                <div class="price-label">Total for ${n} ${guestWord(n)}</div>
+                <div class="price-label">Total for ${plural(n, "guest", "guests")}</div>
                 <div class="price-total">${money(total)}</div>
                 <div class="price-pp">${money(total / n)} per person</div>
-                <div class="tax-note">Includes about ${money(taxPerGuest)} per guest in taxes</div>
                 <div class="rows">
-                    ${extraRows}
+                    ${rowsHtml}
+                    <div class="row total"><span class="k">Total</span><span class="v">${money(total)}</span></div>
                     <div class="row"><span class="k">Cost per night</span><span class="v">${money(perNight)} (${money(perNight / n)} per person)</span></div>
-                    ${fasRow()}
-                </div>
-                ${n > 2 && addon != null ? `<div class="addon">Estimated add-on (NCL's cheapest cabin for that party size): <strong>${addon >= 0 ? "+" : "-"}${money(Math.abs(addon))}</strong> for ${addonGuests(n)}</div>` : ""}`;
+                </div>`;
+        }
+
+        function catHeader(c) {
+            return `<div class="cabin-line"><span class="cat-name">${esc(catLabel(c))}</span>
+                <div class="cat-meta">${esc(c.typeTitle || "")}${c.capacity ? `, holds up to ${c.capacity}` : ""}</div>
+                ${c.guarantee ? `<div class="cat-meta gty">${GUARANTEE_TEXT}</div>` : ""}</div>`;
+        }
+
+        // Tap list of the other available categories in this type, cheapest first.
+        function catPicker(s, t, chosen, n) {
+            const list = availableIn(t, n);
+            if (list.length < 2) return "";
+            const field = s === G ? "pickG" : "pickA";
+            return `<div class="cat-list-title">${esc(t.title)} cabins on the ${esc(s.ship_short)} for ${n} guests</div><ul class="cat-list">${list.map(c => `
+                <li><button type="button" data-pick="${field}" data-code="${esc(c.code)}" aria-pressed="${c.code === chosen.code}">
+                    <span><span class="cat-name">${esc(catLabel(c))}</span>${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</span>
+                    <span class="price">${money(entry(c, n).cabin_total)}</span>
+                </button></li>`).join("")}</ul>`;
         }
 
         function daysList(s) {
@@ -578,21 +772,26 @@
         function stops(s) {
             const names = s.ports.filter((d, i) => !d.sea && i > 0 && i < s.ports.length - 1).map(d => d.port.split(",")[0]);
             const seaDays = s.ports.filter(d => d.sea).length;
-            return `<div class="stops">${names.map(p => `<span class="stop">${esc(p)}</span>`).join("")}${seaDays ? `<span class="stop">${seaDays} sea ${seaDays === 1 ? "day" : "days"}</span>` : ""}</div>`;
+            return `<div class="stops">${names.map(p => `<span class="stop">${esc(p)}</span>`).join("")}${seaDays ? `<span class="stop">${plural(seaDays, "sea day", "sea days")}</span>` : ""}</div>`;
         }
 
         // ---------- cards ----------
         function singleCard(s, label) {
-            const n = state.guests;
-            const p = pick(s, state.type);
-            let body;
-            if (p.missing) {
+            const n = guests();
+            const tf = typeFor(s, state.type);
+            let body = "";
+            if (tf.missing) {
                 body = `<div class="notice bad">${esc(typeName(state.type))}: not offered on the ${esc(s.ship_short)}</div>`;
             } else {
-                const r = price(s, p.cat, n);
-                body = `<div class="cabin-line">Cabin: <strong>${esc(p.cat.title)}</strong></div>` + (r.ok
-                    ? priceBlock({ total: r.e.cabin_total, n, nights: s.nights, taxPerGuest: taxEstimate(s), addon: r.e.addon_vs_2 })
-                    : `<div class="notice bad">${esc(r.reason)}</div>`);
+                if (tf.note) body += `<div class="notice info">${esc(tf.note)}</div>`;
+                const c = chosenInType(s, tf.t, n);
+                if (!c) {
+                    body += `<div class="notice bad">${esc(noneAvailableText(s, tf.t, n))}</div>`;
+                } else {
+                    const full = findCat(s, c.code);
+                    const k = cost(s, full);
+                    body += catHeader(full) + totalBlock(k.total, s.nights, lineRows(s, k)) + addedCostLine(full) + catPicker(s, tf.t, full, n);
+                }
             }
             return `
                 <article class="card">
@@ -607,66 +806,63 @@
                 </article>`;
         }
 
-        function shipSelect(s, field) {
-            const n = state.guests;
-            const options = TYPE_ORDER.flatMap(k => cats(s).filter(c => c.match === k)).map(c => {
-                const r = price(s, c, n);
-                const text = r.ok ? `${c.title}: ${money(r.e.cabin_total)}` : `${c.title}: ${r.reason.replace(` on the ${s.ship_short}`, "").toLowerCase()}`;
-                return `<option value="${esc(c.match)}" ${state[field] === c.match ? "selected" : ""}>${esc(text)}</option>`;
+        // Different cabins mode: any available category on the ship, grouped by type.
+        function diffSelect(s, field) {
+            const n = guests();
+            const groups = types(s).map(t => {
+                const list = availableIn(t, n);
+                if (!list.length) return "";
+                return `<optgroup label="${esc(t.title)}">${list.map(c => `<option value="${esc(c.code)}" ${state[field] === c.code ? "selected" : ""}>${esc(catLabel(c))}${c.guarantee ? " (Guarantee)" : ""}: ${money(entry(c, n).cabin_total)}</option>`).join("")}</optgroup>`;
             }).join("");
-            return `<label for="${field}">${esc(s.ship_short)} cabin (${s.nights} nights)</label><select id="${field}" data-field="${field}">${options}</select>`;
+            return `<label for="${field}">${esc(s.ship_short)} cabin (${s.nights} nights)</label><select id="${field}" data-field="${field}">${groups}</select>`;
         }
 
         function eightCard() {
-            const n = state.guests, nights = G.nights + A.nights;
+            const n = guests(), nights = G.nights + A.nights;
             const toggle = `
                 <div class="seg small" role="group" aria-label="Cabins for 8 nights" style="margin-bottom:0.9rem">
                     <button type="button" data-mode="same" aria-pressed="${state.mode === "same"}">Same cabin on both ships</button>
                     <button type="button" data-mode="different" aria-pressed="${state.mode === "different"}">Different cabin on each ship</button>
                 </div>`;
-            let picks, body = "", ok = true;
+            let body = "", chosen = null, pickers = "";
             if (state.mode === "same") {
-                picks = [[G, pick(G, state.type)], [A, pick(A, state.type)]];
-                const missing = picks.filter(([, p]) => p.missing);
+                const tfs = [[G, typeFor(G, state.type)], [A, typeFor(A, state.type)]];
+                const missing = tfs.filter(([, tf]) => tf.missing);
                 if (missing.length) {
-                    ok = false;
                     for (const [s] of missing) {
                         const other = otherShip(s);
                         body += `<div class="notice bad">${esc(typeName(state.type))}: not offered on the ${esc(s.ship_short)}</div>`;
                         if (hasType(other, state.type)) body += `<div class="notice info">Switch to Different cabins to pair an ${esc(other.ship_short)} ${esc(typeName(state.type))} with any ${esc(s.ship_short)} cabin.</div>`;
                     }
+                } else {
+                    for (const [, tf] of tfs) if (tf.note) body += `<div class="notice info">${esc(tf.note)}</div>`;
+                    const picks = tfs.map(([s, tf]) => [s, tf.t, chosenInType(s, tf.t, n)]);
+                    const blocked = picks.filter(([, , c]) => !c);
+                    if (blocked.length === 1) {
+                        const [bs, bt] = blocked[0];
+                        body += `<div class="notice bad">${esc(typeName(state.type))} is available for ${n} guests on the ${esc(otherShip(bs).ship_short)} but not on the ${esc(bs.ship_short)}.</div>`;
+                    } else if (blocked.length === 2) {
+                        body += `<div class="notice bad">${esc(typeName(state.type))} is not available for ${n} guests on either ship.</div>`;
+                    } else {
+                        chosen = picks.map(([s, , c]) => [s, findCat(s, c.code)]);
+                        body += `<div class="cabin-line">Matched: <strong>${esc(catLabel(chosen[0][1]))}</strong> on the Getaway and <strong>${esc(catLabel(chosen[1][1]))}</strong> on the Aura. Pick a different one on each ship below.</div>`;
+                        pickers = picks.map(([s, t, c]) => catPicker(s, t, c, n)).join("");
+                    }
                 }
             } else {
-                picks = [[G, pick(G, state.getawayType)], [A, pick(A, state.auraType)]];
-                body += `<div class="ship-pick">${shipSelect(G, "getawayType")}${shipSelect(A, "auraType")}</div>`;
-                if (picks.some(([, p]) => p.missing)) ok = false;
+                body += `<div class="ship-pick">${diffSelect(G, "diffG")}${diffSelect(A, "diffA")}</div>`;
+                const cg = findCat(G, state.diffG), ca = findCat(A, state.diffA);
+                if (cg && ca && isAvail(cg, n) && isAvail(ca, n)) chosen = [[G, cg], [A, ca]];
+                else body += `<div class="notice bad">Pick an available cabin on each ship.</div>`;
             }
-            if (ok) {
-                const results = picks.map(([s, p]) => [s, p, price(s, p.cat, n)]);
-                const blocked = results.filter(([, , r]) => !r.ok);
-                if (state.mode === "same") {
-                    body += `<div class="cabin-line">Matched: <strong>${esc(results[0][1].cat.title)}</strong> on the Getaway, <strong>${esc(results[1][1].cat.title)}</strong> on the Aura</div>`;
-                    for (const [, p] of results) if (p.note) body += `<div class="notice info">${esc(p.note)}</div>`;
-                }
-                if (blocked.length) {
-                    if (blocked.length === 1) {
-                        const [bs, bp] = blocked[0];
-                        const [os] = results.find(([s]) => s !== bs);
-                        body += `<div class="notice bad">${esc(bp.cat.title)} is available for ${n} guests on the ${esc(os.ship_short)} but not on the ${esc(bs.ship_short)}.</div>`;
-                    } else {
-                        body += `<div class="notice bad">Not available for ${n} guests on either ship.</div>`;
-                    }
-                } else {
-                    const total = results.reduce((t, [, , r]) => t + r.e.cabin_total, 0);
-                    const addons = results.map(([, , r]) => r.e.addon_vs_2);
-                    const extraRows = results.map(([s, p, r]) => `<div class="row"><span class="k">${esc(s.ship_short)} (${s.nights} nights), ${esc(p.cat.title)}</span><span class="v">${money(r.e.cabin_total)}</span></div>`).join("");
-                    body += priceBlock({
-                        total, n, nights,
-                        taxPerGuest: taxEstimate(G) + taxEstimate(A),
-                        addon: addons.every(a => a != null) ? addons[0] + addons[1] : null,
-                        extraRows,
-                    });
-                }
+            if (chosen) {
+                const ks = chosen.map(([s, c]) => [s, c, cost(s, c)]);
+                const total = ks.reduce((t, [, , k]) => t + k.total, 0);
+                const rows = ks.map(([s, c, k]) => `
+                    <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${esc(catLabel(c))}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</div>
+                    ${lineRows(s, k, true)}
+                    <div class="row"><span class="k">${esc(s.ship_short)} total</span><span class="v">${agesKnown() ? money(k.total) : ""}</span></div>`).join("");
+                body += totalBlock(total, nights, rows) + ks.map(([, c]) => addedCostLine(c)).join("") + pickers;
             }
             return `
                 <article class="card featured">
@@ -695,46 +891,76 @@
                 </section>`;
         }
 
-        function compareTable() {
-            const n = state.guests;
-            const cell = (s, key) => {
-                const p = pick(s, key);
-                if (p.missing) return { html: `<span class="na">Not offered</span>` };
-                const r = price(s, p.cat, n);
-                return r.ok ? { html: `${money(r.e.cabin_total)}<span class="pp">${money(r.e.price_pp)} pp</span>`, total: r.e.cabin_total } : { html: `<span class="na">${r.reason.startsWith("Sold") ? "Sold out" : "Not available"}</span>` };
-            };
-            const rows = allTypes().map(key => {
-                const g = cell(G, key), a = cell(A, key);
-                const both = g.total != null && a.total != null
-                    ? `${money(g.total + a.total)}<span class="pp">${money((g.total + a.total) / n)} pp</span>`
-                    : `<span class="na">Not available</span>`;
-                return `<tr data-type="${key}" class="${key === state.type ? "selected" : ""}"><td><strong>${esc(typeName(key))}</strong></td><td>${g.html}</td><td>${a.html}</td><td>${both}</td></tr>`;
+        // Every cabin on one ship for the party. Unavailable ones are greyed out with the reason.
+        function cabinTable(s) {
+            const n = guests();
+            let chosenCode = s === G ? state.diffG : state.diffA;
+            if (state.mode === "same") {
+                const tf = typeFor(s, state.type);
+                const c = tf.missing ? null : chosenInType(s, tf.t, n);
+                chosenCode = c ? c.code : null;
+            }
+            const rows = types(s).map(t => {
+                const cats = catsOf(t).slice().sort((a, b) => {
+                    const ea = entry(a, n), eb = entry(b, n);
+                    if (ea.available !== eb.available) return ea.available ? -1 : 1;
+                    return (ea.cabin_total || 1e9) - (eb.cabin_total || 1e9);
+                });
+                return `<tr class="group"><td colspan="2">${esc(t.title)}</td></tr>` + cats.map(c => {
+                    const e = entry(c, n);
+                    const meta = [c.capacity ? `Holds up to ${c.capacity}` : "", c.guarantee ? GUARANTEE_TEXT : ""].filter(Boolean).join(". ");
+                    return e.available
+                        ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td><span class="cat-name">${esc(catLabel(c))}</span>${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${money(e.cabin_total)}<span class="pp-small">${money(e.price_pp)} pp</span></td></tr>`
+                        : `<tr class="off"><td><span class="cat-name">${esc(catLabel(c))}</span>${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${esc(e.reason)}</td></tr>`;
+                }).join("");
             }).join("");
             return `
-                <section class="panel" aria-label="All cabin types">
-                    <div class="panel-title">All cabin types for ${n} ${guestWord(n)}, total per cabin</div>
-                    <div class="table-scroll">
-                        <table class="compare">
-                            <thead><tr><th>Cabin type</th><th>3 nights<br>Getaway</th><th>5 nights<br>Aura</th><th>8 nights<br>same cabin</th></tr></thead>
-                            <tbody>${rows}</tbody>
-                        </table>
-                    </div>
-                    <p class="hint">Tap a row to pick that cabin type. NCL's prices already include taxes.</p>
+                <section class="panel" aria-label="Every ${esc(s.ship_short)} cabin">
+                    <div class="panel-title">Every ${esc(s.ship_short)} cabin for ${plural(n, "guest", "guests")} (fare and taxes)</div>
+                    <table class="cabins"><tbody>${rows}</tbody></table>
+                    <p class="hint">Tap an available cabin to choose it. Free at Sea gratuities are added in the option cards above.</p>
                 </section>`;
         }
 
         // ---------- render ----------
-        function renderControls() {
-            document.getElementById("guestButtons").innerHTML = GUEST_COUNTS.map(n =>
-                `<button type="button" data-guests="${n}" aria-pressed="${state.guests === n}">${n}</button>`).join("");
+        function renderGuests(msg = "") {
+            document.getElementById("adultCount").textContent = state.adults;
+            document.getElementById("kidCount").textContent = state.kids.length;
+            const opts = a => `<option value="">Choose age</option>` + Array.from({ length: 21 }, (_, i) => `<option value="${i}" ${a === i ? "selected" : ""}>${i}</option>`).join("");
+            document.getElementById("kidAges").innerHTML = state.kids.map((a, i) => `
+                <div><label for="kid${i}">Kid ${i + 1} age</label><select id="kid${i}" data-kid="${i}" class="${Number.isInteger(a) ? "" : "unset"}">${opts(a)}</select></div>`).join("");
+            document.getElementById("guestMsg").textContent = msg;
+            const n = guests();
+            const teens = state.kids.filter(a => Number.isInteger(a) && a >= 13).length;
+            const little = state.kids.filter(a => Number.isInteger(a) && a <= 12).length;
+            const parts = [`${plural(n, "guest", "guests")} in the cabin`];
+            if (agesKnown() && state.kids.length) parts.push(`Open Bar charged for ${state.adults}, Specialty Dining for ${state.adults + teens}, no Free at Sea charge for ${little}`);
+            document.getElementById("guestSummary").textContent = parts.join(". ") + ".";
+        }
+
+        function renderTypes() {
             document.getElementById("typeButtons").innerHTML = allTypes().map(k =>
                 `<button type="button" data-type="${k}" aria-pressed="${state.type === k}">${esc(typeName(k))}</button>`).join("");
         }
 
-        function render() {
+        // Keep every saved pick valid for the current party.
+        function normalize() {
+            const n = guests();
             if (!allTypes().includes(state.type)) state.type = "balcony";
-            for (const [f, s] of [["getawayType", G], ["auraType", A]]) if (!hasType(s, state[f])) state[f] = cats(s)[0].match;
-            renderControls();
+            for (const [s, f] of [[G, "diffG"], [A, "diffA"]]) {
+                const c = findCat(s, state[f]);
+                if (!c || !isAvail(c, n)) {
+                    const tf = typeFor(s, state.type);
+                    const best = (!tf.missing && availableIn(tf.t, n)[0]) || allCats(s).filter(c => isAvail(c, n)).sort((a, b) => entry(a, n).cabin_total - entry(b, n).cabin_total)[0];
+                    state[f] = best ? best.code : null;
+                }
+            }
+        }
+
+        function render(msg) {
+            normalize();
+            renderGuests(msg);
+            renderTypes();
             document.getElementById("app").innerHTML = `
                 <div class="options">
                     ${singleCard(G, "Option 1: 3 nights")}
@@ -742,46 +968,55 @@
                     ${eightCard()}
                 </div>
                 ${explainer()}
-                ${compareTable()}`;
+                <div class="tables">${cabinTable(G)}${cabinTable(A)}</div>`;
             save();
         }
 
-        function renderMeta() {
-            const d = new Date(DATA.saved_at);
-            document.getElementById("asOf").textContent = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
-            const cf = DATA.cruisefeed || {};
-            let text = "";
-            if (cf.status === "checked") {
-                const parts = Object.entries(cf.sailings || {}).map(([id, v]) => {
-                    const s = DATA.sailings.find(x => x.id === id);
-                    return v.price_amount != null ? `${s ? s.ship_short : id} from ${money(v.price_amount)} per person` : `${s ? s.ship_short : id}: ${v.error || "no price"}`;
-                });
-                text = `CruiseFeed cross check on ${cf.checked_at.slice(0, 10)}: ${parts.join("; ")}.`;
-            } else if (cf.warning) {
-                text = `CruiseFeed cross check: ${cf.warning}`;
+        // ---------- guest rules ----------
+        function changeCount(which, step) {
+            const n = guests();
+            if (step > 0 && n >= MAX_GUESTS) return `A cabin here holds at most ${MAX_GUESTS} guests, so remove someone before adding another.`;
+            if (which === "adults") {
+                if (step < 0 && state.adults <= 1) return "Every cabin needs at least 1 adult (21 or older).";
+                if (step < 0 && n <= MIN_GUESTS) return `Prices are for at least ${MIN_GUESTS} guests in a cabin, so add a kid before removing an adult.`;
+                state.adults += step;
+            } else {
+                if (step < 0 && !state.kids.length) return "There are no kids to remove.";
+                if (step < 0 && n <= MIN_GUESTS) return `Prices are for at least ${MIN_GUESTS} guests in a cabin, so add an adult before removing a kid.`;
+                if (step > 0) state.kids.push(null); else state.kids.pop();
             }
-            document.getElementById("crossCheck").textContent = text;
+            return "";
         }
 
         // ---------- events ----------
         document.addEventListener("click", e => {
-            const b = e.target.closest("button[data-guests], button[data-type], button[data-mode], tr[data-type]");
-            if (!b || !DATA) return;
-            if (b.dataset.guests) state.guests = Number(b.dataset.guests);
+            if (!DATA) return;
+            const b = e.target.closest("button[data-count], button[data-type], button[data-mode], button[data-pick], tr.pickable");
+            if (!b) return;
+            let msg = "";
+            if (b.dataset.count) msg = changeCount(b.dataset.count, Number(b.dataset.step));
             else if (b.dataset.mode) state.mode = b.dataset.mode;
-            else if (b.dataset.type) {
-                state.type = b.dataset.type;
-                // Keep the "different cabins" picks in step with the main choice where possible.
-                if (hasType(G, state.type)) state.getawayType = state.type;
-                if (hasType(A, state.type)) state.auraType = state.type;
+            else if (b.dataset.pick) state[b.dataset.pick] = b.dataset.code;
+            else if (b.dataset.type) state.type = b.dataset.type;
+            else if (b.dataset.ship) {
+                // A cabin tapped in the full table: choose it, and its type for the option cards.
+                const s = b.dataset.ship === "G" ? G : A;
+                state[b.dataset.ship === "G" ? "diffG" : "diffA"] = b.dataset.code;
+                if (state.mode === "same") {
+                    state.type = b.dataset.typekey;
+                    state[b.dataset.ship === "G" ? "pickG" : "pickA"] = b.dataset.code;
+                }
             }
-            render();
+            render(msg);
         });
 
         document.addEventListener("change", e => {
+            if (!DATA) return;
+            const kid = e.target.closest("select[data-kid]");
             const sel = e.target.closest("select[data-field]");
-            if (!sel) return;
-            state[sel.dataset.field] = sel.value;
+            if (kid) state.kids[Number(kid.dataset.kid)] = kid.value === "" ? null : Number(kid.value);
+            else if (sel) state[sel.dataset.field] = sel.value;
+            else return;
             render();
         });
 
@@ -796,7 +1031,7 @@
                 G = d.sailings.find(s => s.id.startsWith("getaway"));
                 A = d.sailings.find(s => s.id.startsWith("aura"));
                 if (!G || !A) throw new Error("a sailing is missing");
-                renderMeta();
+                document.getElementById("asOf").textContent = new Date(d.saved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
                 render();
             })
             .catch(err => {

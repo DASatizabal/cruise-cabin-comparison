@@ -89,7 +89,7 @@ Superseded on 2026-10-07: the refresh now runs as a GitHub Actions workflow on G
 - Specific categories (like "Family Balcony" or a category code like BA) are not on the cruise page. They live in NCL's booking app (`/booking`), which is a JavaScript app shell. Not probed further.
 - Guests: add `?numberOfGuests=N` to the cruise page URL. The page then reports `guestCount` N and per person prices for N guests. `guestCount=N` works the same. One page fetch per guest count, so 4 fetches per sailing per day (8 total).
 - The per person "from" price for a category can be a different specific cabin at a different guest count, because the cheapest cabin may not hold that many people. Seen: Getaway Oceanview went from $429 pp at 2 guests to $466 pp at 3. Aura Haven went from $2,602 pp at 3 to $2,799 pp at 4. So "cabin total at N minus cabin total at 2" is an estimate of the add-on cost, not an exact one.
-- Taxes: the grid header says "PP / INCLUDES TAXES, FEES AND PORT EXPENSES". NCL's prices already include taxes, and the page does not itemize them. Adding $200 or $210 per guest on top would count taxes twice. Decided 2026-10-07: use NCL's price as the total and show the tax amount only as a note.
+- Taxes: the grid header says "PP / INCLUDES TAXES, FEES AND PORT EXPENSES". NCL's prices already include taxes, and the page does not itemize them. Adding $200 or $210 per guest on top would count taxes twice. Decided 2026-10-07: use NCL's price as the total and show the tax amount only as a note. Correction (2026-10-07, AI PC test): the sailing page bundles taxes, but NCL's booking API shows taxes as their own line ($200 per guest on the Getaway, $210 on the Aura). Version 4.0.0 shows that line.
 - Free at Sea: the page lists the four offers (open bar, specialty dining, excursion credits, Wi-Fi) and says "Simply pay the package gratuities in advance", but gives no dollar amount for that per guest charge on either ship. Leave it empty until a source is found.
 - Terminal: neither page names a terminal. `/api/cruises/v1/route-events/<packageId>` gives port times but no terminal. Show "Expected: Terminal B (confirm on your eDocs)".
 
@@ -112,7 +112,7 @@ No login, no reservation, no cabin hold. Not used by the daily job (decision 3 b
 - Bot protection: Akamai Bot Manager. The booking page sets the cookies `_abck` and `bm_sz` (plus `ak_*` location cookies and `akaas_www_ncl_com_as`). Nothing returned 403 or a challenge page. The app is built to send `X-XSRF-TOKEN`, but NCL never set an `XSRF-TOKEN` cookie, so none was sent.
 - Where it failed: `meta-availability` (HTTP 500). The cause is unknown: a wrong body shape, a skipped step, or Akamai quietly refusing a client that never ran its sensor script. A real browser run that records the `meta-availability` and `quote` request bodies will tell.
 - Avoid `api/recommended-cabin` (its config name is `recommendedCabinHoldUrl`, so it likely holds a cabin) and `api/book`.
-- Free at Sea: no dollar amount for the per guest charge in any response. It most likely appears in `quote`.
+- Free at Sea: no dollar amount for the per guest charge in any response. It most likely appears in `quote`. Correction (2026-10-07, AI PC test): the Free at Sea gratuities do have dollar amounts, in the vacation-builder price summary (see below).
 
 ## Decisions (2026-10-07)
 
@@ -126,7 +126,9 @@ No login, no reservation, no cabin hold. Not used by the daily job (decision 3 b
 8. Free at Sea: leave empty and show "Free at Sea charge: not yet available".
 9. Hide Studio on both ships (it fits one guest).
 
-## Refresh plan (built in 3.0.0)
+## Refresh plan (built in 3.0.0, replaced in 4.0.0)
+
+Superseded: 4.0.0 reads the vacation-builder API instead of the sailing pages, and CruiseFeed was removed. See "Version 4.0.0" below.
 
 - `.github/workflows/refresh-prices.yml` on GitHub's own runners, not the AI PC.
 - Daily (10:17 UTC): `tools/fetch_prices.py` loads both sailing pages at 2, 3, 4 and 5 guests (8 page loads, free) and writes `data/prices.new.json`.
@@ -135,3 +137,37 @@ No login, no reservation, no cabin hold. Not used by the daily job (decision 3 b
 - The workflow commits `data/prices.json` every day, because `saved_at` changes even when prices don't. That keeps "Prices as of" honest.
 - Scheduled runs only fire on the default branch (`main`), so the daily schedule starts after the merge. Until then, pushes to this branch that change the fetch tools or the workflow run it once, to test GitHub's runners.
 - If NCL blocks GitHub's runners, fall back to the AI PC (a self-hosted runner or a scheduled Python job running the same script).
+
+## Booking flow test on the AI PC (2026-10-07, run by the owner's local session, nothing committed there)
+
+1. Availability: POST `https://www.ncl.com/api/vacation-builder/v2/stateroom-types-availability`, body `{"sailingFilters":[{"packageId":"24223992","numberOfGuests":2,"filterId":"0"}]}`. Returns every broad type with each specific category. Per category, under `results[0].result.stateroomTypesPricing[].stateroomsPricing[].categoryPricing[]`: `isAvailable`, `isSoldOut`, and `standardOption` with `pricedCategoryCode`, `guestCapacity`, and `price` (average per person, includes taxes, not Free at Sea gratuities).
+2. When a category can't take the party, it stays in the list, `isAvailable` becomes false, `isSoldOut` stays false, `standardOption.guestCapacity` becomes 0, and `price` and `fareCode` are removed. No field says why. Whole broad types can switch off the same way at 5 guests.
+3. Capacity: use `standardOption.guestCapacity` from the 2-guest call only, since it reads 0 whenever unavailable. Do not use `stateroom.guestCapacity` one level up; it is wrong for some categories (example: Getaway "Oceanview with Picture Window" says 5 there, but OA and OB hold 2).
+4. Price summary: POST `https://www.ncl.com/api/vacation-builder/price-summary`, body `{"packageId":"24223992","stateroomFilters":[{"id":"0","mainCabin":true,"numberOfGuests":2,"stateroomTypeCode":"BALCONY","pricedCategoryCode":"B4","fareCodes":["ALL4CHO"],"guests":[],"vouchers":[]}],"userFareCodes":[]}`. Returns the fare, taxes per guest as their own line, Free at Sea gratuities per guest, and the total. Getaway B4: 2 guests $1,230 total, 3 guests $1,715. Getaway gratuities: Open Bar $96 per guest, Specialty Dining $20 per guest; excursion credits and Wi-Fi included.
+5. Both calls work as plain requests with no browser and no cookies, and neither holds a cabin.
+6. NEVER call `cabin/manage-cabin`. It carries recommendAndHold and puts a temporary hold on a real cabin. `tools/fetch_prices.py` refuses any address containing "manage-cabin" or "hold".
+
+Confirmed from the cloud session on 2026-10-07:
+- The Aura's packageId is 25729291: `route-events/25729291` starts on 2027-06-14 in Miami, and the availability and price summary calls accept it.
+- Aura gratuities: Open Bar $160 per guest ($32 per day for 5 nights), Specialty Dining - 2 Meals $40 per guest. Aura taxes $210 per guest.
+- Gratuities are the same for every cabin type on a ship (checked Getaway B4 and Haven HI, Aura IF and Haven HE).
+- `fareCodes` matters. The default Free at Sea promotion per cabin type is in the availability answer's `offerGroups` (`FREE-AT-SEA` group, `isDefaultInGroup` true): ALL4CHO for Studio, Inside, Oceanview, Balcony and Club Balcony Suite; CHOALL4M for Suite and Haven. With `BESTFARE` the price summary leaves out Free at Sea entirely.
+- The price summary also shows a per guest fare: on Getaway B4 at 3 guests the third guest's fare is $169 against $299 for guests 1 and 2.
+- NCL's Open Bar text says: "Guests 1 or 2 under age 21 will instead receive juice and unlimited fountain soda for $12.50 per person per day. Guests 3 to 8 under 21 will not receive a beverage package." The page does not charge this yet (the owner's age rules apply until the kid pricing test is done). It only matters when a kid is guest 1 or 2, which happens with 1 adult and kids.
+- Sold out categories (`isSoldOut` true) also read `guestCapacity` 0 at 2 guests, so their capacity is unknown (null in the data file) and their reason is "Sold out".
+
+## Decisions (2026-10-07, second set)
+
+1. CruiseFeed removed from this project: no weekly check, no workflow option, no footer message, no repo secret. NCL's own API provides everything needed, and the CruiseFeed allowance is saved for Deck Finder.
+2. `tools/fetch_prices.py` uses the vacation-builder calls instead of the sailing pages: availability once per ship at 2, 3, 4 and 5 guests (8 calls), price summary once per ship per party size for the cheapest available category (8 calls), 2 seconds between calls.
+3. Capacity and reasons: capacity from the 2-guest call. At N guests, unavailable and capacity below N: "Holds only X guests". Capacity N or more and still unavailable: "Sold out for this party size".
+4. Daily cross checks, logged in the data file: extra guest price ((total at N minus total at 2) / (N minus 2) within $5 across 3, 4 and 5; log mismatches, keep the real per N numbers), and the formula check (average per person price x guests + gratuities x guests within $5 of the price summary total; fail the run if not).
+5. Show specific categories under each broad type, cheapest first. Pickers show only available ones; the full tables show unavailable ones greyed out with the reason. Hide Solo and Studio (T1, IT, OT, BT). Label Guarantee categories (IX, OX, BX, MX) "Guarantee: NCL picks your cabin location". Show the real added cost for guests 3, 4 and 5 in the same category. Same cabin mode: match by broad type, default to the cheapest available category on each ship, tap to pick another. Different cabins mode: any available category on each ship.
+6. Guests: "Adults (21+)" and "Kids (under 21)" counters, an age dropdown per kid (0 to 20), total 2 to 5 with at least 1 adult. Prices and fit use the total guest count. Gratuities per person: 21 and over pay Open Bar and Specialty Dining; 13 to 20 pay Specialty Dining only; 12 and under pay neither. Show who is charged for what. The AI PC session is testing whether NCL prices kids differently; an update may follow.
+7. Each total shows its own lines: fare, NCL's tax line per ship, and each gratuity line. The tax notes and the Free at Sea placeholder are gone.
+8. The old Norwegian Joy CSV files are deleted (git history keeps them).
+
+## Version 4.0.0 refresh
+
+- Daily on GitHub's runners (`.github/workflows/refresh-prices.yml`, 10:17 UTC once merged to `main`): 2 route-events calls, 8 availability calls, 8 price summary calls, 2 seconds apart, about 1 minute.
+- The new file goes to `data/prices.new.json`; `tools/check_prices.py` checks it (including that every formula check passed); only then does it replace `data/prices.json`.
