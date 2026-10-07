@@ -2,6 +2,17 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.1.0] - 2026-10-07
+
+### Added
+- Plain cabin descriptions instead of technical names, for example "Balcony, Decks 12 to 14 (BA)" or "Family Balcony, Decks 13 and 14, midship (B4)". The NCL code stays in small grey text. Sizes are shown where NCL gives them for that one code.
+- Description fields in the data file (`description`, `decks`, `location`, `size`, `details_source`, `shares_ncl_description_with`), rebuilt on every daily refresh. The format check covers them.
+
+### Changed
+- "Kids (under 21)" sits directly under "Adults (21+)", and the kid age dropdowns appear right under the Kids counter.
+- Cabin type has its own card, directly below "Who is in the cabin".
+- The cabin selection lists (the tap-to-choose category buttons, and for 8 nights the Same/Different toggle and the two cabin pickers) now sit between each option card's heading and its prices.
+
 ## [4.0.0] - 2026-10-07
 
 Prices now come from NCL's booking system, cabin by cabin, with every line of the total shown. The data file format changed (schema 2), so this is a major version.

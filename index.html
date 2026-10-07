@@ -150,14 +150,6 @@
             margin-bottom: 0.6rem;
         }
 
-        .controls-grid {
-            display: grid;
-            gap: 1.25rem;
-        }
-
-        @media (min-width: 800px) {
-            .controls-grid { grid-template-columns: auto 1fr; gap: 2rem; }
-        }
 
         .hint {
             font-size: 0.8rem;
@@ -453,7 +445,7 @@
         }
 
         /* Guest counters */
-        .counters { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+        .counters { display: flex; flex-direction: column; gap: 0.75rem; }
 
         .counter { display: flex; align-items: center; gap: 0.6rem; }
 
@@ -476,7 +468,8 @@
 
         .counter-value { font-size: 1.25rem; font-weight: 700; min-width: 1.5rem; text-align: center; }
 
-        .kid-ages { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; }
+        .kid-ages { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .kid-ages:empty { display: none; }
 
         .kid-ages label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.2rem; }
 
@@ -498,6 +491,9 @@
         /* Specific category lists */
         .cat-name { font-weight: 700; color: var(--gray-900); }
         .cat-meta { font-size: 0.78rem; color: var(--gray-500); margin-top: 0.1rem; }
+        .cat-code { font-size: 0.75rem; color: var(--gray-500); font-weight: 400; white-space: nowrap; }
+        .card-picks { padding: 0.9rem 1.25rem 0; }
+        .card-picks .cat-list-title { margin-top: 0; }
         .gty { color: #92400e; }
 
         .cat-list { list-style: none; margin-top: 0.9rem; }
@@ -565,34 +561,31 @@
     </header>
 
     <main class="wrap">
-        <section class="panel" aria-label="Who is in the cabin and which cabin type">
-            <div class="controls-grid">
-                <div>
-                    <div class="panel-title">Who is in the cabin</div>
-                    <div class="counters">
-                        <div class="counter">
-                            <span class="counter-label">Adults (21+)</span>
-                            <button type="button" data-count="adults" data-step="-1" aria-label="One fewer adult">&minus;</button>
-                            <span class="counter-value" id="adultCount">2</span>
-                            <button type="button" data-count="adults" data-step="1" aria-label="One more adult">+</button>
-                        </div>
-                        <div class="counter">
-                            <span class="counter-label">Kids (under 21)</span>
-                            <button type="button" data-count="kids" data-step="-1" aria-label="One fewer kid">&minus;</button>
-                            <span class="counter-value" id="kidCount">0</span>
-                            <button type="button" data-count="kids" data-step="1" aria-label="One more kid">+</button>
-                        </div>
-                    </div>
-                    <div class="kid-ages" id="kidAges"></div>
-                    <div class="guest-msg" id="guestMsg" role="status" aria-live="polite"></div>
-                    <div class="guest-summary" id="guestSummary"></div>
+        <section class="panel" aria-label="Who is in the cabin">
+            <div class="panel-title">Who is in the cabin</div>
+            <div class="counters">
+                <div class="counter">
+                    <span class="counter-label">Adults (21+)</span>
+                    <button type="button" data-count="adults" data-step="-1" aria-label="One fewer adult">&minus;</button>
+                    <span class="counter-value" id="adultCount">2</span>
+                    <button type="button" data-count="adults" data-step="1" aria-label="One more adult">+</button>
                 </div>
-                <div>
-                    <div class="panel-title">Cabin type</div>
-                    <div class="seg small" id="typeButtons" role="group" aria-label="Cabin type"></div>
-                    <p class="hint">Prices are for one cabin with everyone above in it.</p>
+                <div class="counter">
+                    <span class="counter-label">Kids (under 21)</span>
+                    <button type="button" data-count="kids" data-step="-1" aria-label="One fewer kid">&minus;</button>
+                    <span class="counter-value" id="kidCount">0</span>
+                    <button type="button" data-count="kids" data-step="1" aria-label="One more kid">+</button>
                 </div>
+                <div class="kid-ages" id="kidAges"></div>
             </div>
+            <div class="guest-msg" id="guestMsg" role="status" aria-live="polite"></div>
+            <div class="guest-summary" id="guestSummary"></div>
+        </section>
+
+        <section class="panel" aria-label="Cabin type">
+            <div class="panel-title">Cabin type</div>
+            <div class="seg small" id="typeButtons" role="group" aria-label="Cabin type"></div>
+            <p class="hint">Prices are for one cabin with everyone above in it.</p>
         </section>
 
         <div id="app"><div class="loading">Loading prices...</div></div>
@@ -608,7 +601,7 @@
     </footer>
 
     <script>
-        const APP_VERSION = "4.0.0";
+        const APP_VERSION = "4.1.0";
         const DATA_URL = "data/prices.json";
         const MIN_GUESTS = 2, MAX_GUESTS = 5;
         const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
@@ -658,7 +651,9 @@
         const isAvail = (c, n) => entry(c, n).available;
         function typeName(key) { for (const s of [A, G]) { const t = typeOf(s, key); if (t) return t.title; } return key; }
         function allTypes() { const keys = new Set([...types(G), ...types(A)].map(t => t.match)); return TYPE_ORDER.filter(k => keys.has(k)); }
-        const catLabel = c => `${c.title} (${c.code})`;
+        // Plain description from the data file (NCL first), with NCL's code in small grey text.
+        const catLabel = c => `${c.description} (${c.code})`;
+        const catHtml = c => `<span class="cat-name">${esc(c.description)}</span> <span class="cat-code">(${esc(c.code)})</span>`;
 
         // Like for like matching by broad type. Mini-suite rule: if both ships have a mini-suite,
         // match them; if only one does, the ship without one uses its Balcony instead.
@@ -715,7 +710,7 @@
                 const prev = entry(c, k - 1), cur = entry(c, k);
                 if (prev.available && cur.available) parts.push(`guest ${k} +${money(cur.cabin_total - prev.cabin_total)}`);
             }
-            return parts.length ? `<div class="addon">Added cost in ${esc(catLabel(c))} (fare and taxes): <strong>${parts.join(", ")}</strong></div>` : "";
+            return parts.length ? `<div class="addon">Added cost in ${catHtml(c)} (fare and taxes): <strong>${parts.join(", ")}</strong></div>` : "";
         }
 
         function lineRows(s, k, indent = false) {
@@ -747,8 +742,9 @@
         }
 
         function catHeader(c) {
-            return `<div class="cabin-line"><span class="cat-name">${esc(catLabel(c))}</span>
-                <div class="cat-meta">${esc(c.typeTitle || "")}${c.capacity ? `, holds up to ${c.capacity}` : ""}</div>
+            const meta = [c.size, c.capacity ? `holds up to ${c.capacity}` : ""].filter(Boolean).join(", ");
+            return `<div class="cabin-line">${catHtml(c)}
+                ${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}
                 ${c.guarantee ? `<div class="cat-meta gty">${GUARANTEE_TEXT}</div>` : ""}</div>`;
         }
 
@@ -759,7 +755,7 @@
             const field = s === G ? "pickG" : "pickA";
             return `<div class="cat-list-title">${esc(t.title)} cabins on the ${esc(s.ship_short)} for ${n} guests</div><ul class="cat-list">${list.map(c => `
                 <li><button type="button" data-pick="${field}" data-code="${esc(c.code)}" aria-pressed="${c.code === chosen.code}">
-                    <span><span class="cat-name">${esc(catLabel(c))}</span>${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</span>
+                    <span>${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</span>
                     <span class="price">${money(entry(c, n).cabin_total)}</span>
                 </button></li>`).join("")}</ul>`;
         }
@@ -779,7 +775,7 @@
         function singleCard(s, label) {
             const n = guests();
             const tf = typeFor(s, state.type);
-            let body = "";
+            let body = "", picks = "";
             if (tf.missing) {
                 body = `<div class="notice bad">${esc(typeName(state.type))}: not offered on the ${esc(s.ship_short)}</div>`;
             } else {
@@ -790,7 +786,8 @@
                 } else {
                     const full = findCat(s, c.code);
                     const k = cost(s, full);
-                    body += catHeader(full) + totalBlock(k.total, s.nights, lineRows(s, k)) + addedCostLine(full) + catPicker(s, tf.t, full, n);
+                    picks = catPicker(s, tf.t, full, n);
+                    body += catHeader(full) + totalBlock(k.total, s.nights, lineRows(s, k)) + addedCostLine(full);
                 }
             }
             return `
@@ -801,6 +798,7 @@
                         <div class="card-dates">${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)</div>
                         ${stops(s)}
                     </div>
+                    ${picks ? `<div class="card-picks">${picks}</div>` : ""}
                     <div class="card-body">${body}${daysList(s)}</div>
                     <a class="ncl-link" href="${esc(s.url)}" target="_blank" rel="noopener">See this sailing on NCL &rarr;</a>
                 </article>`;
@@ -812,7 +810,7 @@
             const groups = types(s).map(t => {
                 const list = availableIn(t, n);
                 if (!list.length) return "";
-                return `<optgroup label="${esc(t.title)}">${list.map(c => `<option value="${esc(c.code)}" ${state[field] === c.code ? "selected" : ""}>${esc(catLabel(c))}${c.guarantee ? " (Guarantee)" : ""}: ${money(entry(c, n).cabin_total)}</option>`).join("")}</optgroup>`;
+                return `<optgroup label="${esc(t.title)}">${list.map(c => `<option value="${esc(c.code)}" ${state[field] === c.code ? "selected" : ""}>${esc(catLabel(c))}: ${money(entry(c, n).cabin_total)}</option>`).join("")}</optgroup>`;
             }).join("");
             return `<label for="${field}">${esc(s.ship_short)} cabin (${s.nights} nights)</label><select id="${field}" data-field="${field}">${groups}</select>`;
         }
@@ -845,12 +843,12 @@
                         body += `<div class="notice bad">${esc(typeName(state.type))} is not available for ${n} guests on either ship.</div>`;
                     } else {
                         chosen = picks.map(([s, , c]) => [s, findCat(s, c.code)]);
-                        body += `<div class="cabin-line">Matched: <strong>${esc(catLabel(chosen[0][1]))}</strong> on the Getaway and <strong>${esc(catLabel(chosen[1][1]))}</strong> on the Aura. Pick a different one on each ship below.</div>`;
+                        body += `<div class="cabin-line">Matched: ${catHtml(chosen[0][1])} on the Getaway and ${catHtml(chosen[1][1])} on the Aura. Pick a different one on each ship above.</div>`;
                         pickers = picks.map(([s, t, c]) => catPicker(s, t, c, n)).join("");
                     }
                 }
             } else {
-                body += `<div class="ship-pick">${diffSelect(G, "diffG")}${diffSelect(A, "diffA")}</div>`;
+                pickers = `<div class="ship-pick">${diffSelect(G, "diffG")}${diffSelect(A, "diffA")}</div>`;
                 const cg = findCat(G, state.diffG), ca = findCat(A, state.diffA);
                 if (cg && ca && isAvail(cg, n) && isAvail(ca, n)) chosen = [[G, cg], [A, ca]];
                 else body += `<div class="notice bad">Pick an available cabin on each ship.</div>`;
@@ -859,10 +857,10 @@
                 const ks = chosen.map(([s, c]) => [s, c, cost(s, c)]);
                 const total = ks.reduce((t, [, , k]) => t + k.total, 0);
                 const rows = ks.map(([s, c, k]) => `
-                    <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${esc(catLabel(c))}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</div>
+                    <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</div>
                     ${lineRows(s, k, true)}
                     <div class="row"><span class="k">${esc(s.ship_short)} total</span><span class="v">${agesKnown() ? money(k.total) : ""}</span></div>`).join("");
-                body += totalBlock(total, nights, rows) + ks.map(([, c]) => addedCostLine(c)).join("") + pickers;
+                body += totalBlock(total, nights, rows) + ks.map(([, c]) => addedCostLine(c)).join("");
             }
             return `
                 <article class="card featured">
@@ -872,7 +870,8 @@
                         <div class="card-dates">${fmtDay(G.depart)} to ${fmtDay(A.return)}, 2027 (${nights} nights)</div>
                         <div class="stops"><span class="stop">Both trips back to back</span><span class="stop">Change ships in Miami</span></div>
                     </div>
-                    <div class="card-body">${toggle}${body}</div>
+                    <div class="card-picks">${toggle}${pickers}</div>
+                    <div class="card-body">${body}</div>
                 </article>`;
         }
 
@@ -908,10 +907,10 @@
                 });
                 return `<tr class="group"><td colspan="2">${esc(t.title)}</td></tr>` + cats.map(c => {
                     const e = entry(c, n);
-                    const meta = [c.capacity ? `Holds up to ${c.capacity}` : "", c.guarantee ? GUARANTEE_TEXT : ""].filter(Boolean).join(". ");
+                    const meta = [c.size, c.capacity ? `holds up to ${c.capacity}` : "", c.guarantee ? GUARANTEE_TEXT : ""].filter(Boolean).join(". ");
                     return e.available
-                        ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td><span class="cat-name">${esc(catLabel(c))}</span>${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${money(e.cabin_total)}<span class="pp-small">${money(e.price_pp)} pp</span></td></tr>`
-                        : `<tr class="off"><td><span class="cat-name">${esc(catLabel(c))}</span>${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${esc(e.reason)}</td></tr>`;
+                        ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${money(e.cabin_total)}<span class="pp-small">${money(e.price_pp)} pp</span></td></tr>`
+                        : `<tr class="off"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${esc(e.reason)}</td></tr>`;
                 }).join("");
             }).join("");
             return `

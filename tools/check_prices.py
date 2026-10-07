@@ -112,6 +112,22 @@ def check(data):
                         err(f"{cp}: {k} must be true or false")
                 if c.get("capacity") is not None and (not is_int(c["capacity"]) or c["capacity"] < 1):
                     err(f"{cp}: capacity must be a positive whole number or null")
+                if not isinstance(c.get("description"), str) or not c["description"].startswith(c.get("title") or "\0"):
+                    err(f"{cp}: description must start with the category title")
+                decks = c.get("decks")
+                if decks is not None and (not isinstance(decks, list) or not decks or not all(is_int(d) for d in decks)):
+                    err(f"{cp}: decks must be a list of deck numbers or null")
+                locs = c.get("location")
+                if locs is not None and (not isinstance(locs, list) or not set(locs) <= {"forward", "midship", "aft"}):
+                    err(f"{cp}: location must be a list of forward, midship, aft or null")
+                if (decks or locs) and not c.get("details_source"):
+                    err(f"{cp}: decks or location without a details_source")
+                if c.get("guarantee") and (decks or locs):
+                    err(f"{cp}: guarantee cabins must not list decks or a location")
+                if c.get("size") is not None and not isinstance(c["size"], str):
+                    err(f"{cp}: size must be text or null")
+                if not isinstance(c.get("shares_ncl_description_with"), list):
+                    err(f"{cp}: shares_ncl_description_with must be a list")
                 bg = c.get("by_guests")
                 if not isinstance(bg, dict) or sorted(bg) != GUEST_KEYS:
                     err(f"{cp}: by_guests must have exactly the keys 2, 3, 4, 5")

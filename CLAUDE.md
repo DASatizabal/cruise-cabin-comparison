@@ -33,6 +33,7 @@ File layout:
 - `sailings[]`: `id`, `ship`, `ship_short`, `itinerary_code`, `package_id`, `depart`, `return`, `nights`, `url`, `taxes_per_guest`, `gratuities` (`open_bar` and `specialty_dining`, each `title` and `per_guest`), `terminal`, `ports`, `price_summaries`, `types[]`.
 - Each type: NCL code (STUDIO, INSIDE, OCEANVIEW, BALCONY, MINISUITE, SUITE, HAVEN), `title`, `match`, `categories[]`.
 - Each category: `code` (pricedCategoryCode, like B4), `title`, `guarantee`, `solo`, `capacity` (from the 2-guest call only, null when unknown), and `by_guests` "2" to "5": `available`, `sold_out`, and when available `price_pp` (average per person, includes taxes, not gratuities), `cabin_total` (= `price_pp` x guests), `added_vs_2`; when unavailable a `reason` ("Sold out", "Holds only X guests", "Sold out for this party size").
+- Each category also has a plain `description` (shown instead of the code), `decks`, `location` (forward, midship, aft), `size`, `details_source` and `shares_ncl_description_with`. Rules (see NOTES.md, "Cabin descriptions"): NCL first; NCL's decks, location and size are used only when NCL's group has that one code; for the Getaway, per-code decks come from the owner's public Deck Finder repo (`ships/ncl/getaway/geometry.json`, read only) and are kept only when they fall inside NCL's deck list; never guess a deck or location; Guarantee cabins list no decks.
 
 ## Pricing logic (in `index.html`)
 

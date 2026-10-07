@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "saved_at": "2026-10-07T01:43:23Z",
+ "saved_at": "2026-10-07T15:29:59Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -306,7 +306,18 @@
          "sold_out": false,
          "reason": "Not available for 5 guests"
         }
-       }
+       },
+       "description": "Solo Studio, Decks 10 and 11, forward",
+       "decks": [
+        10,
+        11
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "97 to 99 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       }
      ]
     },
@@ -347,7 +358,13 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Guarantee Inside",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": []
       },
       {
        "code": "IF",
@@ -381,7 +398,20 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Inside, Decks 5 and 8",
+       "decks": [
+        5,
+        8
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "IB",
+        "IA",
+        "IC"
+       ]
       },
       {
        "code": "IC",
@@ -415,7 +445,20 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Inside, Decks 8 and 9",
+       "decks": [
+        8,
+        9
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "IB",
+        "IA",
+        "IF"
+       ]
       },
       {
        "code": "IB",
@@ -449,7 +492,20 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Inside, Decks 10 and 11",
+       "decks": [
+        10,
+        11
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "IA",
+        "IC",
+        "IF"
+       ]
       },
       {
        "code": "IA",
@@ -481,7 +537,21 @@
          "sold_out": false,
          "reason": "Holds only 3 guests"
         }
-       }
+       },
+       "description": "Inside, Decks 12 to 14",
+       "decks": [
+        12,
+        13,
+        14
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "IB",
+        "IC",
+        "IF"
+       ]
       },
       {
        "code": "I4",
@@ -515,7 +585,21 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Family Inside, Decks 12 to 14, forward, midship and aft",
+       "decks": [
+        12,
+        13,
+        14
+       ],
+       "location": [
+        "forward",
+        "midship",
+        "aft"
+       ],
+       "size": "135 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "IT",
@@ -544,7 +628,19 @@
          "sold_out": false,
          "reason": "Not available for 5 guests"
         }
-       }
+       },
+       "description": "Solo Inside, Decks 5 and 9, forward and midship",
+       "decks": [
+        5,
+        9
+       ],
+       "location": [
+        "forward",
+        "midship"
+       ],
+       "size": "129 to 201 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       }
      ]
     },
@@ -581,7 +677,13 @@
          "sold_out": false,
          "reason": "Holds only 2 guests"
         }
-       }
+       },
+       "description": "Guarantee Oceanview",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": []
       },
       {
        "code": "OB",
@@ -611,7 +713,17 @@
          "sold_out": false,
          "reason": "Holds only 2 guests"
         }
-       }
+       },
+       "description": "Oceanview with Picture Window, Deck 5",
+       "decks": [
+        5
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "OA"
+       ]
       },
       {
        "code": "OA",
@@ -641,7 +753,22 @@
          "sold_out": false,
          "reason": "Holds only 2 guests"
         }
-       }
+       },
+       "description": "Oceanview with Picture Window, Decks 5 and 9 to 13",
+       "decks": [
+        5,
+        9,
+        10,
+        11,
+        12,
+        13
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "OB"
+       ]
       },
       {
        "code": "O4",
@@ -675,7 +802,17 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Family Oceanview, Deck 5",
+       "decks": [
+        5
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "O5"
+       ]
       },
       {
        "code": "O5",
@@ -711,7 +848,17 @@
          "cabin_total": 2135,
          "added_vs_2": 1077
         }
-       }
+       },
+       "description": "Family Oceanview, Deck 5",
+       "decks": [
+        5
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "O4"
+       ]
       },
       {
        "code": "OT",
@@ -740,7 +887,17 @@
          "sold_out": false,
          "reason": "Not available for 5 guests"
         }
-       }
+       },
+       "description": "Solo Oceanview, Deck 5, midship",
+       "decks": [
+        5
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "161 to 252 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       }
      ]
     },
@@ -781,7 +938,13 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Guarantee Balcony",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": []
       },
       {
        "code": "BF",
@@ -815,7 +978,19 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Balcony, Decks 8 and 9",
+       "decks": [
+        8,
+        9
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "BB",
+        "BA"
+       ]
       },
       {
        "code": "BB",
@@ -849,7 +1024,19 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Balcony, Decks 10 and 11",
+       "decks": [
+        10,
+        11
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "BA",
+        "BF"
+       ]
       },
       {
        "code": "BA",
@@ -883,7 +1070,20 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Balcony, Decks 12 to 14",
+       "decks": [
+        12,
+        13,
+        14
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "BB",
+        "BF"
+       ]
       },
       {
        "code": "B4",
@@ -917,7 +1117,18 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Family Balcony, Decks 13 and 14, midship",
+       "decks": [
+        13,
+        14
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "204 to 208 sq ft, balcony 32 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "B6",
@@ -951,7 +1162,17 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Large Balcony, Deck 9, forward",
+       "decks": [
+        9
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "245 sq ft, balcony 70 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "B1",
@@ -983,7 +1204,22 @@
          "sold_out": false,
          "reason": "Holds only 3 guests"
         }
-       }
+       },
+       "description": "Aft-Facing Balcony, Decks 9 to 14, aft",
+       "decks": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "207 to 550 sq ft, balcony 32 to 249 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "BT",
@@ -1012,7 +1248,20 @@
          "sold_out": false,
          "reason": "Not available for 5 guests"
         }
-       }
+       },
+       "description": "Solo Balcony, Decks 9, 10 and 12, forward and midship",
+       "decks": [
+        9,
+        10,
+        12
+       ],
+       "location": [
+        "forward",
+        "midship"
+       ],
+       "size": "204 to 366 sq ft, balcony 32 to 133 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       }
      ]
     },
@@ -1051,7 +1300,13 @@
          "sold_out": false,
          "reason": "Holds only 3 guests"
         }
-       }
+       },
+       "description": "Guarantee Club Balcony Suite",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": []
       },
       {
        "code": "MB",
@@ -1085,7 +1340,18 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Club Balcony Suite, Decks 9 and 10",
+       "decks": [
+        9,
+        10
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "MA"
+       ]
       },
       {
        "code": "MA",
@@ -1119,7 +1385,20 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Club Balcony Suite, Decks 11 to 14",
+       "decks": [
+        11,
+        12,
+        13,
+        14
+       ],
+       "location": null,
+       "size": null,
+       "details_source": "Deck Finder (checked against NCL)",
+       "shares_ncl_description_with": [
+        "MB"
+       ]
       },
       {
        "code": "M4",
@@ -1153,7 +1432,23 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Family Club Balcony Suite, Decks 9 to 14, forward and midship",
+       "decks": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+       ],
+       "location": [
+        "forward",
+        "midship"
+       ],
+       "size": "239 sq ft, balcony 32 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "M6",
@@ -1187,7 +1482,17 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Club Balcony Suite with Larger Balcony, Deck 8, forward",
+       "decks": [
+        8
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "289 to 310 sq ft, balcony 82 to 103 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "M1",
@@ -1217,7 +1522,17 @@
          "sold_out": false,
          "reason": "Holds only 2 guests"
         }
-       }
+       },
+       "description": "Aft-Facing Club Balcony Suite, Deck 10, aft",
+       "decks": [
+        10
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "513 to 585 sq ft, balcony 210 to 282 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       }
      ]
     },
@@ -1254,7 +1569,17 @@
          "sold_out": false,
          "reason": "Holds only 2 guests"
         }
-       }
+       },
+       "description": "The Haven Penthouse Suite with Balcony, Deck 14, forward",
+       "decks": [
+        14
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "309 sq ft, balcony 54 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "HG",
@@ -1286,7 +1611,21 @@
          "sold_out": false,
          "reason": "Holds only 3 guests"
         }
-       }
+       },
+       "description": "The Haven Forward-Facing Penthouse with Balcony, Decks 9 to 13, forward",
+       "decks": [
+        9,
+        10,
+        11,
+        12,
+        13
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "419 to 451 sq ft, balcony 32 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "HF",
@@ -1318,7 +1657,18 @@
          "sold_out": false,
          "reason": "Holds only 3 guests"
         }
-       }
+       },
+       "description": "The Haven Courtyard Penthouse with Balcony, Decks 15 and 16, forward",
+       "decks": [
+        15,
+        16
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "324 to 540 sq ft, balcony 48 to 79 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "HA",
@@ -1352,7 +1702,20 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "The Haven Aft-Facing Penthouse with Master Bedroom & Balcony, Decks 10, 11, 13 and 14, aft",
+       "decks": [
+        10,
+        11,
+        13,
+        14
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "655 to 715 sq ft, balcony 236 to 296 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "H7",
@@ -1386,7 +1749,18 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "The Haven Aft-Facing Penthouse with Master Bedroom & Large Balcony, Decks 9 and 12, aft",
+       "decks": [
+        9,
+        12
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "789 to 824 sq ft, balcony 370 to 405 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "H6",
@@ -1422,7 +1796,18 @@
          "cabin_total": 6285,
          "added_vs_2": 1347
         }
-       }
+       },
+       "description": "The Haven 2-Bedroom Family Villa with Balcony, Decks 15 and 16, forward",
+       "decks": [
+        15,
+        16
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "534 to 545 sq ft, balcony 39 to 50 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "H3",
@@ -1456,7 +1841,17 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "The Haven Deluxe Owner's Suite with Balcony, Deck 16, forward",
+       "decks": [
+        16
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "572 sq ft, balcony 95 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "H2",
@@ -1490,7 +1885,17 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "The Haven Deluxe Owner's Suite with Large Balcony, Deck 16, forward",
+       "decks": [
+        16
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "932 sq ft, balcony 204 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       }
      ]
     }
@@ -1732,7 +2137,18 @@
          "sold_out": false,
          "reason": "Not available for 5 guests"
         }
-       }
+       },
+       "description": "Solo Studio, Decks 12 and 13, midship",
+       "decks": [
+        12,
+        13
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "94 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       }
      ]
     },
@@ -1769,7 +2185,16 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Inside, holds up to 4",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": [
+        "IB",
+        "IA"
+       ]
       },
       {
        "code": "IB",
@@ -1799,7 +2224,16 @@
          "sold_out": false,
          "reason": "Holds only 2 guests"
         }
-       }
+       },
+       "description": "Inside, holds up to 2",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": [
+        "IF",
+        "IA"
+       ]
       },
       {
        "code": "IA",
@@ -1829,7 +2263,16 @@
          "sold_out": false,
          "reason": "Holds only 3 guests"
         }
-       }
+       },
+       "description": "Inside, holds up to 3",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": [
+        "IF",
+        "IB"
+       ]
       },
       {
        "code": "I4",
@@ -1863,7 +2306,26 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Family Inside, Decks 5 and 9 to 16, forward and midship",
+       "decks": [
+        5,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+       ],
+       "location": [
+        "forward",
+        "midship"
+       ],
+       "size": "160 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "IT",
@@ -1892,7 +2354,19 @@
          "sold_out": true,
          "reason": "Sold out"
         }
-       }
+       },
+       "description": "Solo Inside, Decks 12, 14 and 16, midship",
+       "decks": [
+        12,
+        14,
+        16
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "160 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "IX",
@@ -1921,7 +2395,13 @@
          "sold_out": true,
          "reason": "Sold out"
         }
-       }
+       },
+       "description": "Guarantee Inside",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": []
       }
      ]
     },
@@ -1958,7 +2438,19 @@
          "sold_out": false,
          "reason": "Holds only 2 guests"
         }
-       }
+       },
+       "description": "Oceanview with Round Window, Deck 5, forward, midship and aft",
+       "decks": [
+        5
+       ],
+       "location": [
+        "forward",
+        "midship",
+        "aft"
+       ],
+       "size": "186 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "OA",
@@ -1990,7 +2482,17 @@
          "sold_out": false,
          "reason": "Holds only 3 guests"
         }
-       }
+       },
+       "description": "Large Oceanview with Round Window, Deck 5, midship",
+       "decks": [
+        5
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "235 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "O4",
@@ -2024,7 +2526,17 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Family Oceanview, Deck 5, midship",
+       "decks": [
+        5
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "235 to 370 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "OT",
@@ -2053,7 +2565,17 @@
          "sold_out": true,
          "reason": "Sold out"
         }
-       }
+       },
+       "description": "Solo Oceanview, Deck 5, midship",
+       "decks": [
+        5
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "186 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "OX",
@@ -2082,7 +2604,13 @@
          "sold_out": true,
          "reason": "Sold out"
         }
-       }
+       },
+       "description": "Guarantee Oceanview",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": []
       }
      ]
     },
@@ -2119,7 +2647,16 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Balcony, holds up to 4",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": [
+        "BB",
+        "BA"
+       ]
       },
       {
        "code": "BB",
@@ -2151,7 +2688,16 @@
          "sold_out": false,
          "reason": "Holds only 3 guests"
         }
-       }
+       },
+       "description": "Balcony, holds up to 3",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": [
+        "BF",
+        "BA"
+       ]
       },
       {
        "code": "BA",
@@ -2183,7 +2729,16 @@
          "sold_out": false,
          "reason": "Holds only 3 guests"
         }
-       }
+       },
+       "description": "Balcony, holds up to 3",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": [
+        "BF",
+        "BB"
+       ]
       },
       {
        "code": "B4",
@@ -2217,41 +2772,63 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Family Balcony, Decks 9 to 16, aft",
+       "decks": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "231 sq ft, balcony 45 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "B1",
        "title": "Aft-Facing Balcony",
        "guarantee": false,
        "solo": false,
-       "capacity": 4,
+       "capacity": null,
        "by_guests": {
         "2": {
-         "available": true,
-         "sold_out": false,
-         "price_pp": 2959,
-         "cabin_total": 5918
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
         },
         "3": {
-         "available": true,
-         "sold_out": false,
-         "price_pp": 2236,
-         "cabin_total": 6708,
-         "added_vs_2": 790
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
         },
         "4": {
-         "available": true,
-         "sold_out": false,
-         "price_pp": 1874,
-         "cabin_total": 7496,
-         "added_vs_2": 1578
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
         },
         "5": {
          "available": false,
-         "sold_out": false,
-         "reason": "Holds only 4 guests"
+         "sold_out": true,
+         "reason": "Sold out"
         }
-       }
+       },
+       "description": "Aft-Facing Balcony, Deck 9, aft",
+       "decks": [
+        9
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "288 sq ft, balcony 102 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "BT",
@@ -2280,7 +2857,17 @@
          "sold_out": true,
          "reason": "Sold out"
         }
-       }
+       },
+       "description": "Solo Balcony, Deck 12, midship",
+       "decks": [
+        12
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "231 sq ft, balcony 45 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "BX",
@@ -2309,7 +2896,13 @@
          "sold_out": true,
          "reason": "Sold out"
         }
-       }
+       },
+       "description": "Guarantee Balcony",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": []
       }
      ]
     },
@@ -2346,7 +2939,21 @@
          "sold_out": false,
          "reason": "Holds only 2 guests"
         }
-       }
+       },
+       "description": "Forward-Facing Club Balcony Suite, Decks 9 to 13, forward",
+       "decks": [
+        9,
+        10,
+        11,
+        12,
+        13
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "241 to 271 sq ft, balcony 75 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "MA",
@@ -2376,7 +2983,19 @@
          "sold_out": false,
          "reason": "Holds only 2 guests"
         }
-       }
+       },
+       "description": "Club Balcony Suite, Decks 9 to 11, aft",
+       "decks": [
+        9,
+        10,
+        11
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "265 to 291 sq ft, balcony 45 to 52 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "M4",
@@ -2410,7 +3029,19 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Family Club Balcony Suite, Decks 9 to 11, aft",
+       "decks": [
+        9,
+        10,
+        11
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "252 to 291 sq ft, balcony 46 to 62 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "M2",
@@ -2444,7 +3075,21 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Forward-Facing Club Balcony Suite with Large Balcony, Decks 9 to 13, forward",
+       "decks": [
+        9,
+        10,
+        11,
+        12,
+        13
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "358 to 412 sq ft, balcony 129 to 185 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "MX",
@@ -2473,7 +3118,13 @@
          "sold_out": true,
          "reason": "Sold out"
         }
-       }
+       },
+       "description": "Guarantee Club Balcony Suite",
+       "decks": null,
+       "location": null,
+       "size": null,
+       "details_source": null,
+       "shares_ncl_description_with": []
       }
      ]
     },
@@ -2514,7 +3165,19 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Forward-Facing Suite with Large Balcony, Decks 9, 10 and 12, forward",
+       "decks": [
+        9,
+        10,
+        12
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "393 to 434 sq ft, balcony 129 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "SK",
@@ -2548,7 +3211,21 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Forward-Facing Suite with Master Bedroom & Large Balcony, Decks 9 to 13, forward",
+       "decks": [
+        9,
+        10,
+        11,
+        12,
+        13
+       ],
+       "location": [
+        "forward"
+       ],
+       "size": "412 to 487 sq ft, balcony 153 to 191 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "SR",
@@ -2582,7 +3259,24 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Family Suite with Master Bedroom & Balcony, Decks 9 to 16, midship",
+       "decks": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "480 to 577 sq ft, balcony 137 to 234 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "SI",
@@ -2612,7 +3306,17 @@
          "sold_out": false,
          "reason": "Holds only 2 guests"
         }
-       }
+       },
+       "description": "Aft-Facing Suite with Large Balcony, Deck 9, aft",
+       "decks": [
+        9
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "448 sq ft, balcony 195 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "SJ",
@@ -2646,7 +3350,24 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "Family Suite with Master Bedroom & Large Balcony, Decks 9 to 16, midship",
+       "decks": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "388 sq ft, balcony 45 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "SH",
@@ -2675,7 +3396,17 @@
          "sold_out": true,
          "reason": "Sold out"
         }
-       }
+       },
+       "description": "Aft-Facing Suite with Large Balcony, Deck 9, aft",
+       "decks": [
+        9
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "635 sq ft, balcony 370 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       }
      ]
     },
@@ -2714,7 +3445,22 @@
          "sold_out": false,
          "reason": "Holds only 3 guests"
         }
-       }
+       },
+       "description": "The Haven Penthouse with Balcony, Decks 12 to 15 and 17, midship and aft",
+       "decks": [
+        12,
+        13,
+        14,
+        15,
+        17
+       ],
+       "location": [
+        "midship",
+        "aft"
+       ],
+       "size": "368 to 418 sq ft, balcony 84 to 134 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "H5",
@@ -2748,7 +3494,18 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "The Haven Owner’s Suite with Large Balcony, Deck 12, midship and aft",
+       "decks": [
+        12
+       ],
+       "location": [
+        "midship",
+        "aft"
+       ],
+       "size": "541 to 614 sq ft, balcony 109 to 132 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "HB",
@@ -2782,7 +3539,21 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "The Haven Aft-Facing Penthouse with Master Bedroom & Large Balcony, Decks 10 to 14, aft",
+       "decks": [
+        10,
+        11,
+        12,
+        13,
+        14
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "496 to 599 sq ft, balcony 129 to 220 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "H6",
@@ -2818,7 +3589,20 @@
          "cabin_total": 14485,
          "added_vs_2": 2367
         }
-       }
+       },
+       "description": "The Haven 2-Bedroom Family Villa with Large Balcony, Decks 13 to 15, midship and aft",
+       "decks": [
+        13,
+        14,
+        15
+       ],
+       "location": [
+        "midship",
+        "aft"
+       ],
+       "size": "606 to 658 sq ft, balcony 138 to 190 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "H4",
@@ -2852,7 +3636,18 @@
          "sold_out": false,
          "reason": "Holds only 4 guests"
         }
-       }
+       },
+       "description": "The Haven Aft-Facing Owner's Suite with Master Bedroom & Large Balcony, Decks 10 and 12, aft",
+       "decks": [
+        10,
+        12
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "974 to 994 sq ft, balcony 527 to 535 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "H3",
@@ -2888,43 +3683,57 @@
          "cabin_total": 20385,
          "added_vs_2": 2367
         }
-       }
+       },
+       "description": "The Haven Deluxe Owner's Suite with Large Balcony, Decks 13 and 15, aft",
+       "decks": [
+        13,
+        15
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "1607 to 1749 sq ft, balcony 613 to 732 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "H2",
        "title": "The Haven Premier Owner's Suite with Large Balcony",
        "guarantee": false,
        "solo": false,
-       "capacity": 8,
+       "capacity": null,
        "by_guests": {
         "2": {
-         "available": true,
-         "sold_out": false,
-         "price_pp": 12009,
-         "cabin_total": 24018
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
         },
         "3": {
-         "available": true,
-         "sold_out": false,
-         "price_pp": 8269,
-         "cabin_total": 24807,
-         "added_vs_2": 789
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
         },
         "4": {
-         "available": true,
-         "sold_out": false,
-         "price_pp": 6399,
-         "cabin_total": 25596,
-         "added_vs_2": 1578
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
         },
         "5": {
-         "available": true,
-         "sold_out": false,
-         "price_pp": 5277,
-         "cabin_total": 26385,
-         "added_vs_2": 2367
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
         }
-       }
+       },
+       "description": "The Haven Premier Owner's Suite with Large Balcony, Deck 14, aft",
+       "decks": [
+        14
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "2100 sq ft, balcony 828 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "H8",
@@ -2953,7 +3762,17 @@
          "sold_out": true,
          "reason": "Sold out"
         }
-       }
+       },
+       "description": "The Haven 2-Bedroom Duplex Suite with Large Balcony, Deck 15, midship",
+       "decks": [
+        15
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "900 to 904 sq ft, balcony 114 to 118 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       },
       {
        "code": "HA",
@@ -2982,7 +3801,17 @@
          "sold_out": true,
          "reason": "Sold out"
         }
-       }
+       },
+       "description": "The Haven Aft-Facing Penthouse with Large Balcony, Deck 11, aft",
+       "decks": [
+        11
+       ],
+       "location": [
+        "aft"
+       ],
+       "size": "830 sq ft, balcony 498 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
       }
      ]
     }

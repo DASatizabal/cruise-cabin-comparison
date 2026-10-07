@@ -39,7 +39,8 @@ ROUTE_EVENTS_URL = API + "/cruises/v1/route-events/{package_id}"
 
 SAILINGS = [
     {"id": "getaway-2027-06-11", "ship": "Norwegian Getaway", "ship_short": "Getaway",
-     "itinerary_code": "GETAWAY3MIANPINASMIA", "package_id": "24223992", "depart": "2027-06-11"},
+     "itinerary_code": "GETAWAY3MIANPINASMIA", "package_id": "24223992", "depart": "2027-06-11",
+     "deck_finder": "getaway"},
     {"id": "aura-2027-06-14", "ship": "Norwegian Aura", "ship_short": "Aura",
      "itinerary_code": "AURA5MIAPOPNPIMIA", "package_id": "25729291", "depart": "2027-06-14"},
 ]
@@ -51,6 +52,12 @@ MATCH_KEYS = {
 SOLO_CODES = {"T1", "IT", "OT", "BT"}          # one-guest cabins, hidden on the page
 GUARANTEE_CODES = {"IX", "OX", "BX", "MX"}     # NCL picks the cabin location
 TERMINAL = {"confirmed": False, "text": "Expected: Terminal B (confirm on your eDocs)"}
+
+# Read only: the owner's public Deck Finder repo has every Getaway cabin with its category
+# and deck, taken from NCL's deck plans. Used only to fill in per-code decks that NCL's API
+# gives for a whole group of codes (for example IA, IB, IC and IF share one deck list).
+DECK_FINDER_GEOMETRY = "https://raw.githubusercontent.com/DASatizabal/deck-finder/main/ships/ncl/{ship}/geometry.json"
+LOCATION_WORDS = {"Forward": "forward", "Mid": "midship", "Aft": "aft"}
 
 # Never touch anything that holds a cabin. NCL's cabin/manage-cabin call carries
 # recommendAndHold and puts a temporary hold on a real cabin.
@@ -184,6 +191,99 @@ def fetch_price_summary(cfg, guests, type_code, cat_code, fare_code):
     }
 
 
+def deck_text(decks):
+    """[5, 8] -> 'Decks 5 and 8'; [10, 11, 13, 14] -> 'Decks 10, 11, 13 and 14'; [5, 9..16] -> 'Decks 5 and 9 to 16'."""
+    decks = sorted(set(decks))
+    if len(decks) == 1:
+        return f"Deck {decks[0]}"
+    parts, run = [], [decks[0]]
+    for d in decks[1:] + [None]:
+        if d is not None and d == run[-1] + 1:
+            run.append(d)
+            continue
+        parts += [f"{run[0]} to {run[-1]}"] if len(run) >= 3 else [str(x) for x in run]
+        run = [d]
+    return "Decks " + (", ".join(parts[:-1]) + " and " + parts[-1] if len(parts) > 1 else parts[0])
+
+
+def location_text(locs):
+    words = [LOCATION_WORDS[l] for l in ("Forward", "Mid", "Aft") if l in locs]
+    return " and ".join(words) if len(words) < 3 else "forward, midship and aft"
+
+
+def size_text(info):
+    lo, hi = info.get("stateroomMin"), info.get("stateroomMax")
+    if not lo:
+        return None
+    room = f"{lo} sq ft" if lo == hi or not hi else f"{lo} to {hi} sq ft"
+    blo, bhi = info.get("balconyMin"), info.get("balconyMax")
+    if blo:
+        room += f", balcony {blo} sq ft" if blo == bhi or not bhi else f", balcony {blo} to {bhi} sq ft"
+    return room
+
+
+def deck_finder_decks(ship):
+    """Per category code: set of decks, from Deck Finder's Getaway geometry. {} if unavailable."""
+    try:
+        url = DECK_FINDER_GEOMETRY.format(ship=ship)
+        if FORBIDDEN.search(url):
+            return {}
+        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+        with urllib.request.urlopen(req, timeout=60) as res:
+            geo = json.loads(res.read())
+        out = {}
+        for deck, d in geo.get("decks", {}).items():
+            for cabin in d.get("cabins", []):
+                if cabin.get("category"):
+                    out.setdefault(cabin["category"], set()).add(int(deck))
+        return out
+    except Exception as e:
+        log(f"  Deck Finder data not available ({type(e).__name__}); per-code decks left out where NCL groups codes")
+        return {}
+
+
+def describe_categories(cfg, types):
+    """Plain description per category, from NCL first, never guessed.
+
+    - NCL gives title, decks, location (Forward/Mid/Aft) and sizes per group of codes.
+      When a group has one code, all of that is confirmed for the code.
+    - When a group has several codes, NCL's decks and location cover the whole group, so they
+      are not used for one code. For the Getaway, the code's own decks come from Deck Finder,
+      kept only when they fall inside NCL's deck list for the group. Location is left out.
+    - Guarantee cabins: NCL picks the cabin, so decks and location are left out.
+    """
+    df = deck_finder_decks(cfg["deck_finder"]) if cfg.get("deck_finder") else {}
+    for t in types.values():
+        for cat in t["categories"].values():
+            room = cat.pop("_group", None) or {}
+            ids = room.get("categoryIds") or [cat["code"]]
+            ncl_decks = {d["deck"]: set(d.get("locations") or []) for d in room.get("deckLocations") or []}
+            decks, locs, source = None, None, None
+            if cat["guarantee"]:
+                pass
+            elif len(ids) == 1 and ncl_decks:
+                decks = sorted(ncl_decks)
+                locs = sorted(set().union(*ncl_decks.values()), key=["Forward", "Mid", "Aft"].index)
+                source = "NCL"
+            elif cat["code"] in df and ncl_decks and df[cat["code"]] <= set(ncl_decks):
+                decks, source = sorted(df[cat["code"]]), "Deck Finder (checked against NCL)"
+            size = size_text(room.get("sizeInfo") or {}) if len(ids) == 1 and not cat["guarantee"] else None
+            parts = [cat["title"]]
+            if decks:
+                parts.append(deck_text(decks))
+            if locs:
+                parts.append(location_text(locs))
+            if not decks and not cat["guarantee"] and len(ids) > 1 and cat["capacity"]:
+                # Nothing else tells these codes apart, so say how many guests each holds.
+                parts.append(f"holds up to {cat['capacity']}")
+            cat["description"] = ", ".join(parts)
+            cat["decks"] = decks
+            cat["location"] = [LOCATION_WORDS[l] for l in locs] if locs else None
+            cat["size"] = size
+            cat["details_source"] = source
+            cat["shares_ncl_description_with"] = [c for c in ids if c != cat["code"]]
+
+
 def fetch_sailing(cfg, checks):
     log(f"{cfg['ship']} {cfg['depart']} (packageId {cfg['package_id']})")
     ports = fetch_ports(cfg)
@@ -202,7 +302,8 @@ def fetch_sailing(cfg, checks):
             tentry = types.setdefault(tcode, {"code": tcode, "title": t.get("title") or tcode.title(),
                                               "match": MATCH_KEYS.get(tcode, tcode.lower()), "categories": {}})
             for sp in t.get("stateroomsPricing", []):
-                title = (sp.get("stateroom") or {}).get("title")
+                room = sp.get("stateroom") or {}
+                title = room.get("title")
                 for cp in sp.get("categoryPricing", []):
                     so = cp.get("standardOption") or {}
                     code = so.get("pricedCategoryCode")
@@ -220,6 +321,7 @@ def fetch_sailing(cfg, checks):
                         # Capacity only from the 2-guest call: it reads 0 whenever a category is unavailable.
                         cap = so.get("guestCapacity")
                         cat["capacity"] = cap if isinstance(cap, int) and cap > 0 else None
+                        cat["_group"] = room
                     price = so.get("price")
                     available = bool(cp.get("isAvailable")) and isinstance(price, (int, float)) and price > 0
                     entry = {"available": available, "sold_out": bool(cp.get("isSoldOut"))}
@@ -286,6 +388,8 @@ def fetch_sailing(cfg, checks):
         ok = abs(expected - s["grand_total"]) <= TOLERANCE
         checks["formula"].append({"sailing": cfg["id"], "guests": g, "category": s["category"],
                                   "expected": expected, "ncl_total": s["grand_total"], "ok": ok})
+
+    describe_categories(cfg, types)
 
     out_types = []
     for t in types.values():

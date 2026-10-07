@@ -171,3 +171,31 @@ Confirmed from the cloud session on 2026-10-07:
 
 - Daily on GitHub's runners (`.github/workflows/refresh-prices.yml`, 10:17 UTC once merged to `main`): 2 route-events calls, 8 availability calls, 8 price summary calls, 2 seconds apart, about 1 minute.
 - The new file goes to `data/prices.new.json`; `tools/check_prices.py` checks it (including that every formula check passed); only then does it replace `data/prices.json`.
+
+## Cabin descriptions (4.1.0, researched 2026-10-07)
+
+Goal: plain descriptions instead of codes, for example "Balcony, Decks 12 to 14 (BA)". Never guess a deck or location.
+
+What NCL provides:
+- The availability call's `stateroom` object (per group of codes): `title` (like "Family Balcony", "Aft-Facing Balcony", "Oceanview with Picture Window"), `categoryIds`, `deckLocations` (decks with Forward, Mid or Aft), `sizeInfo` (room and balcony square feet), descriptions and images.
+- NCL groups several codes under one description. Getaway: Inside IB, IA, IC, IF; Balcony BB, BA, BF; Oceanview with Picture Window OA, OB; Family Oceanview O4, O5; Club Balcony Suite MB, MA. Aura: Inside IF, IB, IA; Balcony BF, BB, BA. For those, NCL's decks, location and size cover the whole group, not one code.
+- The public pages say the same thing per group: `ncl.com/cruise-ships/norwegian-getaway/staterooms/options` ("Category IB, IA, IC, IF") and `ncl.com/cruise-ships/<ship>/deck-plans` (one entry per group with its decks and Forward, Mid, Aft). The Aura has no staterooms/options page (404). The deck plan legends only explain symbols; the per-deck plans are images (for example `Aura_Deck_14_01062026.png`), so per-code decks can't be read from NCL as text.
+
+What Deck Finder provides (Getaway only, read only, `https://raw.githubusercontent.com/DASatizabal/deck-finder/main/ships/ncl/getaway/geometry.json`):
+- Every cabin on decks 5 and 8 to 16 with its number, category code and position on the deck plan.
+- Checked 2026-10-07: for every Getaway code, the decks in Deck Finder fall inside NCL's deck list for that code's group. So the per-code decks agree with NCL.
+- Location is NOT derived from Deck Finder. Splitting each deck into front, middle and back thirds disagreed with NCL's own Forward, Mid, Aft labels for single-code groups (B4, HI, BT, M4), so that method is not reliable.
+
+Rules in `tools/fetch_prices.py` (`describe_categories`), run on every refresh:
+1. Description starts with NCL's title for the code.
+2. If NCL's group has only that code: add NCL's decks, location and size (source "NCL").
+3. If NCL's group has several codes: for the Getaway, add the code's decks from Deck Finder, only when they are inside NCL's deck list (source "Deck Finder (checked against NCL)"). No location and no size.
+4. Guarantee cabins (IX, OX, BX, MX): no decks, no location, no size. The page says "Guarantee: NCL picks your cabin location".
+5. When nothing else tells codes apart (the Aura's Inside IF, IB, IA and Balcony BF, BB, BA), add how many guests the cabin holds, from the 2-guest call. The Aura's BB and BA both hold 3, so only their prices differ.
+6. If Deck Finder can't be read, the refresh still runs and those decks are left out that day.
+
+## Layout changes (4.1.0)
+
+- "Who is in the cabin": Adults counter, then Kids counter directly under it, then the kid age dropdowns.
+- Cabin type is its own card below it.
+- In each option card, the cabin selection lists (`div.card-picks`) sit between `div.card-head` and `div.card-body`. For the 3 and 5 night cards that is the list of categories in the chosen type. For the 8 night card it is the Same/Different toggle, then the category lists for both ships (Same) or the two cabin dropdowns (Different).
