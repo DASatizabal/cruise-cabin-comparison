@@ -329,7 +329,7 @@
 
         .ship-pick { margin-bottom: 0.9rem; }
 
-        .ship-pick label {
+        .ship-pick label, .ship-pick .pick-label {
             display: block;
             font-size: 0.8rem;
             font-weight: 600;
@@ -527,6 +527,7 @@
 
         .cat-list button:hover { border-color: var(--teal); }
         .cat-list button[aria-pressed="true"] { border-color: var(--teal); background: var(--teal-wash); }
+        .cat-list button.only { cursor: default; pointer-events: none; }
         .cat-list .price { font-weight: 700; white-space: nowrap; }
 
         .row.total { border-top: 2px solid var(--gray-300); font-size: 1rem; }
@@ -603,7 +604,7 @@
     </footer>
 
     <script>
-        const APP_VERSION = "4.2.0";
+        const APP_VERSION = "4.2.1";
         const DATA_URL = "data/prices.json";
         const MIN_GUESTS = 2, MAX_GUESTS = 5;
         const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
@@ -773,16 +774,25 @@
                 ${c.guarantee ? `<div class="cat-meta gty">${GUARANTEE_TEXT}</div>` : ""}</div>`;
         }
 
-        // Tap list of the other available categories in this type, cheapest first.
-        function catPicker(s, t, chosen, n) {
-            const list = availableIn(t, n);
-            if (list.length < 2) return "";
-            const field = s === G ? "pickG" : "pickA";
-            return `<div class="cat-list-title">${esc(t.title)} cabins on the ${esc(s.ship_short)} for ${n} guests</div><ul class="cat-list">${list.map(c => `
-                <li><button type="button" data-pick="${field}" data-code="${esc(c.code)}" aria-pressed="${c.code === chosen.code}">
+        // One cabin button. When it is the only available option it is shown already selected,
+        // with no tap action and no hover effect (no data-pick, so the click handler ignores it).
+        function catButton(c, n, field, pressed, only) {
+            const attrs = only
+                ? `class="only" aria-pressed="true" aria-disabled="true" tabindex="-1"`
+                : `data-pick="${field}" data-code="${esc(c.code)}" aria-pressed="${pressed}"`;
+            return `<li><button type="button" ${attrs}>
                     <span>${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</span>
                     <span class="price">${money(entry(c, n).cabin_total)}</span>
-                </button></li>`).join("")}</ul>`;
+                </button></li>`;
+        }
+
+        // Tap list of the available categories in this type, cheapest first.
+        function catPicker(s, t, chosen, n) {
+            const list = availableIn(t, n);
+            if (!list.length) return "";
+            const field = s === G ? "pickG" : "pickA";
+            const only = list.length === 1;
+            return `<div class="cat-list-title">${esc(t.title)} cabins on the ${esc(s.ship_short)} for ${n} guests</div><ul class="cat-list">${list.map(c => catButton(c, n, field, c.code === chosen.code, only)).join("")}</ul>`;
         }
 
         function daysList(s) {
@@ -837,6 +847,10 @@
                 if (!list.length) return "";
                 return `<optgroup label="${esc(t.title)}">${list.map(c => `<option value="${esc(c.code)}" ${state[field] === c.code ? "selected" : ""}>${esc(catLabel(c))}: ${money(entry(c, n).cabin_total)}</option>`).join("")}</optgroup>`;
             }).join("");
+            const all = types(s).flatMap(t => availableIn(t, n));
+            if (all.length === 1) {
+                return `<div class="pick-label">${esc(s.ship_short)} cabin (${s.nights} nights)</div><ul class="cat-list">${catButton(all[0], n, field, true, true)}</ul>`;
+            }
             return `<label for="${field}">${esc(s.ship_short)} cabin (${s.nights} nights)</label><select id="${field}" data-field="${field}">${groups}</select>`;
         }
 

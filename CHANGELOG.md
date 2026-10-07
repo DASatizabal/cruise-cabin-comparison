@@ -2,6 +2,11 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.2.1] - 2026-10-07
+
+### Fixed
+- When a cabin list has only one available option, it now shows that option as a button that is already selected, with no tap action and no hover effect. Before, the 3 and 5 night cards showed no list at all in that case. This applies to every cabin picker, including both ship pickers in Different cabins mode (which show the single option as a selected button instead of a one-item dropdown).
+
 ## [4.2.0] - 2026-10-07
 
 Kid pricing now follows NCL's confirmed age rules.
