@@ -53,6 +53,13 @@ def check(data):
         for c in checks["formula"]:
             if c.get("ok") is not True:
                 err(f"formula cross check failed: {c}")
+        ages = checks.get("ages")
+        if not isinstance(ages, list) or len(ages) != len(EXPECTED_SAILINGS):
+            err("checks.ages must have one entry per sailing")
+        else:
+            for c in ages:
+                if c.get("ok") is not True:
+                    err(f"age cross check failed: {c}")
 
     sailings = data.get("sailings")
     if not isinstance(sailings, list):
@@ -80,6 +87,9 @@ def check(data):
             g = grat.get(k) if isinstance(grat, dict) else None
             if not isinstance(g, dict) or not g.get("title") or not isinstance(g.get("per_guest"), (int, float)) or g["per_guest"] < 0:
                 err(f"{p}: gratuities.{k} needs a title and a per_guest amount")
+        soda = (grat.get("open_bar") or {}).get("soda_under_21_position_2") if isinstance(grat, dict) else None
+        if not isinstance(soda, (int, float)) or soda < 0:
+            err(f"{p}: gratuities.open_bar.soda_under_21_position_2 must be a number")
         if not isinstance((s.get("terminal") or {}).get("text"), str):
             err(f"{p}: terminal.text is missing")
         ports = s.get("ports")
@@ -139,10 +149,11 @@ def check(data):
                         err(f"{ep}: available and sold_out must be true or false")
                         continue
                     if e["available"]:
-                        if not is_int(e.get("price_pp")) or e["price_pp"] <= 0:
-                            err(f"{ep}: price_pp must be a positive whole number")
-                        elif e.get("cabin_total") != e["price_pp"] * int(g):
-                            err(f"{ep}: cabin_total must equal price_pp x {g}")
+                        pp = e.get("price_pp")
+                        if not isinstance(pp, (int, float)) or isinstance(pp, bool) or pp <= 0:
+                            err(f"{ep}: price_pp must be a positive number")
+                        elif not is_int(e.get("cabin_total")) or abs(e["cabin_total"] - pp * int(g)) > 0.5 + 0.01 * int(g):
+                            err(f"{ep}: cabin_total must be price_pp x {g}, rounded to whole dollars")
                         if g != "2" and bg["2"].get("available") and not is_int(e.get("added_vs_2")):
                             err(f"{ep}: added_vs_2 is missing")
                         if not c.get("solo"):

@@ -11,12 +11,17 @@ Calls per run (2 seconds apart, no cookies, nothing is held or booked):
   - stateroom-types-availability: 1 per ship per party size 2, 3, 4, 5 (8)
   - price-summary: 1 per ship per party size, for the cheapest available category,
     to read NCL's tax line and Free at Sea gratuity lines (8)
+  - price-summary age test: 1 per ship, guests 1 adult (reservation owner), a 15 year old
+    and a 7 year old (birth dates only), to read the adult Open Bar, the under 21 soda
+    package and the Specialty Dining amounts per guest (2)
 
 Cross checks are logged in the data file under "checks":
   - extra_guest: per category, (total at N minus total at 2) / (N minus 2) should match
     across 3, 4 and 5 guests within $5. A mismatch is logged, never fatal.
   - formula: average per person price x guests + gratuities x guests should match the
     price summary total within $5. A mismatch fails the run (exit 1).
+  - ages: the page's age formula for 1 adult + 15 + 7 should match NCL's total for that
+    party within $5. A mismatch fails the run (exit 1).
 """
 import argparse
 import datetime as dt
@@ -156,12 +161,12 @@ def default_fare_codes(result):
     return codes
 
 
-def fetch_price_summary(cfg, guests, type_code, cat_code, fare_code):
+def fetch_price_summary(cfg, guests, type_code, cat_code, fare_code, guest_list=None):
     body = {
         "packageId": cfg["package_id"],
         "stateroomFilters": [{"id": "0", "mainCabin": True, "numberOfGuests": guests,
                               "stateroomTypeCode": type_code, "pricedCategoryCode": cat_code,
-                              "fareCodes": [fare_code], "guests": [], "vouchers": []}],
+                              "fareCodes": [fare_code], "guests": guest_list or [], "vouchers": []}],
         "userFareCodes": [],
     }
     res = request(PRICE_SUMMARY_URL, body)
@@ -180,6 +185,7 @@ def fetch_price_summary(cfg, guests, type_code, cat_code, fare_code):
     dining = next((l for c, l in lines.items() if c.startswith("specialty-dining")), None)
     return {
         "guests": guests,
+        "type": type_code,
         "category": cat_code,
         "fare_code": fare_code,
         "fare_total": fare,
@@ -284,6 +290,17 @@ def describe_categories(cfg, types):
             cat["shares_ncl_description_with"] = [c for c in ids if c != cat["code"]]
 
 
+def age_test_guests(depart):
+    """1 adult (reservation owner), a 15 year old and a 7 year old on the sail date. Birth dates only, no names."""
+    sail = dt.date.fromisoformat(depart)
+    def born(age):
+        # Birthday 60 days before the sail date, so the age is exact on the sail date.
+        return (dt.date(sail.year - age, sail.month, sail.day) - dt.timedelta(days=60)).isoformat()
+    return [{"birthDate": born(45), "reservationOwner": True},
+            {"birthDate": born(15), "reservationOwner": False},
+            {"birthDate": born(7), "reservationOwner": False}]
+
+
 def fetch_sailing(cfg, checks):
     log(f"{cfg['ship']} {cfg['depart']} (packageId {cfg['package_id']})")
     ports = fetch_ports(cfg)
@@ -326,8 +343,10 @@ def fetch_sailing(cfg, checks):
                     available = bool(cp.get("isAvailable")) and isinstance(price, (int, float)) and price > 0
                     entry = {"available": available, "sold_out": bool(cp.get("isSoldOut"))}
                     if available:
-                        entry["price_pp"] = int(round(price))
-                        entry["cabin_total"] = entry["price_pp"] * g
+                        # NCL sends the average with cents (like 455.66); round only the cabin total,
+                        # which then equals NCL's fare plus taxes for the party.
+                        entry["price_pp"] = round(float(price), 2)
+                        entry["cabin_total"] = int(round(price * g))
                         if not cat["solo"] and (cheapest is None or price < cheapest[2]):
                             cheapest = (tcode, code, price)
                     cat["by_guests"][str(g)] = entry
@@ -368,19 +387,30 @@ def fetch_sailing(cfg, checks):
                         "per_extra_guest": {str(k): round(v, 2) for k, v in per_extra.items()},
                     })
 
-    # Gratuities and taxes per guest, from the 2-guest price summary.
-    s2 = summaries[0]
-    gratuities = {}
-    for key in ("open_bar", "specialty_dining"):
-        line = s2[key]
-        if not line or not line["per_guest"]:
-            raise RuntimeError(f"No {key} gratuity in the {cfg['ship']} price summary")
-        gratuities[key] = {"title": line["title"], "per_guest": line["per_guest"][0]}
-    taxes = s2["taxes_per_guest"]
+    # Taxes per guest, from the 2-guest price summary (the same for every guest at any age).
+    taxes = summaries[0]["taxes_per_guest"]
     if not taxes:
         raise RuntimeError(f"No tax line in the {cfg['ship']} price summary")
 
-    # Cross check: availability price x guests + gratuities x guests = price summary total.
+    # Gratuities per guest by age and position, read from NCL with an age test party:
+    # guest 1 an adult (reservation owner), guest 2 a 15 year old, guest 3 a 7 year old.
+    s3 = summaries[1]
+    age_summary = fetch_price_summary(cfg, 3, s3["type"], s3["category"], s3["fare_code"], age_test_guests(cfg["depart"]))
+    bar, dining = age_summary["open_bar"], age_summary["specialty_dining"]
+    if not bar or not dining or len(bar["per_guest"]) != 3 or len(dining["per_guest"]) != 3:
+        raise RuntimeError(f"Unexpected gratuity lines in the {cfg['ship']} age test price summary")
+    b, d = bar["per_guest"], dining["per_guest"]
+    # The confirmed rules: Open Bar adult full, under 21 in position 2 a soda package, under 21
+    # in position 3 or later nothing; Specialty Dining 13 and over pay, under 13 free.
+    if not (b[0] > 0 and 0 < b[1] < b[0] and b[2] == 0 and d[0] > 0 and d[1] == d[0] and d[2] == 0):
+        raise RuntimeError(f"NCL's age rules changed on the {cfg['ship']}: Open Bar {b}, Specialty Dining {d}")
+    gratuities = {
+        "open_bar": {"title": bar["title"], "per_guest": b[0], "soda_under_21_position_2": b[1],
+                     "under_21_position_3_plus": 0},
+        "specialty_dining": {"title": dining["title"], "per_guest": d[0], "under_13": 0},
+    }
+
+    # Cross check: availability price x guests + gratuities x guests = price summary total (all adults).
     for s in summaries:
         g = s["guests"]
         cat = next(c for t in types.values() for c in t["categories"].values() if c["code"] == s["category"])
@@ -388,6 +418,16 @@ def fetch_sailing(cfg, checks):
         ok = abs(expected - s["grand_total"]) <= TOLERANCE
         checks["formula"].append({"sailing": cfg["id"], "guests": g, "category": s["category"],
                                   "expected": expected, "ncl_total": s["grand_total"], "ok": ok})
+
+    # Cross check: the page's age formula for 1 adult + 15 + 7 against NCL's total.
+    cat = next(c for t in types.values() for c in t["categories"].values() if c["code"] == s3["category"])
+    expected = (cat["by_guests"]["3"]["cabin_total"]
+                + gratuities["open_bar"]["per_guest"] + gratuities["open_bar"]["soda_under_21_position_2"]
+                + 2 * gratuities["specialty_dining"]["per_guest"])
+    checks["ages"].append({"sailing": cfg["id"], "party": "1 adult, 15, 7", "category": s3["category"],
+                           "expected": expected, "ncl_total": age_summary["grand_total"],
+                           "ok": abs(expected - age_summary["grand_total"]) <= TOLERANCE})
+    log(f"  age test (1 adult, 15, 7) {s3['category']}: NCL {age_summary['grand_total']}, formula {expected}")
 
     describe_categories(cfg, types)
 
@@ -421,7 +461,7 @@ def main():
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
 
-    checks = {"extra_guest_mismatches": [], "formula": []}
+    checks = {"extra_guest_mismatches": [], "formula": [], "ages": []}
     sailings = [fetch_sailing(cfg, checks) for cfg in SAILINGS]
     out = {
         "schema_version": SCHEMA_VERSION,
@@ -439,9 +479,9 @@ def main():
 
     for m in checks["extra_guest_mismatches"]:
         log(f"Note: extra guest price differs for {m['sailing']} {m['category']}: {m['per_extra_guest']}")
-    bad = [c for c in checks["formula"] if not c["ok"]]
+    bad = [c for c in checks["formula"] + checks["ages"] if not c["ok"]]
     for c in bad:
-        log(f"FORMULA CHECK FAILED: {c['sailing']} {c['category']} at {c['guests']} guests: "
+        log(f"CROSS CHECK FAILED: {c['sailing']} {c['category']} {c.get('party') or str(c.get('guests')) + ' guests'}: "
             f"expected {c['expected']}, NCL total {c['ncl_total']}")
     if bad:
         sys.exit(1)

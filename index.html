@@ -470,6 +470,7 @@
 
         .kid-ages { display: flex; flex-wrap: wrap; gap: 0.75rem; }
         .kid-ages:empty { display: none; }
+        .kid-note { margin-top: -0.4rem; }
 
         .kid-ages label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.2rem; }
 
@@ -576,6 +577,7 @@
                     <span class="counter-value" id="kidCount">0</span>
                     <button type="button" data-count="kids" data-step="1" aria-label="One more kid">+</button>
                 </div>
+                <p class="hint kid-note" id="kidNote">Use each kid's age on Jun 11, 2027.</p>
                 <div class="kid-ages" id="kidAges"></div>
             </div>
             <div class="guest-msg" id="guestMsg" role="status" aria-live="polite"></div>
@@ -595,13 +597,13 @@
         <div class="wrap">
             <strong>About these prices</strong>
             <p>Prices come from Norwegian Cruise Line's booking system and are checked once a day. They change often, so check NCL before booking.</p>
-            <p>Each total is the cruise fare, NCL's government taxes, fees and port expenses, and the Free at Sea gratuities: Unlimited Open Bar for guests 21 and over, Specialty Dining for guests 13 and over, and nothing for kids 12 and under. How NCL prices kids is still being checked.</p>
+            <p>Each total is the cruise fare, NCL's government taxes, fees and port expenses, and the Free at Sea gratuities. Unlimited Open Bar: guests 21 and over pay the full gratuity, a guest under 21 who is guest 2 pays for a soda package instead, and other guests under 21 pay nothing. Specialty Dining: guests 13 and over pay, under 13 eat free. NCL lists adults first, then kids oldest first.</p>
             <p id="footerVersion"></p>
         </div>
     </footer>
 
     <script>
-        const APP_VERSION = "4.1.0";
+        const APP_VERSION = "4.2.0";
         const DATA_URL = "data/prices.json";
         const MIN_GUESTS = 2, MAX_GUESTS = 5;
         const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
@@ -618,7 +620,10 @@
 
         // ---------- helpers ----------
         const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-        const money = n => "$" + Math.round(n).toLocaleString("en-US");
+        // Exact amounts (line items, totals) show cents when NCL charges cents, like $37.50.
+        const money = n => { const r = Math.round(n * 100) / 100; return "$" + r.toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(r) ? 0 : 2, maximumFractionDigits: 2 }); };
+        // Derived amounts (per person, per night) in whole dollars.
+        const moneyR = n => "$" + Math.round(n).toLocaleString("en-US");
         const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const fmtDay = iso => { const d = new Date(iso + "T12:00:00Z"); return `${DAYS[d.getUTCDay()]}, ${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`; };
@@ -688,17 +693,34 @@
         }
 
         // ---------- cost ----------
+        // NCL's guest order: adults first, then kids oldest first. Position matters for Open Bar.
+        function guestOrder() {
+            return [...Array(state.adults).fill(null), ...state.kids.slice().sort((a, b) => (b ?? -1) - (a ?? -1))];
+        }
+
+        // Confirmed by NCL price summaries (see NOTES.md, "Age rules"):
+        // Open Bar: 21 and over full gratuity; under 21 in position 2 a soda package; under 21 in
+        // position 3 or later nothing. Specialty Dining: 13 and over pay, under 13 free, any position.
+        // Fare and taxes don't depend on age (cabin_total already covers the party).
         function cost(s, c) {
             const n = guests();
             const e = entry(c, n);
             const taxes = s.taxes_per_guest * n;
-            const teens = state.kids.filter(a => Number.isInteger(a) && a >= 13).length;
-            const barCount = state.adults;
-            const diningCount = state.adults + teens;
-            const bar = { title: s.gratuities.open_bar.title, count: barCount, pp: s.gratuities.open_bar.per_guest };
-            const dining = { title: s.gratuities.specialty_dining.title, count: diningCount, pp: s.gratuities.specialty_dining.per_guest };
-            bar.total = bar.count * bar.pp;
-            dining.total = dining.count * dining.pp;
+            const g = s.gratuities;
+            const order = guestOrder();
+            const isAdult = a => a === null;
+            const adults = order.filter(isAdult).length;
+            const soda = order.filter((a, i) => !isAdult(a) && i === 1).length;
+            const kidsFreeBar = order.filter((a, i) => !isAdult(a) && i >= 2).length;
+            const diners = order.filter(a => isAdult(a) || a >= 13).length;
+            const under13 = order.length - diners;
+            const bar = { title: g.open_bar.title, parts: [], total: 0 };
+            if (adults) bar.parts.push({ count: adults, pp: g.open_bar.per_guest });
+            if (soda) bar.parts.push({ count: soda, pp: g.open_bar.soda_under_21_position_2, note: "soda package, under 21" });
+            bar.total = bar.parts.reduce((t, p) => t + p.count * p.pp, 0);
+            bar.note = kidsFreeBar ? "other guests under 21: no charge" : "";
+            const dining = { title: g.specialty_dining.title, parts: diners ? [{ count: diners, pp: g.specialty_dining.per_guest }] : [], note: under13 ? "under 13 eat free" : "" };
+            dining.total = diners * g.specialty_dining.per_guest;
             return { n, cabin: e.cabin_total, fare: e.cabin_total - taxes, taxes, bar, dining, total: e.cabin_total + bar.total + dining.total };
         }
 
@@ -715,9 +737,12 @@
 
         function lineRows(s, k, indent = false) {
             const cls = indent ? "row sub" : "row";
-            const gr = x => x.count
-                ? `<div class="${cls}"><span class="k">${esc(x.title)}: ${plural(x.count, "guest", "guests")} x ${money(x.pp)}</span><span class="v">${money(x.total)}</span></div>`
-                : `<div class="${cls} muted"><span class="k">${esc(x.title)}</span><span class="v">no one charged</span></div>`;
+            // Example: "Unlimited Open Bar: 1 guest x $96, 1 guest x $37.50 (soda package, under 21)"
+            const gr = x => {
+                const parts = x.parts.map(p => `${plural(p.count, "guest", "guests")} x ${money(p.pp)}${p.note ? ` (${p.note})` : ""}`);
+                if (!parts.length) return `<div class="${cls} muted"><span class="k">${esc(x.title)}${x.note ? ` (${x.note})` : ""}</span><span class="v">no one charged</span></div>`;
+                return `<div class="${cls}"><span class="k">${esc(x.title)}: ${parts.join(", ")}${x.note ? ` (${x.note})` : ""}</span><span class="v">${money(x.total)}</span></div>`;
+            };
             return `
                 <div class="${cls}"><span class="k">Cruise fare</span><span class="v">${money(k.fare)}</span></div>
                 <div class="${cls}"><span class="k">Taxes, fees and port expenses: ${k.n} x ${money(s.taxes_per_guest)}</span><span class="v">${money(k.taxes)}</span></div>
@@ -733,11 +758,11 @@
             return `
                 <div class="price-label">Total for ${plural(n, "guest", "guests")}</div>
                 <div class="price-total">${money(total)}</div>
-                <div class="price-pp">${money(total / n)} per person</div>
+                <div class="price-pp">${moneyR(total / n)} per person</div>
                 <div class="rows">
                     ${rowsHtml}
                     <div class="row total"><span class="k">Total</span><span class="v">${money(total)}</span></div>
-                    <div class="row"><span class="k">Cost per night</span><span class="v">${money(perNight)} (${money(perNight / n)} per person)</span></div>
+                    <div class="row"><span class="k">Cost per night</span><span class="v">${moneyR(perNight)} (${moneyR(perNight / n)} per person)</span></div>
                 </div>`;
         }
 
@@ -909,7 +934,7 @@
                     const e = entry(c, n);
                     const meta = [c.size, c.capacity ? `holds up to ${c.capacity}` : "", c.guarantee ? GUARANTEE_TEXT : ""].filter(Boolean).join(". ");
                     return e.available
-                        ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${money(e.cabin_total)}<span class="pp-small">${money(e.price_pp)} pp</span></td></tr>`
+                        ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${money(e.cabin_total)}<span class="pp-small">${moneyR(e.price_pp)} pp</span></td></tr>`
                         : `<tr class="off"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${esc(e.reason)}</td></tr>`;
                 }).join("");
             }).join("");
@@ -922,18 +947,20 @@
         }
 
         // ---------- render ----------
+        // Ages are taken on the first sail date (the Getaway, Jun 11, 2027).
+        const ageDateText = () => { const iso = G ? G.depart : "2027-06-11"; const d = new Date(iso + "T12:00:00Z"); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`; };
+
         function renderGuests(msg = "") {
             document.getElementById("adultCount").textContent = state.adults;
             document.getElementById("kidCount").textContent = state.kids.length;
             const opts = a => `<option value="">Choose age</option>` + Array.from({ length: 21 }, (_, i) => `<option value="${i}" ${a === i ? "selected" : ""}>${i}</option>`).join("");
             document.getElementById("kidAges").innerHTML = state.kids.map((a, i) => `
-                <div><label for="kid${i}">Kid ${i + 1} age</label><select id="kid${i}" data-kid="${i}" class="${Number.isInteger(a) ? "" : "unset"}">${opts(a)}</select></div>`).join("");
+                <div><label for="kid${i}">Kid ${i + 1} age on ${esc(ageDateText())}</label><select id="kid${i}" data-kid="${i}" class="${Number.isInteger(a) ? "" : "unset"}">${opts(a)}</select></div>`).join("");
             document.getElementById("guestMsg").textContent = msg;
+            document.getElementById("kidNote").textContent = `Use each kid's age on ${ageDateText()}.`;
             const n = guests();
-            const teens = state.kids.filter(a => Number.isInteger(a) && a >= 13).length;
-            const little = state.kids.filter(a => Number.isInteger(a) && a <= 12).length;
             const parts = [`${plural(n, "guest", "guests")} in the cabin`];
-            if (agesKnown() && state.kids.length) parts.push(`Open Bar charged for ${state.adults}, Specialty Dining for ${state.adults + teens}, no Free at Sea charge for ${little}`);
+            if (agesKnown() && state.kids.length) parts.push(`NCL's guest order: ${guestOrder().map(a => a === null ? "adult" : `age ${a}`).join(", ")}`);
             document.getElementById("guestSummary").textContent = parts.join(". ") + ".";
         }
 

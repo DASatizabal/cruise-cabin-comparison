@@ -2,6 +2,21 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.2.0] - 2026-10-07
+
+Kid pricing now follows NCL's confirmed age rules.
+
+### Added
+- Guests are listed in NCL's order: adults first, then kids oldest first.
+- Unlimited Open Bar per guest: 21 and over pay the full gratuity, a guest under 21 in position 2 (only possible with 1 adult) pays NCL's soda package instead, and guests under 21 in position 3 or later pay nothing. Specialty Dining: 13 and over pay, under 13 eat free, in any position.
+- Breakdown wording such as "Unlimited Open Bar: 1 guest x $96, 1 guest x $37.50 (soda package, under 21)" and "Specialty Dining: 2 guests x $20 (under 13 eat free)". Amounts with cents show the cents.
+- Kid dropdowns are labeled "Kid 1 age on Jun 11, 2027", with the note "Use each kid's age on Jun 11, 2027." under the Kids counter. The guest summary shows NCL's guest order.
+- Daily age test in the fetch script: one price summary per ship for 1 adult, a 15 year old and a 7 year old (birth dates only, no names). The adult Open Bar, soda package and Specialty Dining amounts per guest are read from it, so the Aura's numbers come from NCL ($160, $62.50 and $40).
+- Age cross check: the page's formula for that party must match NCL's total within $5 on each ship, or the run fails. The run also fails if NCL's age rules change.
+
+### Fixed
+- Cabin totals now use NCL's average per person price with cents (for example $455.66), so a 3 guest total matches NCL to the dollar. Before, rounding the average first could add $1.
+
 ## [4.1.0] - 2026-10-07
 
 ### Added

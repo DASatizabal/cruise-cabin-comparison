@@ -199,3 +199,24 @@ Rules in `tools/fetch_prices.py` (`describe_categories`), run on every refresh:
 - "Who is in the cabin": Adults counter, then Kids counter directly under it, then the kid age dropdowns.
 - Cabin type is its own card below it.
 - In each option card, the cabin selection lists (`div.card-picks`) sit between `div.card-head` and `div.card-body`. For the 3 and 5 night cards that is the list of categories in the chosen type. For the 8 night card it is the Same/Different toggle, then the category lists for both ships (Same) or the two cabin dropdowns (Different).
+
+## Age rules (confirmed 2026-10-07 by price-summary tests on the AI PC, applied in 4.2.0)
+
+Tests: Getaway B4, guests sent as `{"birthDate":"YYYY-MM-DD","reservationOwner":true or false}`, no names.
+
+1. Fare is set by guest position, not age: positions 1 and 2 pay the base fare, position 3 and up pay the lower extra guest fare (Getaway B4: $299, $299, then $169).
+2. Taxes are the same for every guest at any age.
+3. Unlimited Open Bar gratuity:
+   - 21 and over: full gratuity ($96 per guest on the Getaway, $160 on the Aura).
+   - Under 21 in position 2 (only possible with 1 adult): $12.50 per day soda package, charged inside the same Open Bar line: $37.50 on the 3 night Getaway, $62.50 on the 5 night Aura. NCL's tooltip says under 21 guests receive a regular non-alcoholic beverage package. This applies at any age under 21, including a 7 year old.
+   - Under 21 in position 3 or later: $0.
+4. Specialty Dining gratuity: 13 and over pay, under 13 is free, in any position ($20 per guest on the Getaway, $40 on the Aura).
+5. Test results (Getaway B4): 1 adult + 15 year old = $1,171.50; 1 adult + 15 + 7 = $1,540.50; 1 adult + 7 = $1,151.50; 2 adults + 15 + 7 = $1,988; 2 adults + 7 = $1,599. Reproduced from the cloud session on 2026-10-07 with the same results, and the page now shows exactly these totals.
+6. Aura check from the cloud session: I4, 1 adult + 15 + 7 = $3,769.50 (fare $1,129, $1,129, $579; Open Bar $160, $62.50, $0; Specialty Dining $40, $40, $0; taxes $210 each).
+
+Applied in 4.2.0:
+- Page guest order: adults first, then kids oldest first. Kid ages are taken on Jun 11, 2027 (the Getaway's sail date); the dropdowns and a note under the Kids counter say so. A kid whose birthday falls between Jun 11 and Jun 14 could be one year older on the Aura; the page uses the Jun 11 age for both ships.
+- The fetch script makes one extra price summary per ship (20 calls in all) with 1 adult (reservation owner), a 15 year old and a 7 year old, using birth dates 60 days before the sail date so the ages are exact. It reads the adult Open Bar, the soda package and Specialty Dining amounts from it, and stops the run if the amounts no longer follow the rules above.
+- Age cross check (`checks.ages`): page formula for that party versus NCL's total, within $5, or the run fails.
+- Rounding fix: NCL's availability average has cents (B4 at 3 guests: $455.66). `price_pp` now keeps the cents and `cabin_total` is rounded once, so it equals NCL's fare plus taxes ($1,367, not $1,368).
+- The earlier NOTES line about the $12.50 soda package "not charged yet" is superseded by these rules.
