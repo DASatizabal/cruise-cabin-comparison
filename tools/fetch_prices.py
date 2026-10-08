@@ -14,6 +14,12 @@ Calls per run (2 seconds apart, no cookies, nothing is held or booked):
   - price-summary age test: 1 per ship, guests 1 adult (reservation owner), a 15 year old
     and a 7 year old (birth dates only), to read the adult Open Bar, the under 21 soda
     package and the Specialty Dining amounts per guest (2)
+  - itinerary: 1 per ship, for the sailing details the cabin call needs (2)
+  - cabin/availability: 1 per ship per party size per available non-Guarantee category,
+    most expensive first, for cabins left and where the open cabins are (about 140)
+POST requests never follow redirects; redirects, 5xx and network errors are retried after
+30, 60 and 120 seconds. A cabin/availability answer that mentions "hold" or "heldUntil"
+stops the run.
 
 Cross checks are logged in the data file under "checks":
   - extra_guest: per category, (total at N minus total at 2) / (N minus 2) should match
@@ -41,6 +47,11 @@ API = "https://www.ncl.com/api"
 AVAILABILITY_URL = API + "/vacation-builder/v2/stateroom-types-availability"
 PRICE_SUMMARY_URL = API + "/vacation-builder/price-summary"
 ROUTE_EVENTS_URL = API + "/cruises/v1/route-events/{package_id}"
+ITINERARY_URL = API + "/vacation-builder/itinerary/{code}?packageId={package_id}"
+CABIN_AVAILABILITY_URL = API + "/vacation-builder/cabin/availability"
+# A cabin/availability answer must never mention a hold; stop the run if it does.
+HOLD_IN_RESPONSE = re.compile(rb"hold|helduntil", re.I)
+LOCATION_ORDER = ["Forward", "Mid", "Aft"]
 
 SAILINGS = [
     {"id": "getaway-2027-06-11", "ship": "Norwegian Getaway", "ship_short": "Getaway",
@@ -75,34 +86,61 @@ def log(msg):
     print(msg, file=sys.stderr, flush=True)
 
 
-def request(url, body=None, tries=3):
-    """GET (body None) or POST JSON. Refuses forbidden addresses. Pauses between calls."""
+RETRY_WAITS = [30, 60, 120]   # seconds before retries 1, 2 and 3
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Never follow redirects. NCL once answered a POST with a 302 to an address that gave 404."""
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+_no_redirect_opener = urllib.request.build_opener(_NoRedirect)
+
+
+def request(url, body=None, raw=False):
+    """GET (body None) or POST JSON. Refuses forbidden addresses. Pauses between calls.
+
+    POST requests never follow redirects. A redirect, a 5xx or a network error is logged
+    (status code and Location header) and retried up to 3 times, after 30, 60 and 120 seconds.
+    401, 403 and 404 fail at once. With raw=True the response bytes are returned as well.
+    """
     global _last_call
     if FORBIDDEN.search(url):
         raise RuntimeError(f"Refusing to call {url}: it could hold a cabin")
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+    data = None
+    if body is not None:
+        headers["Content-Type"] = "application/json"
+        data = json.dumps(body).encode()
     last = None
-    for attempt in range(tries):
+    for attempt in range(len(RETRY_WAITS) + 1):
+        if attempt:
+            log(f"  retry {attempt} of {len(RETRY_WAITS)} in {RETRY_WAITS[attempt - 1]} s: {url}")
+            time.sleep(RETRY_WAITS[attempt - 1])
         wait = PAUSE_SECONDS - (time.monotonic() - _last_call)
         if wait > 0:
             time.sleep(wait)
         _last_call = time.monotonic()
-        headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
-        data = None
-        if body is not None:
-            headers["Content-Type"] = "application/json"
-            data = json.dumps(body).encode()
+        req = urllib.request.Request(url, data=data, headers=headers, method="POST" if data else "GET")
+        opener = _no_redirect_opener if data else urllib.request.build_opener()
         try:
-            req = urllib.request.Request(url, data=data, headers=headers, method="POST" if data else "GET")
-            with urllib.request.urlopen(req, timeout=60) as res:
-                return json.loads(res.read())
+            with opener.open(req, timeout=60) as res:
+                content = res.read()
+                return (json.loads(content), content) if raw else json.loads(content)
         except urllib.error.HTTPError as e:
+            location = e.headers.get("Location") if e.headers else None
             if e.code in (401, 403, 404):
                 raise RuntimeError(f"NCL answered HTTP {e.code} for {url} (blocked or moved)")
-            last = e
+            if 300 <= e.code < 400 or e.code >= 500:
+                log(f"  NCL answered HTTP {e.code} for {url}" + (f", Location: {location}" if location else ""))
+            else:
+                log(f"  NCL answered HTTP {e.code} for {url}")
+            last = f"HTTP {e.code}" + (f" to {location}" if location else "")
         except Exception as e:
-            last = e
-        time.sleep(2 ** (attempt + 1))
-    raise RuntimeError(f"Request failed after {tries} tries: {url} ({last})")
+            log(f"  {type(e).__name__} for {url}: {e}")
+            last = f"{type(e).__name__}: {e}"
+    raise RuntimeError(f"Request failed after {len(RETRY_WAITS) + 1} tries: {url} ({last})")
 
 
 def utc(ms):
@@ -273,6 +311,14 @@ def describe_categories(cfg, types):
                 source = "NCL"
             elif cat["code"] in df and ncl_decks and df[cat["code"]] <= set(ncl_decks):
                 decks, source = sorted(df[cat["code"]]), "Deck Finder (checked against NCL)"
+            opened = cat.pop("_open", None) or {}
+            if not cat["guarantee"]:
+                # Fill gaps from NCL's own list of this category's open cabins (2 guests).
+                if not decks and opened.get("decks"):
+                    decks, source = opened["decks"], "NCL cabin availability"
+                if not locs and opened.get("locations"):
+                    locs = opened["locations"]
+                    source = (source + " and NCL cabin availability") if source and "cabin availability" not in source else (source or "NCL cabin availability")
             size = size_text(room.get("sizeInfo") or {}) if len(ids) == 1 and not cat["guarantee"] else None
             parts = [cat["title"]]
             if decks:
@@ -288,6 +334,88 @@ def describe_categories(cfg, types):
             cat["size"] = size
             cat["details_source"] = source
             cat["shares_ncl_description_with"] = [c for c in ids if c != cat["code"]]
+
+
+def fetch_itinerary_sailing(cfg):
+    """Sailing details for cabin/availability, from NCL's public itinerary call."""
+    it = request(ITINERARY_URL.format(code=cfg["itinerary_code"], package_id=cfg["package_id"]))
+    s = it.get("sailing") or {}
+    if str(s.get("packageId")) != cfg["package_id"] or not (s.get("sailStartDate") or "").startswith(cfg["depart"]):
+        raise RuntimeError(f"NCL's itinerary for {cfg['itinerary_code']} does not match packageId {cfg['package_id']} on {cfg['depart']}")
+    return {
+        "packageId": cfg["package_id"],
+        "shipCode": (it.get("ship") or {}).get("code"),
+        "departureDate": s["sailStartDate"],
+        "destinationCodes": [d.get("code") for d in it.get("destinations") or [] if d.get("code")],
+        "duration": it.get("duration"),
+        "packageType": "CRUISE",
+        "sailingId": str(s.get("sailingId")),
+    }
+
+
+def fetch_cabin_counts(cfg, sailing, types, checks):
+    """Cabins left per category and party size, from NCL's cabin/availability call.
+
+    The call for a category returns it plus every pricier category of the same broad type, with
+    per location totals (numberOfCabins). Cabin lists and deck counts are capped at 15 per deck,
+    so counts come only from the location totals: calling non-Guarantee categories from the most
+    expensive down, a category's count is its call's location totals minus those of the call for
+    the next pricier category. A count is unreliable (shown as nothing) when its call returns a
+    category or a location lowestPriceCategory from another broad type, when it ties in price
+    with another category, or when the subtraction is not positive. Guarantee cabins have no count.
+    """
+    for g in GUEST_COUNTS:
+        for t in types.values():
+            codes = set(t["categories"])
+            cats = [c for c in t["categories"].values()
+                    if not c["solo"] and not c["guarantee"] and c["by_guests"][str(g)]["available"]]
+            cats.sort(key=lambda c: c["by_guests"][str(g)]["price_pp"], reverse=True)
+            prices = [c["by_guests"][str(g)]["price_pp"] for c in cats]
+            prev = {}
+            for c in cats:
+                e = c["by_guests"][str(g)]
+                body = {"stateroomSearchFilter": {
+                    "stateroomTypeCode": t["code"], "numberOfGuests": g, "pricedCategoryCode": c["code"],
+                    "accessibilityRequested": False, "filterId": "0", "sailing": sailing, "guests": []}}
+                res, raw = request(CABIN_AVAILABILITY_URL, body, raw=True)
+                if HOLD_IN_RESPONSE.search(raw):
+                    raise RuntimeError(f"cabin/availability for {cfg['ship']} {c['code']} mentioned a hold; stopping")
+                locations = ((res or {}).get("results") or {}).get("availablePositionInShip") or []
+                totals = {loc.get("name"): int(loc.get("numberOfCabins") or 0) for loc in locations}
+                own = [cab for loc in locations for dk in loc.get("decks") or [] for cab in dk.get("cabins") or []
+                       if cab.get("pricedCategoryCode") == c["code"]]
+                foreign = sorted({loc.get("lowestPriceCategory") for loc in locations} - codes - {None}
+                                 | {cab.get("pricedCategoryCode") for loc in locations for dk in loc.get("decks") or []
+                                    for cab in dk.get("cabins") or []} - codes - {None})
+                by_loc = {k: totals.get(k, 0) - prev.get(k, 0) for k in set(totals) | set(prev)}
+                count = sum(by_loc.values())
+                why = None
+                if foreign:
+                    why = f"call returned other cabin types: {', '.join(foreign)}"
+                elif prices.count(e["price_pp"]) > 1:
+                    why = "ties in price with another category"
+                elif any(v < 0 for v in by_loc.values()) or count <= 0:
+                    why = f"subtraction gave {by_loc}"
+                e["cabins_left"] = None if why else count
+                e["count_reliable"] = why is None
+                if why:
+                    checks["counts"]["unreliable"].append({"sailing": cfg["id"], "guests": g, "category": c["code"], "why": why})
+                if g == 2:
+                    # Where this category's own open cabins are, as listed by NCL (never guessed).
+                    c["_open"] = {
+                        "decks": sorted({int(cab["deckNumber"]) for cab in own if str(cab.get("deckNumber", "")).isdigit()}),
+                        "locations": [l for l in LOCATION_ORDER if any(cab.get("shipLocation") == l for cab in own)],
+                    }
+                checks["counts"]["calls"] += 1
+                prev = totals
+        log(f"  cabin counts at {g} guests done ({checks['counts']['calls']} calls so far)")
+    # Every available entry carries the count fields (null for Guarantee and unreliable counts).
+    for t in types.values():
+        for c in t["categories"].values():
+            for e in c["by_guests"].values():
+                if e.get("available"):
+                    e.setdefault("cabins_left", None)
+                    e.setdefault("count_reliable", False)
 
 
 def age_test_guests(depart):
@@ -429,6 +557,8 @@ def fetch_sailing(cfg, checks):
                            "ok": abs(expected - age_summary["grand_total"]) <= TOLERANCE})
     log(f"  age test (1 adult, 15, 7) {s3['category']}: NCL {age_summary['grand_total']}, formula {expected}")
 
+    log(f"  cabin counts (about {sum(1 for t in types.values() for c in t['categories'].values() for e in c['by_guests'].values() if e.get('available') and not c['solo'] and not c['guarantee'])} calls)")
+    fetch_cabin_counts(cfg, fetch_itinerary_sailing(cfg), types, checks)
     describe_categories(cfg, types)
 
     out_types = []
@@ -461,7 +591,7 @@ def main():
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
 
-    checks = {"extra_guest_mismatches": [], "formula": [], "ages": []}
+    checks = {"extra_guest_mismatches": [], "formula": [], "ages": [], "counts": {"calls": 0, "unreliable": []}}
     sailings = [fetch_sailing(cfg, checks) for cfg in SAILINGS]
     out = {
         "schema_version": SCHEMA_VERSION,

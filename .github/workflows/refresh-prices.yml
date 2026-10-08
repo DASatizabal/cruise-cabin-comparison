@@ -1,7 +1,8 @@
 name: Refresh prices
 
 # Daily: ask NCL's vacation-builder API for both sailings at 2, 3, 4 and 5 guests, plus one
-# age test per ship (20 calls, 2 seconds apart, nothing held), commit the new data file,
+# age test per ship, plus cabin counts (about 160 calls, 2 seconds apart, nothing held),
+# commit the new data file,
 # then publish the site in the same run.
 # Scheduled runs only happen on the default branch (main). The push trigger below lets
 # this branch test the fetch on GitHub's runners before it is merged; only main is published.
@@ -25,12 +26,12 @@ concurrency:
 
 jobs:
   refresh:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     outputs:
       sha: ${{ steps.commit.outputs.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Fetch prices from NCL into a new file
         run: python3 tools/fetch_prices.py --out data/prices.new.json
@@ -77,7 +78,7 @@ jobs:
   # safety net, mark this workflow enabled again on every scheduled run. Never fails the run.
   keepalive:
     if: github.ref == 'refs/heads/main' && github.event_name == 'schedule'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       actions: write

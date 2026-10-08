@@ -239,3 +239,44 @@ Order for the switch (chosen so the family page relies only on documented behavi
 2. Right after, switch Settings, Pages, Source to "GitHub Actions".
 3. Run "Deploy site" by hand once, so the next publish comes from GitHub Actions.
 4. From then on, the daily refresh publishes the site itself.
+
+## Cabin counts (4.4.0, 2026-10-08)
+
+From the owner's AI PC test (plain requests, no cookies, no hold), confirmed from the cloud session:
+- POST `https://www.ncl.com/api/vacation-builder/cabin/availability`, body `{"stateroomSearchFilter":{"stateroomTypeCode":"BALCONY","numberOfGuests":2,"pricedCategoryCode":"B4","accessibilityRequested":false,"filterId":"0","sailing":{"packageId":"24223992","shipCode":"GETAWAY","departureDate":"2027-06-11T00:00:00","destinationCodes":["BAHAMAS","WEEKEND"],"duration":3,"packageType":"CRUISE","sailingId":"60533"},"guests":[]}}`.
+- The sailing part comes from the public GET `https://www.ncl.com/api/vacation-builder/itinerary/<itineraryCode>?packageId=<packageId>`: `ship.code`, `destinations[].code`, `duration`, `sailing.sailingId`, `sailing.sailStartDate`. Aura: AURA, ["CARIBBEAN"], 5, 62344, 2027-06-14T00:00:00. The fetch script reads these every run and checks packageId and date.
+- The answer has `results.availablePositionInShip[]`: locations (Forward, Mid, Aft) with `numberOfCabins`, `lowestPriceCategory`, and `decks[]` with `cabins[]` (cabinNumber, deckNumber, shipLocation, shipSide, pricedCategoryCode, maxOccupancy, isADA, isGTY, extraPrice, price). It covers the requested category plus every pricier category of the same broad type.
+- Cabin lists and deck `numberOfCabins` are capped at 15 per deck, so counts use only the location totals.
+- Count for a category = its call's location totals minus those of the call for the next pricier non-Guarantee category (calls made from the most expensive down). Getaway Balcony at 2 guests: B4 call 139, B6 call 54, B1 call 30, so B4 85, B6 24, B1 30.
+- No answer so far has contained "hold" or "heldUntil" (checked on every call; the run stops if one does).
+
+Does numberOfGuests change the counts? Yes. Tested 2026-10-08: the Getaway B4 call returned 139 cabins at 2 guests and 97 at 4 guests (Aft dropped from 57 to 27, because B1 holds only 3 and some cabins can't take 4). So counts are fetched for every party size (2 to 5), only for categories available at that size: 141 calls on 2026-10-08 (74 Getaway, 67 Aura), about 19 minutes with the 2 second pauses (three calls timed out after 60 seconds and succeeded on retry).
+
+Reliability rules (a count that fails one is stored as null and shows nothing):
+- The call returned a location `lowestPriceCategory`, or a listed cabin, from another broad type. Seen on 2026-10-08: Getaway B6 (O4), MB (O4, O5), the Getaway Oceanview codes (MA, IA, B6), I4 (OA), IC (OX); Aura BB (O4), SK (M2). Deck-level `lowestPriceCategory` values are not used for this rule (the B4 call lists deck 9 Forward as O4 because its cabins are B6, which costs the same as O4).
+- Two non-Guarantee categories of the same type have the same price for that party size (the subtraction order would be ambiguous). None on 2026-10-08.
+- The subtraction is negative in a location or not positive in total. Seen: Getaway IF at 4 guests, Aura IF at 2 guests (0).
+- 18 of 141 counts were unreliable on 2026-10-08. The list with reasons is in `checks.counts.unreliable` in the data file.
+
+Descriptions from open cabins: for each category, the call at 2 guests lists its own open cabins (the category is the cheapest in its own call, so its cabins come first on each deck). Their decks and shipLocation fill a description's missing decks (the Aura's IB, IA, BF, BB, BA) and missing location (the Getaway's grouped codes). These describe where cabins are open now, so they can change from day to day. Nothing is filled when no open cabin of that code is listed (the Aura's IF on 2026-10-08).
+
+Default cabin: every picker starts on the cheapest available non-Guarantee category; Guarantee categories stay in the lists.
+
+## Resilience (4.4.0, 2026-10-08)
+
+Two failures on `main` on 2026-10-08:
+1. A manual "Refresh prices" run failed: NCL answered the availability POST with a 302, urllib followed it, and the new address gave 404. Fix: POST requests never follow redirects. A redirect, a 5xx or a network error is logged with the status code and Location header, then retried after 30, 60 and 120 seconds; after that the run fails. 401, 403 and 404 fail at once. Tested locally against a small test server (302 is never followed and fails after 4 tries; a 503 twice then 200 succeeds on the third try).
+2. On the re-run, "publish / deploy" failed: upload-pages-artifact succeeded (artifact id 11552464267), and about a second later deploy-pages listed 0 artifacts: "No artifacts named github-pages were found for this workflow run."
+
+Research on the deploy failure:
+- actions/deploy-pages issue 451 (opened 2026-10-07, still open) describes the same pattern: upload-pages-artifact and deploy-pages in the same job, and the artifact listing comes back empty for an artifact finalized a fraction of a second earlier (62 of 63 runs worked). Its reporter fixed it by moving the upload into an earlier job, as GitHub's own Pages starter workflows do. https://github.com/actions/deploy-pages/issues/451
+- The same issue explains that re-running cannot recover that layout, because the re-run uploads a second artifact with the same name and deploy-pages then fails with "Multiple artifacts named github-pages were unexpectedly found" (issue 338). https://github.com/actions/deploy-pages/issues/338
+- deploy-pages v5 source (`src/internal/api-client.js`): it lists all artifacts of the run and filters by name, failing on 0 or more than 1 match. It has an `artifact_name` input. https://github.com/actions/deploy-pages
+- Older reports of the same message were version mismatches between upload-pages-artifact and deploy-pages (issue 305, community discussion 84008); the versions here match. https://github.com/actions/deploy-pages/issues/305 and https://github.com/orgs/community/discussions/84008
+
+Fix in "Deploy site":
+- A `build` job runs the release check, collects `_site`, configure-pages and upload-pages-artifact. A separate `deploy` job runs deploy-pages, so the listing happens seconds after the upload, in another job.
+- The artifact is named `github-pages-<run attempt>`, reported by the build job and passed to deploy-pages as `artifact_name`. "Re-run all jobs" uploads a new name instead of a second `github-pages`; "Re-run failed jobs" reuses the build job's name from the first attempt.
+- The deploy step is retried once after 30 seconds if the first attempt fails.
+
+Workflow maintenance: actions/checkout v7, configure-pages v6, upload-pages-artifact v5 (composite; it uses upload-artifact v7) and deploy-pages v5 all run on Node.js 24 (checked in each release's action.yml on 2026-10-08). Every job is pinned to `ubuntu-24.04`, so GitHub's change of `ubuntu-latest` can't change anything unexpectedly. actionlint 1.7.7 reports no problems.

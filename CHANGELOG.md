@@ -2,6 +2,23 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.4.0] - 2026-10-08
+
+### Added
+- Cabins left: each category button, each dropdown option in Different cabins mode and each row of the full tables shows "Plenty left" (50 or more), "Getting low" (10 to 49) or "Only X left" (under 10). Nothing is shown for Guarantee cabins or counts marked unreliable.
+- The fetch script reads NCL's cabin/availability call for every available non-Guarantee category at every party size, most expensive first, and counts cabins by subtracting location totals. Counts are marked unreliable (and not shown) when a call returns another cabin type's code, when two categories tie in price, or when the subtraction is not positive. The reasons are logged in the data file under `checks.counts`.
+- Descriptions gain where each category's open cabins are: missing decks (the Aura's grouped Inside and Balcony codes) and missing forward, midship, aft locations (the Getaway's grouped codes), taken only from NCL's list of open cabins.
+- The run stops if a cabin/availability answer mentions "hold" or "heldUntil".
+
+### Changed
+- Every cabin picker defaults to the cheapest available non-Guarantee category. Guarantee categories stay in the lists and can still be picked; when a type has only Guarantee categories available, the cheapest Guarantee one is the default.
+- Workflow actions moved to their Node.js 24 versions: actions/checkout v7, actions/configure-pages v6, actions/upload-pages-artifact v5 (uses upload-artifact v7), actions/deploy-pages v5. Every job runs on `ubuntu-24.04` instead of `ubuntu-latest`.
+- The refresh job may now take up to 45 minutes (about 160 NCL calls).
+
+### Fixed
+- POST requests to NCL no longer follow redirects. A redirect, a 5xx or a network error is logged with its status code and Location header and retried after 30, 60 and 120 seconds before the run fails.
+- "Deploy site" uploads in a "build" job and publishes in a separate "deploy" job, names the artifact per run attempt, and retries the publish once after 30 seconds. This addresses deploy-pages reporting 0 artifacts right after a successful upload in the same job.
+
 ## [4.3.0] - 2026-10-08
 
 The site is now published by GitHub Actions, so the daily price refresh reaches the family page.
