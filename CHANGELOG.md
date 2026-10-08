@@ -1,0 +1,97 @@
+# Changelog
+
+All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
+
+## [4.3.0] - 2026-10-08
+
+The site is now published by GitHub Actions, so the daily price refresh reaches the family page.
+
+### Added
+- `.github/workflows/deploy-pages.yml` ("Deploy site"): publishes `index.html` and `data/prices.json` to GitHub Pages on every push to `main`, on demand, and when called by the refresh. It runs the release check first and only ever publishes `main`.
+- The daily refresh now publishes the site in the same run, right after its data commit ("publish" job). Commits made with `GITHUB_TOKEN` don't start a Pages build on their own, which is why this is needed.
+- Keep-alive for the daily schedule ("keepalive" job): on every scheduled run on `main`, the refresh marks its own workflow enabled again through GitHub's API. GitHub turns off scheduled workflows in public repos after 60 days without repository activity and doesn't define activity, so this is a safety net on top of the daily data commit. It never fails the run.
+
+### Changed
+- GitHub Pages must be switched from "Deploy from a branch" to "GitHub Actions" (Settings, Pages, Source). See NOTES.md, "Publishing (4.3.0)", for the order of steps.
+
+## [4.2.1] - 2026-10-07
+
+### Fixed
+- When a cabin list has only one available option, it now shows that option as a button that is already selected, with no tap action and no hover effect. Before, the 3 and 5 night cards showed no list at all in that case. This applies to every cabin picker, including both ship pickers in Different cabins mode (which show the single option as a selected button instead of a one-item dropdown).
+
+## [4.2.0] - 2026-10-07
+
+Kid pricing now follows NCL's confirmed age rules.
+
+### Added
+- Guests are listed in NCL's order: adults first, then kids oldest first.
+- Unlimited Open Bar per guest: 21 and over pay the full gratuity, a guest under 21 in position 2 (only possible with 1 adult) pays NCL's soda package instead, and guests under 21 in position 3 or later pay nothing. Specialty Dining: 13 and over pay, under 13 eat free, in any position.
+- Breakdown wording such as "Unlimited Open Bar: 1 guest x $96, 1 guest x $37.50 (soda package, under 21)" and "Specialty Dining: 2 guests x $20 (under 13 eat free)". Amounts with cents show the cents.
+- Kid dropdowns are labeled "Kid 1 age on Jun 11, 2027", with the note "Use each kid's age on Jun 11, 2027." under the Kids counter. The guest summary shows NCL's guest order.
+- Daily age test in the fetch script: one price summary per ship for 1 adult, a 15 year old and a 7 year old (birth dates only, no names). The adult Open Bar, soda package and Specialty Dining amounts per guest are read from it, so the Aura's numbers come from NCL ($160, $62.50 and $40).
+- Age cross check: the page's formula for that party must match NCL's total within $5 on each ship, or the run fails. The run also fails if NCL's age rules change.
+
+### Fixed
+- Cabin totals now use NCL's average per person price with cents (for example $455.66), so a 3 guest total matches NCL to the dollar. Before, rounding the average first could add $1.
+
+## [4.1.0] - 2026-10-07
+
+### Added
+- Plain cabin descriptions instead of technical names, for example "Balcony, Decks 12 to 14 (BA)" or "Family Balcony, Decks 13 and 14, midship (B4)". The NCL code stays in small grey text. Sizes are shown where NCL gives them for that one code.
+- Description fields in the data file (`description`, `decks`, `location`, `size`, `details_source`, `shares_ncl_description_with`), rebuilt on every daily refresh. The format check covers them.
+
+### Changed
+- "Kids (under 21)" sits directly under "Adults (21+)", and the kid age dropdowns appear right under the Kids counter.
+- Cabin type has its own card, directly below "Who is in the cabin".
+- The cabin selection lists (the tap-to-choose category buttons, and for 8 nights the Same/Different toggle and the two cabin pickers) now sit between each option card's heading and its prices.
+
+## [4.0.0] - 2026-10-07
+
+Prices now come from NCL's booking system, cabin by cabin, with every line of the total shown. The data file format changed (schema 2), so this is a major version.
+
+### Added
+- Specific cabin categories (for example Family Balcony B4) under each cabin type, with prices for the current party, cheapest first. Tap one to choose it.
+- Guest counters for "Adults (21+)" and "Kids (under 21)", with an age dropdown for each kid. Adults plus kids must total 2 to 5 with at least 1 adult; anything else is blocked with a plain message.
+- Each total shows its own lines: cruise fare, NCL's taxes, fees and port expenses, Unlimited Open Bar and Specialty Dining gratuities, then the total, per person price and cost per night.
+- Free at Sea gratuities by age: 21 and over pay Open Bar and Specialty Dining, 13 to 20 pay Specialty Dining only, 12 and under pay neither. The page shows who is charged, for example "Unlimited Open Bar: 2 guests x $96".
+- Real added cost for guests 3, 4 and 5 in the same category (fare and taxes).
+- Full tables of every cabin on each ship for the current party. Unavailable cabins are greyed out with the reason: "Sold out", "Holds only X guests" or "Sold out for this party size".
+- Guarantee categories (IX, OX, BX, MX) are labeled "Guarantee: NCL picks your cabin location".
+- Daily cross checks in the data file: extra guest price consistency (logged) and fare plus taxes plus gratuities against NCL's price summary (fails the run when off by more than $5).
+- The fetch script refuses any address containing "manage-cabin" or "hold".
+
+### Changed
+- `tools/fetch_prices.py` reads NCL's vacation-builder API (stateroom-types-availability and price-summary) and the route-events itinerary, with 2 seconds between calls, instead of the public sailing pages.
+- Same cabin mode matches by broad type and defaults to the cheapest available category on each ship. Different cabins mode picks any available category on each ship.
+- `tools/check_prices.py` checks the new data format.
+
+### Removed
+- CruiseFeed: the weekly cross check, the workflow option, the footer message and the repo secret steps.
+- The "Includes about $200 per guest in taxes" notes and the "Free at Sea charge: not yet available" placeholder (both are now real lines).
+- The "Estimated add-on" label (replaced by the real added cost).
+- The 2 to 5 guest buttons (replaced by the adult and kid counters).
+- The old Norwegian Joy CSV files (still in git history).
+
+## [3.0.0] - 2026-10-07
+
+The page is now a decision guide for the family's June 2027 cruise. It replaces the Norwegian Joy (Nov 2026) cabin selector, which stays available on `main` until this branch is merged and in git history after that.
+
+### Added
+- Three options side by side: 3 nights on the Norwegian Getaway (Jun 11 to Jun 14, 2027), 5 nights on the Norwegian Aura (Jun 14 to Jun 19, 2027), and 8 nights on both back to back.
+- Guest selector for 2, 3, 4 or 5 people per cabin, and a cabin type selector (Inside, Oceanview, Balcony, Club Balcony Suite, Suite, The Haven). Studio is hidden because it only fits one guest.
+- 8-night toggle: "Same cabin on both ships" (like for like matching, with the mini-suite rule) or "Different cabin on each ship" (a picker for each ship).
+- Per person and total prices, cost per night, tax notes ("Includes about $200 / $210 / $410 per guest in taxes"), the "Estimated add-on (NCL's cheapest cabin for that party size)" line for 3 to 5 guests, and a "Free at Sea charge: not yet available" placeholder.
+- Plain language box explaining the ship change in Miami on Jun 14, the expected terminal, and the two visits to Great Stirrup Cay.
+- Table of every cabin type for the chosen party size.
+- "Prices as of" date from the data file, and the CruiseFeed cross check status in the footer.
+- `data/prices.json`, written by `tools/fetch_prices.py` from NCL's public sailing pages (8 page loads: both sailings at 2, 3, 4 and 5 guests).
+- `tools/check_prices.py`: format check for the data file.
+- `tools/check_release.py` and `.github/workflows/check.yml`: release gate on every push and pull request (data format, version matches this changelog).
+- `.github/workflows/refresh-prices.yml`: daily refresh on GitHub's runners, a weekly CruiseFeed cross check when the `CRUISEFEED_KEY` repo secret exists, and a format check that keeps the old data file when the new one is bad.
+
+### Removed
+- The Norwegian Joy cabin cards, deposit options, package toggles and child age inputs. The old CSV price files are no longer read by the page.
+
+## [2.5.0] and earlier
+
+Norwegian Joy (Nov 20 to Nov 23, 2026) cabin selector. See the git history on `main` for details.

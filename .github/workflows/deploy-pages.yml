@@ -1,0 +1,57 @@
+name: Deploy site
+
+# Publishes the family page to GitHub Pages (Settings, Pages, Source: GitHub Actions).
+# Runs on every push to main, on demand, and from the daily refresh right after its commit
+# (commits made with GITHUB_TOKEN don't start a Pages build by themselves).
+# Only main is ever published; runs for any other branch skip the deploy job.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Commit to publish (the refresh workflow passes its new data commit)"
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - name: Release check (never publish a bad page or data file)
+        run: python3 tools/check_release.py
+
+      - name: Collect the site files
+        run: |
+          mkdir -p _site/data
+          cp index.html _site/index.html
+          cp data/prices.json _site/data/prices.json
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
