@@ -48,4 +48,6 @@ File layout:
 ## Automation
 
 - `.github/workflows/refresh-prices.yml`: daily at 10:17 UTC (scheduled runs only fire on `main`), manual runs, and pushes to the development branch that touch the fetch tools. The new file is written to `data/prices.new.json`, format checked, and only then replaces `data/prices.json`.
+- `.github/workflows/refresh-prices.yml` also has a `publish` job (calls `deploy-pages.yml` with the new data commit, only on `main`) and a `keepalive` job (scheduled runs on `main` only: `gh workflow enable refresh-prices.yml`, never fatal).
+- `.github/workflows/deploy-pages.yml` ("Deploy site"): GitHub Pages source is "GitHub Actions". Publishes only `index.html` and `data/prices.json` (in `_site`), after the release check, on push to `main`, on demand, or when called by the refresh. Never publishes another branch. Commits made with `GITHUB_TOKEN` don't trigger Pages builds, so every automated data change must go through this workflow.
 - `.github/workflows/check.yml`: release gate.

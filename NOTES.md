@@ -220,3 +220,22 @@ Applied in 4.2.0:
 - Age cross check (`checks.ages`): page formula for that party versus NCL's total, within $5, or the run fails.
 - Rounding fix: NCL's availability average has cents (B4 at 3 guests: $455.66). `price_pp` now keeps the cents and `cabin_total` is rounded once, so it equals NCL's fare plus taxes ($1,367, not $1,368).
 - The earlier NOTES line about the $12.50 soda package "not charged yet" is superseded by these rules.
+
+## Publishing (4.3.0, researched 2026-10-07 and 2026-10-08)
+
+Findings:
+- GitHub Pages for this repo publishes from a branch today: every "pages build and deployment" run built `main`, and the live site at https://dasatizabal.github.io/cruise-cabin-comparison/ was byte-for-byte `main`'s top-level `index.html` (v2.5.0). `main` has no `docs` folder, so the folder is the root. `main` is not a protected branch.
+- GitHub's docs (GITHUB_TOKEN page and the Pages publishing source page): "Commits pushed by a GitHub Actions workflow that uses the GITHUB_TOKEN do not trigger a GitHub Pages build." So with "Deploy from a branch", the daily data commits would never reach the family page.
+- GitHub's docs on disabling workflows: "In a public repository, scheduled workflows are automatically disabled when no repository activity has occurred in 60 days." The docs don't define activity, so it's not documented whether the bot's daily commits count.
+- The Pages docs don't say whether the currently published site stays live when the source is switched to GitHub Actions before a workflow deploys.
+
+What was built:
+- `.github/workflows/deploy-pages.yml` ("Deploy site"): on push to `main`, on demand (Run workflow), and as a reusable workflow. Checks out the commit, runs `tools/check_release.py`, copies `index.html` and `data/prices.json` into `_site`, then configure-pages, upload-pages-artifact and deploy-pages to the `github-pages` environment. The job only runs when the ref is `main`.
+- `.github/workflows/refresh-prices.yml`: the `refresh` job outputs the commit it pushed (or the current commit when nothing changed); the `publish` job calls "Deploy site" with that commit, only on `main`; the `keepalive` job runs on scheduled runs on `main` and calls `gh workflow enable refresh-prices.yml` (needs `actions: write`; failures are ignored). Community keep-alive tools use this same API in their "no dummy commit" mode. It only helps while the workflow is still enabled, so the manual fallback is: Actions tab, "Refresh prices", "Enable workflow".
+- Checked with actionlint 1.7.7: no problems.
+
+Order for the switch (chosen so the family page relies only on documented behavior):
+1. Merge the pull request first, while Pages still deploys from the `main` branch. The merge is a normal push by a person, so the branch build publishes the new page. The new "Deploy site" run on that push may fail, because Pages isn't set to GitHub Actions yet; that red mark is expected and harmless.
+2. Right after, switch Settings, Pages, Source to "GitHub Actions".
+3. Run "Deploy site" by hand once, so the next publish comes from GitHub Actions.
+4. From then on, the daily refresh publishes the site itself.

@@ -2,6 +2,18 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.3.0] - 2026-10-08
+
+The site is now published by GitHub Actions, so the daily price refresh reaches the family page.
+
+### Added
+- `.github/workflows/deploy-pages.yml` ("Deploy site"): publishes `index.html` and `data/prices.json` to GitHub Pages on every push to `main`, on demand, and when called by the refresh. It runs the release check first and only ever publishes `main`.
+- The daily refresh now publishes the site in the same run, right after its data commit ("publish" job). Commits made with `GITHUB_TOKEN` don't start a Pages build on their own, which is why this is needed.
+- Keep-alive for the daily schedule ("keepalive" job): on every scheduled run on `main`, the refresh marks its own workflow enabled again through GitHub's API. GitHub turns off scheduled workflows in public repos after 60 days without repository activity and doesn't define activity, so this is a safety net on top of the daily data commit. It never fails the run.
+
+### Changed
+- GitHub Pages must be switched from "Deploy from a branch" to "GitHub Actions" (Settings, Pages, Source). See NOTES.md, "Publishing (4.3.0)", for the order of steps.
+
 ## [4.2.1] - 2026-10-07
 
 ### Fixed
