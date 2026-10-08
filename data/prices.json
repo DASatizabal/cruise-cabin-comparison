@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "saved_at": "2026-10-08T16:09:02Z",
+ "saved_at": "2026-10-08T16:21:05Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -155,7 +155,7 @@
      "sailing": "getaway-2027-06-11",
      "guests": 4,
      "category": "IF",
-     "why": "subtraction gave {'Mid': 0, 'Aft': 0, 'Forward': 0}"
+     "why": "subtraction gave {'Mid': 0, 'Forward': 0, 'Aft': 0}"
     },
     {
      "sailing": "getaway-2027-06-11",
@@ -168,6 +168,12 @@
      "guests": 4,
      "category": "O4",
      "why": "call returned other cabin types: B6"
+    },
+    {
+     "sailing": "getaway-2027-06-11",
+     "guests": 4,
+     "category": "BA",
+     "why": "subtraction gave {'Mid': -28, 'Forward': -68, 'Aft': -44}"
     },
     {
      "sailing": "aura-2027-06-14",
@@ -1312,8 +1318,8 @@
          "price_pp": 429.0,
          "cabin_total": 1716,
          "added_vs_2": 738,
-         "cabins_left": 71,
-         "count_reliable": true
+         "cabins_left": null,
+         "count_reliable": false
         },
         "5": {
          "available": false,
@@ -1369,7 +1375,7 @@
          "price_pp": 434.0,
          "cabin_total": 1736,
          "added_vs_2": 738,
-         "cabins_left": 85,
+         "cabins_left": 296,
          "count_reliable": true
         },
         "5": {
@@ -2805,7 +2811,7 @@
          "sold_out": false,
          "price_pp": 1439.0,
          "cabin_total": 2878,
-         "cabins_left": 58,
+         "cabins_left": 59,
          "count_reliable": true
         },
         "3": {
@@ -2849,7 +2855,7 @@
          "sold_out": false,
          "price_pp": 1549.0,
          "cabin_total": 3098,
-         "cabins_left": 32,
+         "cabins_left": 30,
          "count_reliable": true
         },
         "3": {
@@ -2858,7 +2864,7 @@
          "price_pp": 1295.66,
          "cabin_total": 3887,
          "added_vs_2": 789,
-         "cabins_left": 2,
+         "cabins_left": 1,
          "count_reliable": true
         },
         "4": {
@@ -2895,7 +2901,7 @@
          "sold_out": false,
          "price_pp": 1709.0,
          "cabin_total": 3418,
-         "cabins_left": 27,
+         "cabins_left": 28,
          "count_reliable": true
         },
         "3": {
@@ -2904,7 +2910,7 @@
          "price_pp": 1402.33,
          "cabin_total": 4207,
          "added_vs_2": 789,
-         "cabins_left": 27,
+         "cabins_left": 28,
          "count_reliable": true
         },
         "4": {
@@ -3026,7 +3032,7 @@
          "sold_out": false,
          "price_pp": 1689.0,
          "cabin_total": 3378,
-         "cabins_left": 83,
+         "cabins_left": 82,
          "count_reliable": true
         },
         "3": {
@@ -4072,7 +4078,7 @@
          "sold_out": false,
          "price_pp": 6059.0,
          "cabin_total": 12118,
-         "cabins_left": 31,
+         "cabins_left": 32,
          "count_reliable": true
         },
         "3": {
@@ -4081,7 +4087,7 @@
          "price_pp": 4302.33,
          "cabin_total": 12907,
          "added_vs_2": 789,
-         "cabins_left": 31,
+         "cabins_left": 32,
          "count_reliable": true
         },
         "4": {
@@ -4090,7 +4096,7 @@
          "price_pp": 3424.0,
          "cabin_total": 13696,
          "added_vs_2": 1578,
-         "cabins_left": 31,
+         "cabins_left": 32,
          "count_reliable": true
         },
         "5": {
@@ -4099,7 +4105,7 @@
          "price_pp": 2897.0,
          "cabin_total": 14485,
          "added_vs_2": 2367,
-         "cabins_left": 31,
+         "cabins_left": 32,
          "count_reliable": true
         }
        },
