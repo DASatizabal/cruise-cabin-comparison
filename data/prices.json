@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "saved_at": "2026-10-09T01:28:51Z",
+ "saved_at": "2026-10-09T16:10:28Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -8,6 +8,34 @@
   4,
   5
  ],
+ "rates": {
+  "free_at_sea_plus": {
+   "adult_per_day": 49.99,
+   "child_per_day": 40.0,
+   "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; 2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. Includes prepaid service charges.",
+   "source": "https://www.ncl.com/cruise-deals/promotion-terms",
+   "checked_at": "2026-10-09"
+  },
+  "open_bar": {
+   "per_day_2_to_5_nights": 32.0,
+   "per_day_6_plus_nights": 28.5,
+   "soda_per_day": 12.5,
+   "source": "https://www.ncl.com/cruise-deals/promotion-terms",
+   "checked_at": "2026-10-09"
+  },
+  "service_charge": {
+   "suite_haven_per_night": 25.0,
+   "standard_per_night": 20.0,
+   "min_age": 3,
+   "suite_haven_types": [
+    "SUITE",
+    "HAVEN"
+   ],
+   "source": "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge",
+   "checked_at": "2026-10-09"
+  }
+ },
+ "rate_warnings": [],
  "checks": {
   "extra_guest_mismatches": [],
   "formula": [
@@ -15,64 +43,64 @@
     "sailing": "getaway-2027-06-11",
     "guests": 2,
     "category": "IX",
-    "expected": 990,
-    "ncl_total": 990,
+    "expected": 890,
+    "ncl_total": 890,
     "ok": true
    },
    {
     "sailing": "getaway-2027-06-11",
     "guests": 3,
     "category": "IX",
-    "expected": 1455,
-    "ncl_total": 1455,
+    "expected": 1305,
+    "ncl_total": 1305,
     "ok": true
    },
    {
     "sailing": "getaway-2027-06-11",
     "guests": 4,
     "category": "IX",
-    "expected": 1920,
-    "ncl_total": 1920,
+    "expected": 1720,
+    "ncl_total": 1720,
     "ok": true
    },
    {
     "sailing": "getaway-2027-06-11",
     "guests": 5,
     "category": "O5",
-    "expected": 2715,
-    "ncl_total": 2715,
+    "expected": 2465,
+    "ncl_total": 2465,
     "ok": true
    },
    {
     "sailing": "aura-2027-06-14",
     "guests": 2,
     "category": "IF",
-    "expected": 2858,
-    "ncl_total": 2858,
+    "expected": 2758,
+    "ncl_total": 2758,
     "ok": true
    },
    {
     "sailing": "aura-2027-06-14",
     "guests": 3,
     "category": "I4",
-    "expected": 4067,
-    "ncl_total": 4067,
+    "expected": 3917,
+    "ncl_total": 3917,
     "ok": true
    },
    {
     "sailing": "aura-2027-06-14",
     "guests": 4,
     "category": "I4",
-    "expected": 5056,
-    "ncl_total": 5056,
+    "expected": 4856,
+    "ncl_total": 4856,
     "ok": true
    },
    {
     "sailing": "aura-2027-06-14",
     "guests": 5,
     "category": "H6",
-    "expected": 15485,
-    "ncl_total": 15485,
+    "expected": 15235,
+    "ncl_total": 15235,
     "ok": true
    }
   ],
@@ -81,16 +109,16 @@
     "sailing": "getaway-2027-06-11",
     "party": "1 adult, 15, 7",
     "category": "IX",
-    "expected": 1280.5,
-    "ncl_total": 1280.5,
+    "expected": 1130.5,
+    "ncl_total": 1130.5,
     "ok": true
    },
    {
     "sailing": "aura-2027-06-14",
     "party": "1 adult, 15, 7",
     "category": "I4",
-    "expected": 3769.5,
-    "ncl_total": 3769.5,
+    "expected": 3619.5,
+    "ncl_total": 3619.5,
     "ok": true
    }
   ],
@@ -138,7 +166,7 @@
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
    "source": "NCL vacation-builder API",
    "saved_at": "2026-10-09",
-   "taxes_per_guest": 200,
+   "taxes_per_guest": 150,
    "gratuities": {
     "open_bar": {
      "title": "Unlimited Open Bar",
@@ -198,8 +226,8 @@
       179
      ],
      "taxes_per_guest": [
-      200,
-      200
+      150,
+      150
      ],
      "open_bar": {
       "title": "Unlimited Open Bar",
@@ -215,7 +243,7 @@
        20
       ]
      },
-     "grand_total": 990
+     "grand_total": 890
     },
     {
      "guests": 3,
@@ -229,9 +257,9 @@
       149
      ],
      "taxes_per_guest": [
-      200,
-      200,
-      200
+      150,
+      150,
+      150
      ],
      "open_bar": {
       "title": "Unlimited Open Bar",
@@ -249,7 +277,7 @@
        20
       ]
      },
-     "grand_total": 1455
+     "grand_total": 1305
     },
     {
      "guests": 4,
@@ -264,10 +292,10 @@
       149
      ],
      "taxes_per_guest": [
-      200,
-      200,
-      200,
-      200
+      150,
+      150,
+      150,
+      150
      ],
      "open_bar": {
       "title": "Unlimited Open Bar",
@@ -287,7 +315,7 @@
        20
       ]
      },
-     "grand_total": 1920
+     "grand_total": 1720
     },
     {
      "guests": 5,
@@ -303,11 +331,11 @@
       159
      ],
      "taxes_per_guest": [
-      200,
-      200,
-      200,
-      200,
-      200
+      150,
+      150,
+      150,
+      150,
+      150
      ],
      "open_bar": {
       "title": "Unlimited Open Bar",
@@ -329,7 +357,7 @@
        20
       ]
      },
-     "grand_total": 2715
+     "grand_total": 2465
     }
    ],
    "types": [
@@ -395,22 +423,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 379.0,
-         "cabin_total": 758
+         "price_pp": 329.0,
+         "cabin_total": 658
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 369.0,
-         "cabin_total": 1107,
-         "added_vs_2": 349
+         "price_pp": 319.0,
+         "cabin_total": 957,
+         "added_vs_2": 299
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 364.0,
-         "cabin_total": 1456,
-         "added_vs_2": 698
+         "price_pp": 314.0,
+         "cabin_total": 1256,
+         "added_vs_2": 598
         },
         "5": {
          "available": false,
@@ -435,22 +463,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 399.0,
-         "cabin_total": 798
+         "price_pp": 349.0,
+         "cabin_total": 698
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 382.33,
-         "cabin_total": 1147,
-         "added_vs_2": 349
+         "price_pp": 332.33,
+         "cabin_total": 997,
+         "added_vs_2": 299
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 374.0,
-         "cabin_total": 1496,
-         "added_vs_2": 698
+         "price_pp": 324.0,
+         "cabin_total": 1296,
+         "added_vs_2": 598
         },
         "5": {
          "available": false,
@@ -482,22 +510,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 409.0,
-         "cabin_total": 818
+         "price_pp": 359.0,
+         "cabin_total": 718
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 389.0,
-         "cabin_total": 1167,
-         "added_vs_2": 349
+         "price_pp": 339.0,
+         "cabin_total": 1017,
+         "added_vs_2": 299
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 379.0,
-         "cabin_total": 1516,
-         "added_vs_2": 698
+         "price_pp": 329.0,
+         "cabin_total": 1316,
+         "added_vs_2": 598
         },
         "5": {
          "available": false,
@@ -529,22 +557,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 419.0,
-         "cabin_total": 838
+         "price_pp": 369.0,
+         "cabin_total": 738
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 395.66,
-         "cabin_total": 1187,
-         "added_vs_2": 349
+         "price_pp": 345.66,
+         "cabin_total": 1037,
+         "added_vs_2": 299
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 384.0,
-         "cabin_total": 1536,
-         "added_vs_2": 698
+         "price_pp": 334.0,
+         "cabin_total": 1336,
+         "added_vs_2": 598
         },
         "5": {
          "available": false,
@@ -576,15 +604,15 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 429.0,
-         "cabin_total": 858
+         "price_pp": 379.0,
+         "cabin_total": 758
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 402.33,
-         "cabin_total": 1207,
-         "added_vs_2": 349
+         "price_pp": 352.33,
+         "cabin_total": 1057,
+         "added_vs_2": 299
         },
         "4": {
          "available": false,
@@ -622,22 +650,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 439.0,
-         "cabin_total": 878
+         "price_pp": 389.0,
+         "cabin_total": 778
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 409.0,
-         "cabin_total": 1227,
-         "added_vs_2": 349
+         "price_pp": 359.0,
+         "cabin_total": 1077,
+         "added_vs_2": 299
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 394.0,
-         "cabin_total": 1576,
-         "added_vs_2": 698
+         "price_pp": 344.0,
+         "cabin_total": 1376,
+         "added_vs_2": 598
         },
         "5": {
          "available": false,
@@ -718,8 +746,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 409.0,
-         "cabin_total": 818
+         "price_pp": 359.0,
+         "cabin_total": 718
         },
         "3": {
          "available": false,
@@ -754,8 +782,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 429.0,
-         "cabin_total": 858
+         "price_pp": 379.0,
+         "cabin_total": 758
         },
         "3": {
          "available": false,
@@ -794,8 +822,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 439.0,
-         "cabin_total": 878
+         "price_pp": 389.0,
+         "cabin_total": 778
         },
         "3": {
          "available": false,
@@ -839,22 +867,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 519.0,
-         "cabin_total": 1038
+         "price_pp": 469.0,
+         "cabin_total": 938
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 465.66,
-         "cabin_total": 1397,
-         "added_vs_2": 359
+         "price_pp": 415.66,
+         "cabin_total": 1247,
+         "added_vs_2": 309
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 439.0,
-         "cabin_total": 1756,
-         "added_vs_2": 718
+         "price_pp": 389.0,
+         "cabin_total": 1556,
+         "added_vs_2": 618
         },
         "5": {
          "available": false,
@@ -883,29 +911,29 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 529.0,
-         "cabin_total": 1058
+         "price_pp": 479.0,
+         "cabin_total": 958
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 472.33,
-         "cabin_total": 1417,
-         "added_vs_2": 359
+         "price_pp": 422.33,
+         "cabin_total": 1267,
+         "added_vs_2": 309
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 444.0,
-         "cabin_total": 1776,
-         "added_vs_2": 718
+         "price_pp": 394.0,
+         "cabin_total": 1576,
+         "added_vs_2": 618
         },
         "5": {
          "available": true,
          "sold_out": false,
-         "price_pp": 427.0,
-         "cabin_total": 2135,
-         "added_vs_2": 1077
+         "price_pp": 377.0,
+         "cabin_total": 1885,
+         "added_vs_2": 927
         }
        },
        "description": "Family Oceanview, Deck 5",
@@ -975,22 +1003,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 449.0,
-         "cabin_total": 898
+         "price_pp": 399.0,
+         "cabin_total": 798
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 422.33,
-         "cabin_total": 1267,
-         "added_vs_2": 369
+         "price_pp": 372.33,
+         "cabin_total": 1117,
+         "added_vs_2": 319
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 409.0,
-         "cabin_total": 1636,
-         "added_vs_2": 738
+         "price_pp": 359.0,
+         "cabin_total": 1436,
+         "added_vs_2": 638
         },
         "5": {
          "available": false,
@@ -1015,22 +1043,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 469.0,
-         "cabin_total": 938
+         "price_pp": 419.0,
+         "cabin_total": 838
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 435.66,
-         "cabin_total": 1307,
-         "added_vs_2": 369
+         "price_pp": 385.66,
+         "cabin_total": 1157,
+         "added_vs_2": 319
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 419.0,
-         "cabin_total": 1676,
-         "added_vs_2": 738
+         "price_pp": 369.0,
+         "cabin_total": 1476,
+         "added_vs_2": 638
         },
         "5": {
          "available": false,
@@ -1061,22 +1089,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 479.0,
-         "cabin_total": 958
+         "price_pp": 429.0,
+         "cabin_total": 858
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 442.33,
-         "cabin_total": 1327,
-         "added_vs_2": 369
+         "price_pp": 392.33,
+         "cabin_total": 1177,
+         "added_vs_2": 319
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 424.0,
-         "cabin_total": 1696,
-         "added_vs_2": 738
+         "price_pp": 374.0,
+         "cabin_total": 1496,
+         "added_vs_2": 638
         },
         "5": {
          "available": false,
@@ -1107,22 +1135,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 489.0,
-         "cabin_total": 978
+         "price_pp": 439.0,
+         "cabin_total": 878
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 449.0,
-         "cabin_total": 1347,
-         "added_vs_2": 369
+         "price_pp": 399.0,
+         "cabin_total": 1197,
+         "added_vs_2": 319
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 429.0,
-         "cabin_total": 1716,
-         "added_vs_2": 738
+         "price_pp": 379.0,
+         "cabin_total": 1516,
+         "added_vs_2": 638
         },
         "5": {
          "available": false,
@@ -1154,22 +1182,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 499.0,
-         "cabin_total": 998
+         "price_pp": 449.0,
+         "cabin_total": 898
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 455.66,
-         "cabin_total": 1367,
-         "added_vs_2": 369
+         "price_pp": 405.66,
+         "cabin_total": 1217,
+         "added_vs_2": 319
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 434.0,
-         "cabin_total": 1736,
-         "added_vs_2": 738
+         "price_pp": 384.0,
+         "cabin_total": 1536,
+         "added_vs_2": 638
         },
         "5": {
          "available": false,
@@ -1199,22 +1227,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 519.0,
-         "cabin_total": 1038
+         "price_pp": 469.0,
+         "cabin_total": 938
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 469.0,
-         "cabin_total": 1407,
-         "added_vs_2": 369
+         "price_pp": 419.0,
+         "cabin_total": 1257,
+         "added_vs_2": 319
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 444.0,
-         "cabin_total": 1776,
-         "added_vs_2": 738
+         "price_pp": 394.0,
+         "cabin_total": 1576,
+         "added_vs_2": 638
         },
         "5": {
          "available": false,
@@ -1243,15 +1271,15 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 599.0,
-         "cabin_total": 1198
+         "price_pp": 549.0,
+         "cabin_total": 1098
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 522.33,
-         "cabin_total": 1567,
-         "added_vs_2": 369
+         "price_pp": 472.33,
+         "cabin_total": 1417,
+         "added_vs_2": 319
         },
         "4": {
          "available": false,
@@ -1339,15 +1367,15 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 499.0,
-         "cabin_total": 998
+         "price_pp": 449.0,
+         "cabin_total": 898
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 459.0,
-         "cabin_total": 1377,
-         "added_vs_2": 379
+         "price_pp": 409.0,
+         "cabin_total": 1227,
+         "added_vs_2": 329
         },
         "4": {
          "available": false,
@@ -1377,22 +1405,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 519.0,
-         "cabin_total": 1038
+         "price_pp": 469.0,
+         "cabin_total": 938
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 472.33,
-         "cabin_total": 1417,
-         "added_vs_2": 379
+         "price_pp": 422.33,
+         "cabin_total": 1267,
+         "added_vs_2": 329
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 449.0,
-         "cabin_total": 1796,
-         "added_vs_2": 758
+         "price_pp": 399.0,
+         "cabin_total": 1596,
+         "added_vs_2": 658
         },
         "5": {
          "available": false,
@@ -1422,22 +1450,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 529.0,
-         "cabin_total": 1058
+         "price_pp": 479.0,
+         "cabin_total": 958
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 479.0,
-         "cabin_total": 1437,
-         "added_vs_2": 379
+         "price_pp": 429.0,
+         "cabin_total": 1287,
+         "added_vs_2": 329
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 454.0,
-         "cabin_total": 1816,
-         "added_vs_2": 758
+         "price_pp": 404.0,
+         "cabin_total": 1616,
+         "added_vs_2": 658
         },
         "5": {
          "available": false,
@@ -1469,22 +1497,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 539.0,
-         "cabin_total": 1078
+         "price_pp": 489.0,
+         "cabin_total": 978
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 485.66,
-         "cabin_total": 1457,
-         "added_vs_2": 379
+         "price_pp": 435.66,
+         "cabin_total": 1307,
+         "added_vs_2": 329
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 459.0,
-         "cabin_total": 1836,
-         "added_vs_2": 758
+         "price_pp": 409.0,
+         "cabin_total": 1636,
+         "added_vs_2": 658
         },
         "5": {
          "available": false,
@@ -1519,22 +1547,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 589.0,
-         "cabin_total": 1178
+         "price_pp": 539.0,
+         "cabin_total": 1078
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 519.0,
-         "cabin_total": 1557,
-         "added_vs_2": 379
+         "price_pp": 469.0,
+         "cabin_total": 1407,
+         "added_vs_2": 329
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 484.0,
-         "cabin_total": 1936,
-         "added_vs_2": 758
+         "price_pp": 434.0,
+         "cabin_total": 1736,
+         "added_vs_2": 658
         },
         "5": {
          "available": false,
@@ -1563,8 +1591,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 819.0,
-         "cabin_total": 1638
+         "price_pp": 769.0,
+         "cabin_total": 1538
         },
         "3": {
          "available": false,
@@ -1610,8 +1638,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1849.0,
-         "cabin_total": 3698
+         "price_pp": 1799.0,
+         "cabin_total": 3598
         },
         "3": {
          "available": false,
@@ -1650,15 +1678,15 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1979.0,
-         "cabin_total": 3958
+         "price_pp": 1929.0,
+         "cabin_total": 3858
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1469.0,
-         "cabin_total": 4407,
-         "added_vs_2": 449
+         "price_pp": 1419.0,
+         "cabin_total": 4257,
+         "added_vs_2": 399
         },
         "4": {
          "available": false,
@@ -1696,15 +1724,15 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2029.0,
-         "cabin_total": 4058
+         "price_pp": 1979.0,
+         "cabin_total": 3958
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1502.33,
-         "cabin_total": 4507,
-         "added_vs_2": 449
+         "price_pp": 1452.33,
+         "cabin_total": 4357,
+         "added_vs_2": 399
         },
         "4": {
          "available": false,
@@ -1739,22 +1767,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2219.0,
-         "cabin_total": 4438
+         "price_pp": 2169.0,
+         "cabin_total": 4338
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1629.0,
-         "cabin_total": 4887,
-         "added_vs_2": 449
+         "price_pp": 1579.0,
+         "cabin_total": 4737,
+         "added_vs_2": 399
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1334.0,
-         "cabin_total": 5336,
-         "added_vs_2": 898
+         "price_pp": 1284.0,
+         "cabin_total": 5136,
+         "added_vs_2": 798
         },
         "5": {
          "available": false,
@@ -1786,22 +1814,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2269.0,
-         "cabin_total": 4538
+         "price_pp": 2219.0,
+         "cabin_total": 4438
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1662.33,
-         "cabin_total": 4987,
-         "added_vs_2": 449
+         "price_pp": 1612.33,
+         "cabin_total": 4837,
+         "added_vs_2": 399
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1359.0,
-         "cabin_total": 5436,
-         "added_vs_2": 898
+         "price_pp": 1309.0,
+         "cabin_total": 5236,
+         "added_vs_2": 798
         },
         "5": {
          "available": false,
@@ -1831,29 +1859,29 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2469.0,
-         "cabin_total": 4938
+         "price_pp": 2419.0,
+         "cabin_total": 4838
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1795.66,
-         "cabin_total": 5387,
-         "added_vs_2": 449
+         "price_pp": 1745.66,
+         "cabin_total": 5237,
+         "added_vs_2": 399
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1459.0,
-         "cabin_total": 5836,
-         "added_vs_2": 898
+         "price_pp": 1409.0,
+         "cabin_total": 5636,
+         "added_vs_2": 798
         },
         "5": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1257.0,
-         "cabin_total": 6285,
-         "added_vs_2": 1347
+         "price_pp": 1207.0,
+         "cabin_total": 6035,
+         "added_vs_2": 1197
         }
        },
        "description": "The Haven 2-Bedroom Family Villa with Balcony, Decks 15 and 16, forward",
@@ -1878,22 +1906,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2919.0,
-         "cabin_total": 5838
+         "price_pp": 2869.0,
+         "cabin_total": 5738
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2095.66,
-         "cabin_total": 6287,
-         "added_vs_2": 449
+         "price_pp": 2045.66,
+         "cabin_total": 6137,
+         "added_vs_2": 399
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1684.0,
-         "cabin_total": 6736,
-         "added_vs_2": 898
+         "price_pp": 1634.0,
+         "cabin_total": 6536,
+         "added_vs_2": 798
         },
         "5": {
          "available": false,
@@ -1922,22 +1950,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 3969.0,
-         "cabin_total": 7938
+         "price_pp": 3919.0,
+         "cabin_total": 7838
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2795.66,
-         "cabin_total": 8387,
-         "added_vs_2": 449
+         "price_pp": 2745.66,
+         "cabin_total": 8237,
+         "added_vs_2": 399
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2209.0,
-         "cabin_total": 8836,
-         "added_vs_2": 898
+         "price_pp": 2159.0,
+         "cabin_total": 8636,
+         "added_vs_2": 798
         },
         "5": {
          "available": false,
@@ -1972,7 +2000,7 @@
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
    "source": "NCL vacation-builder API",
    "saved_at": "2026-10-09",
-   "taxes_per_guest": 210,
+   "taxes_per_guest": 160,
    "gratuities": {
     "open_bar": {
      "title": "Unlimited Open Bar",
@@ -2040,8 +2068,8 @@
       1019
      ],
      "taxes_per_guest": [
-      210,
-      210
+      160,
+      160
      ],
      "open_bar": {
       "title": "Unlimited Open Bar",
@@ -2057,7 +2085,7 @@
        40
       ]
      },
-     "grand_total": 2858
+     "grand_total": 2758
     },
     {
      "guests": 3,
@@ -2071,9 +2099,9 @@
       579
      ],
      "taxes_per_guest": [
-      210,
-      210,
-      210
+      160,
+      160,
+      160
      ],
      "open_bar": {
       "title": "Unlimited Open Bar",
@@ -2091,7 +2119,7 @@
        40
       ]
      },
-     "grand_total": 4067
+     "grand_total": 3917
     },
     {
      "guests": 4,
@@ -2106,10 +2134,10 @@
       579
      ],
      "taxes_per_guest": [
-      210,
-      210,
-      210,
-      210
+      160,
+      160,
+      160,
+      160
      ],
      "open_bar": {
       "title": "Unlimited Open Bar",
@@ -2129,7 +2157,7 @@
        40
       ]
      },
-     "grand_total": 5056
+     "grand_total": 4856
     },
     {
      "guests": 5,
@@ -2145,11 +2173,11 @@
       579
      ],
      "taxes_per_guest": [
-      210,
-      210,
-      210,
-      210,
-      210
+      160,
+      160,
+      160,
+      160,
+      160
      ],
      "open_bar": {
       "title": "Unlimited Open Bar",
@@ -2171,7 +2199,7 @@
        40
       ]
      },
-     "grand_total": 15485
+     "grand_total": 15235
     }
    ],
    "types": [
@@ -2237,8 +2265,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1229.0,
-         "cabin_total": 2458
+         "price_pp": 1179.0,
+         "cabin_total": 2358
         },
         "3": {
          "available": false,
@@ -2276,8 +2304,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1239.0,
-         "cabin_total": 2478
+         "price_pp": 1189.0,
+         "cabin_total": 2378
         },
         "3": {
          "available": false,
@@ -2315,8 +2343,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1259.0,
-         "cabin_total": 2518
+         "price_pp": 1209.0,
+         "cabin_total": 2418
         },
         "3": {
          "available": false,
@@ -2354,22 +2382,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1339.0,
-         "cabin_total": 2678
+         "price_pp": 1289.0,
+         "cabin_total": 2578
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1155.66,
-         "cabin_total": 3467,
-         "added_vs_2": 789
+         "price_pp": 1105.66,
+         "cabin_total": 3317,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1064.0,
-         "cabin_total": 4256,
-         "added_vs_2": 1578
+         "price_pp": 1014.0,
+         "cabin_total": 4056,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -2490,8 +2518,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1439.0,
-         "cabin_total": 2878
+         "price_pp": 1389.0,
+         "cabin_total": 2778
         },
         "3": {
          "available": false,
@@ -2532,15 +2560,15 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1549.0,
-         "cabin_total": 3098
+         "price_pp": 1499.0,
+         "cabin_total": 2998
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1295.66,
-         "cabin_total": 3887,
-         "added_vs_2": 789
+         "price_pp": 1245.66,
+         "cabin_total": 3737,
+         "added_vs_2": 739
         },
         "4": {
          "available": false,
@@ -2574,22 +2602,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1709.0,
-         "cabin_total": 3418
+         "price_pp": 1659.0,
+         "cabin_total": 3318
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1402.33,
-         "cabin_total": 4207,
-         "added_vs_2": 789
+         "price_pp": 1352.33,
+         "cabin_total": 4057,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1249.0,
-         "cabin_total": 4996,
-         "added_vs_2": 1578
+         "price_pp": 1199.0,
+         "cabin_total": 4796,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -2699,8 +2727,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1689.0,
-         "cabin_total": 3378
+         "price_pp": 1639.0,
+         "cabin_total": 3278
         },
         "3": {
          "available": false,
@@ -2738,15 +2766,15 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1709.0,
-         "cabin_total": 3418
+         "price_pp": 1659.0,
+         "cabin_total": 3318
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1402.33,
-         "cabin_total": 4207,
-         "added_vs_2": 789
+         "price_pp": 1352.33,
+         "cabin_total": 4057,
+         "added_vs_2": 739
         },
         "4": {
          "available": false,
@@ -2779,15 +2807,15 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1749.0,
-         "cabin_total": 3498
+         "price_pp": 1699.0,
+         "cabin_total": 3398
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1429.0,
-         "cabin_total": 4287,
-         "added_vs_2": 789
+         "price_pp": 1379.0,
+         "cabin_total": 4137,
+         "added_vs_2": 739
         },
         "4": {
          "available": false,
@@ -2820,22 +2848,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1779.0,
-         "cabin_total": 3558
+         "price_pp": 1729.0,
+         "cabin_total": 3458
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1449.0,
-         "cabin_total": 4347,
-         "added_vs_2": 789
+         "price_pp": 1399.0,
+         "cabin_total": 4197,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1284.0,
-         "cabin_total": 5136,
-         "added_vs_2": 1578
+         "price_pp": 1234.0,
+         "cabin_total": 4936,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -2866,29 +2894,32 @@
        "title": "Aft-Facing Balcony",
        "guarantee": false,
        "solo": false,
-       "capacity": null,
+       "capacity": 4,
        "by_guests": {
         "2": {
-         "available": false,
-         "sold_out": true,
-         "reason": "Sold out"
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2909.0,
+         "cabin_total": 5818
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2235.66,
-         "cabin_total": 6707
+         "price_pp": 2185.66,
+         "cabin_total": 6557,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1874.0,
-         "cabin_total": 7496
+         "price_pp": 1824.0,
+         "cabin_total": 7296,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
-         "sold_out": true,
-         "reason": "Sold out"
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
         }
        },
        "description": "Aft-Facing Balcony, Deck 9, aft",
@@ -2993,8 +3024,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2029.0,
-         "cabin_total": 4058
+         "price_pp": 1979.0,
+         "cabin_total": 3958
         },
         "3": {
          "available": false,
@@ -3037,8 +3068,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2129.0,
-         "cabin_total": 4258
+         "price_pp": 2079.0,
+         "cabin_total": 4158
         },
         "3": {
          "available": false,
@@ -3079,22 +3110,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2199.0,
-         "cabin_total": 4398
+         "price_pp": 2149.0,
+         "cabin_total": 4298
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1729.0,
-         "cabin_total": 5187,
-         "added_vs_2": 789
+         "price_pp": 1679.0,
+         "cabin_total": 5037,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1494.0,
-         "cabin_total": 5976,
-         "added_vs_2": 1578
+         "price_pp": 1444.0,
+         "cabin_total": 5776,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -3125,22 +3156,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2509.0,
-         "cabin_total": 5018
+         "price_pp": 2459.0,
+         "cabin_total": 4918
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1935.66,
-         "cabin_total": 5807,
-         "added_vs_2": 789
+         "price_pp": 1885.66,
+         "cabin_total": 5657,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1649.0,
-         "cabin_total": 6596,
-         "added_vs_2": 1578
+         "price_pp": 1599.0,
+         "cabin_total": 6396,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -3215,22 +3246,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2359.0,
-         "cabin_total": 4718
+         "price_pp": 2309.0,
+         "cabin_total": 4618
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1835.66,
-         "cabin_total": 5507,
-         "added_vs_2": 789
+         "price_pp": 1785.66,
+         "cabin_total": 5357,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1574.0,
-         "cabin_total": 6296,
-         "added_vs_2": 1578
+         "price_pp": 1524.0,
+         "cabin_total": 6096,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -3261,22 +3292,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2509.0,
-         "cabin_total": 5018
+         "price_pp": 2459.0,
+         "cabin_total": 4918
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1935.66,
-         "cabin_total": 5807,
-         "added_vs_2": 789
+         "price_pp": 1885.66,
+         "cabin_total": 5657,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1649.0,
-         "cabin_total": 6596,
-         "added_vs_2": 1578
+         "price_pp": 1599.0,
+         "cabin_total": 6396,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -3309,22 +3340,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2609.0,
-         "cabin_total": 5218
+         "price_pp": 2559.0,
+         "cabin_total": 5118
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2002.33,
-         "cabin_total": 6007,
-         "added_vs_2": 789
+         "price_pp": 1952.33,
+         "cabin_total": 5857,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1699.0,
-         "cabin_total": 6796,
-         "added_vs_2": 1578
+         "price_pp": 1649.0,
+         "cabin_total": 6596,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -3360,8 +3391,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2909.0,
-         "cabin_total": 5818
+         "price_pp": 2859.0,
+         "cabin_total": 5718
         },
         "3": {
          "available": false,
@@ -3400,22 +3431,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 3059.0,
-         "cabin_total": 6118
+         "price_pp": 3009.0,
+         "cabin_total": 6018
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2302.33,
-         "cabin_total": 6907,
-         "added_vs_2": 789
+         "price_pp": 2252.33,
+         "cabin_total": 6757,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1924.0,
-         "cabin_total": 7696,
-         "added_vs_2": 1578
+         "price_pp": 1874.0,
+         "cabin_total": 7496,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -3497,15 +3528,15 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 3509.0,
-         "cabin_total": 7018
+         "price_pp": 3459.0,
+         "cabin_total": 6918
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2602.33,
-         "cabin_total": 7807,
-         "added_vs_2": 789
+         "price_pp": 2552.33,
+         "cabin_total": 7657,
+         "added_vs_2": 739
         },
         "4": {
          "available": false,
@@ -3544,22 +3575,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 4809.0,
-         "cabin_total": 9618
+         "price_pp": 4759.0,
+         "cabin_total": 9518
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 3469.0,
-         "cabin_total": 10407,
-         "added_vs_2": 789
+         "price_pp": 3419.0,
+         "cabin_total": 10257,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2799.0,
-         "cabin_total": 11196,
-         "added_vs_2": 1578
+         "price_pp": 2749.0,
+         "cabin_total": 10996,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -3589,22 +3620,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 4909.0,
-         "cabin_total": 9818
+         "price_pp": 4859.0,
+         "cabin_total": 9718
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 3535.66,
-         "cabin_total": 10607,
-         "added_vs_2": 789
+         "price_pp": 3485.66,
+         "cabin_total": 10457,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2849.0,
-         "cabin_total": 11396,
-         "added_vs_2": 1578
+         "price_pp": 2799.0,
+         "cabin_total": 11196,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -3637,29 +3668,29 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 6059.0,
-         "cabin_total": 12118
+         "price_pp": 6009.0,
+         "cabin_total": 12018
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 4302.33,
-         "cabin_total": 12907,
-         "added_vs_2": 789
+         "price_pp": 4252.33,
+         "cabin_total": 12757,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 3424.0,
-         "cabin_total": 13696,
-         "added_vs_2": 1578
+         "price_pp": 3374.0,
+         "cabin_total": 13496,
+         "added_vs_2": 1478
         },
         "5": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2897.0,
-         "cabin_total": 14485,
-         "added_vs_2": 2367
+         "price_pp": 2847.0,
+         "cabin_total": 14235,
+         "added_vs_2": 2217
         }
        },
        "description": "The Haven 2-Bedroom Family Villa with Large Balcony, Decks 13 to 15, midship and aft",
@@ -3686,22 +3717,22 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 7009.0,
-         "cabin_total": 14018
+         "price_pp": 6959.0,
+         "cabin_total": 13918
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 4935.66,
-         "cabin_total": 14807,
-         "added_vs_2": 789
+         "price_pp": 4885.66,
+         "cabin_total": 14657,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 3899.0,
-         "cabin_total": 15596,
-         "added_vs_2": 1578
+         "price_pp": 3849.0,
+         "cabin_total": 15396,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
@@ -3731,29 +3762,29 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 9009.0,
-         "cabin_total": 18018
+         "price_pp": 8959.0,
+         "cabin_total": 17918
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 6269.0,
-         "cabin_total": 18807,
-         "added_vs_2": 789
+         "price_pp": 6219.0,
+         "cabin_total": 18657,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 4899.0,
-         "cabin_total": 19596,
-         "added_vs_2": 1578
+         "price_pp": 4849.0,
+         "cabin_total": 19396,
+         "added_vs_2": 1478
         },
         "5": {
          "available": true,
          "sold_out": false,
-         "price_pp": 4077.0,
-         "cabin_total": 20385,
-         "added_vs_2": 2367
+         "price_pp": 4027.0,
+         "cabin_total": 20135,
+         "added_vs_2": 2217
         }
        },
        "description": "The Haven Deluxe Owner's Suite with Large Balcony, Decks 13 and 15, aft",
@@ -3778,29 +3809,29 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 12009.0,
-         "cabin_total": 24018
+         "price_pp": 11959.0,
+         "cabin_total": 23918
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 8269.0,
-         "cabin_total": 24807,
-         "added_vs_2": 789
+         "price_pp": 8219.0,
+         "cabin_total": 24657,
+         "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 6399.0,
-         "cabin_total": 25596,
-         "added_vs_2": 1578
+         "price_pp": 6349.0,
+         "cabin_total": 25396,
+         "added_vs_2": 1478
         },
         "5": {
          "available": true,
          "sold_out": false,
-         "price_pp": 5277.0,
-         "cabin_total": 26385,
-         "added_vs_2": 2367
+         "price_pp": 5227.0,
+         "cabin_total": 26135,
+         "added_vs_2": 2217
         }
        },
        "description": "The Haven Premier Owner's Suite with Large Balcony, Deck 14, aft",
@@ -3896,33 +3927,5 @@
     }
    ]
   }
- ],
- "rates": {
-  "free_at_sea_plus": {
-   "adult_per_day": 49.99,
-   "child_per_day": 40.0,
-   "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; 2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. Includes prepaid service charges.",
-   "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-09"
-  },
-  "open_bar": {
-   "per_day_2_to_5_nights": 32.0,
-   "per_day_6_plus_nights": 28.5,
-   "soda_per_day": 12.5,
-   "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-09"
-  },
-  "service_charge": {
-   "suite_haven_per_night": 25.0,
-   "standard_per_night": 20.0,
-   "min_age": 3,
-   "suite_haven_types": [
-    "SUITE",
-    "HAVEN"
-   ],
-   "source": "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge",
-   "checked_at": "2026-10-09"
-  }
- },
- "rate_warnings": []
+ ]
 }
