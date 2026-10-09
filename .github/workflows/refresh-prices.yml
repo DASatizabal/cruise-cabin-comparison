@@ -1,20 +1,32 @@
 name: Refresh prices
 
-# Daily: ask NCL's vacation-builder API for both sailings at 2, 3, 4 and 5 guests, plus one
-# age test per ship, plus cabin counts (about 160 calls, 2 seconds apart, nothing held),
-# commit the new data file,
-# then publish the site in the same run.
-# Scheduled runs only happen on the default branch (main). The push trigger below lets
-# this branch test the fetch on GitHub's runners before it is merged; only main is published.
+# Daily, two parts in one run:
+# 1. Prices (job "refresh"): NCL's vacation-builder API for both sailings at 2, 3, 4 and 5
+#    guests, plus one age test per ship (20 calls, 2 seconds apart, nothing held). Commits
+#    data/prices.json, then publishes the site (job "publish"). Never depends on counts.
+# 2. Cabin counts (job "counts"): runs after the price job, even if it failed. A full sweep
+#    every 3 days, a light re-check on the other days, 3 seconds between calls. Commits
+#    data/counts.json, then publishes again (job "publish-counts"). If it fails, the published
+#    prices stay and the page keeps the last good counts.
+# Scheduled runs only happen on the default branch (main). The push trigger below lets this
+# branch test both parts on GitHub's runners before it is merged; only main is published.
 on:
   schedule:
     - cron: "17 10 * * *"   # 10:17 UTC, about 6:17 AM Miami time in summer
   workflow_dispatch:
+    inputs:
+      count_mode:
+        description: "Cabin counts: auto (full every 3 days), full, or light"
+        type: choice
+        options: [auto, full, light]
+        default: auto
   push:
     branches: [claude/cabin-selector-improvements-08QHA]
     paths:
       - tools/fetch_prices.py
       - tools/check_prices.py
+      - tools/fetch_counts.py
+      - tools/check_counts.py
       - .github/workflows/refresh-prices.yml
 
 permissions:
@@ -27,7 +39,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 20
     outputs:
       sha: ${{ steps.commit.outputs.sha }}
     steps:
@@ -39,7 +51,7 @@ jobs:
       - name: Format check (keeps the old file if this fails)
         run: python3 tools/check_prices.py data/prices.new.json
 
-      - name: Replace the data file and commit
+      - name: Replace the price file and commit
         id: commit
         run: |
           mv data/prices.new.json data/prices.json
@@ -72,6 +84,65 @@ jobs:
     uses: ./.github/workflows/deploy-pages.yml
     with:
       ref: ${{ needs.refresh.outputs.sha }}
+      label: prices
+
+  counts:
+    needs: refresh
+    # Runs after the price job whether it passed or failed; counts never block prices.
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}   # the newest commit, including today's price file
+
+      - name: Count cabins left into a new file
+        run: |
+          MODE="${{ inputs.count_mode }}"
+          if [ "${{ github.event_name }}" = "push" ]; then MODE=full; fi
+          python3 tools/fetch_counts.py --prices data/prices.json --previous data/counts.json \
+            --out data/counts.new.json --mode "${MODE:-auto}"
+
+      - name: Format check (keeps the old counts file if this fails)
+        run: python3 tools/check_counts.py data/counts.new.json
+
+      - name: Replace the counts file and commit
+        id: commit
+        run: |
+          mv data/counts.new.json data/counts.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/counts.json
+          if git diff --cached --quiet; then
+            echo "No change to commit."
+            echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          MODE=$(python3 -c "import json; print(json.load(open('data/counts.json'))['mode'])")
+          git commit -m "Refresh cabin counts $(date -u +%Y-%m-%d) ($MODE)"
+          for i in 1 2 3 4; do
+            if git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep $((2 ** i))
+          done
+          exit 1
+
+  publish-counts:
+    needs: counts
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy-pages.yml
+    with:
+      ref: ${{ needs.counts.outputs.sha }}
+      label: counts
 
   # GitHub turns off scheduled workflows in public repos after 60 days without "repository
   # activity" and doesn't define activity. The daily data commit is probably enough; as a

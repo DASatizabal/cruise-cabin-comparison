@@ -82,6 +82,9 @@
             margin-bottom: 1.25rem;
         }
 
+        .as-of-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .as-of[hidden] { display: none; }
+
         .as-of {
             display: inline-flex;
             align-items: center;
@@ -562,7 +565,10 @@
             <span class="version-badge" id="versionBadge"></span>
             <h1 class="hero-title">Our June 2027 Family Cruise</h1>
             <p class="hero-subtitle">Three choices, all Norwegian Cruise Line, all round trip from Miami: 3 nights, 5 nights, or both back to back for 8 nights.</p>
-            <span class="as-of">Prices as of <strong id="asOf">loading...</strong></span>
+            <div class="as-of-row">
+                <span class="as-of">Prices as of <strong id="asOf">loading...</strong></span>
+                <span class="as-of" id="countsAsOf" hidden>Cabins left as of <strong id="countsAsOfDate"></strong></span>
+            </div>
         </div>
         <div class="wave-container"><div class="wave"></div></div>
     </header>
@@ -609,14 +615,17 @@
     </footer>
 
     <script>
-        const APP_VERSION = "4.4.0";
+        const APP_VERSION = "4.5.0";
         const DATA_URL = "data/prices.json";
+        const COUNTS_URL = "data/counts.json";
+        const COUNTS_MAX_AGE_DAYS = 7;
         const MIN_GUESTS = 2, MAX_GUESTS = 5;
         const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
         const STORE_KEY = "cruise-decision-guide-v4";
         const GUARANTEE_TEXT = "Guarantee: NCL picks your cabin location";
 
         let DATA = null, G = null, A = null;   // data file, Getaway sailing, Aura sailing
+        let COUNTS = null;                      // data/counts.json when present and at most 7 days old
         const state = {
             adults: 2, kids: [],            // kids: ages 0 to 20, or null until chosen
             type: "balcony", mode: "same",
@@ -704,11 +713,11 @@
             return list.find(c => !c.guarantee) || list[0] || null;
         }
 
-        // Cabins left, from NCL's cabin availability counts. Nothing for Guarantee cabins or
-        // counts the fetch marked unreliable.
+        // Cabins left, from data/counts.json. Nothing for Guarantee cabins, unreliable counts,
+        // or when the counts file is missing or more than 7 days old.
         function gauge(c, n) {
-            const e = entry(c, n);
-            if (c.guarantee || !e.count_reliable || !Number.isInteger(e.cabins_left)) return "";
+            const e = c._counts && c._counts.by_guests && c._counts.by_guests[String(n)];
+            if (c.guarantee || !e || !e.reliable || !Number.isInteger(e.cabins_left) || e.cabins_left < 1) return "";
             const left = e.cabins_left;
             if (left >= 50) return "Plenty left";
             if (left >= 10) return "Getting low";
@@ -1083,18 +1092,85 @@
             render();
         });
 
+        // ---------- counts and descriptions ----------
+        function usableCounts(cnt) {
+            try {
+                if (!cnt || cnt.schema_version !== 1 || typeof cnt.sailings !== "object") return null;
+                const saved = Date.parse(cnt.saved_at);
+                if (!Number.isFinite(saved)) return null;
+                if (Date.now() - saved > COUNTS_MAX_AGE_DAYS * 86400000) return null;
+                return cnt;
+            } catch (e) { return null; }
+        }
+
+        const LOCATION_ORDER = ["forward", "midship", "aft"];
+        function deckText(decks) {
+            const d = [...new Set(decks)].sort((a, b) => a - b);
+            if (d.length === 1) return `Deck ${d[0]}`;
+            const parts = [];
+            let run = [d[0]];
+            for (const x of [...d.slice(1), null]) {
+                if (x !== null && x === run[run.length - 1] + 1) { run.push(x); continue; }
+                if (run.length >= 3) parts.push(`${run[0]} to ${run[run.length - 1]}`); else parts.push(...run.map(String));
+                run = [x];
+            }
+            return "Decks " + (parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1] : parts[0]);
+        }
+        function locationText(locs) {
+            const w = LOCATION_ORDER.filter(l => locs.includes(l));
+            return w.length < 3 ? w.join(" and ") : "forward, midship and aft";
+        }
+
+        // Plain description: NCL's title, decks and location from the price file, with gaps
+        // filled from where this category's own open cabins are (counts file, if fresh).
+        // Same rules as tools/fetch_prices.py; nothing is guessed.
+        function describe(c) {
+            const cc = c._counts || {};
+            const decks = c.decks || (!c.guarantee && cc.open_decks) || null;
+            const locs = c.location || (!c.guarantee && cc.open_locations) || null;
+            const parts = [c.title];
+            if (decks && decks.length) parts.push(deckText(decks));
+            if (locs && locs.length) parts.push(locationText(locs));
+            if (!(decks && decks.length) && !c.guarantee && (c.shares_ncl_description_with || []).length && c.capacity) parts.push(`holds up to ${c.capacity}`);
+            return parts.join(", ");
+        }
+
+        function attachCounts() {
+            for (const s of DATA.sailings) {
+                const sc = COUNTS && COUNTS.sailings[s.id];
+                for (const t of s.types) for (const c of t.categories) {
+                    c._counts = (sc && !c.guarantee && sc[c.code]) || null;
+                    c.description = describe(c);
+                }
+            }
+            const pill = document.getElementById("countsAsOf");
+            if (COUNTS) {
+                document.getElementById("countsAsOfDate").textContent = new Date(COUNTS.saved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
+                pill.hidden = false;
+            } else {
+                pill.hidden = true;
+            }
+        }
+
         // ---------- start ----------
         document.getElementById("versionBadge").textContent = "v" + APP_VERSION;
         document.getElementById("footerVersion").textContent = "Version " + APP_VERSION;
         restore();
+        // Counts are optional: any problem loading them just hides the count labels.
+        const countsPromise = fetch(COUNTS_URL, { cache: "no-cache" })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null);
         fetch(DATA_URL, { cache: "no-cache" })
             .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-            .then(d => {
+            .then(d => countsPromise.then(cnt => [d, cnt]))
+            .then(([d, cnt]) => {
                 DATA = d;
+                COUNTS = usableCounts(cnt);
                 G = d.sailings.find(s => s.id.startsWith("getaway"));
                 A = d.sailings.find(s => s.id.startsWith("aura"));
                 if (!G || !A) throw new Error("a sailing is missing");
                 document.getElementById("asOf").textContent = new Date(d.saved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
+                attachCounts();
                 render();
             })
             .catch(err => {

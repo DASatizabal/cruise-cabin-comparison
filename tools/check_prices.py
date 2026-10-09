@@ -53,9 +53,6 @@ def check(data):
         for c in checks["formula"]:
             if c.get("ok") is not True:
                 err(f"formula cross check failed: {c}")
-        counts = checks.get("counts")
-        if not isinstance(counts, dict) or not is_int(counts.get("calls")) or not isinstance(counts.get("unreliable"), list):
-            err("checks.counts needs calls (a whole number) and unreliable (a list)")
         ages = checks.get("ages")
         if not isinstance(ages, list) or len(ages) != len(EXPECTED_SAILINGS):
             err("checks.ages must have one entry per sailing")
@@ -161,15 +158,8 @@ def check(data):
                             err(f"{ep}: added_vs_2 is missing")
                         if not c.get("solo"):
                             available_for[g] = True
-                        left = e.get("cabins_left")
-                        if left is not None and (not is_int(left) or left < 1):
-                            err(f"{ep}: cabins_left must be a positive whole number or null")
-                        if not isinstance(e.get("count_reliable"), bool):
-                            err(f"{ep}: count_reliable must be true or false")
-                        elif e["count_reliable"] != (left is not None):
-                            err(f"{ep}: cabins_left must be set exactly when count_reliable is true")
-                        if c.get("guarantee") and left is not None:
-                            err(f"{ep}: Guarantee cabins must not have a count")
+                        if "cabins_left" in e or "count_reliable" in e:
+                            err(f"{ep}: cabin counts belong in data/counts.json, not in prices")
                     else:
                         if "price_pp" in e:
                             err(f"{ep}: not available but has a price")

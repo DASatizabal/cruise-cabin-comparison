@@ -2,6 +2,22 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.5.0] - 2026-10-09
+
+Cabin counts are separated from prices, so prices never depend on them, and count traffic is lighter.
+
+### Added
+- `data/counts.json`, a separate cabin counts file with its own `saved_at`, written by the new `tools/fetch_counts.py` and checked by the new `tools/check_counts.py`.
+- Count schedule: a full sweep (every category, every party size) when the last full sweep was 3 or more days ago, and on the other days a light re-check of only the counts that were under 50, plus the next pricier category each one needs for the subtraction. 3 seconds between count calls. The mode is recorded in the file (`mode`, `mode_reason`, `last_full_sweep`) and in the commit message ("Refresh cabin counts DATE (full)" or "(light)").
+- "Refresh prices" can be run by hand with a cabin counts choice: auto, full or light.
+- The page shows "Cabins left as of [date]" from `counts.json`. If the file is missing, unreadable or more than 7 days old, the date and every count label are hidden.
+
+### Changed
+- "Refresh prices" now has two parts. The price job (itineraries, availability, price summaries, age test) commits `data/prices.json` and publishes on its own, as before. A separate counts job runs after it (even if the price job failed), commits `data/counts.json` and publishes again. If the counts job fails, the published prices stay and the page keeps the last good counts.
+- Descriptions are built on the page from the price file plus, when fresh, where each category's open cabins are from the counts file. `data/prices.json` no longer holds counts or open-cabin details.
+- "Deploy site" copies `data/counts.json` when present, takes a label for its artifact name (`prices` or `counts`), and queues publishes in the deploy job's concurrency group.
+- The price job's time limit is back to 20 minutes; the counts job has 60.
+
 ## [4.4.0] - 2026-10-08
 
 ### Added

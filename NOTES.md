@@ -280,3 +280,22 @@ Fix in "Deploy site":
 - The deploy step is retried once after 30 seconds if the first attempt fails.
 
 Workflow maintenance: actions/checkout v7, configure-pages v6, upload-pages-artifact v5 (composite; it uses upload-artifact v7) and deploy-pages v5 all run on Node.js 24 (checked in each release's action.yml on 2026-10-08). Every job is pinned to `ubuntu-24.04`, so GitHub's change of `ubuntu-latest` can't change anything unexpectedly. actionlint 1.7.7 reports no problems.
+
+## Counts separated from prices (4.5.0, 2026-10-09)
+
+Owner decisions:
+1. Prices stay daily and never depend on counts. The price fetch (itineraries, availability, price summaries, age test) keeps its schedule and publishes even if counts fail.
+2. Counts move to their own job and their own file, `data/counts.json`, with its own `saved_at`. The counts job runs after the price job, commits its file, then publishes. If it fails or NCL refuses it, the prices still publish and the page keeps the last good counts.
+3. Schedule: a full sweep (all categories, all party sizes) every 3 days; on the other days, re-check only categories whose last count was under 50, plus the next pricier category each one needs for the subtraction. 3 second pauses between count calls.
+4. The page shows "Cabins left as of [date]" from `counts.json` and hides every count label when the file is missing or more than 7 days old.
+5. `counts.json` has its own format check (`tools/check_counts.py`), so a bad counts file never blocks a price publish.
+
+How it's built:
+- `tools/fetch_prices.py` no longer makes cabin calls. `data/prices.json` no longer holds `cabins_left`, `count_reliable` or open-cabin details; `tools/check_prices.py` rejects them if they reappear.
+- `tools/fetch_counts.py --prices data/prices.json --previous data/counts.json --out data/counts.new.json --mode auto|full|light`. It reads today's categories, prices and availability from `prices.json`. `auto` is full when there's no usable previous file (missing or failing `check_counts.py`) or the last full sweep was 3 or more UTC calendar days ago; light otherwise. Light mode starts from the previous entries for categories still available today, re-checks the reliable counts under 50 (and calls the next pricier category for each), and keeps every other entry with its own `checked_at`. Unreliable counts are only retried on full sweeps.
+- Workflow "Refresh prices": `refresh` (prices) then `publish` (label prices); `counts` (`if: !cancelled()`, so it runs even if `refresh` failed, and checks out the branch head so it sees today's prices) then `publish-counts` (label counts); `keepalive`. Two publishes in one run use different artifact names (`github-pages-prices-<attempt>`, `github-pages-counts-<attempt>`), and the deploy job's concurrency group `pages` makes the second wait for the first.
+- Manual runs: Actions, "Refresh prices", "Run workflow", then choose the cabin counts mode (auto, full or light). Pushes to the development branch always do a full sweep.
+- How to tell the days apart: the counts commit message ends in "(full)" or "(light)"; `counts.json` has `mode`, `mode_reason`, `calls` and `last_full_sweep`; the counts job's log starts with "Mode: full (...)" or "Mode: light (...)".
+- The page loads `counts.json` separately; any problem (missing, unreadable, wrong schema, more than 7 days old) hides the labels and the "Cabins left as of" date without touching prices. Descriptions are rebuilt on the page with the same rules as `fetch_prices.py`, filling missing decks or locations from `open_decks` and `open_locations` only while counts are fresh.
+
+Volume (2026-10-08 data): a full sweep is 141 calls. 89 of those counts were under 50 (mostly small Haven, suite and Club Balcony categories), so a light day is about 100 calls including the subtrahend calls. Light days save roughly a quarter to a third of the calls; most of the saving comes from the 3 day full sweep cycle and the slower 3 second pace is a choice for gentleness, not speed.
