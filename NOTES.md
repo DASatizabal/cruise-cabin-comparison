@@ -344,3 +344,11 @@ Scheduled runs: as of 2026-10-09 16:06 UTC, GitHub had never started a scheduled
 Free at Sea Plus coupling (kept on purpose): turning Free at Sea Plus on also turns on Open Bar and Specialty Dining, and turning either off turns Plus off. This comes from the 2.x page; NCL's terms describe Plus as an upgrade of Free at Sea but don't confirm this rule.
 
 Per party size fallback (4.7.0): see CLAUDE.md, "Data". Tested locally on 2026-10-09 with simulated failures: one party size failing (Getaway 4 guests kept its earlier prices, run succeeded, file passed the format check), kept prices 8 days old (run failed), every party size failing on the Aura (run failed).
+
+## Branch data conflicts (4.7.1, 2026-10-09)
+
+GitHub reported that the branch couldn't merge into main automatically. Cause: the owner ran "Refresh prices" by hand on main (bot commits at 16:10 UTC), and the branch's push-triggered test runs committed their own `data/prices.json` and `data/counts.json` (16:16 UTC). Both sides changed the same files. Only those two files conflicted.
+
+Resolution: merged main into the branch and kept the newer versions (the branch's: prices 2026-10-09T16:16:45Z with `party_sizes`, counts 2026-10-09T16:16:52Z full sweep). Both pass their format checks.
+
+Prevention: in `refresh-prices.yml`, the commit steps run only when `github.ref` is `refs/heads/main`. Branch runs fetch, run the format checks, and stop with "Branch run, so ... is checked but not committed." Until this version is merged, a new data commit on main could still conflict with the branch's data files; merging main into the branch again fixes it.

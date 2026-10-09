@@ -9,7 +9,8 @@ name: Refresh prices
 #    data/counts.json, then publishes again (job "publish-counts"). If it fails, the published
 #    prices stay and the page keeps the last good counts.
 # Scheduled runs only happen on the default branch (main). The push trigger below lets this
-# branch test both parts on GitHub's runners before it is merged; only main is published.
+# branch test both parts on GitHub's runners before it is merged; only main commits data
+# files and publishes.
 on:
   schedule:
     - cron: "17 10 * * *"   # 10:17 UTC, about 6:17 AM Miami time in summer
@@ -51,8 +52,15 @@ jobs:
       - name: Format check (keeps the old file if this fails)
         run: python3 tools/check_prices.py data/prices.new.json
 
+      # Only main commits data files. Branch test runs fetch and check, then stop, so the
+      # branch never carries its own data/prices.json that would conflict with main's.
+      - name: Branch test (fetched and checked; not committed)
+        if: github.ref != 'refs/heads/main'
+        run: echo "Branch run, so data/prices.new.json is checked but not committed."
+
       - name: Replace the price file and commit
         id: commit
+        if: github.ref == 'refs/heads/main'
         run: |
           mv data/prices.new.json data/prices.json
           git config user.name "github-actions[bot]"
@@ -109,8 +117,13 @@ jobs:
       - name: Format check (keeps the old counts file if this fails)
         run: python3 tools/check_counts.py data/counts.new.json
 
+      - name: Branch test (counted and checked; not committed)
+        if: github.ref != 'refs/heads/main'
+        run: echo "Branch run, so data/counts.new.json is checked but not committed."
+
       - name: Replace the counts file and commit
         id: commit
+        if: github.ref == 'refs/heads/main'
         run: |
           mv data/counts.new.json data/counts.json
           git config user.name "github-actions[bot]"

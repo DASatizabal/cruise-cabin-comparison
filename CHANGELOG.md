@@ -2,6 +2,12 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.7.1] - 2026-10-09
+
+### Fixed
+- Branch test runs of "Refresh prices" no longer commit `data/prices.json` or `data/counts.json`. They still fetch and run both format checks, then stop; only runs on `main` commit data files. This stops the branch's data files from conflicting with `main`'s, which made GitHub report that the branch couldn't merge automatically.
+- Merged `main` into the branch. `data/prices.json` and `data/counts.json` conflicted (main's 16:10 UTC manual refresh against the branch's 16:16 UTC test run); the newer branch versions were kept and both pass their format checks.
+
 ## [4.7.0] - 2026-10-09
 
 ### Added
