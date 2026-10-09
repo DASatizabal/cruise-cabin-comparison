@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Fetch prices from NCL into a new file
-        run: python3 tools/fetch_prices.py --out data/prices.new.json
+        run: python3 tools/fetch_prices.py --out data/prices.new.json --previous data/prices.json
 
       - name: Format check (keeps the old file if this fails)
         run: python3 tools/check_prices.py data/prices.new.json

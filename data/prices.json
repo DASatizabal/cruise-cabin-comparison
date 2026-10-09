@@ -93,6 +93,36 @@
     "ncl_total": 3769.5,
     "ok": true
    }
+  ],
+  "rates": [
+   {
+    "sailing": "getaway-2027-06-11",
+    "item": "open bar",
+    "price_summary": 96,
+    "terms_rate_x_nights": 96.0,
+    "ok": true
+   },
+   {
+    "sailing": "getaway-2027-06-11",
+    "item": "soda",
+    "price_summary": 37.5,
+    "terms_rate_x_nights": 37.5,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "item": "open bar",
+    "price_summary": 160,
+    "terms_rate_x_nights": 160.0,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "item": "soda",
+    "price_summary": 62.5,
+    "terms_rate_x_nights": 62.5,
+    "ok": true
+   }
   ]
  },
  "sailings": [
@@ -114,12 +144,16 @@
      "title": "Unlimited Open Bar",
      "per_guest": 96,
      "soda_under_21_position_2": 37.5,
-     "under_21_position_3_plus": 0
+     "under_21_position_3_plus": 0,
+     "source": "NCL price-summary (age test)",
+     "checked_at": "2026-10-09"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 1 Meal",
      "per_guest": 20,
-     "under_13": 0
+     "under_13": 0,
+     "source": "NCL price-summary (age test)",
+     "checked_at": "2026-10-09"
     }
    },
    "terminal": {
@@ -1944,12 +1978,16 @@
      "title": "Unlimited Open Bar",
      "per_guest": 160,
      "soda_under_21_position_2": 62.5,
-     "under_21_position_3_plus": 0
+     "under_21_position_3_plus": 0,
+     "source": "NCL price-summary (age test)",
+     "checked_at": "2026-10-09"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 2 Meals",
      "per_guest": 40,
-     "under_13": 0
+     "under_13": 0,
+     "source": "NCL price-summary (age test)",
+     "checked_at": "2026-10-09"
     }
    },
    "terminal": {
@@ -3858,5 +3896,33 @@
     }
    ]
   }
- ]
+ ],
+ "rates": {
+  "free_at_sea_plus": {
+   "adult_per_day": 49.99,
+   "child_per_day": 40.0,
+   "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; 2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. Includes prepaid service charges.",
+   "source": "https://www.ncl.com/cruise-deals/promotion-terms",
+   "checked_at": "2026-10-09"
+  },
+  "open_bar": {
+   "per_day_2_to_5_nights": 32.0,
+   "per_day_6_plus_nights": 28.5,
+   "soda_per_day": 12.5,
+   "source": "https://www.ncl.com/cruise-deals/promotion-terms",
+   "checked_at": "2026-10-09"
+  },
+  "service_charge": {
+   "suite_haven_per_night": 25.0,
+   "standard_per_night": 20.0,
+   "min_age": 3,
+   "suite_haven_types": [
+    "SUITE",
+    "HAVEN"
+   ],
+   "source": "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge",
+   "checked_at": "2026-10-09"
+  }
+ },
+ "rate_warnings": []
 }

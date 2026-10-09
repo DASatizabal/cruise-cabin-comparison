@@ -299,3 +299,32 @@ How it's built:
 - The page loads `counts.json` separately; any problem (missing, unreadable, wrong schema, more than 7 days old) hides the labels and the "Cabins left as of" date without touching prices. Descriptions are rebuilt on the page with the same rules as `fetch_prices.py`, filling missing decks or locations from `open_decks` and `open_locations` only while counts are fresh.
 
 Volume (2026-10-08 data): a full sweep is 141 calls. 89 of those counts were under 50 (mostly small Haven, suite and Club Balcony categories), so a light day is about 100 calls including the subtrahend calls. Light days save roughly a quarter to a third of the calls; most of the saving comes from the 3 day full sweep cycle and the slower 3 second pace is a choice for gentleness, not speed.
+
+## Free at Sea choices and gratuities (4.6.0, researched 2026-10-09)
+
+Does the fare change when offers are declined? No. Price summaries for the Getaway Jun 11 sailing at 2 guests (cloud session, no cabin hold, no manage-cabin):
+- B4 (Balcony): every Free at Sea promotion code NCL lists for the type gives the same fare, $299 per guest. ALL4CHO (all offers) $1,230 total = fare $598 + Open Bar $192 + Specialty Dining $40 + taxes $400. BVSXIN (Open Bar, Wi-Fi, excursions) $1,190: no dining line. DISXIN (Specialty Dining, Wi-Fi, excursions) $1,038: no Open Bar line. INTSHO (Wi-Fi, excursions) $998. BESTFARE and no fare code $998.
+- HI (Haven): CHOALL4M $3,930, HSBVSXIN $3,890, HSINTSHO $3,698, all with a fare of $1,649 per guest. HSDISXIN returned an empty summary (all zeros), so it isn't usable.
+- So turning off Open Bar or Specialty Dining only removes that gratuity. The page does this with the daily rates; it doesn't need extra calls.
+
+Rates and their sources (read daily by `tools/fetch_prices.py`, stored in `rates` with `source` and `checked_at`):
+- Free at Sea Plus, NCL promotion terms (https://www.ncl.com/cruise-deals/promotion-terms), "Prices are Per Person Per Day": guests 1 to 8 adult $49.99, guests 1 to 2 child $40 (USD). Terms: guests 2 and under are not eligible; 21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 get the child version; guests 3 to 8 under 21 don't get it ("no substitutes, credits, or cash value"); all guests in a stateroom must choose the same offer. Plus includes "Prepaid Service Charge". The terms also say guests who already prepaid service charges get $15 ($20 child) off Plus; the page instead removes the service charge for Plus guests, which is the owner's rule.
+- Open Bar gratuity, same terms page: $32 per person per day for 2 to 5 nights, $28.50 for 6 or more; Unlimited Soda package $12.50 per person per day. Cross check on 2026-10-09: the price summary amounts equal the rate x nights on both ships ($96 and $37.50 Getaway, $160 and $62.50 Aura).
+- Specialty Dining: from the daily price summary age test ($20 Getaway, 1 meal; $40 Aura, 2 meals), with source and date. The terms page has no plain price table for it.
+- Service charges, NCL FAQ (https://www.ncl.com/faq/what-is-onboard-service-charge redirects to https://www.ncl.com/faq/what-is-ncl-onboard-service-charge): "$25.00 USD per person per day for The Haven and Suites; $20.00 USD per person per day for Club Balcony Suite and below" (bookings on or after January 1, 2023), charged to "All guests 3 years or older", prepay up to 24 hours before sailing, adjustable onboard.
+- The owner asked for the service charge "for every guest"; NCL's FAQ says guests 3 and older, so the page follows NCL and shows "(under 3: no charge)".
+
+Page rules (4.6.0):
+- Switches per cabin: Open Bar (on), Specialty Dining (on), Free at Sea Plus (off). For 8 nights, the Getaway and the Aura each have their own set. The 3 night card and the 8 night card share the Getaway's set, and the 5 night card and the 8 night card share the Aura's, because each is the same cabin booking.
+- Free at Sea Plus on also turns Open Bar and Specialty Dining on, and turning either off turns Plus off. This follows the 2.x page's behavior (Plus is an upgrade of the Free at Sea beverage and dining offers); it is not separately confirmed in NCL's terms.
+- Free at Sea Plus can't be priced through the price summary (it is not among the offer groups the availability call lists), so it is computed from the terms rates.
+- Gratuities total = service charges + Open Bar gratuity + Specialty Dining gratuity. The prepay switch moves only the service charges between "Due before you sail" and "Charged onboard"; Free at Sea gratuities and Plus are always before sailing.
+
+Light count days: re-check only counts under 15 (was under 50), plus the next pricier category each one needs. On the 2026-10-09 counts that is 58 counts and about 75 calls (it was 87 counts and about 94 calls at under 50; a full sweep is about 140). Most remaining small counts are Haven and suite categories.
+
+NCL glitch seen 2026-10-09 around 02:00 UTC: the availability call for the Getaway at 4 and 5 guests marked categories available at a price of $0 (fare code ALL4CHO), and the price summary briefly returned a $0 total at 3 guests and $150 taxes at 4 guests. The Aura and the Getaway at 2 and 3 guests were normal. It lasted at least 15 minutes. The price fetch now retries such answers after 30, 60 and 120 seconds and then fails, so the last good prices stay published (counts still run). The committed `data/prices.json` for 4.6.0 is the last good fetch from 01:28 UTC with the rates read from NCL's pages at about 02:00 UTC.
+
+## To do (not built yet)
+
+1. Price drop and low availability email alerts to the owner, possibly through Resend.
+2. A "Make Selection" button. When a family member has picked a trip and cabin, it opens a form for each guest's full name, date of birth, email address, Latitudes number if they have one, and anything else NCL needs to create a reservation, and sends it to the owner so the owner's NCL cruise consultant can book it. These are personal details and the repo and page are public, so the form must never store anything in the repo (or in the data files, or in browser storage beyond the open form). Options to weigh later: a button that opens the family member's own email app with everything filled in and addressed to the owner (nothing leaves their device except through their own email), or sending it through the owner's Cloudflare Worker by email (needs spam protection, for example the family passphrase).

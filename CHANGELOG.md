@@ -2,6 +2,22 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.6.0] - 2026-10-09
+
+Free at Sea choices per cabin, crew gratuities, and what is due before sailing versus onboard.
+
+### Added
+- Free at Sea switches for each cabin, in the same iOS style as the 2.x page: Unlimited Open Bar (on), Specialty Dining (on) and Free at Sea Plus (off). All guests in a cabin share the choice. For 8 nights the Getaway and the Aura each have their own set, since they are separate bookings. Turning Free at Sea Plus on also turns on Open Bar and Specialty Dining; turning either of those off turns Plus off.
+- Free at Sea Plus per guest per night: 21 and over at the adult rate, a guest 1 or 2 aged 3 to 20 at the child rate; 2 and under, and under 21 in position 3 or later, are not charged.
+- Service charges (crew gratuities) per guest per night for every guest 3 and older, at NCL's Suite and Haven rate or standard rate, as their own line. Guests covered by Free at Sea Plus don't pay them (Plus includes prepaid service charges).
+- A "Gratuities total" line (service charges, Open Bar and Specialty Dining gratuities) in every total.
+- A "Gratuities" card with a "Prepay gratuities" / "Pay onboard on the last day" switch and the note "Daily gratuities can be adjusted or removed onboard at Guest Services." Every total is split into "Due before you sail" and "Charged onboard".
+- `rates` in `data/prices.json`, read daily from NCL's pages with source and date: Free at Sea Plus adult and child rates and the Open Bar and soda rates (promotion terms page), and the service charge rates and minimum age (NCL's service charge FAQ). If a page can't be read, the previous rate is kept with a warning. The Open Bar and soda amounts from NCL's price summary are cross checked against these rates.
+- The price fetch retries an availability answer that shows nothing available at a real price, and a price summary with a $0 total, after 30, 60 and 120 seconds.
+
+### Changed
+- Light count days re-check only counts under 15 (was under 50), plus the next pricier category each one needs. About 75 calls instead of about 95 (full sweep about 140).
+
 ## [4.5.0] - 2026-10-09
 
 Cabin counts are separated from prices, so prices never depend on them, and count traffic is lighter.

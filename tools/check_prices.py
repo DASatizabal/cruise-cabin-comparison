@@ -61,6 +61,31 @@ def check(data):
                 if c.get("ok") is not True:
                     err(f"age cross check failed: {c}")
 
+    rates = data.get("rates")
+    if not isinstance(rates, dict):
+        err("rates block is missing")
+    else:
+        need = {"free_at_sea_plus": ["adult_per_day", "child_per_day"],
+                "open_bar": ["per_day_2_to_5_nights", "per_day_6_plus_nights", "soda_per_day"],
+                "service_charge": ["suite_haven_per_night", "standard_per_night"]}
+        for key, fields in need.items():
+            r = rates.get(key)
+            if not isinstance(r, dict):
+                err(f"rates.{key} is missing")
+                continue
+            for f in fields:
+                if not isinstance(r.get(f), (int, float)) or isinstance(r.get(f), bool) or r[f] <= 0:
+                    err(f"rates.{key}.{f} must be a positive number")
+            if not str(r.get("source", "")).startswith("https://www.ncl.com/"):
+                err(f"rates.{key}.source must be an NCL page")
+            try:
+                dt.date.fromisoformat(r.get("checked_at", ""))
+            except (TypeError, ValueError):
+                err(f"rates.{key}.checked_at must be a date")
+        sc = rates.get("service_charge") or {}
+        if not is_int(sc.get("min_age")) or not isinstance(sc.get("suite_haven_types"), list):
+            err("rates.service_charge needs min_age and suite_haven_types")
+
     sailings = data.get("sailings")
     if not isinstance(sailings, list):
         return errors + ["sailings must be a list"]
