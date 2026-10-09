@@ -30,6 +30,7 @@ Cross checks are logged in the data file under "checks":
 """
 import argparse
 import datetime as dt
+import html
 import json
 import os
 import re
@@ -174,12 +175,28 @@ def fetch_ports(cfg):
 
 
 def fetch_availability(cfg, guests):
+    """Availability for one ship and party size.
+
+    NCL has briefly answered with every category unavailable, or available at a price of $0
+    (both seen 2026-10-09 for the Getaway at 4 and 5 guests). An answer with nothing available
+    at a real price is retried after 30, 60 and 120 seconds before the run fails, so the old
+    price file stays published.
+    """
     body = {"sailingFilters": [{"packageId": cfg["package_id"], "numberOfGuests": guests, "filterId": "0"}]}
-    res = request(AVAILABILITY_URL, body)
-    try:
-        return res["results"][0]["result"]
-    except (KeyError, IndexError, TypeError):
-        raise RuntimeError(f"Unexpected availability answer for {cfg['ship']} at {guests} guests")
+    for attempt in range(len(RETRY_WAITS) + 1):
+        if attempt:
+            log(f"  NCL showed nothing available for {cfg['ship']} at {guests} guests; retry {attempt} of {len(RETRY_WAITS)} in {RETRY_WAITS[attempt - 1]} s")
+            time.sleep(RETRY_WAITS[attempt - 1])
+        res = request(AVAILABILITY_URL, body)
+        try:
+            result = res["results"][0]["result"]
+        except (KeyError, IndexError, TypeError):
+            raise RuntimeError(f"Unexpected availability answer for {cfg['ship']} at {guests} guests")
+        if any(cp.get("isAvailable") and ((cp.get("standardOption") or {}).get("price") or 0) > 0
+               for t in result.get("stateroomTypesPricing", [])
+               for sp in t.get("stateroomsPricing", []) for cp in sp.get("categoryPricing", [])):
+            return result
+    return result
 
 
 def default_fare_codes(result):
@@ -206,9 +223,16 @@ def fetch_price_summary(cfg, guests, type_code, cat_code, fare_code, guest_list=
                               "fareCodes": [fare_code], "guests": guest_list or [], "vouchers": []}],
         "userFareCodes": [],
     }
-    res = request(PRICE_SUMMARY_URL, body)
-    if "total" not in res:
-        raise RuntimeError(f"Unexpected price summary for {cfg['ship']} {cat_code} at {guests} guests")
+    # NCL has briefly answered with a total of $0 (seen 2026-10-09); retry before giving up.
+    for attempt in range(len(RETRY_WAITS) + 1):
+        if attempt:
+            log(f"  NCL price summary for {cfg['ship']} {cat_code} at {guests} guests was empty; retry {attempt} of {len(RETRY_WAITS)} in {RETRY_WAITS[attempt - 1]} s")
+            time.sleep(RETRY_WAITS[attempt - 1])
+        res = request(PRICE_SUMMARY_URL, body)
+        if "total" not in res:
+            raise RuntimeError(f"Unexpected price summary for {cfg['ship']} {cat_code} at {guests} guests")
+        if (res["total"].get("grandTotal") or 0) > 0:
+            break
     lines = {}
     for group in res["staterooms"][0]["pricing"]["priceGroups"]:
         for item in group.get("priceItems", []):
@@ -441,10 +465,12 @@ def fetch_sailing(cfg, checks):
     # in position 3 or later nothing; Specialty Dining 13 and over pay, under 13 free.
     if not (b[0] > 0 and 0 < b[1] < b[0] and b[2] == 0 and d[0] > 0 and d[1] == d[0] and d[2] == 0):
         raise RuntimeError(f"NCL's age rules changed on the {cfg['ship']}: Open Bar {b}, Specialty Dining {d}")
+    read_on = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
     gratuities = {
         "open_bar": {"title": bar["title"], "per_guest": b[0], "soda_under_21_position_2": b[1],
-                     "under_21_position_3_plus": 0},
-        "specialty_dining": {"title": dining["title"], "per_guest": d[0], "under_13": 0},
+                     "under_21_position_3_plus": 0, "source": "NCL price-summary (age test)", "checked_at": read_on},
+        "specialty_dining": {"title": dining["title"], "per_guest": d[0], "under_13": 0,
+                             "source": "NCL price-summary (age test)", "checked_at": read_on},
     }
 
     # Cross check: availability price x guests + gratuities x guests = price summary total (all adults).
@@ -493,18 +519,112 @@ def fetch_sailing(cfg, checks):
     }
 
 
+TERMS_URL = "https://www.ncl.com/cruise-deals/promotion-terms"
+SERVICE_CHARGE_URL = "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge"
+
+
+def page_text(url):
+    """A public NCL page as plain text (GET; following redirects is fine for GET)."""
+    if FORBIDDEN.search(url):
+        raise RuntimeError(f"Refusing to call {url}")
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
+    with urllib.request.urlopen(req, timeout=60) as res:
+        raw = res.read().decode("utf-8", errors="replace")
+    raw = re.sub(r"<script.*?</script>|<style.*?</style>", " ", raw, flags=re.S)
+    text = html.unescape(re.sub(r"<[^>]+>", " ", raw)).replace("\\r\\n", " ").replace("&nbsp;", " ")
+    return re.sub(r"\s+", " ", text)
+
+
+def money_in(pattern, text, what):
+    m = re.search(pattern, text)
+    if not m:
+        raise RuntimeError(f"{what} not found")
+    return [float(x) for x in m.groups()]
+
+
+def fetch_rates(previous):
+    """Free at Sea Plus, Open Bar, soda and service charge rates from NCL's own pages.
+
+    Each rate is stored with its source and the date it was read. If a page can't be read or
+    its wording changed, the previous day's rate is carried forward with a warning (prices
+    still publish); with no previous rate the run fails.
+    """
+    today = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
+    prev = (previous or {}).get("rates") or {}
+    rates, warnings = {}, []
+
+    def read(key, url, build):
+        try:
+            rates[key] = dict(build(page_text(url)), source=url, checked_at=today)
+        except Exception as e:
+            if key in prev:
+                rates[key] = dict(prev[key], stale_since=prev[key].get("stale_since") or prev[key].get("checked_at"))
+                warnings.append(f"{key}: could not read {url} ({e}); kept the rate from {prev[key].get('checked_at')}")
+            else:
+                raise RuntimeError(f"Could not read {key} from {url}: {e}")
+
+    def plus(text):
+        adult, child = money_in(r"1-8 \(Adult\) \$ ?([\d.]+).{0,120}?1-2 \(Child\) \$ ?([\d.]+)", text, "Free at Sea Plus rates")
+        if not (20 <= adult <= 200 and 10 <= child <= 200):
+            raise RuntimeError(f"Free at Sea Plus rates look wrong: {adult}, {child}")
+        return {"adult_per_day": adult, "child_per_day": child,
+                "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; "
+                         "2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. "
+                         "Includes prepaid service charges."}
+
+    def open_bar(text):
+        short, long_ = money_in(r"2 - 5 Nights \$([\d.]+) USD 6\+ Nights \$([\d.]+) USD", text, "Open Bar gratuity rates")
+        soda, = money_in(r"Unlimited Soda Beverage Package is \$([\d.]+) USD per person per day", text, "soda package rate")
+        return {"per_day_2_to_5_nights": short, "per_day_6_plus_nights": long_, "soda_per_day": soda}
+
+    def service(text):
+        suite, std = money_in(r"\$([\d.]+) USD per person per day for The Haven and Suites; \$([\d.]+) USD per person per day for Club Balcony Suite and below", text, "service charge rates")
+        age, = money_in(r"All guests (\d+) years or older", text, "service charge minimum age")
+        if not (5 <= std <= 60 and 5 <= suite <= 60):
+            raise RuntimeError(f"service charge rates look wrong: {suite}, {std}")
+        return {"suite_haven_per_night": suite, "standard_per_night": std, "min_age": int(age),
+                "suite_haven_types": ["SUITE", "HAVEN"]}
+
+    read("free_at_sea_plus", TERMS_URL, plus)
+    read("open_bar", TERMS_URL, open_bar)
+    read("service_charge", SERVICE_CHARGE_URL, service)
+    return rates, warnings
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
+    ap.add_argument("--previous", help="the current data/prices.json, to carry rates forward if a page can't be read")
     args = ap.parse_args()
 
-    checks = {"extra_guest_mismatches": [], "formula": [], "ages": []}
+    previous = None
+    if args.previous and os.path.exists(args.previous):
+        try:
+            with open(args.previous, encoding="utf-8") as f:
+                previous = json.load(f)
+        except Exception:
+            previous = None
+
+    checks = {"extra_guest_mismatches": [], "formula": [], "ages": [], "rates": []}
     sailings = [fetch_sailing(cfg, checks) for cfg in SAILINGS]
+    rates, rate_warnings = fetch_rates(previous)
+    for w in rate_warnings:
+        log("Warning: " + w)
+    # Cross check NCL's price summary gratuities against the terms page rates (logged, not fatal).
+    for s in sailings:
+        n = s["nights"]
+        per_day = rates["open_bar"]["per_day_2_to_5_nights"] if n <= 5 else rates["open_bar"]["per_day_6_plus_nights"]
+        for what, got, want in [("open bar", s["gratuities"]["open_bar"]["per_guest"], per_day * n),
+                                ("soda", s["gratuities"]["open_bar"]["soda_under_21_position_2"], rates["open_bar"]["soda_per_day"] * n)]:
+            checks["rates"].append({"sailing": s["id"], "item": what, "price_summary": got, "terms_rate_x_nights": round(want, 2),
+                                    "ok": abs(got - want) <= TOLERANCE})
     out = {
         "schema_version": SCHEMA_VERSION,
         "saved_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
         "guest_counts": GUEST_COUNTS,
+        "rates": rates,
+        "rate_warnings": rate_warnings,
         "checks": checks,
         "sailings": sailings,
     }
@@ -514,6 +634,9 @@ def main():
         f.write("\n")
     log(f"Wrote {args.out}")
 
+    for c in checks["rates"]:
+        if not c["ok"]:
+            log(f"Note: {c['sailing']} {c['item']} gratuity {c['price_summary']} differs from the terms rate x nights {c['terms_rate_x_nights']}")
     for m in checks["extra_guest_mismatches"]:
         log(f"Note: extra guest price differs for {m['sailing']} {m['category']}: {m['per_extra_guest']}")
     bad = [c for c in checks["formula"] + checks["ages"] if not c["ok"]]

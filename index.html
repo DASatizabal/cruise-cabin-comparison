@@ -532,6 +532,26 @@
         .cat-list button[aria-pressed="true"] { border-color: var(--teal); background: var(--teal-wash); }
         .cat-list button.only { cursor: default; pointer-events: none; }
         .cat-list .price { font-weight: 700; white-space: nowrap; }
+
+        /* iOS-style switches (same look as the 2.x page) */
+        .toggle-container { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.6rem; }
+        .toggle-label { font-size: 0.875rem; font-weight: 600; color: var(--gray-700); }
+        .toggle-price { font-size: 0.78rem; color: var(--gray-500); }
+        .toggle-note { font-size: 0.72rem; color: #92400e; margin-top: 0.15rem; }
+        .toggle-switch {
+            position: relative; flex-shrink: 0; width: 50px; height: 28px; appearance: none; -webkit-appearance: none;
+            background: var(--gray-300); border-radius: 9999px; cursor: pointer; transition: background 0.3s; margin: 0;
+        }
+        .toggle-switch:checked { background: var(--teal); }
+        .toggle-switch::before {
+            content: ''; position: absolute; width: 24px; height: 24px; border-radius: 50%; top: 2px; left: 2px;
+            background: var(--white); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); transition: transform 0.3s;
+        }
+        .toggle-switch:checked::before { transform: translateX(22px); }
+        .offers { margin-top: 0.9rem; padding-top: 0.6rem; border-top: 1px solid var(--gray-200); }
+        .offers-title { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ocean-blue); }
+        .row.subtotal .k, .row.subtotal .v { font-weight: 700; color: var(--gray-900); }
+        .row.due .k { color: var(--gray-700); }
         .gauge { display: inline-block; margin-top: 0.25rem; padding: 0.05rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600; }
         .gauge.ok { background: #dcfce7; color: #166534; }
         .gauge.mid { background: var(--gold-wash); color: #92400e; }
@@ -602,6 +622,18 @@
             <p class="hint">Prices are for one cabin with everyone above in it.</p>
         </section>
 
+        <section class="panel" aria-label="Gratuities">
+            <div class="panel-title">Gratuities</div>
+            <div class="toggle-container">
+                <input type="checkbox" class="toggle-switch" id="prepayToggle" checked aria-label="Prepay gratuities">
+                <div>
+                    <div class="toggle-label" id="prepayLabel">Prepay gratuities</div>
+                    <div class="toggle-price" id="prepayDesc">Service charges are paid with the cruise, before you sail</div>
+                </div>
+            </div>
+            <p class="hint">Daily gratuities can be adjusted or removed onboard at Guest Services.</p>
+        </section>
+
         <div id="app"><div class="loading">Loading prices...</div></div>
     </main>
 
@@ -609,13 +641,13 @@
         <div class="wrap">
             <strong>About these prices</strong>
             <p>Prices come from Norwegian Cruise Line's booking system and are checked once a day. They change often, so check NCL before booking.</p>
-            <p>Each total is the cruise fare, NCL's government taxes, fees and port expenses, and the Free at Sea gratuities. Unlimited Open Bar: guests 21 and over pay the full gratuity, a guest under 21 who is guest 2 pays for a soda package instead, and other guests under 21 pay nothing. Specialty Dining: guests 13 and over pay, under 13 eat free. NCL lists adults first, then kids oldest first.</p>
+            <p>Each total is the cruise fare, NCL's government taxes, fees and port expenses, the daily service charges (crew gratuities) for every guest 3 and older, the gratuities for the Free at Sea offers you keep switched on, and Free at Sea Plus if you choose it. Unlimited Open Bar: guests 21 and over pay the full gratuity, a guest under 21 who is guest 2 pays for a soda package instead, and other guests under 21 pay nothing. Specialty Dining: guests 13 and over pay, under 13 eat free. NCL lists adults first, then kids oldest first.</p>
             <p id="footerVersion"></p>
         </div>
     </footer>
 
     <script>
-        const APP_VERSION = "4.5.0";
+        const APP_VERSION = "4.6.0";
         const DATA_URL = "data/prices.json";
         const COUNTS_URL = "data/counts.json";
         const COUNTS_MAX_AGE_DAYS = 7;
@@ -631,6 +663,10 @@
             type: "balcony", mode: "same",
             pickG: null, pickA: null,       // chosen category code per ship (same cabin type)
             diffG: null, diffA: null,       // chosen category code per ship (different cabins)
+            // Free at Sea choices per cabin (all guests in a cabin must choose the same offers).
+            // The Getaway and the Aura are separate bookings, so each has its own set.
+            offers: { G: { bar: true, dining: true, plus: false }, A: { bar: true, dining: true, plus: false } },
+            prepayGratuities: true,         // service charges before sailing, or onboard on the last day
         };
 
         // ---------- helpers ----------
@@ -654,7 +690,13 @@
                 if (!s || !Number.isInteger(s.adults) || !Array.isArray(s.kids)) return;
                 const kids = s.kids.map(a => Number.isInteger(a) && a >= 0 && a <= 20 ? a : null);
                 if (s.adults < 1 || s.adults + kids.length < MIN_GUESTS || s.adults + kids.length > MAX_GUESTS) return;
-                Object.assign(state, s, { kids });
+                const offers = {};
+                for (const k of ["G", "A"]) {
+                    const o = (s.offers && s.offers[k]) || {};
+                    offers[k] = { bar: o.bar !== false, dining: o.dining !== false, plus: o.plus === true };
+                    if (offers[k].plus && !(offers[k].bar && offers[k].dining)) offers[k].plus = false;
+                }
+                Object.assign(state, s, { kids, offers, prepayGratuities: s.prepayGratuities !== false });
             } catch (e) {}
         }
 
@@ -731,30 +773,78 @@
             return [...Array(state.adults).fill(null), ...state.kids.slice().sort((a, b) => (b ?? -1) - (a ?? -1))];
         }
 
-        // Confirmed by NCL price summaries (see NOTES.md, "Age rules"):
-        // Open Bar: 21 and over full gratuity; under 21 in position 2 a soda package; under 21 in
-        // position 3 or later nothing. Specialty Dining: 13 and over pay, under 13 free, any position.
+        // Confirmed by NCL price summaries and NCL's terms and FAQ (see NOTES.md):
         // Fare and taxes don't depend on age (cabin_total already covers the party).
+        // Open Bar (if chosen): 21 and over the full gratuity; an under 21 guest 1 or 2 the soda
+        //   package; under 21 in position 3 or later nothing.
+        // Specialty Dining (if chosen): 13 and over pay; under 13 eat free; any position.
+        // Free at Sea Plus (if chosen), per guest per night: 21 and over the adult rate; a guest
+        //   1 or 2 aged 3 to 20 the child rate; 2 and under not eligible; under 21 in position 3 or
+        //   later doesn't get it and isn't charged. It includes prepaid service charges.
+        // Service charges (crew gratuities), per guest per night, for guests 3 and older (NCL's
+        //   FAQ), at the Suite and Haven rate or the standard rate, except guests covered by Plus.
+        const shipKey = s => s === G ? "G" : "A";
         function cost(s, c) {
             const n = guests();
             const e = entry(c, n);
+            const nights = s.nights;
             const taxes = s.taxes_per_guest * n;
-            const g = s.gratuities;
+            const g = s.gratuities, R = DATA.rates;
+            const off = state.offers[shipKey(s)];
             const order = guestOrder();
             const isAdult = a => a === null;
-            const adults = order.filter(isAdult).length;
-            const soda = order.filter((a, i) => !isAdult(a) && i === 1).length;
-            const kidsFreeBar = order.filter((a, i) => !isAdult(a) && i >= 2).length;
-            const diners = order.filter(a => isAdult(a) || a >= 13).length;
-            const under13 = order.length - diners;
-            const bar = { title: g.open_bar.title, parts: [], total: 0 };
-            if (adults) bar.parts.push({ count: adults, pp: g.open_bar.per_guest });
-            if (soda) bar.parts.push({ count: soda, pp: g.open_bar.soda_under_21_position_2, note: "soda package, under 21" });
-            bar.total = bar.parts.reduce((t, p) => t + p.count * p.pp, 0);
-            bar.note = kidsFreeBar ? "other guests under 21: no charge" : "";
-            const dining = { title: g.specialty_dining.title, parts: diners ? [{ count: diners, pp: g.specialty_dining.per_guest }] : [], note: under13 ? "under 13 eat free" : "" };
-            dining.total = diners * g.specialty_dining.per_guest;
-            return { n, cabin: e.cabin_total, fare: e.cabin_total - taxes, taxes, bar, dining, total: e.cabin_total + bar.total + dining.total };
+            const ageOf = a => isAdult(a) ? 99 : a;
+
+            // Free at Sea Plus
+            const plusAdult = off.plus ? order.filter(isAdult).length : 0;
+            const plusChild = off.plus ? order.filter((a, i) => !isAdult(a) && i <= 1 && a >= 3).length : 0;
+            const coveredByPlus = plusAdult + plusChild;
+            const plus = { on: off.plus, parts: [], total: 0 };
+            if (plusAdult) plus.parts.push({ count: plusAdult, pp: R.free_at_sea_plus.adult_per_day, nights });
+            if (plusChild) plus.parts.push({ count: plusChild, pp: R.free_at_sea_plus.child_per_day, nights, note: "child rate" });
+            plus.total = plus.parts.reduce((t, p) => t + p.count * p.pp * p.nights, 0);
+            plus.notCovered = off.plus ? n - coveredByPlus : 0;
+
+            // Service charges (crew gratuities)
+            const scRate = R.service_charge.suite_haven_types.includes((typeOfCat(s, c) || "").toUpperCase()) ? R.service_charge.suite_haven_per_night : R.service_charge.standard_per_night;
+            const scAge = R.service_charge.min_age;
+            const isPlusGuest = (a, i) => off.plus && (isAdult(a) || (i <= 1 && a >= 3));
+            const scPayers = order.filter((a, i) => ageOf(a) >= scAge && !isPlusGuest(a, i)).length;
+            const under3 = order.filter(a => ageOf(a) < scAge).length;
+            const sc = { title: "Service charges (crew gratuities)", parts: scPayers ? [{ count: scPayers, pp: scRate, nights }] : [], total: scPayers * scRate * nights,
+                         notes: [coveredByPlus ? `included in Free at Sea Plus for ${plural(coveredByPlus, "guest", "guests")}` : "", under3 ? `under ${scAge}: no charge` : ""].filter(Boolean) };
+
+            // Open Bar gratuity
+            const bar = { title: g.open_bar.title, on: off.bar, parts: [], total: 0, notes: [] };
+            if (off.bar) {
+                const adults = order.filter(isAdult).length;
+                const soda = order.filter((a, i) => !isAdult(a) && i <= 1).length;
+                const free = order.filter((a, i) => !isAdult(a) && i >= 2).length;
+                if (adults) bar.parts.push({ count: adults, pp: g.open_bar.per_guest });
+                if (soda) bar.parts.push({ count: soda, pp: g.open_bar.soda_under_21_position_2, note: "soda package, under 21" });
+                bar.total = bar.parts.reduce((t, p) => t + p.count * p.pp, 0);
+                if (free) bar.notes.push("other guests under 21: no charge");
+            }
+
+            // Specialty Dining gratuity
+            const dining = { title: g.specialty_dining.title, on: off.dining, parts: [], total: 0, notes: [] };
+            if (off.dining) {
+                const diners = order.filter(a => ageOf(a) >= 13).length;
+                if (diners) dining.parts.push({ count: diners, pp: g.specialty_dining.per_guest });
+                dining.total = diners * g.specialty_dining.per_guest;
+                if (n - diners) dining.notes.push("under 13 eat free");
+            }
+
+            const gratuities = sc.total + bar.total + dining.total;
+            const total = e.cabin_total + plus.total + gratuities;
+            const onboard = state.prepayGratuities ? 0 : sc.total;
+            return { n, nights, cabin: e.cabin_total, fare: e.cabin_total - taxes, taxes, plus, sc, scRate, bar, dining, gratuities, total, onboard, before: total - onboard };
+        }
+
+        // NCL broad type code (INSIDE, ..., SUITE, HAVEN) of a category on a ship.
+        function typeOfCat(s, c) {
+            const t = s.types.find(t => t.categories.some(x => x.code === c.code));
+            return t ? t.code : null;
         }
 
         function addedCostLine(c) {
@@ -770,32 +860,74 @@
 
         function lineRows(s, k, indent = false) {
             const cls = indent ? "row sub" : "row";
+            const part = p => `${plural(p.count, "guest", "guests")} x ${money(p.pp)}${p.nights ? ` x ${p.nights} nights` : ""}${p.note ? ` (${p.note})` : ""}`;
             // Example: "Unlimited Open Bar: 1 guest x $96, 1 guest x $37.50 (soda package, under 21)"
-            const gr = x => {
-                const parts = x.parts.map(p => `${plural(p.count, "guest", "guests")} x ${money(p.pp)}${p.note ? ` (${p.note})` : ""}`);
-                if (!parts.length) return `<div class="${cls} muted"><span class="k">${esc(x.title)}${x.note ? ` (${x.note})` : ""}</span><span class="v">no one charged</span></div>`;
-                return `<div class="${cls}"><span class="k">${esc(x.title)}: ${parts.join(", ")}${x.note ? ` (${x.note})` : ""}</span><span class="v">${money(x.total)}</span></div>`;
+            const line = (x, offText) => {
+                if (x.on === false) return `<div class="${cls} muted"><span class="k">${esc(x.title)}</span><span class="v">${offText}</span></div>`;
+                const notes = (x.notes || []).map(n => ` (${n})`).join("");
+                if (!x.parts.length) return `<div class="${cls} muted"><span class="k">${esc(x.title)}${notes}</span><span class="v">no one charged</span></div>`;
+                return `<div class="${cls}"><span class="k">${esc(x.title)}: ${x.parts.map(part).join(", ")}${notes}</span><span class="v">${money(x.total)}</span></div>`;
             };
+            const plusRow = !k.plus.on ? "" : k.plus.parts.length
+                ? `<div class="${cls}"><span class="k">Free at Sea Plus: ${k.plus.parts.map(part).join(", ")}${k.plus.notCovered ? ` (${plural(k.plus.notCovered, "guest", "guests")} not eligible: no charge)` : ""}</span><span class="v">${money(k.plus.total)}</span></div>`
+                : `<div class="${cls} muted"><span class="k">Free at Sea Plus</span><span class="v">no one eligible</span></div>`;
+            const when = state.prepayGratuities ? "" : " (charged onboard)";
+            const scRow = k.sc.parts.length
+                ? `<div class="${cls}"><span class="k">${esc(k.sc.title)}${when}: ${k.sc.parts.map(part).join(", ")}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">${money(k.sc.total)}</span></div>`
+                : `<div class="${cls} muted"><span class="k">${esc(k.sc.title)}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">$0</span></div>`;
             return `
                 <div class="${cls}"><span class="k">Cruise fare</span><span class="v">${money(k.fare)}</span></div>
                 <div class="${cls}"><span class="k">Taxes, fees and port expenses: ${k.n} x ${money(s.taxes_per_guest)}</span><span class="v">${money(k.taxes)}</span></div>
-                ${gr(k.bar)}${gr(k.dining)}`;
+                ${plusRow}
+                ${scRow}
+                ${line(k.bar, "not chosen")}
+                ${line(k.dining, "not chosen")}
+                <div class="${cls} subtotal"><span class="k">Gratuities total</span><span class="v">${money(k.gratuities)}</span></div>`;
         }
 
-        function totalBlock(total, nights, rowsHtml) {
+        function totalBlock(k, nights, rowsHtml) {
             const n = guests();
             if (!agesKnown()) {
                 return `<div class="notice info">Choose every kid's age above to see the full total. Free at Sea charges depend on age.</div><div class="rows">${rowsHtml}</div>`;
             }
-            const perNight = total / nights;
+            const perNight = k.total / nights;
             return `
                 <div class="price-label">Total for ${plural(n, "guest", "guests")}</div>
-                <div class="price-total">${money(total)}</div>
-                <div class="price-pp">${moneyR(total / n)} per person</div>
+                <div class="price-total">${money(k.total)}</div>
+                <div class="price-pp">${moneyR(k.total / n)} per person</div>
                 <div class="rows">
                     ${rowsHtml}
-                    <div class="row total"><span class="k">Total</span><span class="v">${money(total)}</span></div>
+                    <div class="row total"><span class="k">Total</span><span class="v">${money(k.total)}</span></div>
+                    <div class="row due"><span class="k">Due before you sail</span><span class="v">${money(k.before)}</span></div>
+                    <div class="row due"><span class="k">Charged onboard</span><span class="v">${money(k.onboard)}</span></div>
                     <div class="row"><span class="k">Cost per night</span><span class="v">${moneyR(perNight)} (${moneyR(perNight / n)} per person)</span></div>
+                </div>`;
+        }
+
+        // Free at Sea switches for one cabin (one ship). All guests in a cabin share the choice.
+        function offerToggles(s, c, heading) {
+            const k = cost(s, c), key = shipKey(s), off = state.offers[key], R = DATA.rates;
+            const desc = x => x.parts.length ? "+" + money(x.total) + " (" + x.parts.map(p => `${plural(p.count, "guest", "guests")} x ${money(p.pp)}${p.nights ? ` x ${p.nights} nights` : ""}`).join(", ") + ")" : "no one charged";
+            const sw = (offer, label, on, text, extra = "") => `
+                <div class="toggle-container">
+                    <input type="checkbox" class="toggle-switch" data-offer="${offer}" data-ship="${key}" ${on ? "checked" : ""} aria-label="${esc(label)} for the ${esc(s.ship_short)} cabin">
+                    <div>
+                        <div class="toggle-label">${esc(label)}</div>
+                        <div class="toggle-price">${text}</div>${extra}
+                    </div>
+                </div>`;
+            const plusPreview = (() => {   // what Plus would cost if switched on
+                if (off.plus) return desc(k.plus) + ", includes prepaid service charges";
+                const save = state.offers[key]; state.offers[key] = { bar: true, dining: true, plus: true };
+                const kp = cost(s, c); state.offers[key] = save;
+                return kp.plus.parts.length ? desc(kp.plus) + ", includes prepaid service charges" : "no one in this cabin is eligible";
+            })();
+            return `
+                <div class="offers">
+                    <div class="offers-title">${esc(heading)}</div>
+                    ${sw("bar", "Unlimited Open Bar", off.bar, off.bar ? desc(k.bar) : "off")}
+                    ${sw("dining", "Specialty Dining", off.dining, off.dining ? desc(k.dining) : "off")}
+                    ${sw("plus", "Free at Sea Plus", off.plus, plusPreview, off.plus ? "" : `<div class="toggle-note">Turning this on also turns on Open Bar and Specialty Dining. ${money(R.free_at_sea_plus.adult_per_day)} per adult per night, ${money(R.free_at_sea_plus.child_per_day)} for a guest 1 or 2 aged 3 to 20.</div>`)}
                 </div>`;
         }
 
@@ -853,8 +985,8 @@
                 } else {
                     const full = findCat(s, c.code);
                     const k = cost(s, full);
-                    picks = catPicker(s, tf.t, full, n);
-                    body += catHeader(full) + totalBlock(k.total, s.nights, lineRows(s, k)) + addedCostLine(full);
+                    picks = catPicker(s, tf.t, full, n) + offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`);
+                    body += catHeader(full) + totalBlock(k, s.nights, lineRows(s, k)) + addedCostLine(full);
                 }
             }
             return `
@@ -926,12 +1058,14 @@
             }
             if (chosen) {
                 const ks = chosen.map(([s, c]) => [s, c, cost(s, c)]);
-                const total = ks.reduce((t, [, , k]) => t + k.total, 0);
+                const sum = f => ks.reduce((t, [, , k]) => t + k[f], 0);
+                const both = { total: sum("total"), before: sum("before"), onboard: sum("onboard") };
+                pickers += ks.map(([s, c]) => offerToggles(s, c, `Free at Sea for the ${s.ship_short} cabin (its own booking)`)).join("");
                 const rows = ks.map(([s, c, k]) => `
                     <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</div>
                     ${lineRows(s, k, true)}
                     <div class="row"><span class="k">${esc(s.ship_short)} total</span><span class="v">${agesKnown() ? money(k.total) : ""}</span></div>`).join("");
-                body += totalBlock(total, nights, rows) + ks.map(([, c]) => addedCostLine(c)).join("");
+                body += totalBlock(both, nights, rows) + ks.map(([, c]) => addedCostLine(c)).join("");
             }
             return `
                 <article class="card featured">
@@ -1029,7 +1163,17 @@
             }
         }
 
+        function renderPrepay() {
+            const on = state.prepayGratuities;
+            document.getElementById("prepayToggle").checked = on;
+            document.getElementById("prepayLabel").textContent = on ? "Prepay gratuities" : "Pay onboard on the last day";
+            document.getElementById("prepayDesc").textContent = on
+                ? "Service charges are paid with the cruise, before you sail. The amount is the same either way."
+                : "Service charges are added to your onboard account. The amount is the same either way.";
+        }
+
         function render(msg) {
+            renderPrepay();
             normalize();
             renderGuests(msg);
             renderTypes();
@@ -1084,6 +1228,21 @@
 
         document.addEventListener("change", e => {
             if (!DATA) return;
+            const offer = e.target.closest("input[data-offer]");
+            if (offer) {
+                const o = state.offers[offer.dataset.ship];
+                o[offer.dataset.offer] = offer.checked;
+                // Free at Sea Plus upgrades the Open Bar and Specialty Dining offers.
+                if (offer.dataset.offer === "plus" && offer.checked) { o.bar = true; o.dining = true; }
+                if ((offer.dataset.offer === "bar" || offer.dataset.offer === "dining") && !offer.checked) o.plus = false;
+                render();
+                return;
+            }
+            if (e.target.id === "prepayToggle") {
+                state.prepayGratuities = e.target.checked;
+                render();
+                return;
+            }
             const kid = e.target.closest("select[data-kid]");
             const sel = e.target.closest("select[data-field]");
             if (kid) state.kids[Number(kid.dataset.kid)] = kid.value === "" ? null : Number(kid.value);

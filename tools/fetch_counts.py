@@ -10,7 +10,7 @@ the last good counts (and hides them once they are more than 7 days old).
 
 Modes:
   full   every available non-Guarantee category at every party size (about 140 calls)
-  light  only categories whose last reliable count was under 50, plus the next pricier
+  light  only categories whose last reliable count was under 15, plus the next pricier
          category each one needs for the subtraction; everything else keeps its last count
   auto   full when there is no usable previous file or the last full sweep was 3 or more
          days ago (by UTC date), light otherwise
@@ -40,7 +40,7 @@ import check_counts  # noqa: E402
 SCHEMA_VERSION = 1
 PAUSE_SECONDS = 3
 FULL_SWEEP_EVERY_DAYS = 3
-LIGHT_RECHECK_BELOW = 50
+LIGHT_RECHECK_BELOW = 15
 GUEST_KEYS = ["2", "3", "4", "5"]
 
 
