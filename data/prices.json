@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "saved_at": "2026-10-09T16:11:44Z",
+ "saved_at": "2026-10-09T16:16:45Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -169,22 +169,22 @@
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-09T16:10:54Z",
+     "as_of": "2026-10-09T16:16:02Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-09T16:10:54Z",
+     "as_of": "2026-10-09T16:16:02Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-09T16:10:54Z",
+     "as_of": "2026-10-09T16:16:02Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-09T16:10:54Z",
+     "as_of": "2026-10-09T16:16:02Z",
      "why": null
     }
    },
@@ -2025,22 +2025,22 @@
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-09T16:11:21Z",
+     "as_of": "2026-10-09T16:16:23Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-09T16:11:21Z",
+     "as_of": "2026-10-09T16:16:23Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-09T16:11:21Z",
+     "as_of": "2026-10-09T16:16:23Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-09T16:11:21Z",
+     "as_of": "2026-10-09T16:16:23Z",
      "why": null
     }
    },
