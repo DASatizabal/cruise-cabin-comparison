@@ -2,6 +2,39 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.8.0] - 2026-10-09
+
+Backup times for the daily refresh, because GitHub's scheduled runs can be late or dropped.
+
+### Added
+- "Refresh prices" now also runs at 14:47 and 19:37 UTC (10:47 AM and 3:37 PM Miami time), besides 10:17 UTC.
+- A first job, `decide` (`tools/decide_run.py`), for scheduled runs: if `data/prices.json` and `data/counts.json` were both saved today (UTC date of `saved_at`), the run ends right away as a success and skips the price, counts and publish jobs; if prices were saved today but counts were not, only counts run. It shows which case applied as a "Refresh decision" notice on the run's summary page. Manual runs and branch test runs always run fully. The keepalive job still runs on every scheduled run.
+- NOTES.md: how to tell from the Actions tab which scheduled time did the work and which ones skipped; a To do item for triggering the refresh from the Cloudflare Worker or the AI PC if GitHub schedules stay unreliable.
+
+### Fixed
+- Merged `main` into the branch again. The first scheduled run (Refresh prices #13, on main) had committed new data files, so `data/prices.json` and `data/counts.json` conflicted. Main's newer versions were kept (prices saved 2026-10-09T17:00:33Z, counts saved 2026-10-09T17:00:40Z, light). Main's price file was written by the 4.6.0 code, so the `party_sizes` block the format check needs was added (every party size updated, as of 17:00:33Z). Both pass their format checks.
+
+## [4.7.1] - 2026-10-09
+
+### Fixed
+- Branch test runs of "Refresh prices" no longer commit `data/prices.json` or `data/counts.json`. They still fetch and run both format checks, then stop; only runs on `main` commit data files. This stops the branch's data files from conflicting with `main`'s, which made GitHub report that the branch couldn't merge automatically.
+- Merged `main` into the branch. `data/prices.json` and `data/counts.json` conflicted (main's 16:10 UTC manual refresh against the branch's 16:16 UTC test run); the newer branch versions were kept and both pass their format checks.
+
+## [4.7.0] - 2026-10-09
+
+### Added
+- Per party size fallback in the daily price fetch. If one party size on one ship fails its checks, that ship and party size keep the previous prices, the page marks them "Not updated today" with the date they are from, and everything else refreshes and publishes. The run fails only if every party size on a ship fails, or if kept prices would be more than 3 days old. `data/prices.json` records this per sailing in `party_sizes` (`updated`, `as_of`, `why`); the format check covers it. The age test keeps the previous gratuities the same way.
+- Aura badge in Option 2 and Option 3: "🍾 Maiden Voyage from Miami 🎆", a short note about her christening, and a "Watch: Meet Norwegian Aura" link.
+- "What's included?" under each set of Free at Sea switches: a Free at Sea versus Free at Sea Plus comparison (Unlimited Open Bar, Specialty Dining, Wi-Fi, service charges), with the Plus daily rates and the service charge rates taken from the data file. The columns stack on a phone.
+
+### Changed
+- The formula cross check now uses each price summary's own gratuity lines, so each party size is checked on its own before it is used.
+- 8 night explainer: "you get off the Getaway" instead of "you leave the Getaway".
+
+### Notes
+- NCL's $0 prices for the Getaway at 4 and 5 guests (2026-10-09 early UTC) were gone by 16:06 UTC. No "3rd and 4th guest free" promotion is listed for this sailing and guests 3 to 5 pay real fares, so no promotion badge was added.
+- NCL lowered taxes, fees and port expenses by $50 per guest on 2026-10-09: Getaway $200 to $150, Aura $210 to $160. Cabin prices dropped by the same amount.
+
 ## [4.6.0] - 2026-10-09
 
 Free at Sea choices per cabin, crew gratuities, and what is due before sailing versus onboard.

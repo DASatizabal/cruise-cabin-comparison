@@ -328,3 +328,49 @@ NCL glitch seen 2026-10-09 around 02:00 UTC: the availability call for the Getaw
 
 1. Price drop and low availability email alerts to the owner, possibly through Resend.
 2. A "Make Selection" button. When a family member has picked a trip and cabin, it opens a form for each guest's full name, date of birth, email address, Latitudes number if they have one, and anything else NCL needs to create a reservation, and sends it to the owner so the owner's NCL cruise consultant can book it. These are personal details and the repo and page are public, so the form must never store anything in the repo (or in the data files, or in browser storage beyond the open form). Options to weigh later: a button that opens the family member's own email app with everything filled in and addressed to the owner (nothing leaves their device except through their own email), or sending it through the owner's Cloudflare Worker by email (needs spam protection, for example the family passphrase).
+3. If GitHub's schedules still prove unreliable after the 4.8.0 backup times, start the refresh from outside GitHub with workflow_dispatch (the same as pressing "Run workflow"): either a cron trigger on the owner's Cloudflare Worker (the Deck Finder Worker) or a scheduled task on the owner's AI PC. Either one calls `POST https://api.github.com/repos/DASatizabal/cruise-cabin-comparison/actions/workflows/refresh-prices.yml/dispatches` with body `{"ref":"main"}` and a fine-grained token limited to this repository with "Actions: Read and write" (stored as a Worker secret or in the PC's credential store, never in a repo). Note: dispatched runs always run fully (the skip logic applies only to scheduled runs), so trigger it once a day, or change `decide_run.py` to treat that trigger like a scheduled run.
+
+## 4.7.0 findings (2026-10-09)
+
+NCL $0 prices and the "Free 3rd & 4th Guest" idea:
+- At 16:06 UTC the $0 prices were gone: every party size on both ships priced normally with fare code BESTFARE (Getaway 2: 32 categories, 3: 27, 4: 22, 5: 2; Aura 2: 28, 3: 20, 4: 16, 5: 3).
+- The Getaway Jun 11 availability answer lists only the usual promotions (Free at Sea codes ALL4CHO, BVSXIN, CHOALL4M, HSBVSXIN, DISXIN, HSDISXIN, INTSHO, HSINTSHO; More Offers DISC50, 2-For-1 Deposits, Risk-Free Cancellation). Nothing in it mentions a free 3rd or 4th guest or kids sailing free.
+- Price summaries now (fare per guest): B4 at 3 guests $299, $299, $169; at 4 guests $299, $299, $169, $169; O5 at 5 guests $329, $329, $159, $159, $159. Guests 3 and up pay a real (lower) fare, not $0.
+- Conclusion: the $0 answers were a temporary NCL error, not a promotion. No badge. If NCL ever does switch on "Free 3rd & 4th Guest" for this sailing, the price summary's per guest fares would show $0 for guests 3 and 4; check that before adding the badge.
+
+NCL tax change, 2026-10-09: taxes, fees and port expenses dropped by $50 per guest on both ships, Getaway $200 to $150 and Aura $210 to $160. The availability prices dropped by the same amount, and all formula and age checks match NCL exactly (Getaway B4 at 2 guests: price summary $890 total for the cheapest category IX, $1,250 on the page for 2 adults in B4 with service charges, Open Bar and dining).
+
+Scheduled runs: as of 2026-10-09 16:06 UTC, GitHub had never started a scheduled "Refresh prices" run in this repository (the workflow is active, the file is on main, `schedule` runs total: 0). Expected runs on 2026-10-09 at 10:17 UTC did not happen. A GitHub staff note on a January 2026 community thread says any commit pushed to the default branch resyncs schedules that stopped firing (https://github.com/orgs/community/discussions/185212). The 4.6.0 merge at 15:57 UTC was such a push; the 2026-10-10 10:17 UTC run is the test. Sources on common causes: https://github.com/orgs/community/discussions/185355, https://steadycron.com/guides/github-actions-schedule-not-running/, https://latchkey.dev/learn/github-actions/github-actions-schedule-cron-default-branch-only. If it still never fires, fallbacks: run "Refresh prices" by hand, have the AI PC run `gh workflow run refresh-prices.yml` on a schedule, or ask GitHub Support with the repo, workflow path and cron line.
+
+Free at Sea Plus coupling (kept on purpose): turning Free at Sea Plus on also turns on Open Bar and Specialty Dining, and turning either off turns Plus off. This comes from the 2.x page; NCL's terms describe Plus as an upgrade of Free at Sea but don't confirm this rule.
+
+Per party size fallback (4.7.0): see CLAUDE.md, "Data". Tested locally on 2026-10-09 with simulated failures: one party size failing (Getaway 4 guests kept its earlier prices, run succeeded, file passed the format check), kept prices 8 days old (run failed), every party size failing on the Aura (run failed).
+
+## Branch data conflicts (4.7.1, 2026-10-09)
+
+GitHub reported that the branch couldn't merge into main automatically. Cause: the owner ran "Refresh prices" by hand on main (bot commits at 16:10 UTC), and the branch's push-triggered test runs committed their own `data/prices.json` and `data/counts.json` (16:16 UTC). Both sides changed the same files. Only those two files conflicted.
+
+Resolution: merged main into the branch and kept the newer versions (the branch's: prices 2026-10-09T16:16:45Z with `party_sizes`, counts 2026-10-09T16:16:52Z full sweep). Both pass their format checks.
+
+Prevention: in `refresh-prices.yml`, the commit steps run only when `github.ref` is `refs/heads/main`. Branch runs fetch, run the format checks, and stop with "Branch run, so ... is checked but not committed." Until this version is merged, a new data commit on main could still conflict with the branch's data files; merging main into the branch again fixes it.
+
+## Backup schedule times (4.8.0, 2026-10-09)
+
+Why: GitHub's scheduled runs are best effort. The first scheduled run ever (Refresh prices #13, 2026-10-09) started about 17:00 UTC for a 10:17 UTC slot. A dropped run used to cost a whole day.
+
+What changed: "Refresh prices" is scheduled at 10:17 UTC (6:17 AM Miami time in summer), 14:47 UTC (10:47 AM) and 19:37 UTC (3:37 PM). Its first job, `decide`, runs `tools/decide_run.py` on the newest `main` and compares the UTC date of `saved_at` in `data/prices.json` and `data/counts.json` with today's UTC date. Scheduled runs only:
+- Both saved today: "Skipped". The refresh, publish, counts and publish-counts jobs are skipped and the run ends green.
+- Prices saved today, counts not: "Counts only". The price job and its publish are skipped; counts and publish-counts run.
+- Otherwise: "Full run".
+Manual runs ("Run workflow") and branch test runs are always "Full run". The keepalive job runs on every scheduled run, including skipped ones.
+
+How to tell from the Actions tab which scheduled time did the work:
+1. Open the repository on GitHub, tap Actions, then tap "Refresh prices" in the list of workflows on the left (on a phone, tap the workflow filter and choose "Refresh prices").
+2. Each run row shows "Scheduled" under its title, and its start time. Runs often start several minutes to over an hour after the cron time, so match a run to the nearest earlier slot: 10:17, 14:47 or 19:37 UTC.
+3. Tap a run. The summary page shows a notice titled "Refresh decision" with one of three texts:
+   - "Full run: prices were not refreshed today yet (...)" This is the run that did the work. The job boxes for refresh, publish, counts and publish-counts are green.
+   - "Counts only: prices were already refreshed today, counts were not (...)" This run did only the counts. The refresh and publish boxes are grey with a skipped mark.
+   - "Skipped: prices and counts were both already refreshed today (...)" Nothing to do. Only decide and keepalive are green; every other box is grey with a skipped mark.
+   The text in brackets lists both saved_at times and today's UTC date, so the run that did the work can be confirmed against the times on the family page.
+4. The commits on main confirm it too: the run that did the work commits "Refresh prices DATE" and "Refresh cabin counts DATE (full)" or "(light)". Skipped runs commit nothing.
+5. A slot with no run row at all means GitHub dropped that scheduled run.

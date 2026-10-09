@@ -9,10 +9,17 @@ name: Refresh prices
 #    data/counts.json, then publishes again (job "publish-counts"). If it fails, the published
 #    prices stay and the page keeps the last good counts.
 # Scheduled runs only happen on the default branch (main). The push trigger below lets this
-# branch test both parts on GitHub's runners before it is merged; only main is published.
+# branch test both parts on GitHub's runners before it is merged; only main commits data
+# files and publishes.
+# GitHub's schedules are best effort (runs can be late or dropped), so there are two backup
+# times. The first job ("decide") makes later scheduled runs skip work already done today:
+# both files saved today skips everything, prices saved today but counts not runs only
+# counts. Manual runs and branch test runs always run fully. Keepalive runs every time.
 on:
   schedule:
-    - cron: "17 10 * * *"   # 10:17 UTC, about 6:17 AM Miami time in summer
+    - cron: "17 10 * * *"   # 10:17 UTC, 6:17 AM Miami time in summer (main time)
+    - cron: "47 14 * * *"   # 14:47 UTC, 10:47 AM Miami (backup 1)
+    - cron: "37 19 * * *"   # 19:37 UTC, 3:37 PM Miami (backup 2)
   workflow_dispatch:
     inputs:
       count_mode:
@@ -27,6 +34,7 @@ on:
       - tools/check_prices.py
       - tools/fetch_counts.py
       - tools/check_counts.py
+      - tools/decide_run.py
       - .github/workflows/refresh-prices.yml
 
 permissions:
@@ -37,7 +45,28 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Reads saved_at in both data files on the newest main and logs which case applied
+  # (a notice on the run's summary page). Never fails on a missing or unreadable file.
+  decide:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      prices: ${{ steps.decide.outputs.prices }}
+      counts: ${{ steps.decide.outputs.counts }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}   # the newest commit, including any data refreshed earlier today
+
+      - name: Decide what this run does
+        id: decide
+        env:
+          EVENT: ${{ github.event_name }}
+        run: python3 tools/decide_run.py --event "$EVENT"
+
   refresh:
+    needs: decide
+    if: needs.decide.outputs.prices == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     outputs:
@@ -51,8 +80,15 @@ jobs:
       - name: Format check (keeps the old file if this fails)
         run: python3 tools/check_prices.py data/prices.new.json
 
+      # Only main commits data files. Branch test runs fetch and check, then stop, so the
+      # branch never carries its own data/prices.json that would conflict with main's.
+      - name: Branch test (fetched and checked; not committed)
+        if: github.ref != 'refs/heads/main'
+        run: echo "Branch run, so data/prices.new.json is checked but not committed."
+
       - name: Replace the price file and commit
         id: commit
+        if: github.ref == 'refs/heads/main'
         run: |
           mv data/prices.new.json data/prices.json
           git config user.name "github-actions[bot]"
@@ -87,9 +123,9 @@ jobs:
       label: prices
 
   counts:
-    needs: refresh
-    # Runs after the price job whether it passed or failed; counts never block prices.
-    if: ${{ !cancelled() }}
+    needs: [decide, refresh]
+    # Runs after the price job whether it passed, failed or was skipped; counts never block prices.
+    if: ${{ !cancelled() && needs.decide.outputs.counts == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     outputs:
@@ -109,8 +145,13 @@ jobs:
       - name: Format check (keeps the old counts file if this fails)
         run: python3 tools/check_counts.py data/counts.new.json
 
+      - name: Branch test (counted and checked; not committed)
+        if: github.ref != 'refs/heads/main'
+        run: echo "Branch run, so data/counts.new.json is checked but not committed."
+
       - name: Replace the counts file and commit
         id: commit
+        if: github.ref == 'refs/heads/main'
         run: |
           mv data/counts.new.json data/counts.json
           git config user.name "github-actions[bot]"
@@ -146,7 +187,8 @@ jobs:
 
   # GitHub turns off scheduled workflows in public repos after 60 days without "repository
   # activity" and doesn't define activity. The daily data commit is probably enough; as a
-  # safety net, mark this workflow enabled again on every scheduled run. Never fails the run.
+  # safety net, mark this workflow enabled again on every scheduled run, including runs that
+  # skip everything. Does not wait for any other job. Never fails the run.
   keepalive:
     if: github.ref == 'refs/heads/main' && github.event_name == 'schedule'
     runs-on: ubuntu-24.04

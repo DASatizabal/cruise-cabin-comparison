@@ -164,6 +164,28 @@
    "return": "2027-06-14",
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
+   "party_sizes": {
+    "2": {
+     "updated": true,
+     "as_of": "2026-10-09T17:00:33Z",
+     "why": null
+    },
+    "3": {
+     "updated": true,
+     "as_of": "2026-10-09T17:00:33Z",
+     "why": null
+    },
+    "4": {
+     "updated": true,
+     "as_of": "2026-10-09T17:00:33Z",
+     "why": null
+    },
+    "5": {
+     "updated": true,
+     "as_of": "2026-10-09T17:00:33Z",
+     "why": null
+    }
+   },
    "source": "NCL vacation-builder API",
    "saved_at": "2026-10-09",
    "taxes_per_guest": 150,
@@ -1998,6 +2020,28 @@
    "return": "2027-06-19",
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
+   "party_sizes": {
+    "2": {
+     "updated": true,
+     "as_of": "2026-10-09T17:00:33Z",
+     "why": null
+    },
+    "3": {
+     "updated": true,
+     "as_of": "2026-10-09T17:00:33Z",
+     "why": null
+    },
+    "4": {
+     "updated": true,
+     "as_of": "2026-10-09T17:00:33Z",
+     "why": null
+    },
+    "5": {
+     "updated": true,
+     "as_of": "2026-10-09T17:00:33Z",
+     "why": null
+    }
+   },
    "source": "NCL vacation-builder API",
    "saved_at": "2026-10-09",
    "taxes_per_guest": 160,
