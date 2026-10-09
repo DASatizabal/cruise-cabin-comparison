@@ -328,6 +328,7 @@ NCL glitch seen 2026-10-09 around 02:00 UTC: the availability call for the Getaw
 
 1. Price drop and low availability email alerts to the owner, possibly through Resend.
 2. A "Make Selection" button. When a family member has picked a trip and cabin, it opens a form for each guest's full name, date of birth, email address, Latitudes number if they have one, and anything else NCL needs to create a reservation, and sends it to the owner so the owner's NCL cruise consultant can book it. These are personal details and the repo and page are public, so the form must never store anything in the repo (or in the data files, or in browser storage beyond the open form). Options to weigh later: a button that opens the family member's own email app with everything filled in and addressed to the owner (nothing leaves their device except through their own email), or sending it through the owner's Cloudflare Worker by email (needs spam protection, for example the family passphrase).
+3. If GitHub's schedules still prove unreliable after the 4.8.0 backup times, start the refresh from outside GitHub with workflow_dispatch (the same as pressing "Run workflow"): either a cron trigger on the owner's Cloudflare Worker (the Deck Finder Worker) or a scheduled task on the owner's AI PC. Either one calls `POST https://api.github.com/repos/DASatizabal/cruise-cabin-comparison/actions/workflows/refresh-prices.yml/dispatches` with body `{"ref":"main"}` and a fine-grained token limited to this repository with "Actions: Read and write" (stored as a Worker secret or in the PC's credential store, never in a repo). Note: dispatched runs always run fully (the skip logic applies only to scheduled runs), so trigger it once a day, or change `decide_run.py` to treat that trigger like a scheduled run.
 
 ## 4.7.0 findings (2026-10-09)
 
@@ -352,3 +353,24 @@ GitHub reported that the branch couldn't merge into main automatically. Cause: t
 Resolution: merged main into the branch and kept the newer versions (the branch's: prices 2026-10-09T16:16:45Z with `party_sizes`, counts 2026-10-09T16:16:52Z full sweep). Both pass their format checks.
 
 Prevention: in `refresh-prices.yml`, the commit steps run only when `github.ref` is `refs/heads/main`. Branch runs fetch, run the format checks, and stop with "Branch run, so ... is checked but not committed." Until this version is merged, a new data commit on main could still conflict with the branch's data files; merging main into the branch again fixes it.
+
+## Backup schedule times (4.8.0, 2026-10-09)
+
+Why: GitHub's scheduled runs are best effort. The first scheduled run ever (Refresh prices #13, 2026-10-09) started about 17:00 UTC for a 10:17 UTC slot. A dropped run used to cost a whole day.
+
+What changed: "Refresh prices" is scheduled at 10:17 UTC (6:17 AM Miami time in summer), 14:47 UTC (10:47 AM) and 19:37 UTC (3:37 PM). Its first job, `decide`, runs `tools/decide_run.py` on the newest `main` and compares the UTC date of `saved_at` in `data/prices.json` and `data/counts.json` with today's UTC date. Scheduled runs only:
+- Both saved today: "Skipped". The refresh, publish, counts and publish-counts jobs are skipped and the run ends green.
+- Prices saved today, counts not: "Counts only". The price job and its publish are skipped; counts and publish-counts run.
+- Otherwise: "Full run".
+Manual runs ("Run workflow") and branch test runs are always "Full run". The keepalive job runs on every scheduled run, including skipped ones.
+
+How to tell from the Actions tab which scheduled time did the work:
+1. Open the repository on GitHub, tap Actions, then tap "Refresh prices" in the list of workflows on the left (on a phone, tap the workflow filter and choose "Refresh prices").
+2. Each run row shows "Scheduled" under its title, and its start time. Runs often start several minutes to over an hour after the cron time, so match a run to the nearest earlier slot: 10:17, 14:47 or 19:37 UTC.
+3. Tap a run. The summary page shows a notice titled "Refresh decision" with one of three texts:
+   - "Full run: prices were not refreshed today yet (...)" This is the run that did the work. The job boxes for refresh, publish, counts and publish-counts are green.
+   - "Counts only: prices were already refreshed today, counts were not (...)" This run did only the counts. The refresh and publish boxes are grey with a skipped mark.
+   - "Skipped: prices and counts were both already refreshed today (...)" Nothing to do. Only decide and keepalive are green; every other box is grey with a skipped mark.
+   The text in brackets lists both saved_at times and today's UTC date, so the run that did the work can be confirmed against the times on the family page.
+4. The commits on main confirm it too: the run that did the work commits "Refresh prices DATE" and "Refresh cabin counts DATE (full)" or "(light)". Skipped runs commit nothing.
+5. A slot with no run row at all means GitHub dropped that scheduled run.

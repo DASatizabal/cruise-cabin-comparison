@@ -2,6 +2,18 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.8.0] - 2026-10-09
+
+Backup times for the daily refresh, because GitHub's scheduled runs can be late or dropped.
+
+### Added
+- "Refresh prices" now also runs at 14:47 and 19:37 UTC (10:47 AM and 3:37 PM Miami time), besides 10:17 UTC.
+- A first job, `decide` (`tools/decide_run.py`), for scheduled runs: if `data/prices.json` and `data/counts.json` were both saved today (UTC date of `saved_at`), the run ends right away as a success and skips the price, counts and publish jobs; if prices were saved today but counts were not, only counts run. It shows which case applied as a "Refresh decision" notice on the run's summary page. Manual runs and branch test runs always run fully. The keepalive job still runs on every scheduled run.
+- NOTES.md: how to tell from the Actions tab which scheduled time did the work and which ones skipped; a To do item for triggering the refresh from the Cloudflare Worker or the AI PC if GitHub schedules stay unreliable.
+
+### Fixed
+- Merged `main` into the branch again. The first scheduled run (Refresh prices #13, on main) had committed new data files, so `data/prices.json` and `data/counts.json` conflicted. Main's newer versions were kept (prices saved 2026-10-09T17:00:33Z, counts saved 2026-10-09T17:00:40Z, light). Main's price file was written by the 4.6.0 code, so the `party_sizes` block the format check needs was added (every party size updated, as of 17:00:33Z). Both pass their format checks.
+
 ## [4.7.1] - 2026-10-09
 
 ### Fixed
