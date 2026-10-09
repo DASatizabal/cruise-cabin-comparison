@@ -2,6 +2,39 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.5.0] - 2026-10-09
+
+Cabin counts are separated from prices, so prices never depend on them, and count traffic is lighter.
+
+### Added
+- `data/counts.json`, a separate cabin counts file with its own `saved_at`, written by the new `tools/fetch_counts.py` and checked by the new `tools/check_counts.py`.
+- Count schedule: a full sweep (every category, every party size) when the last full sweep was 3 or more days ago, and on the other days a light re-check of only the counts that were under 50, plus the next pricier category each one needs for the subtraction. 3 seconds between count calls. The mode is recorded in the file (`mode`, `mode_reason`, `last_full_sweep`) and in the commit message ("Refresh cabin counts DATE (full)" or "(light)").
+- "Refresh prices" can be run by hand with a cabin counts choice: auto, full or light.
+- The page shows "Cabins left as of [date]" from `counts.json`. If the file is missing, unreadable or more than 7 days old, the date and every count label are hidden.
+
+### Changed
+- "Refresh prices" now has two parts. The price job (itineraries, availability, price summaries, age test) commits `data/prices.json` and publishes on its own, as before. A separate counts job runs after it (even if the price job failed), commits `data/counts.json` and publishes again. If the counts job fails, the published prices stay and the page keeps the last good counts.
+- Descriptions are built on the page from the price file plus, when fresh, where each category's open cabins are from the counts file. `data/prices.json` no longer holds counts or open-cabin details.
+- "Deploy site" copies `data/counts.json` when present, takes a label for its artifact name (`prices` or `counts`), and queues publishes in the deploy job's concurrency group.
+- The price job's time limit is back to 20 minutes; the counts job has 60.
+
+## [4.4.0] - 2026-10-08
+
+### Added
+- Cabins left: each category button, each dropdown option in Different cabins mode and each row of the full tables shows "Plenty left" (50 or more), "Getting low" (10 to 49) or "Only X left" (under 10). Nothing is shown for Guarantee cabins or counts marked unreliable.
+- The fetch script reads NCL's cabin/availability call for every available non-Guarantee category at every party size, most expensive first, and counts cabins by subtracting location totals. Counts are marked unreliable (and not shown) when a call returns another cabin type's code, when two categories tie in price, or when the subtraction is not positive. The reasons are logged in the data file under `checks.counts`.
+- Descriptions gain where each category's open cabins are: missing decks (the Aura's grouped Inside and Balcony codes) and missing forward, midship, aft locations (the Getaway's grouped codes), taken only from NCL's list of open cabins.
+- The run stops if a cabin/availability answer mentions "hold" or "heldUntil".
+
+### Changed
+- Every cabin picker defaults to the cheapest available non-Guarantee category. Guarantee categories stay in the lists and can still be picked; when a type has only Guarantee categories available, the cheapest Guarantee one is the default.
+- Workflow actions moved to their Node.js 24 versions: actions/checkout v7, actions/configure-pages v6, actions/upload-pages-artifact v5 (uses upload-artifact v7), actions/deploy-pages v5. Every job runs on `ubuntu-24.04` instead of `ubuntu-latest`.
+- The refresh job may now take up to 45 minutes (about 160 NCL calls).
+
+### Fixed
+- POST requests to NCL no longer follow redirects. A redirect, a 5xx or a network error is logged with its status code and Location header and retried after 30, 60 and 120 seconds before the run fails.
+- "Deploy site" uploads in a "build" job and publishes in a separate "deploy" job, names the artifact per run attempt, and retries the publish once after 30 seconds. This addresses deploy-pages reporting 0 artifacts right after a successful upload in the same job.
+
 ## [4.3.0] - 2026-10-08
 
 The site is now published by GitHub Actions, so the daily price refresh reaches the family page.

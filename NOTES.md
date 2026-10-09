@@ -239,3 +239,63 @@ Order for the switch (chosen so the family page relies only on documented behavi
 2. Right after, switch Settings, Pages, Source to "GitHub Actions".
 3. Run "Deploy site" by hand once, so the next publish comes from GitHub Actions.
 4. From then on, the daily refresh publishes the site itself.
+
+## Cabin counts (4.4.0, 2026-10-08)
+
+From the owner's AI PC test (plain requests, no cookies, no hold), confirmed from the cloud session:
+- POST `https://www.ncl.com/api/vacation-builder/cabin/availability`, body `{"stateroomSearchFilter":{"stateroomTypeCode":"BALCONY","numberOfGuests":2,"pricedCategoryCode":"B4","accessibilityRequested":false,"filterId":"0","sailing":{"packageId":"24223992","shipCode":"GETAWAY","departureDate":"2027-06-11T00:00:00","destinationCodes":["BAHAMAS","WEEKEND"],"duration":3,"packageType":"CRUISE","sailingId":"60533"},"guests":[]}}`.
+- The sailing part comes from the public GET `https://www.ncl.com/api/vacation-builder/itinerary/<itineraryCode>?packageId=<packageId>`: `ship.code`, `destinations[].code`, `duration`, `sailing.sailingId`, `sailing.sailStartDate`. Aura: AURA, ["CARIBBEAN"], 5, 62344, 2027-06-14T00:00:00. The fetch script reads these every run and checks packageId and date.
+- The answer has `results.availablePositionInShip[]`: locations (Forward, Mid, Aft) with `numberOfCabins`, `lowestPriceCategory`, and `decks[]` with `cabins[]` (cabinNumber, deckNumber, shipLocation, shipSide, pricedCategoryCode, maxOccupancy, isADA, isGTY, extraPrice, price). It covers the requested category plus every pricier category of the same broad type.
+- Cabin lists and deck `numberOfCabins` are capped at 15 per deck, so counts use only the location totals.
+- Count for a category = its call's location totals minus those of the call for the next pricier non-Guarantee category (calls made from the most expensive down). Getaway Balcony at 2 guests: B4 call 139, B6 call 54, B1 call 30, so B4 85, B6 24, B1 30.
+- No answer so far has contained "hold" or "heldUntil" (checked on every call; the run stops if one does).
+
+Does numberOfGuests change the counts? Yes. Tested 2026-10-08: the Getaway B4 call returned 139 cabins at 2 guests and 97 at 4 guests (Aft dropped from 57 to 27, because B1 holds only 3 and some cabins can't take 4). So counts are fetched for every party size (2 to 5), only for categories available at that size: 141 calls on 2026-10-08 (74 Getaway, 67 Aura), about 19 minutes with the 2 second pauses (three calls timed out after 60 seconds and succeeded on retry).
+
+Reliability rules (a count that fails one is stored as null and shows nothing):
+- The call returned a location `lowestPriceCategory`, or a listed cabin, from another broad type. Seen on 2026-10-08: Getaway B6 (O4), MB (O4, O5), the Getaway Oceanview codes (MA, IA, B6), I4 (OA), IC (OX); Aura BB (O4), SK (M2). Deck-level `lowestPriceCategory` values are not used for this rule (the B4 call lists deck 9 Forward as O4 because its cabins are B6, which costs the same as O4).
+- Two non-Guarantee categories of the same type have the same price for that party size (the subtraction order would be ambiguous). None on 2026-10-08.
+- The subtraction is negative in a location or not positive in total. Seen: Getaway IF at 4 guests, Aura IF at 2 guests (0).
+- 18 of 141 counts were unreliable on 2026-10-08. The list with reasons is in `checks.counts.unreliable` in the data file.
+
+Descriptions from open cabins: for each category, the call at 2 guests lists its own open cabins (the category is the cheapest in its own call, so its cabins come first on each deck). Their decks and shipLocation fill a description's missing decks (the Aura's IB, IA, BF, BB, BA) and missing location (the Getaway's grouped codes). These describe where cabins are open now, so they can change from day to day. Nothing is filled when no open cabin of that code is listed (the Aura's IF on 2026-10-08).
+
+Default cabin: every picker starts on the cheapest available non-Guarantee category; Guarantee categories stay in the lists.
+
+## Resilience (4.4.0, 2026-10-08)
+
+Two failures on `main` on 2026-10-08:
+1. A manual "Refresh prices" run failed: NCL answered the availability POST with a 302, urllib followed it, and the new address gave 404. Fix: POST requests never follow redirects. A redirect, a 5xx or a network error is logged with the status code and Location header, then retried after 30, 60 and 120 seconds; after that the run fails. 401, 403 and 404 fail at once. Tested locally against a small test server (302 is never followed and fails after 4 tries; a 503 twice then 200 succeeds on the third try).
+2. On the re-run, "publish / deploy" failed: upload-pages-artifact succeeded (artifact id 11552464267), and about a second later deploy-pages listed 0 artifacts: "No artifacts named github-pages were found for this workflow run."
+
+Research on the deploy failure:
+- actions/deploy-pages issue 451 (opened 2026-10-07, still open) describes the same pattern: upload-pages-artifact and deploy-pages in the same job, and the artifact listing comes back empty for an artifact finalized a fraction of a second earlier (62 of 63 runs worked). Its reporter fixed it by moving the upload into an earlier job, as GitHub's own Pages starter workflows do. https://github.com/actions/deploy-pages/issues/451
+- The same issue explains that re-running cannot recover that layout, because the re-run uploads a second artifact with the same name and deploy-pages then fails with "Multiple artifacts named github-pages were unexpectedly found" (issue 338). https://github.com/actions/deploy-pages/issues/338
+- deploy-pages v5 source (`src/internal/api-client.js`): it lists all artifacts of the run and filters by name, failing on 0 or more than 1 match. It has an `artifact_name` input. https://github.com/actions/deploy-pages
+- Older reports of the same message were version mismatches between upload-pages-artifact and deploy-pages (issue 305, community discussion 84008); the versions here match. https://github.com/actions/deploy-pages/issues/305 and https://github.com/orgs/community/discussions/84008
+
+Fix in "Deploy site":
+- A `build` job runs the release check, collects `_site`, configure-pages and upload-pages-artifact. A separate `deploy` job runs deploy-pages, so the listing happens seconds after the upload, in another job.
+- The artifact is named `github-pages-<run attempt>`, reported by the build job and passed to deploy-pages as `artifact_name`. "Re-run all jobs" uploads a new name instead of a second `github-pages`; "Re-run failed jobs" reuses the build job's name from the first attempt.
+- The deploy step is retried once after 30 seconds if the first attempt fails.
+
+Workflow maintenance: actions/checkout v7, configure-pages v6, upload-pages-artifact v5 (composite; it uses upload-artifact v7) and deploy-pages v5 all run on Node.js 24 (checked in each release's action.yml on 2026-10-08). Every job is pinned to `ubuntu-24.04`, so GitHub's change of `ubuntu-latest` can't change anything unexpectedly. actionlint 1.7.7 reports no problems.
+
+## Counts separated from prices (4.5.0, 2026-10-09)
+
+Owner decisions:
+1. Prices stay daily and never depend on counts. The price fetch (itineraries, availability, price summaries, age test) keeps its schedule and publishes even if counts fail.
+2. Counts move to their own job and their own file, `data/counts.json`, with its own `saved_at`. The counts job runs after the price job, commits its file, then publishes. If it fails or NCL refuses it, the prices still publish and the page keeps the last good counts.
+3. Schedule: a full sweep (all categories, all party sizes) every 3 days; on the other days, re-check only categories whose last count was under 50, plus the next pricier category each one needs for the subtraction. 3 second pauses between count calls.
+4. The page shows "Cabins left as of [date]" from `counts.json` and hides every count label when the file is missing or more than 7 days old.
+5. `counts.json` has its own format check (`tools/check_counts.py`), so a bad counts file never blocks a price publish.
+
+How it's built:
+- `tools/fetch_prices.py` no longer makes cabin calls. `data/prices.json` no longer holds `cabins_left`, `count_reliable` or open-cabin details; `tools/check_prices.py` rejects them if they reappear.
+- `tools/fetch_counts.py --prices data/prices.json --previous data/counts.json --out data/counts.new.json --mode auto|full|light`. It reads today's categories, prices and availability from `prices.json`. `auto` is full when there's no usable previous file (missing or failing `check_counts.py`) or the last full sweep was 3 or more UTC calendar days ago; light otherwise. Light mode starts from the previous entries for categories still available today, re-checks the reliable counts under 50 (and calls the next pricier category for each), and keeps every other entry with its own `checked_at`. Unreliable counts are only retried on full sweeps.
+- Workflow "Refresh prices": `refresh` (prices) then `publish` (label prices); `counts` (`if: !cancelled()`, so it runs even if `refresh` failed, and checks out the branch head so it sees today's prices) then `publish-counts` (label counts); `keepalive`. Two publishes in one run use different artifact names (`github-pages-prices-<attempt>`, `github-pages-counts-<attempt>`), and the deploy job's concurrency group `pages` makes the second wait for the first.
+- Manual runs: Actions, "Refresh prices", "Run workflow", then choose the cabin counts mode (auto, full or light). Pushes to the development branch always do a full sweep.
+- How to tell the days apart: the counts commit message ends in "(full)" or "(light)"; `counts.json` has `mode`, `mode_reason`, `calls` and `last_full_sweep`; the counts job's log starts with "Mode: full (...)" or "Mode: light (...)".
+- The page loads `counts.json` separately; any problem (missing, unreadable, wrong schema, more than 7 days old) hides the labels and the "Cabins left as of" date without touching prices. Descriptions are rebuilt on the page with the same rules as `fetch_prices.py`, filling missing decks or locations from `open_decks` and `open_locations` only while counts are fresh.
+
+Volume (2026-10-08 data): a full sweep is 141 calls. 89 of those counts were under 50 (mostly small Haven, suite and Club Balcony categories), so a light day is about 100 calls including the subtrahend calls. Light days save roughly a quarter to a third of the calls; most of the saving comes from the 3 day full sweep cycle and the slower 3 second pace is a choice for gentleness, not speed.

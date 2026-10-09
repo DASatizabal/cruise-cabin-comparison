@@ -14,6 +14,11 @@ Calls per run (2 seconds apart, no cookies, nothing is held or booked):
   - price-summary age test: 1 per ship, guests 1 adult (reservation owner), a 15 year old
     and a 7 year old (birth dates only), to read the adult Open Bar, the under 21 soda
     package and the Specialty Dining amounts per guest (2)
+POST requests never follow redirects; redirects, 5xx and network errors are retried after
+30, 60 and 120 seconds.
+
+Cabin counts are not fetched here. They live in tools/fetch_counts.py and data/counts.json,
+so prices never depend on them.
 
 Cross checks are logged in the data file under "checks":
   - extra_guest: per category, (total at N minus total at 2) / (N minus 2) should match
@@ -41,6 +46,11 @@ API = "https://www.ncl.com/api"
 AVAILABILITY_URL = API + "/vacation-builder/v2/stateroom-types-availability"
 PRICE_SUMMARY_URL = API + "/vacation-builder/price-summary"
 ROUTE_EVENTS_URL = API + "/cruises/v1/route-events/{package_id}"
+ITINERARY_URL = API + "/vacation-builder/itinerary/{code}?packageId={package_id}"
+CABIN_AVAILABILITY_URL = API + "/vacation-builder/cabin/availability"
+# A cabin/availability answer must never mention a hold; stop the run if it does.
+HOLD_IN_RESPONSE = re.compile(rb"hold|helduntil", re.I)
+LOCATION_ORDER = ["Forward", "Mid", "Aft"]
 
 SAILINGS = [
     {"id": "getaway-2027-06-11", "ship": "Norwegian Getaway", "ship_short": "Getaway",
@@ -75,34 +85,61 @@ def log(msg):
     print(msg, file=sys.stderr, flush=True)
 
 
-def request(url, body=None, tries=3):
-    """GET (body None) or POST JSON. Refuses forbidden addresses. Pauses between calls."""
+RETRY_WAITS = [30, 60, 120]   # seconds before retries 1, 2 and 3
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Never follow redirects. NCL once answered a POST with a 302 to an address that gave 404."""
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+_no_redirect_opener = urllib.request.build_opener(_NoRedirect)
+
+
+def request(url, body=None, raw=False):
+    """GET (body None) or POST JSON. Refuses forbidden addresses. Pauses between calls.
+
+    POST requests never follow redirects. A redirect, a 5xx or a network error is logged
+    (status code and Location header) and retried up to 3 times, after 30, 60 and 120 seconds.
+    401, 403 and 404 fail at once. With raw=True the response bytes are returned as well.
+    """
     global _last_call
     if FORBIDDEN.search(url):
         raise RuntimeError(f"Refusing to call {url}: it could hold a cabin")
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+    data = None
+    if body is not None:
+        headers["Content-Type"] = "application/json"
+        data = json.dumps(body).encode()
     last = None
-    for attempt in range(tries):
+    for attempt in range(len(RETRY_WAITS) + 1):
+        if attempt:
+            log(f"  retry {attempt} of {len(RETRY_WAITS)} in {RETRY_WAITS[attempt - 1]} s: {url}")
+            time.sleep(RETRY_WAITS[attempt - 1])
         wait = PAUSE_SECONDS - (time.monotonic() - _last_call)
         if wait > 0:
             time.sleep(wait)
         _last_call = time.monotonic()
-        headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
-        data = None
-        if body is not None:
-            headers["Content-Type"] = "application/json"
-            data = json.dumps(body).encode()
+        req = urllib.request.Request(url, data=data, headers=headers, method="POST" if data else "GET")
+        opener = _no_redirect_opener if data else urllib.request.build_opener()
         try:
-            req = urllib.request.Request(url, data=data, headers=headers, method="POST" if data else "GET")
-            with urllib.request.urlopen(req, timeout=60) as res:
-                return json.loads(res.read())
+            with opener.open(req, timeout=60) as res:
+                content = res.read()
+                return (json.loads(content), content) if raw else json.loads(content)
         except urllib.error.HTTPError as e:
+            location = e.headers.get("Location") if e.headers else None
             if e.code in (401, 403, 404):
                 raise RuntimeError(f"NCL answered HTTP {e.code} for {url} (blocked or moved)")
-            last = e
+            if 300 <= e.code < 400 or e.code >= 500:
+                log(f"  NCL answered HTTP {e.code} for {url}" + (f", Location: {location}" if location else ""))
+            else:
+                log(f"  NCL answered HTTP {e.code} for {url}")
+            last = f"HTTP {e.code}" + (f" to {location}" if location else "")
         except Exception as e:
-            last = e
-        time.sleep(2 ** (attempt + 1))
-    raise RuntimeError(f"Request failed after {tries} tries: {url} ({last})")
+            log(f"  {type(e).__name__} for {url}: {e}")
+            last = f"{type(e).__name__}: {e}"
+    raise RuntimeError(f"Request failed after {len(RETRY_WAITS) + 1} tries: {url} ({last})")
 
 
 def utc(ms):

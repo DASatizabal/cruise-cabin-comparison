@@ -82,6 +82,9 @@
             margin-bottom: 1.25rem;
         }
 
+        .as-of-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .as-of[hidden] { display: none; }
+
         .as-of {
             display: inline-flex;
             align-items: center;
@@ -529,6 +532,11 @@
         .cat-list button[aria-pressed="true"] { border-color: var(--teal); background: var(--teal-wash); }
         .cat-list button.only { cursor: default; pointer-events: none; }
         .cat-list .price { font-weight: 700; white-space: nowrap; }
+        .gauge { display: inline-block; margin-top: 0.25rem; padding: 0.05rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600; }
+        .gauge.ok { background: #dcfce7; color: #166534; }
+        .gauge.mid { background: var(--gold-wash); color: #92400e; }
+        .gauge.low { background: var(--red-wash); color: var(--red); }
+        span.gauge { display: table; }
 
         .row.total { border-top: 2px solid var(--gray-300); font-size: 1rem; }
         .row.total .k { color: var(--gray-900); font-weight: 700; }
@@ -557,7 +565,10 @@
             <span class="version-badge" id="versionBadge"></span>
             <h1 class="hero-title">Our June 2027 Family Cruise</h1>
             <p class="hero-subtitle">Three choices, all Norwegian Cruise Line, all round trip from Miami: 3 nights, 5 nights, or both back to back for 8 nights.</p>
-            <span class="as-of">Prices as of <strong id="asOf">loading...</strong></span>
+            <div class="as-of-row">
+                <span class="as-of">Prices as of <strong id="asOf">loading...</strong></span>
+                <span class="as-of" id="countsAsOf" hidden>Cabins left as of <strong id="countsAsOfDate"></strong></span>
+            </div>
         </div>
         <div class="wave-container"><div class="wave"></div></div>
     </header>
@@ -604,14 +615,17 @@
     </footer>
 
     <script>
-        const APP_VERSION = "4.3.0";
+        const APP_VERSION = "4.5.0";
         const DATA_URL = "data/prices.json";
+        const COUNTS_URL = "data/counts.json";
+        const COUNTS_MAX_AGE_DAYS = 7;
         const MIN_GUESTS = 2, MAX_GUESTS = 5;
         const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
         const STORE_KEY = "cruise-decision-guide-v4";
         const GUARANTEE_TEXT = "Guarantee: NCL picks your cabin location";
 
         let DATA = null, G = null, A = null;   // data file, Getaway sailing, Aura sailing
+        let COUNTS = null;                      // data/counts.json when present and at most 7 days old
         const state = {
             adults: 2, kids: [],            // kids: ages 0 to 20, or null until chosen
             type: "balcony", mode: "same",
@@ -690,8 +704,26 @@
         function chosenInType(s, t, n) {
             const list = availableIn(t, n);
             const saved = s === G ? state.pickG : state.pickA;
-            return list.find(c => c.code === saved) || list[0] || null;
+            return list.find(c => c.code === saved) || defaultPick(list);
         }
+
+        // Default cabin: the cheapest available non-Guarantee category; if a list has only
+        // Guarantee categories, the cheapest Guarantee one. Lists are cheapest first.
+        function defaultPick(list) {
+            return list.find(c => !c.guarantee) || list[0] || null;
+        }
+
+        // Cabins left, from data/counts.json. Nothing for Guarantee cabins, unreliable counts,
+        // or when the counts file is missing or more than 7 days old.
+        function gauge(c, n) {
+            const e = c._counts && c._counts.by_guests && c._counts.by_guests[String(n)];
+            if (c.guarantee || !e || !e.reliable || !Number.isInteger(e.cabins_left) || e.cabins_left < 1) return "";
+            const left = e.cabins_left;
+            if (left >= 50) return "Plenty left";
+            if (left >= 10) return "Getting low";
+            return `Only ${left} left`;
+        }
+        const gaugeHtml = (c, n) => { const g = gauge(c, n); return g ? `<span class="gauge ${g.startsWith("Only") ? "low" : g === "Getting low" ? "mid" : "ok"}">${esc(g)}</span>` : ""; };
 
         // ---------- cost ----------
         // NCL's guest order: adults first, then kids oldest first. Position matters for Open Bar.
@@ -768,7 +800,7 @@
         }
 
         function catHeader(c) {
-            const meta = [c.size, c.capacity ? `holds up to ${c.capacity}` : ""].filter(Boolean).join(", ");
+            const meta = [c.size, c.capacity && !c.description.includes("holds up to") ? `holds up to ${c.capacity}` : ""].filter(Boolean).join(", ");
             return `<div class="cabin-line">${catHtml(c)}
                 ${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}
                 ${c.guarantee ? `<div class="cat-meta gty">${GUARANTEE_TEXT}</div>` : ""}</div>`;
@@ -781,7 +813,7 @@
                 ? `class="only" aria-pressed="true" aria-disabled="true" tabindex="-1"`
                 : `data-pick="${field}" data-code="${esc(c.code)}" aria-pressed="${pressed}"`;
             return `<li><button type="button" ${attrs}>
-                    <span>${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</span>
+                    <span>${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}${gaugeHtml(c, n)}</span>
                     <span class="price">${money(entry(c, n).cabin_total)}</span>
                 </button></li>`;
         }
@@ -845,7 +877,7 @@
             const groups = types(s).map(t => {
                 const list = availableIn(t, n);
                 if (!list.length) return "";
-                return `<optgroup label="${esc(t.title)}">${list.map(c => `<option value="${esc(c.code)}" ${state[field] === c.code ? "selected" : ""}>${esc(catLabel(c))}: ${money(entry(c, n).cabin_total)}</option>`).join("")}</optgroup>`;
+                return `<optgroup label="${esc(t.title)}">${list.map(c => `<option value="${esc(c.code)}" ${state[field] === c.code ? "selected" : ""}>${esc(catLabel(c))}: ${money(entry(c, n).cabin_total)}${gauge(c, n) ? `, ${esc(gauge(c, n).toLowerCase())}` : ""}</option>`).join("")}</optgroup>`;
             }).join("");
             const all = types(s).flatMap(t => availableIn(t, n));
             if (all.length === 1) {
@@ -946,9 +978,9 @@
                 });
                 return `<tr class="group"><td colspan="2">${esc(t.title)}</td></tr>` + cats.map(c => {
                     const e = entry(c, n);
-                    const meta = [c.size, c.capacity ? `holds up to ${c.capacity}` : "", c.guarantee ? GUARANTEE_TEXT : ""].filter(Boolean).join(". ");
+                    const meta = [c.size, c.capacity && !c.description.includes("holds up to") ? `holds up to ${c.capacity}` : "", c.guarantee ? GUARANTEE_TEXT : ""].filter(Boolean).join(". ");
                     return e.available
-                        ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${money(e.cabin_total)}<span class="pp-small">${moneyR(e.price_pp)} pp</span></td></tr>`
+                        ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}${gaugeHtml(c, n)}</td><td>${money(e.cabin_total)}<span class="pp-small">${moneyR(e.price_pp)} pp</span></td></tr>`
                         : `<tr class="off"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${esc(e.reason)}</td></tr>`;
                 }).join("");
             }).join("");
@@ -991,7 +1023,7 @@
                 const c = findCat(s, state[f]);
                 if (!c || !isAvail(c, n)) {
                     const tf = typeFor(s, state.type);
-                    const best = (!tf.missing && availableIn(tf.t, n)[0]) || allCats(s).filter(c => isAvail(c, n)).sort((a, b) => entry(a, n).cabin_total - entry(b, n).cabin_total)[0];
+                    const best = (!tf.missing && defaultPick(availableIn(tf.t, n))) || defaultPick(allCats(s).filter(c => isAvail(c, n)).sort((a, b) => entry(a, n).cabin_total - entry(b, n).cabin_total));
                     state[f] = best ? best.code : null;
                 }
             }
@@ -1060,18 +1092,85 @@
             render();
         });
 
+        // ---------- counts and descriptions ----------
+        function usableCounts(cnt) {
+            try {
+                if (!cnt || cnt.schema_version !== 1 || typeof cnt.sailings !== "object") return null;
+                const saved = Date.parse(cnt.saved_at);
+                if (!Number.isFinite(saved)) return null;
+                if (Date.now() - saved > COUNTS_MAX_AGE_DAYS * 86400000) return null;
+                return cnt;
+            } catch (e) { return null; }
+        }
+
+        const LOCATION_ORDER = ["forward", "midship", "aft"];
+        function deckText(decks) {
+            const d = [...new Set(decks)].sort((a, b) => a - b);
+            if (d.length === 1) return `Deck ${d[0]}`;
+            const parts = [];
+            let run = [d[0]];
+            for (const x of [...d.slice(1), null]) {
+                if (x !== null && x === run[run.length - 1] + 1) { run.push(x); continue; }
+                if (run.length >= 3) parts.push(`${run[0]} to ${run[run.length - 1]}`); else parts.push(...run.map(String));
+                run = [x];
+            }
+            return "Decks " + (parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1] : parts[0]);
+        }
+        function locationText(locs) {
+            const w = LOCATION_ORDER.filter(l => locs.includes(l));
+            return w.length < 3 ? w.join(" and ") : "forward, midship and aft";
+        }
+
+        // Plain description: NCL's title, decks and location from the price file, with gaps
+        // filled from where this category's own open cabins are (counts file, if fresh).
+        // Same rules as tools/fetch_prices.py; nothing is guessed.
+        function describe(c) {
+            const cc = c._counts || {};
+            const decks = c.decks || (!c.guarantee && cc.open_decks) || null;
+            const locs = c.location || (!c.guarantee && cc.open_locations) || null;
+            const parts = [c.title];
+            if (decks && decks.length) parts.push(deckText(decks));
+            if (locs && locs.length) parts.push(locationText(locs));
+            if (!(decks && decks.length) && !c.guarantee && (c.shares_ncl_description_with || []).length && c.capacity) parts.push(`holds up to ${c.capacity}`);
+            return parts.join(", ");
+        }
+
+        function attachCounts() {
+            for (const s of DATA.sailings) {
+                const sc = COUNTS && COUNTS.sailings[s.id];
+                for (const t of s.types) for (const c of t.categories) {
+                    c._counts = (sc && !c.guarantee && sc[c.code]) || null;
+                    c.description = describe(c);
+                }
+            }
+            const pill = document.getElementById("countsAsOf");
+            if (COUNTS) {
+                document.getElementById("countsAsOfDate").textContent = new Date(COUNTS.saved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
+                pill.hidden = false;
+            } else {
+                pill.hidden = true;
+            }
+        }
+
         // ---------- start ----------
         document.getElementById("versionBadge").textContent = "v" + APP_VERSION;
         document.getElementById("footerVersion").textContent = "Version " + APP_VERSION;
         restore();
+        // Counts are optional: any problem loading them just hides the count labels.
+        const countsPromise = fetch(COUNTS_URL, { cache: "no-cache" })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null);
         fetch(DATA_URL, { cache: "no-cache" })
             .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-            .then(d => {
+            .then(d => countsPromise.then(cnt => [d, cnt]))
+            .then(([d, cnt]) => {
                 DATA = d;
+                COUNTS = usableCounts(cnt);
                 G = d.sailings.find(s => s.id.startsWith("getaway"));
                 A = d.sailings.find(s => s.id.startsWith("aura"));
                 if (!G || !A) throw new Error("a sailing is missing");
                 document.getElementById("asOf").textContent = new Date(d.saved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
+                attachCounts();
                 render();
             })
             .catch(err => {

@@ -158,6 +158,8 @@ def check(data):
                             err(f"{ep}: added_vs_2 is missing")
                         if not c.get("solo"):
                             available_for[g] = True
+                        if "cabins_left" in e or "count_reliable" in e:
+                            err(f"{ep}: cabin counts belong in data/counts.json, not in prices")
                     else:
                         if "price_pp" in e:
                             err(f"{ep}: not available but has a price")

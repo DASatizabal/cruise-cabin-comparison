@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "saved_at": "2026-10-08T13:22:58Z",
+ "saved_at": "2026-10-09T01:28:51Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -107,7 +107,7 @@
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-08",
+   "saved_at": "2026-10-09",
    "taxes_per_guest": 200,
    "gratuities": {
     "open_bar": {
@@ -1937,7 +1937,7 @@
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-08",
+   "saved_at": "2026-10-09",
    "taxes_per_guest": 210,
    "gratuities": {
     "open_bar": {
@@ -2828,32 +2828,29 @@
        "title": "Aft-Facing Balcony",
        "guarantee": false,
        "solo": false,
-       "capacity": 4,
+       "capacity": null,
        "by_guests": {
         "2": {
-         "available": true,
-         "sold_out": false,
-         "price_pp": 2959.0,
-         "cabin_total": 5918
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
         },
         "3": {
          "available": true,
          "sold_out": false,
          "price_pp": 2235.66,
-         "cabin_total": 6707,
-         "added_vs_2": 789
+         "cabin_total": 6707
         },
         "4": {
          "available": true,
          "sold_out": false,
          "price_pp": 1874.0,
-         "cabin_total": 7496,
-         "added_vs_2": 1578
+         "cabin_total": 7496
         },
         "5": {
          "available": false,
-         "sold_out": false,
-         "reason": "Holds only 4 guests"
+         "sold_out": true,
+         "reason": "Sold out"
         }
        },
        "description": "Aft-Facing Balcony, Deck 9, aft",
