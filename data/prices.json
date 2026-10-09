@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "saved_at": "2026-10-09T16:16:45Z",
+ "saved_at": "2026-10-09T17:00:33Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -164,30 +164,30 @@
    "return": "2027-06-14",
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
-   "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-09",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-09T16:16:02Z",
+     "as_of": "2026-10-09T17:00:33Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-09T16:16:02Z",
+     "as_of": "2026-10-09T17:00:33Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-09T16:16:02Z",
+     "as_of": "2026-10-09T17:00:33Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-09T16:16:02Z",
+     "as_of": "2026-10-09T17:00:33Z",
      "why": null
     }
    },
+   "source": "NCL vacation-builder API",
+   "saved_at": "2026-10-09",
    "taxes_per_guest": 150,
    "gratuities": {
     "open_bar": {
@@ -2020,30 +2020,30 @@
    "return": "2027-06-19",
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
-   "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-09",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-09T16:16:23Z",
+     "as_of": "2026-10-09T17:00:33Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-09T16:16:23Z",
+     "as_of": "2026-10-09T17:00:33Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-09T16:16:23Z",
+     "as_of": "2026-10-09T17:00:33Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-09T16:16:23Z",
+     "as_of": "2026-10-09T17:00:33Z",
      "why": null
     }
    },
+   "source": "NCL vacation-builder API",
+   "saved_at": "2026-10-09",
    "taxes_per_guest": 160,
    "gratuities": {
     "open_bar": {
