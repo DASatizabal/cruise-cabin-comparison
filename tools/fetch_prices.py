@@ -362,67 +362,144 @@ def age_test_guests(depart):
             {"birthDate": born(7), "reservationOwner": False}]
 
 
-def fetch_sailing(cfg, checks):
+MAX_STALE_DAYS = 3   # kept prices older than this fail the run
+
+
+def parse_iso_z(s):
+    return dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
+
+
+def fetch_party_size(cfg, g, fare_codes):
+    """Availability and the price summary for one ship and party size, checked before use.
+
+    Returns (rows, summary, formula). Raises if anything is missing or NCL's numbers disagree,
+    so a failed party size never leaves half its data behind.
+    """
+    result = fetch_availability(cfg, g)
+    for tcode, code in default_fare_codes(result).items():
+        fare_codes.setdefault(tcode, code)
+    rows, cheapest = [], None
+    for t in result.get("stateroomTypesPricing", []):
+        for sp in t.get("stateroomsPricing", []):
+            room = sp.get("stateroom") or {}
+            for cp in sp.get("categoryPricing", []):
+                so = cp.get("standardOption") or {}
+                code = so.get("pricedCategoryCode")
+                if not code:
+                    continue
+                title = room.get("title")
+                solo = code in SOLO_CODES or (title or "").lower().startswith("solo")
+                price = so.get("price")
+                available = bool(cp.get("isAvailable")) and isinstance(price, (int, float)) and price > 0
+                entry = {"available": available, "sold_out": bool(cp.get("isSoldOut"))}
+                if available:
+                    # NCL sends the average with cents (like 455.66); round only the cabin total,
+                    # which then equals NCL's fare plus taxes for the party.
+                    entry["price_pp"] = round(float(price), 2)
+                    entry["cabin_total"] = int(round(price * g))
+                    if not solo and (cheapest is None or price < cheapest[2]):
+                        cheapest = (t["code"], code, price, entry["cabin_total"])
+                rows.append({"type": t, "room": room, "so": so, "code": code, "title": title, "solo": solo, "entry": entry})
+    if cheapest is None:
+        raise RuntimeError(f"no cabin available at a real price for {g} guests")
+    tcode, ccode, _, cabin_total = cheapest
+    fare_code = fare_codes.get(tcode)
+    if not fare_code:
+        raise RuntimeError(f"no Free at Sea promotion code found for {tcode}")
+    summary = fetch_price_summary(cfg, g, tcode, ccode, fare_code)
+    if (summary["grand_total"] or 0) <= 0:
+        raise RuntimeError(f"NCL's price summary for {ccode} at {g} guests was empty")
+    # Cross check: availability price x guests + this summary's own gratuity lines = its total.
+    grat = sum(sum(x["per_guest"]) for x in (summary["open_bar"], summary["specialty_dining"]) if x)
+    expected = cabin_total + grat
+    formula = {"sailing": cfg["id"], "guests": g, "category": ccode, "expected": expected,
+               "ncl_total": summary["grand_total"], "ok": abs(expected - summary["grand_total"]) <= TOLERANCE}
+    if not formula["ok"]:
+        raise RuntimeError(f"formula check failed for {ccode} at {g} guests: expected {expected}, NCL total {summary['grand_total']}")
+    return rows, summary, formula
+
+
+def fetch_sailing(cfg, checks, previous=None):
+    """One sailing. Each party size (2 to 5) succeeds or fails on its own.
+
+    A failed party size keeps the previous file's prices for that ship and party size, marked
+    in `party_sizes` as not updated, with the time they are from. The run fails if every party
+    size fails, if there is nothing to keep, or if kept prices are more than 3 days old.
+    """
     log(f"{cfg['ship']} {cfg['depart']} (packageId {cfg['package_id']})")
+    now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+    now_iso = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    prev_s = next((s for s in (previous or {}).get("sailings", []) if s.get("id") == cfg["id"]), None)
     ports = fetch_ports(cfg)
     nights = len(ports) - 1
-    types = {}
-    capacity = {}
-    fare_codes = {}
-    summaries = []
+    types, fare_codes, summaries, status = {}, {}, {}, {}
     for g in GUEST_COUNTS:
-        result = fetch_availability(cfg, g)
-        if g == 2:
-            fare_codes = default_fare_codes(result)
-        cheapest = None
-        for t in result.get("stateroomTypesPricing", []):
-            tcode = t["code"]
-            tentry = types.setdefault(tcode, {"code": tcode, "title": t.get("title") or tcode.title(),
-                                              "match": MATCH_KEYS.get(tcode, tcode.lower()), "categories": {}})
-            for sp in t.get("stateroomsPricing", []):
-                room = sp.get("stateroom") or {}
-                title = room.get("title")
-                for cp in sp.get("categoryPricing", []):
-                    so = cp.get("standardOption") or {}
-                    code = so.get("pricedCategoryCode")
-                    if not code:
-                        continue
-                    cat = tentry["categories"].setdefault(code, {
-                        "code": code,
-                        "title": title or code,
-                        "guarantee": code in GUARANTEE_CODES or bool(so.get("isGTY")),
-                        "solo": code in SOLO_CODES or (title or "").lower().startswith("solo"),
-                        "capacity": None,
-                        "by_guests": {},
-                    })
-                    if g == 2:
-                        # Capacity only from the 2-guest call: it reads 0 whenever a category is unavailable.
-                        cap = so.get("guestCapacity")
-                        cat["capacity"] = cap if isinstance(cap, int) and cap > 0 else None
-                        cat["_group"] = room
-                    price = so.get("price")
-                    available = bool(cp.get("isAvailable")) and isinstance(price, (int, float)) and price > 0
-                    entry = {"available": available, "sold_out": bool(cp.get("isSoldOut"))}
-                    if available:
-                        # NCL sends the average with cents (like 455.66); round only the cabin total,
-                        # which then equals NCL's fare plus taxes for the party.
-                        entry["price_pp"] = round(float(price), 2)
-                        entry["cabin_total"] = int(round(price * g))
-                        if not cat["solo"] and (cheapest is None or price < cheapest[2]):
-                            cheapest = (tcode, code, price)
-                    cat["by_guests"][str(g)] = entry
-        if cheapest is None:
-            raise RuntimeError(f"No cabin is available on the {cfg['ship']} for {g} guests")
-        tcode, ccode, _ = cheapest
-        fare_code = fare_codes.get(tcode)
-        if not fare_code:
-            raise RuntimeError(f"No Free at Sea promotion code found for {cfg['ship']} {tcode}")
-        summaries.append(fetch_price_summary(cfg, g, tcode, ccode, fare_code))
-        log(f"  {g} guests: cheapest {ccode} ({tcode}), price summary {summaries[-1]['grand_total']}")
+        try:
+            rows, summary, formula = fetch_party_size(cfg, g, fare_codes)
+        except Exception as e:
+            status[str(g)] = {"updated": False, "why": f"{type(e).__name__}: {e}"}
+            log(f"  {g} guests FAILED: {e}")
+            continue
+        for r in rows:
+            t = r["type"]
+            tentry = types.setdefault(t["code"], {"code": t["code"], "title": t.get("title") or t["code"].title(),
+                                                  "match": MATCH_KEYS.get(t["code"], t["code"].lower()), "categories": {}})
+            cat = tentry["categories"].setdefault(r["code"], {
+                "code": r["code"], "title": r["title"] or r["code"],
+                "guarantee": r["code"] in GUARANTEE_CODES or bool(r["so"].get("isGTY")),
+                "solo": r["solo"], "capacity": None, "by_guests": {}})
+            if g == 2:
+                # Capacity only from the 2-guest call: it reads 0 whenever a category is unavailable.
+                cap = r["so"].get("guestCapacity")
+                cat["capacity"] = cap if isinstance(cap, int) and cap > 0 else None
+                cat["_group"] = r["room"]
+            cat["by_guests"][str(g)] = r["entry"]
+        summaries[g] = summary
+        checks["formula"].append(formula)
+        status[str(g)] = {"updated": True, "as_of": now_iso, "why": None}
+        log(f"  {g} guests: cheapest {summary['category']} ({summary['type']}), price summary {summary['grand_total']}")
+
+    if not summaries:
+        raise RuntimeError(f"Every party size failed on the {cfg['ship']}")
+
+    # Keep the previous prices for any party size that failed today.
+    for g in GUEST_COUNTS:
+        st = status[str(g)]
+        if st["updated"]:
+            continue
+        if not prev_s:
+            raise RuntimeError(f"{cfg['ship']} {g} guests failed and there are no previous prices to keep")
+        prev_st = (prev_s.get("party_sizes") or {}).get(str(g)) or {}
+        as_of = prev_st.get("as_of") or previous.get("saved_at")
+        age_days = (now - parse_iso_z(as_of)).total_seconds() / 86400
+        if age_days > MAX_STALE_DAYS:
+            raise RuntimeError(f"{cfg['ship']} {g} guests failed and the kept prices are {age_days:.1f} days old (limit {MAX_STALE_DAYS})")
+        st["as_of"] = as_of
+        log(f"  {g} guests: keeping prices from {as_of}")
+        for pt in prev_s["types"]:
+            tentry = types.setdefault(pt["code"], {"code": pt["code"], "title": pt["title"], "match": pt["match"], "categories": {}})
+            for pc in pt["categories"]:
+                cat = tentry["categories"].setdefault(pc["code"], {
+                    "code": pc["code"], "title": pc["title"], "guarantee": pc["guarantee"], "solo": pc["solo"],
+                    "capacity": pc.get("capacity"), "by_guests": {}, "_prev": pc})
+                cat.setdefault("_prev", pc)
+                e = dict(pc["by_guests"][str(g)])
+                e.pop("added_vs_2", None)
+                e.pop("reason", None)
+                cat["by_guests"][str(g)] = e
+        prev_sum = next((x for x in prev_s.get("price_summaries", []) if x.get("guests") == g), None)
+        if prev_sum:
+            summaries[g] = prev_sum
+        prev_formula = next((x for x in (previous.get("checks") or {}).get("formula", [])
+                             if x.get("sailing") == cfg["id"] and x.get("guests") == g), None)
+        if prev_formula:
+            checks["formula"].append(dict(prev_formula, kept_from=as_of))
 
     # Fill in categories that were missing from some calls, and the reasons.
     for t in types.values():
         for cat in t["categories"].values():
+            if cat["capacity"] is None and cat.get("_prev"):
+                cat["capacity"] = cat["_prev"].get("capacity")
             two = cat["by_guests"].get("2", {})
             for g in GUEST_COUNTS:
                 e = cat["by_guests"].setdefault(str(g), {"available": False, "sold_out": False})
@@ -448,51 +525,66 @@ def fetch_sailing(cfg, checks):
                         "per_extra_guest": {str(k): round(v, 2) for k, v in per_extra.items()},
                     })
 
-    # Taxes per guest, from the 2-guest price summary (the same for every guest at any age).
-    taxes = summaries[0]["taxes_per_guest"]
+    # Taxes per guest (the same for every guest at any age), from today's first good summary.
+    fresh = [summaries[g] for g in GUEST_COUNTS if status[str(g)]["updated"]]
+    taxes = fresh[0]["taxes_per_guest"]
     if not taxes:
         raise RuntimeError(f"No tax line in the {cfg['ship']} price summary")
 
     # Gratuities per guest by age and position, read from NCL with an age test party:
     # guest 1 an adult (reservation owner), guest 2 a 15 year old, guest 3 a 7 year old.
-    s3 = summaries[1]
-    age_summary = fetch_price_summary(cfg, 3, s3["type"], s3["category"], s3["fare_code"], age_test_guests(cfg["depart"]))
-    bar, dining = age_summary["open_bar"], age_summary["specialty_dining"]
-    if not bar or not dining or len(bar["per_guest"]) != 3 or len(dining["per_guest"]) != 3:
-        raise RuntimeError(f"Unexpected gratuity lines in the {cfg['ship']} age test price summary")
-    b, d = bar["per_guest"], dining["per_guest"]
-    # The confirmed rules: Open Bar adult full, under 21 in position 2 a soda package, under 21
-    # in position 3 or later nothing; Specialty Dining 13 and over pay, under 13 free.
-    if not (b[0] > 0 and 0 < b[1] < b[0] and b[2] == 0 and d[0] > 0 and d[1] == d[0] and d[2] == 0):
-        raise RuntimeError(f"NCL's age rules changed on the {cfg['ship']}: Open Bar {b}, Specialty Dining {d}")
-    read_on = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
-    gratuities = {
-        "open_bar": {"title": bar["title"], "per_guest": b[0], "soda_under_21_position_2": b[1],
-                     "under_21_position_3_plus": 0, "source": "NCL price-summary (age test)", "checked_at": read_on},
-        "specialty_dining": {"title": dining["title"], "per_guest": d[0], "under_13": 0,
-                             "source": "NCL price-summary (age test)", "checked_at": read_on},
-    }
-
-    # Cross check: availability price x guests + gratuities x guests = price summary total (all adults).
-    for s in summaries:
-        g = s["guests"]
-        cat = next(c for t in types.values() for c in t["categories"].values() if c["code"] == s["category"])
-        expected = cat["by_guests"][str(g)]["cabin_total"] + g * (gratuities["open_bar"]["per_guest"] + gratuities["specialty_dining"]["per_guest"])
-        ok = abs(expected - s["grand_total"]) <= TOLERANCE
-        checks["formula"].append({"sailing": cfg["id"], "guests": g, "category": s["category"],
-                                  "expected": expected, "ncl_total": s["grand_total"], "ok": ok})
-
-    # Cross check: the page's age formula for 1 adult + 15 + 7 against NCL's total.
-    cat = next(c for t in types.values() for c in t["categories"].values() if c["code"] == s3["category"])
-    expected = (cat["by_guests"]["3"]["cabin_total"]
-                + gratuities["open_bar"]["per_guest"] + gratuities["open_bar"]["soda_under_21_position_2"]
-                + 2 * gratuities["specialty_dining"]["per_guest"])
-    checks["ages"].append({"sailing": cfg["id"], "party": "1 adult, 15, 7", "category": s3["category"],
-                           "expected": expected, "ncl_total": age_summary["grand_total"],
-                           "ok": abs(expected - age_summary["grand_total"]) <= TOLERANCE})
-    log(f"  age test (1 adult, 15, 7) {s3['category']}: NCL {age_summary['grand_total']}, formula {expected}")
+    try:
+        s3 = summaries[3]
+        age_summary = fetch_price_summary(cfg, 3, s3["type"], s3["category"], s3["fare_code"], age_test_guests(cfg["depart"]))
+        bar, dining = age_summary["open_bar"], age_summary["specialty_dining"]
+        if not bar or not dining or len(bar["per_guest"]) != 3 or len(dining["per_guest"]) != 3:
+            raise RuntimeError("unexpected gratuity lines in the age test price summary")
+        b, d = bar["per_guest"], dining["per_guest"]
+        # The confirmed rules: Open Bar adult full, under 21 in position 2 a soda package, under 21
+        # in position 3 or later nothing; Specialty Dining 13 and over pay, under 13 free.
+        if not (b[0] > 0 and 0 < b[1] < b[0] and b[2] == 0 and d[0] > 0 and d[1] == d[0] and d[2] == 0):
+            raise RuntimeError(f"NCL's age rules changed: Open Bar {b}, Specialty Dining {d}")
+        read_on = now.strftime("%Y-%m-%d")
+        gratuities = {
+            "open_bar": {"title": bar["title"], "per_guest": b[0], "soda_under_21_position_2": b[1],
+                         "under_21_position_3_plus": 0, "source": "NCL price-summary (age test)", "checked_at": read_on},
+            "specialty_dining": {"title": dining["title"], "per_guest": d[0], "under_13": 0,
+                                 "source": "NCL price-summary (age test)", "checked_at": read_on},
+        }
+        cat = next(c for t in types.values() for c in t["categories"].values() if c["code"] == s3["category"])
+        expected = (cat["by_guests"]["3"]["cabin_total"]
+                    + gratuities["open_bar"]["per_guest"] + gratuities["open_bar"]["soda_under_21_position_2"]
+                    + 2 * gratuities["specialty_dining"]["per_guest"])
+        age_check = {"sailing": cfg["id"], "party": "1 adult, 15, 7", "category": s3["category"],
+                     "expected": expected, "ncl_total": age_summary["grand_total"],
+                     "ok": abs(expected - age_summary["grand_total"]) <= TOLERANCE}
+        if not age_check["ok"]:
+            raise RuntimeError(f"age check failed: expected {expected}, NCL total {age_summary['grand_total']}")
+        log(f"  age test (1 adult, 15, 7) {s3['category']}: NCL {age_summary['grand_total']}, formula {expected}")
+    except Exception as e:
+        # Keep yesterday's gratuities (they change rarely) if they are recent enough.
+        if not prev_s or not prev_s.get("gratuities"):
+            raise RuntimeError(f"{cfg['ship']} age test failed and there are no previous gratuities: {e}")
+        kept_on = prev_s["gratuities"]["open_bar"].get("checked_at") or previous["saved_at"][:10]
+        if (now.date() - dt.date.fromisoformat(kept_on)).days > MAX_STALE_DAYS:
+            raise RuntimeError(f"{cfg['ship']} age test failed and the kept gratuities are from {kept_on}: {e}")
+        log(f"  age test FAILED ({e}); keeping gratuities from {kept_on}")
+        gratuities = prev_s["gratuities"]
+        age_check = next((dict(x, kept_from=kept_on) for x in (previous.get("checks") or {}).get("ages", [])
+                          if x.get("sailing") == cfg["id"]), None)
+        if age_check is None:
+            raise RuntimeError(f"{cfg['ship']} age test failed and there is no previous age check")
+    checks["ages"].append(age_check)
 
     describe_categories(cfg, types)
+    # A category described only from kept data (its 2-guest call failed today) keeps yesterday's description.
+    for t in types.values():
+        for cat in t["categories"].values():
+            pc = cat.pop("_prev", None)
+            if pc and not status["2"]["updated"]:
+                for k in ("description", "decks", "location", "size", "details_source", "shares_ncl_description_with"):
+                    if k in pc:
+                        cat[k] = pc[k]
 
     out_types = []
     for t in types.values():
@@ -509,12 +601,13 @@ def fetch_sailing(cfg, checks):
         "nights": nights,
         "url": f"https://www.ncl.com/cruises/{cfg['itinerary_code']}",
         "source": "NCL vacation-builder API",
-        "saved_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d"),
+        "saved_at": now.strftime("%Y-%m-%d"),
+        "party_sizes": status,
         "taxes_per_guest": taxes[0],
         "gratuities": gratuities,
         "terminal": TERMINAL,
         "ports": ports,
-        "price_summaries": summaries,
+        "price_summaries": [summaries[g] for g in GUEST_COUNTS if g in summaries],
         "types": out_types,
     }
 
@@ -606,7 +699,7 @@ def main():
             previous = None
 
     checks = {"extra_guest_mismatches": [], "formula": [], "ages": [], "rates": []}
-    sailings = [fetch_sailing(cfg, checks) for cfg in SAILINGS]
+    sailings = [fetch_sailing(cfg, checks, previous) for cfg in SAILINGS]
     rates, rate_warnings = fetch_rates(previous)
     for w in rate_warnings:
         log("Warning: " + w)

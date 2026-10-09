@@ -123,6 +123,25 @@ def check(data):
         elif any(not is_date(d.get("date")) for d in ports):
             err(f"{p}: every port day needs a date")
 
+        ps = s.get("party_sizes")
+        if not isinstance(ps, dict) or sorted(ps) != GUEST_KEYS:
+            err(f"{p}: party_sizes must have the keys 2, 3, 4, 5")
+        else:
+            if not any(v.get("updated") is True for v in ps.values()):
+                err(f"{p}: no party size was updated")
+            for g, v in ps.items():
+                if not isinstance(v.get("updated"), bool):
+                    err(f"{p}: party_sizes.{g}.updated must be true or false")
+                try:
+                    as_of = dt.datetime.strptime(v.get("as_of", ""), "%Y-%m-%dT%H:%M:%SZ")
+                    saved = dt.datetime.strptime(data.get("saved_at", ""), "%Y-%m-%dT%H:%M:%SZ")
+                    if (saved - as_of).total_seconds() > 3 * 86400:
+                        err(f"{p}: prices for {g} guests are more than 3 days old")
+                except (TypeError, ValueError):
+                    err(f"{p}: party_sizes.{g}.as_of must be a time")
+                if v.get("updated") is False and not v.get("why"):
+                    err(f"{p}: party_sizes.{g} is not updated but has no why")
+
         types = s.get("types")
         if not isinstance(types, list) or not types:
             err(f"{p}: types is empty")

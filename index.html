@@ -550,6 +550,42 @@
         .toggle-switch:checked::before { transform: translateX(22px); }
         .offers { margin-top: 0.9rem; padding-top: 0.6rem; border-top: 1px solid var(--gray-200); }
         .offers-title { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ocean-blue); }
+        .notice.stale { background: var(--gold-wash); color: var(--gray-800); font-size: 0.85rem; }
+
+        /* Maiden voyage badge (Aura) */
+        .maiden { margin-top: 0.5rem; }
+        .maiden-badge {
+            display: inline-block; padding: 0.25rem 0.7rem; border-radius: 9999px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid var(--gold);
+            color: #78350f; font-size: 0.8rem; font-weight: 700;
+        }
+        .maiden-text { font-size: 0.78rem; color: var(--gray-600); margin-top: 0.35rem; line-height: 1.4; }
+        .maiden-link { display: inline-block; margin-top: 0.3rem; font-size: 0.8rem; font-weight: 600; color: var(--ocean-blue); }
+
+        /* What's included? (Free at Sea vs Plus) */
+        details.included { margin-top: 0.4rem; font-size: 0.82rem; }
+        details.included summary { cursor: pointer; color: var(--ocean-blue); font-weight: 600; }
+        .inc-table { margin-top: 0.5rem; border: 1px solid var(--gray-200); border-radius: 10px; overflow: hidden; }
+        .inc-row { display: grid; grid-template-columns: 1fr; border-top: 1px solid var(--gray-200); }
+        .inc-row:first-child { border-top: none; }
+        .inc-head { display: none; }
+        .inc-name { background: var(--gray-50); font-weight: 700; color: var(--gray-900); padding: 0.45rem 0.6rem; }
+        .inc-cell { padding: 0.45rem 0.6rem; color: var(--gray-700); }
+        .inc-cell + .inc-cell { border-top: 1px dashed var(--gray-200); }
+        .inc-label { display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--teal); margin-bottom: 0.2rem; }
+        .inc-cell ul { padding-left: 1.1rem; }
+        .inc-cell li, .inc-cell p { margin: 0.15rem 0; }
+        .inc-rate { display: block; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--gray-600); font-size: 0.75rem; }
+        .inc-plus-rate { font-size: 0.78rem; color: var(--gray-700); margin-top: 0.4rem; }
+        @media (min-width: 700px) {
+            .inc-row { grid-template-columns: 9rem 1fr 1fr; }
+            .inc-head { display: grid; background: var(--deep-ocean); color: var(--white); font-weight: 700; }
+            .inc-head > div { padding: 0.45rem 0.6rem; }
+            .inc-head .inc-rate { color: #cbd5e1; }
+            .inc-cell + .inc-cell { border-top: none; border-left: 1px dashed var(--gray-200); }
+            .inc-label { display: none; }
+            .inc-narrow { display: none; }
+        }
         .row.subtotal .k, .row.subtotal .v { font-weight: 700; color: var(--gray-900); }
         .row.due .k { color: var(--gray-700); }
         .gauge { display: inline-block; margin-top: 0.25rem; padding: 0.05rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600; }
@@ -647,7 +683,7 @@
     </footer>
 
     <script>
-        const APP_VERSION = "4.6.0";
+        const APP_VERSION = "4.7.0";
         const DATA_URL = "data/prices.json";
         const COUNTS_URL = "data/counts.json";
         const COUNTS_MAX_AGE_DAYS = 7;
@@ -885,6 +921,65 @@
                 <div class="${cls} subtotal"><span class="k">Gratuities total</span><span class="v">${money(k.gratuities)}</span></div>`;
         }
 
+        // Prices kept from an earlier day for this party size (NCL failed today's check).
+        function staleNote(ships) {
+            const n = String(guests());
+            return ships.map(s => {
+                const st = s.party_sizes && s.party_sizes[n];
+                if (!st || st.updated !== false) return "";
+                const when = new Date(st.as_of).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" });
+                return `<div class="notice stale"><strong>Not updated today.</strong> ${esc(s.ship_short)} prices for ${n} guests are from ${esc(when)}.</div>`;
+            }).join("");
+        }
+
+        function auraBadge() {
+            return `<div class="maiden">
+                <span class="maiden-badge">🍾 Maiden Voyage from Miami 🎆</span>
+                <div class="maiden-text">Her first ever sailing from her new home port. NCL christened her sisters Aqua and Luna in Miami after their Atlantic crossings, so her christening is expected here too.</div>
+                <a class="maiden-link" href="https://www.youtube.com/watch?v=WSWIpQhOoE4" target="_blank" rel="noopener">Watch: Meet Norwegian Aura &rarr;</a>
+            </div>`;
+        }
+
+        // "What's included?" comparison, Free at Sea vs Free at Sea Plus. Rates come from the data file.
+        function includedPanel() {
+            const R = DATA.rates;
+            const list = items => `<ul>${items.map(i => `<li>${i}</li>`).join("")}</ul>`;
+            const sc = R.service_charge;
+            const rows = [
+                ["Unlimited Open Bar",
+                 list(["Unlimited open bar onboard and at Great Stirrup Cay where applicable.", "Unlimited premium beverage brands such as Grey Goose, Casamigos, Woodford Reserve and more.", "Over 100 cocktails to choose from.", "20% off all bottles of champagne and wine.", "Beer and wine by the glass."]),
+                 "<p>Everything included with Free at Sea, plus:</p>" + list(["Top shelf spirits, including Patrón Añejo, The Macallan 12 YO, and more.", "Premium wines and champagne by the glass, with over 50 labels from the signature collection, and 40% off all other bottles.", "All Starbucks coffee and specialty coffee drinks from Starbucks locations and restaurants, one drink per visit.", "Bottled water at the bar, and premium bottled water (still and sparkling) in restaurants."])],
+                ["Specialty Dining",
+                 "<p>Specialty dining meals for all guests in your stateroom, by sail length: 2 to 4 nights, 1 meal; 5 to 6 nights, 2 meals; 7 to 8 nights, 3 meals; 9 or more nights, 4 meals.</p>",
+                 "<p>Free at Sea specialty dining meals, plus 50% off the cover charge on any additional specialty dining nights.</p>"],
+                ["Wi-Fi",
+                 list(["150 minutes of high speed Wi-Fi powered by Starlink.", "1 login per guest, used on 1 device at a time.", "Applies to all guests in the stateroom."]),
+                 list(["Unlimited streaming high speed Wi-Fi.", "1 login per guest, used on 1 device at a time.", "Applies to all guests in the stateroom, except guests 3 to 8 under 21."])],
+                ["Service charges (crew gratuities)",
+                 `<p>Not included. Charged per guest per night: ${money(sc.standard_per_night)} (Club Balcony Suite and below), ${money(sc.suite_haven_per_night)} (Suites and The Haven), for guests ${sc.min_age} and older.</p>`,
+                 "<p>Prepaid service charges included for every guest who gets Plus. Kids under 21 in position 3 or later still pay them.</p>"],
+            ];
+            return `
+                <details class="included">
+                    <summary>What's included?</summary>
+                    <div class="inc-plus-rate inc-narrow">Free at Sea Plus costs ${money(R.free_at_sea_plus.adult_per_day)} per adult per night, and ${money(R.free_at_sea_plus.child_per_day)} per night for a guest 1 or 2 aged 3 to 20.</div>
+                    <div class="inc-table" role="table" aria-label="Free at Sea compared with Free at Sea Plus">
+                        <div class="inc-row inc-head" role="row">
+                            <div role="columnheader"></div>
+                            <div role="columnheader">Free at Sea</div>
+                            <div role="columnheader">Free at Sea Plus<span class="inc-rate">${money(R.free_at_sea_plus.adult_per_day)} per adult per night; ${money(R.free_at_sea_plus.child_per_day)} for a guest 1 or 2 aged 3 to 20</span></div>
+                        </div>
+                        ${rows.map(([name, fas, plus]) => `
+                        <div class="inc-row" role="row">
+                            <div class="inc-name" role="rowheader">${name}</div>
+                            <div class="inc-cell" role="cell"><span class="inc-label">Free at Sea</span>${fas}</div>
+                            <div class="inc-cell" role="cell"><span class="inc-label">Free at Sea Plus</span>${plus}</div>
+                        </div>`).join("")}
+                    </div>
+                    <p class="hint">All guests in a cabin must choose the same offers. Details from NCL's terms; NCL may change them.</p>
+                </details>`;
+        }
+
         function totalBlock(k, nights, rowsHtml) {
             const n = guests();
             if (!agesKnown()) {
@@ -924,7 +1019,8 @@
             })();
             return `
                 <div class="offers">
-                    <div class="offers-title">${esc(heading)}</div>
+                    <div class="offers-head"><span class="offers-title">${esc(heading)}</span></div>
+                    ${includedPanel()}
                     ${sw("bar", "Unlimited Open Bar", off.bar, off.bar ? desc(k.bar) : "off")}
                     ${sw("dining", "Specialty Dining", off.dining, off.dining ? desc(k.dining) : "off")}
                     ${sw("plus", "Free at Sea Plus", off.plus, plusPreview, off.plus ? "" : `<div class="toggle-note">Turning this on also turns on Open Bar and Specialty Dining. ${money(R.free_at_sea_plus.adult_per_day)} per adult per night, ${money(R.free_at_sea_plus.child_per_day)} for a guest 1 or 2 aged 3 to 20.</div>`)}
@@ -986,7 +1082,7 @@
                     const full = findCat(s, c.code);
                     const k = cost(s, full);
                     picks = catPicker(s, tf.t, full, n) + offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`);
-                    body += catHeader(full) + totalBlock(k, s.nights, lineRows(s, k)) + addedCostLine(full);
+                    body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k)) + addedCostLine(full);
                 }
             }
             return `
@@ -994,6 +1090,7 @@
                     <div class="card-head">
                         <span class="option-badge">${label}</span>
                         <h2 class="card-title">${esc(s.ship)}</h2>
+                        ${s === A ? auraBadge() : ""}
                         <div class="card-dates">${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)</div>
                         ${stops(s)}
                     </div>
@@ -1065,13 +1162,14 @@
                     <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</div>
                     ${lineRows(s, k, true)}
                     <div class="row"><span class="k">${esc(s.ship_short)} total</span><span class="v">${agesKnown() ? money(k.total) : ""}</span></div>`).join("");
-                body += totalBlock(both, nights, rows) + ks.map(([, c]) => addedCostLine(c)).join("");
+                body += staleNote([G, A]) + totalBlock(both, nights, rows) + ks.map(([, c]) => addedCostLine(c)).join("");
             }
             return `
                 <article class="card featured">
                     <div class="card-head">
                         <span class="option-badge">Option 3: 8 nights</span>
                         <h2 class="card-title">Getaway, then Aura</h2>
+                        ${auraBadge()}
                         <div class="card-dates">${fmtDay(G.depart)} to ${fmtDay(A.return)}, 2027 (${nights} nights)</div>
                         <div class="stops"><span class="stop">Both trips back to back</span><span class="stop">Change ships in Miami</span></div>
                     </div>
@@ -1086,7 +1184,7 @@
                 <section class="explainer" aria-label="What the 8 night trip looks like">
                     <h2>What the 8 night trip looks like</h2>
                     <ul>
-                        <li>On the morning of ${fmtDay(G.return)}, you leave the Getaway in Miami with your luggage (it arrives at ${fmtTime(G.ports[G.ports.length - 1].arrive)}).</li>
+                        <li>On the morning of ${fmtDay(G.return)}, you get off the Getaway in Miami with your luggage (it arrives at ${fmtTime(G.ports[G.ports.length - 1].arrive)}).</li>
                         <li>That afternoon you board the Aura in Miami (it sails at ${fmtTime(A.ports[0].depart)}).</li>
                         <li>${esc(A.terminal.text)}</li>
                         <li>These are two separate bookings on two different ships, so the 8 night price is the two prices added together.</li>

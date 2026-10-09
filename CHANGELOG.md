@@ -2,6 +2,21 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.7.0] - 2026-10-09
+
+### Added
+- Per party size fallback in the daily price fetch. If one party size on one ship fails its checks, that ship and party size keep the previous prices, the page marks them "Not updated today" with the date they are from, and everything else refreshes and publishes. The run fails only if every party size on a ship fails, or if kept prices would be more than 3 days old. `data/prices.json` records this per sailing in `party_sizes` (`updated`, `as_of`, `why`); the format check covers it. The age test keeps the previous gratuities the same way.
+- Aura badge in Option 2 and Option 3: "🍾 Maiden Voyage from Miami 🎆", a short note about her christening, and a "Watch: Meet Norwegian Aura" link.
+- "What's included?" under each set of Free at Sea switches: a Free at Sea versus Free at Sea Plus comparison (Unlimited Open Bar, Specialty Dining, Wi-Fi, service charges), with the Plus daily rates and the service charge rates taken from the data file. The columns stack on a phone.
+
+### Changed
+- The formula cross check now uses each price summary's own gratuity lines, so each party size is checked on its own before it is used.
+- 8 night explainer: "you get off the Getaway" instead of "you leave the Getaway".
+
+### Notes
+- NCL's $0 prices for the Getaway at 4 and 5 guests (2026-10-09 early UTC) were gone by 16:06 UTC. No "3rd and 4th guest free" promotion is listed for this sailing and guests 3 to 5 pay real fares, so no promotion badge was added.
+- NCL lowered taxes, fees and port expenses by $50 per guest on 2026-10-09: Getaway $200 to $150, Aura $210 to $160. Cabin prices dropped by the same amount.
+
 ## [4.6.0] - 2026-10-09
 
 Free at Sea choices per cabin, crew gratuities, and what is due before sailing versus onboard.
