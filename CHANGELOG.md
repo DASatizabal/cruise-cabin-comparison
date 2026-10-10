@@ -2,6 +2,33 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.9.2] - 2026-10-10
+
+### Changed
+- Free at Sea Plus line, in every Free at Sea set: "Adds unlmt. Wi-Fi\\top shelf spirits\\Starbucks\\bottled water\\daily svc. chrg. $[adult rate]/adult/night." with a literal backslash between items and the adult rate from the data file. Checked on the rendered page: the backslashes show as typed. It takes 2 lines at 360 px wide.
+
+## [4.9.1] - 2026-10-10
+
+### Changed
+- Shorter Free at Sea lines so they fit on a phone. Under the switches: "Premium spirits, 100+ cocktails, sodas and juices, plus drinks at Great Stirrup Cay."; "[N] specialty restaurant meal(s) per guest, about a $40 to $60 value each." (N from each ship's price summary); "Adds unlimited Wi-Fi, top shelf spirits, Starbucks, bottled water, and all crew gratuities. $[adult rate] per adult per night." (rate from the data file).
+- Below the switches, three lines in this order: the under 21 and under 13 rules, "Always included: 150 minutes of Wi-Fi per guest and a $50 excursion credit per port for guest 1.", and "Choose at least 24 hours before sailing. No changes onboard."
+- Measured at 360 px wide: every line takes 2 lines except the Free at Sea Plus line, which takes 3.
+
+## [4.9.0] - 2026-10-10
+
+Free at Sea explained in short lines instead of a table.
+
+### Added
+- A "See NCL's full drink list (PDF)" link above each set of Free at Sea switches, opening NCL's 2026 Beverage Packages Flyer in a new tab.
+- One short line under each Free at Sea switch in every option card: what Unlimited Open Bar includes and the under 21 rules; Specialty Dining meals per guest (1 on the Getaway, 2 on the Aura, each ship's own number in the 8 night card); what Free at Sea Plus adds, with the adult rate per night from the data file.
+- Under the switches: "Always included: 150 minutes of Wi-Fi for each guest, and a $50 shore excursion credit per port of call for guest 1." (confirmed on NCL's promotion terms, 2026-10-10) and "Choices must be made at least 24 hours before sailing and can't be changed onboard."
+
+### Removed
+- The "What's included?" comparison table, which was too wide and too much at once on a phone.
+
+### Notes
+- NOTES.md records the flyer's fine print, including its "Unlimited open bar at Great Stirrup Cay (where applicable)" wording under Free at Sea Plus, and the owner's firsthand finding that Great Stirrup Cay drinks were included with regular Free at Sea Open Bar (Getaway, Oct 2, 2026). All charges still come from NCL's live price summaries.
+
 ## [4.8.0] - 2026-10-09
 
 Backup times for the daily refresh, because GitHub's scheduled runs can be late or dropped.
