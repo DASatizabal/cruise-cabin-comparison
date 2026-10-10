@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "saved_at": "2026-10-09T17:00:33Z",
+ "saved_at": "2026-10-10T15:53:26Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -14,14 +14,14 @@
    "child_per_day": 40.0,
    "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; 2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. Includes prepaid service charges.",
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-09"
+   "checked_at": "2026-10-10"
   },
   "open_bar": {
    "per_day_2_to_5_nights": 32.0,
    "per_day_6_plus_nights": 28.5,
    "soda_per_day": 12.5,
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-09"
+   "checked_at": "2026-10-10"
   },
   "service_charge": {
    "suite_haven_per_night": 25.0,
@@ -32,7 +32,7 @@
     "HAVEN"
    ],
    "source": "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge",
-   "checked_at": "2026-10-09"
+   "checked_at": "2026-10-10"
   }
  },
  "rate_warnings": [],
@@ -164,30 +164,30 @@
    "return": "2027-06-14",
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
+   "source": "NCL vacation-builder API",
+   "saved_at": "2026-10-10",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-09T17:00:33Z",
+     "as_of": "2026-10-10T15:52:15Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-09T17:00:33Z",
+     "as_of": "2026-10-10T15:52:15Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-09T17:00:33Z",
+     "as_of": "2026-10-10T15:52:15Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-09T17:00:33Z",
+     "as_of": "2026-10-10T15:52:15Z",
      "why": null
     }
    },
-   "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-09",
    "taxes_per_guest": 150,
    "gratuities": {
     "open_bar": {
@@ -196,14 +196,14 @@
      "soda_under_21_position_2": 37.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-09"
+     "checked_at": "2026-10-10"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 1 Meal",
      "per_guest": 20,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-09"
+     "checked_at": "2026-10-10"
     }
    },
    "terminal": {
@@ -2020,30 +2020,30 @@
    "return": "2027-06-19",
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
+   "source": "NCL vacation-builder API",
+   "saved_at": "2026-10-10",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-09T17:00:33Z",
+     "as_of": "2026-10-10T15:52:57Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-09T17:00:33Z",
+     "as_of": "2026-10-10T15:52:57Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-09T17:00:33Z",
+     "as_of": "2026-10-10T15:52:57Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-09T17:00:33Z",
+     "as_of": "2026-10-10T15:52:57Z",
      "why": null
     }
    },
-   "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-09",
    "taxes_per_guest": 160,
    "gratuities": {
     "open_bar": {
@@ -2052,14 +2052,14 @@
      "soda_under_21_position_2": 62.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-09"
+     "checked_at": "2026-10-10"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 2 Meals",
      "per_guest": 40,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-09"
+     "checked_at": "2026-10-10"
     }
    },
    "terminal": {
@@ -2562,8 +2562,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1389.0,
-         "cabin_total": 2778
+         "price_pp": 1349.0,
+         "cabin_total": 2698
         },
         "3": {
          "available": false,
@@ -2604,14 +2604,14 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1499.0,
-         "cabin_total": 2998
+         "price_pp": 1459.0,
+         "cabin_total": 2918
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1245.66,
-         "cabin_total": 3737,
+         "price_pp": 1219.0,
+         "cabin_total": 3657,
          "added_vs_2": 739
         },
         "4": {
@@ -2646,21 +2646,21 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1659.0,
-         "cabin_total": 3318
+         "price_pp": 1619.0,
+         "cabin_total": 3238
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1352.33,
-         "cabin_total": 4057,
+         "price_pp": 1325.66,
+         "cabin_total": 3977,
          "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1199.0,
-         "cabin_total": 4796,
+         "price_pp": 1179.0,
+         "cabin_total": 4716,
          "added_vs_2": 1478
         },
         "5": {
@@ -3290,21 +3290,21 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2309.0,
-         "cabin_total": 4618
+         "price_pp": 2259.0,
+         "cabin_total": 4518
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1785.66,
-         "cabin_total": 5357,
+         "price_pp": 1752.33,
+         "cabin_total": 5257,
          "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1524.0,
-         "cabin_total": 6096,
+         "price_pp": 1499.0,
+         "cabin_total": 5996,
          "added_vs_2": 1478
         },
         "5": {
@@ -3384,21 +3384,21 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2559.0,
-         "cabin_total": 5118
+         "price_pp": 2639.0,
+         "cabin_total": 5278
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1952.33,
-         "cabin_total": 5857,
+         "price_pp": 2005.66,
+         "cabin_total": 6017,
          "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1649.0,
-         "cabin_total": 6596,
+         "price_pp": 1689.0,
+         "cabin_total": 6756,
          "added_vs_2": 1478
         },
         "5": {
@@ -3619,21 +3619,21 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 4759.0,
-         "cabin_total": 9518
+         "price_pp": 4619.0,
+         "cabin_total": 9238
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 3419.0,
-         "cabin_total": 10257,
+         "price_pp": 3325.66,
+         "cabin_total": 9977,
          "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2749.0,
-         "cabin_total": 10996,
+         "price_pp": 2679.0,
+         "cabin_total": 10716,
          "added_vs_2": 1478
         },
         "5": {
@@ -3853,28 +3853,28 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 11959.0,
-         "cabin_total": 23918
+         "price_pp": 11609.0,
+         "cabin_total": 23218
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 8219.0,
-         "cabin_total": 24657,
+         "price_pp": 7985.66,
+         "cabin_total": 23957,
          "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 6349.0,
-         "cabin_total": 25396,
+         "price_pp": 6174.0,
+         "cabin_total": 24696,
          "added_vs_2": 1478
         },
         "5": {
          "available": true,
          "sold_out": false,
-         "price_pp": 5227.0,
-         "cabin_total": 26135,
+         "price_pp": 5087.0,
+         "cabin_total": 25435,
          "added_vs_2": 2217
         }
        },
