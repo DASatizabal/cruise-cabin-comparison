@@ -2,6 +2,21 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.9.0] - 2026-10-10
+
+Free at Sea explained in short lines instead of a table.
+
+### Added
+- A "See NCL's full drink list (PDF)" link above each set of Free at Sea switches, opening NCL's 2026 Beverage Packages Flyer in a new tab.
+- One short line under each Free at Sea switch in every option card: what Unlimited Open Bar includes and the under 21 rules; Specialty Dining meals per guest (1 on the Getaway, 2 on the Aura, each ship's own number in the 8 night card); what Free at Sea Plus adds, with the adult rate per night from the data file.
+- Under the switches: "Always included: 150 minutes of Wi-Fi for each guest, and a $50 shore excursion credit per port of call for guest 1." (confirmed on NCL's promotion terms, 2026-10-10) and "Choices must be made at least 24 hours before sailing and can't be changed onboard."
+
+### Removed
+- The "What's included?" comparison table, which was too wide and too much at once on a phone.
+
+### Notes
+- NOTES.md records the flyer's fine print, including its "Unlimited open bar at Great Stirrup Cay (where applicable)" wording under Free at Sea Plus, and the owner's firsthand finding that Great Stirrup Cay drinks were included with regular Free at Sea Open Bar (Getaway, Oct 2, 2026). All charges still come from NCL's live price summaries.
+
 ## [4.8.0] - 2026-10-09
 
 Backup times for the daily refresh, because GitHub's scheduled runs can be late or dropped.

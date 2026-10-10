@@ -374,3 +374,27 @@ How to tell from the Actions tab which scheduled time did the work:
    The text in brackets lists both saved_at times and today's UTC date, so the run that did the work can be confirmed against the times on the family page.
 4. The commits on main confirm it too: the run that did the work commits "Refresh prices DATE" and "Refresh cabin counts DATE (full)" or "(light)". Skipped runs commit nothing.
 5. A slot with no run row at all means GitHub dropped that scheduled run.
+
+## Free at Sea blurbs (4.9.0, 2026-10-10)
+
+The "What's included?" comparison table was removed: too wide and too much at once on a phone. In its place each set of Free at Sea switches has a "See NCL's full drink list (PDF)" link, one short line under each switch, and two lines under the switches.
+
+Sources:
+- NCL Beverage Packages Flyer 2026, https://www.ncl.com/sites/default/files//NCL%20Beverage%20Packages%20Flyer%202026.pdf (fine print, as summarized by the owner):
+  - A guest 3 to 8 under 21 gets no Unlimited Open Bar with Free at Sea or Free at Sea Plus, and no Soda Package as a substitute.
+  - Guests 1 and 2 must be 21 or over for Unlimited Open Bar; a guest 1 or 2 under 21 gets the Soda Package. (The page's pricing already works this way.)
+  - Free at Sea choices must be made at least 24 hours before sailing and can't be changed onboard. All guests in a stateroom must choose the same offer.
+  - Free at Sea Plus adds premium wines and champagne by the glass and 40% off other bottles, Starbucks drinks (one per visit), Red Bull energy drinks and fresh juices, bottled water (Dasani at the bar, Aqua Panna and Pellegrino in restaurants), and top shelf spirits such as Patrón Añejo and The Macallan 12.
+  - The flyer lists "Unlimited open bar at Great Stirrup Cay (where applicable)" under Free at Sea Plus. The owner confirmed on the Oct 2, 2026 Getaway sailing that drinks at Great Stirrup Cay were included with regular Free at Sea Open Bar, so the page's Open Bar line says "drinks at Great Stirrup Cay". NCL's promotion terms agree: the Open Bar offer "is applicable at Great Stirrup Cay bars, restaurants, or venues" (not Harvest Caye).
+- NCL promotion terms, https://www.ncl.com/cruise-deals/promotion-terms, read 2026-10-10:
+  - Wi-Fi package (Free at Sea): every guest in the stateroom, per person, 1 login on 1 device at a time, limited minutes and no streaming; "2 + Nights: 150 Minutes" per person. Not available at Great Stirrup Cay or Harvest Caye.
+  - Excursion credit: first guest on the reservation only; $50 per port of call; unused value is forfeited; equipment rentals at Great Stirrup Cay are excluded.
+  - Specialty dining by sail length: 2 to 4 nights 1 meal, 5 to 6 nights 2 meals, 7 to 8 nights 3 meals, 9 or more nights 4 meals.
+  - Plus Wi-Fi: unlimited streaming, all guests except guests 3 to 8 under 21.
+
+Rules kept:
+- Every amount the family pays still comes from NCL's live price summaries and the `rates` read daily (Plus adult rate in the Plus line). No rate from the flyer is used.
+- The meal count in the Specialty Dining line comes from that ship's price summary line ("Specialty Dining - 1 Meal", "Specialty Dining - 2 Meals"), falling back to the sail length rule above.
+- The Wi-Fi minutes and the $50 credit are written into the page (not read daily). If NCL changes them, update `index.html` and this section.
+
+Phone length: the owner asked for one or two lines per blurb but also gave the exact wording. With that wording at 360 px wide (lines span the card's full width), Open Bar takes 5 lines, Specialty Dining 3, Plus 6, "Always included" 3 and the 24 hour line 2. Shorter wording would be needed to reach two lines.

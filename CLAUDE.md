@@ -62,7 +62,7 @@ File layout:
 - Cabins left labels come from `data/counts.json`: 50 or more "Plenty left", 10 to 49 "Getting low", under 10 "Only X left"; nothing for Guarantee or unreliable counts. "Cabins left as of [date]" shows its `saved_at`. If the file is missing, unreadable or more than 7 days old, all labels and that date are hidden.
 - "Not updated today" note on a card when `party_sizes` for the current party size on that ship (either ship for 8 nights) is not updated, with the date the kept prices are from.
 - Aura: "🍾 Maiden Voyage from Miami 🎆" badge, christening note and "Watch: Meet Norwegian Aura" link in Options 2 and 3.
-- "What's included?" panel under each set of Free at Sea switches (Free at Sea vs Free at Sea Plus; Plus and service charge rates from `rates`).
+- Free at Sea blurbs (no comparison table): a "See NCL's full drink list (PDF)" link above each set of switches (NCL Beverage Packages Flyer 2026, new tab); one short line under each switch (Open Bar; Specialty Dining with the meal count from that ship's `specialty_dining.title`, else by sail length; Plus with the adult rate from `rates`); under the switches "Always included" (150 Wi-Fi minutes per guest, $50 shore excursion credit per port of call for guest 1, from NCL's promotion terms 2026-10-10) and the 24 hour choice rule. Every charge still comes from NCL's live price summaries or `rates`, never from the flyer.
 - Hide Studio and Solo categories (T1, IT, OT, BT). Label Guarantee categories (IX, OX, BX, MX) "Guarantee: NCL picks your cabin location". Pickers show available categories only; the full tables show unavailable ones greyed out with the reason.
 
 ## Automation

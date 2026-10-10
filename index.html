@@ -562,30 +562,10 @@
         .maiden-text { font-size: 0.78rem; color: var(--gray-600); margin-top: 0.35rem; line-height: 1.4; }
         .maiden-link { display: inline-block; margin-top: 0.3rem; font-size: 0.8rem; font-weight: 600; color: var(--ocean-blue); }
 
-        /* What's included? (Free at Sea vs Plus) */
-        details.included { margin-top: 0.4rem; font-size: 0.82rem; }
-        details.included summary { cursor: pointer; color: var(--ocean-blue); font-weight: 600; }
-        .inc-table { margin-top: 0.5rem; border: 1px solid var(--gray-200); border-radius: 10px; overflow: hidden; }
-        .inc-row { display: grid; grid-template-columns: 1fr; border-top: 1px solid var(--gray-200); }
-        .inc-row:first-child { border-top: none; }
-        .inc-head { display: none; }
-        .inc-name { background: var(--gray-50); font-weight: 700; color: var(--gray-900); padding: 0.45rem 0.6rem; }
-        .inc-cell { padding: 0.45rem 0.6rem; color: var(--gray-700); }
-        .inc-cell + .inc-cell { border-top: 1px dashed var(--gray-200); }
-        .inc-label { display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--teal); margin-bottom: 0.2rem; }
-        .inc-cell ul { padding-left: 1.1rem; }
-        .inc-cell li, .inc-cell p { margin: 0.15rem 0; }
-        .inc-rate { display: block; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--gray-600); font-size: 0.75rem; }
-        .inc-plus-rate { font-size: 0.78rem; color: var(--gray-700); margin-top: 0.4rem; }
-        @media (min-width: 700px) {
-            .inc-row { grid-template-columns: 9rem 1fr 1fr; }
-            .inc-head { display: grid; background: var(--deep-ocean); color: var(--white); font-weight: 700; }
-            .inc-head > div { padding: 0.45rem 0.6rem; }
-            .inc-head .inc-rate { color: #cbd5e1; }
-            .inc-cell + .inc-cell { border-top: none; border-left: 1px dashed var(--gray-200); }
-            .inc-label { display: none; }
-            .inc-narrow { display: none; }
-        }
+        /* Free at Sea blurbs and the drink list link */
+        .toggle-blurb { font-size: 0.72rem; color: var(--gray-600); margin-top: 0.3rem; line-height: 1.35; }
+        .offers-foot { font-size: 0.72rem; color: var(--gray-600); margin-top: 0.5rem; line-height: 1.35; }
+        .drink-list { display: inline-block; margin-top: 0.35rem; font-size: 0.8rem; font-weight: 600; color: var(--ocean-blue); }
         .row.subtotal .k, .row.subtotal .v { font-weight: 700; color: var(--gray-900); }
         .row.due .k { color: var(--gray-700); }
         .gauge { display: inline-block; margin-top: 0.25rem; padding: 0.05rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600; }
@@ -683,7 +663,7 @@
     </footer>
 
     <script>
-        const APP_VERSION = "4.8.0";
+        const APP_VERSION = "4.9.0";
         const DATA_URL = "data/prices.json";
         const COUNTS_URL = "data/counts.json";
         const COUNTS_MAX_AGE_DAYS = 7;
@@ -940,45 +920,21 @@
             </div>`;
         }
 
-        // "What's included?" comparison, Free at Sea vs Free at Sea Plus. Rates come from the data file.
-        function includedPanel() {
-            const R = DATA.rates;
-            const list = items => `<ul>${items.map(i => `<li>${i}</li>`).join("")}</ul>`;
-            const sc = R.service_charge;
-            const rows = [
-                ["Unlimited Open Bar",
-                 list(["Unlimited open bar onboard and at Great Stirrup Cay where applicable.", "Unlimited premium beverage brands such as Grey Goose, Casamigos, Woodford Reserve and more.", "Over 100 cocktails to choose from.", "20% off all bottles of champagne and wine.", "Beer and wine by the glass."]),
-                 "<p>Everything included with Free at Sea, plus:</p>" + list(["Top shelf spirits, including Patrón Añejo, The Macallan 12 YO, and more.", "Premium wines and champagne by the glass, with over 50 labels from the signature collection, and 40% off all other bottles.", "All Starbucks coffee and specialty coffee drinks from Starbucks locations and restaurants, one drink per visit.", "Bottled water at the bar, and premium bottled water (still and sparkling) in restaurants."])],
-                ["Specialty Dining",
-                 "<p>Specialty dining meals for all guests in your stateroom, by sail length: 2 to 4 nights, 1 meal; 5 to 6 nights, 2 meals; 7 to 8 nights, 3 meals; 9 or more nights, 4 meals.</p>",
-                 "<p>Free at Sea specialty dining meals, plus 50% off the cover charge on any additional specialty dining nights.</p>"],
-                ["Wi-Fi",
-                 list(["150 minutes of high speed Wi-Fi powered by Starlink.", "1 login per guest, used on 1 device at a time.", "Applies to all guests in the stateroom."]),
-                 list(["Unlimited streaming high speed Wi-Fi.", "1 login per guest, used on 1 device at a time.", "Applies to all guests in the stateroom, except guests 3 to 8 under 21."])],
-                ["Service charges (crew gratuities)",
-                 `<p>Not included. Charged per guest per night: ${money(sc.standard_per_night)} (Club Balcony Suite and below), ${money(sc.suite_haven_per_night)} (Suites and The Haven), for guests ${sc.min_age} and older.</p>`,
-                 "<p>Prepaid service charges included for every guest who gets Plus. Kids under 21 in position 3 or later still pay them.</p>"],
-            ];
-            return `
-                <details class="included">
-                    <summary>What's included?</summary>
-                    <div class="inc-plus-rate inc-narrow">Free at Sea Plus costs ${money(R.free_at_sea_plus.adult_per_day)} per adult per night, and ${money(R.free_at_sea_plus.child_per_day)} per night for a guest 1 or 2 aged 3 to 20.</div>
-                    <div class="inc-table" role="table" aria-label="Free at Sea compared with Free at Sea Plus">
-                        <div class="inc-row inc-head" role="row">
-                            <div role="columnheader"></div>
-                            <div role="columnheader">Free at Sea</div>
-                            <div role="columnheader">Free at Sea Plus<span class="inc-rate">${money(R.free_at_sea_plus.adult_per_day)} per adult per night; ${money(R.free_at_sea_plus.child_per_day)} for a guest 1 or 2 aged 3 to 20</span></div>
-                        </div>
-                        ${rows.map(([name, fas, plus]) => `
-                        <div class="inc-row" role="row">
-                            <div class="inc-name" role="rowheader">${name}</div>
-                            <div class="inc-cell" role="cell"><span class="inc-label">Free at Sea</span>${fas}</div>
-                            <div class="inc-cell" role="cell"><span class="inc-label">Free at Sea Plus</span>${plus}</div>
-                        </div>`).join("")}
-                    </div>
-                    <p class="hint">All guests in a cabin must choose the same offers. Details from NCL's terms; NCL may change them.</p>
-                </details>`;
+        // Free at Sea blurbs. Amounts come from the data file; the Wi-Fi minutes and excursion
+        // credit were read from NCL's promotion terms on 2026-10-10 (NOTES.md, "Free at Sea blurbs").
+        const DRINK_LIST_URL = "https://www.ncl.com/sites/default/files//NCL%20Beverage%20Packages%20Flyer%202026.pdf";
+        // Specialty dining meals per guest: from NCL's price summary line ("Specialty Dining - 2 Meals"),
+        // or by sail length when that line is missing (2 to 4 nights 1, 5 to 6 nights 2, 7 to 8 nights 3, 9+ nights 4).
+        function diningMeals(s) {
+            const m = /(\d+)\s*Meal/i.exec((s.gratuities.specialty_dining || {}).title || "");
+            if (m) return Number(m[1]);
+            return s.nights <= 4 ? 1 : s.nights <= 6 ? 2 : s.nights <= 8 ? 3 : 4;
         }
+        const BLURBS = {
+            bar: () => "Premium spirits like Grey Goose and Casamigos, over 100 cocktails, unlimited soft drinks and juices, 20% off bottles, and drinks at Great Stirrup Cay. Under 21 as guest 1 or 2: juice and soda package. Under 21 as guest 3 or later: no drink package.",
+            dining: s => `${plural(diningMeals(s), "meal", "meals")} per guest at a specialty restaurant, about a $40 to $60 value per meal. Kids under 13: no charge.`,
+            plus: () => `Adds unlimited streaming Wi-Fi, top shelf spirits like Patrón Añejo and The Macallan 12, premium wines by the glass, Starbucks, energy drinks and fresh juices, bottled water, 50% off extra specialty dining nights, and all daily crew gratuities. ${money(DATA.rates.free_at_sea_plus.adult_per_day)} per adult per night.`,
+        };
 
         function totalBlock(k, nights, rowsHtml) {
             const n = guests();
@@ -1008,9 +964,10 @@
                     <input type="checkbox" class="toggle-switch" data-offer="${offer}" data-ship="${key}" ${on ? "checked" : ""} aria-label="${esc(label)} for the ${esc(s.ship_short)} cabin">
                     <div>
                         <div class="toggle-label">${esc(label)}</div>
-                        <div class="toggle-price">${text}</div>${extra}
+                        <div class="toggle-price">${text}</div>
                     </div>
-                </div>`;
+                </div>
+                <div class="toggle-blurb">${esc(BLURBS[offer](s))}</div>${extra}`;
             const plusPreview = (() => {   // what Plus would cost if switched on
                 if (off.plus) return desc(k.plus) + ", includes prepaid service charges";
                 const save = state.offers[key]; state.offers[key] = { bar: true, dining: true, plus: true };
@@ -1020,10 +977,12 @@
             return `
                 <div class="offers">
                     <div class="offers-head"><span class="offers-title">${esc(heading)}</span></div>
-                    ${includedPanel()}
+                    <a class="drink-list" href="${DRINK_LIST_URL}" target="_blank" rel="noopener">See NCL's full drink list (PDF) &rarr;</a>
                     ${sw("bar", "Unlimited Open Bar", off.bar, off.bar ? desc(k.bar) : "off")}
                     ${sw("dining", "Specialty Dining", off.dining, off.dining ? desc(k.dining) : "off")}
-                    ${sw("plus", "Free at Sea Plus", off.plus, plusPreview, off.plus ? "" : `<div class="toggle-note">Turning this on also turns on Open Bar and Specialty Dining. ${money(R.free_at_sea_plus.adult_per_day)} per adult per night, ${money(R.free_at_sea_plus.child_per_day)} for a guest 1 or 2 aged 3 to 20.</div>`)}
+                    ${sw("plus", "Free at Sea Plus", off.plus, plusPreview, off.plus ? "" : `<div class="toggle-note">Turning this on also turns on Open Bar and Specialty Dining. ${money(R.free_at_sea_plus.child_per_day)} per night for a guest 1 or 2 aged 3 to 20.</div>`)}
+                    <div class="offers-foot">Always included: 150 minutes of Wi-Fi for each guest, and a $50 shore excursion credit per port of call for guest 1.</div>
+                    <div class="offers-foot">Choices must be made at least 24 hours before sailing and can't be changed onboard.</div>
                 </div>`;
         }
 
