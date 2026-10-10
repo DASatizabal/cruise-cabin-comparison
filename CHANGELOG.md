@@ -2,6 +2,13 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.9.1] - 2026-10-10
+
+### Changed
+- Shorter Free at Sea lines so they fit on a phone. Under the switches: "Premium spirits, 100+ cocktails, sodas and juices, plus drinks at Great Stirrup Cay."; "[N] specialty restaurant meal(s) per guest, about a $40 to $60 value each." (N from each ship's price summary); "Adds unlimited Wi-Fi, top shelf spirits, Starbucks, bottled water, and all crew gratuities. $[adult rate] per adult per night." (rate from the data file).
+- Below the switches, three lines in this order: the under 21 and under 13 rules, "Always included: 150 minutes of Wi-Fi per guest and a $50 excursion credit per port for guest 1.", and "Choose at least 24 hours before sailing. No changes onboard."
+- Measured at 360 px wide: every line takes 2 lines except the Free at Sea Plus line, which takes 3.
+
 ## [4.9.0] - 2026-10-10
 
 Free at Sea explained in short lines instead of a table.

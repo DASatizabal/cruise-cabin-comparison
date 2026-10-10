@@ -663,7 +663,7 @@
     </footer>
 
     <script>
-        const APP_VERSION = "4.9.0";
+        const APP_VERSION = "4.9.1";
         const DATA_URL = "data/prices.json";
         const COUNTS_URL = "data/counts.json";
         const COUNTS_MAX_AGE_DAYS = 7;
@@ -931,9 +931,9 @@
             return s.nights <= 4 ? 1 : s.nights <= 6 ? 2 : s.nights <= 8 ? 3 : 4;
         }
         const BLURBS = {
-            bar: () => "Premium spirits like Grey Goose and Casamigos, over 100 cocktails, unlimited soft drinks and juices, 20% off bottles, and drinks at Great Stirrup Cay. Under 21 as guest 1 or 2: juice and soda package. Under 21 as guest 3 or later: no drink package.",
-            dining: s => `${plural(diningMeals(s), "meal", "meals")} per guest at a specialty restaurant, about a $40 to $60 value per meal. Kids under 13: no charge.`,
-            plus: () => `Adds unlimited streaming Wi-Fi, top shelf spirits like Patrón Añejo and The Macallan 12, premium wines by the glass, Starbucks, energy drinks and fresh juices, bottled water, 50% off extra specialty dining nights, and all daily crew gratuities. ${money(DATA.rates.free_at_sea_plus.adult_per_day)} per adult per night.`,
+            bar: () => "Premium spirits, 100+ cocktails, sodas and juices, plus drinks at Great Stirrup Cay.",
+            dining: s => `${diningMeals(s)} specialty restaurant ${diningMeals(s) === 1 ? "meal" : "meals"} per guest, about a $40 to $60 value each.`,
+            plus: () => `Adds unlimited Wi-Fi, top shelf spirits, Starbucks, bottled water, and all crew gratuities. ${money(DATA.rates.free_at_sea_plus.adult_per_day)} per adult per night.`,
         };
 
         function totalBlock(k, nights, rowsHtml) {
@@ -981,8 +981,9 @@
                     ${sw("bar", "Unlimited Open Bar", off.bar, off.bar ? desc(k.bar) : "off")}
                     ${sw("dining", "Specialty Dining", off.dining, off.dining ? desc(k.dining) : "off")}
                     ${sw("plus", "Free at Sea Plus", off.plus, plusPreview, off.plus ? "" : `<div class="toggle-note">Turning this on also turns on Open Bar and Specialty Dining. ${money(R.free_at_sea_plus.child_per_day)} per night for a guest 1 or 2 aged 3 to 20.</div>`)}
-                    <div class="offers-foot">Always included: 150 minutes of Wi-Fi for each guest, and a $50 shore excursion credit per port of call for guest 1.</div>
-                    <div class="offers-foot">Choices must be made at least 24 hours before sailing and can't be changed onboard.</div>
+                    <div class="offers-foot">Under 21: soda package as guest 1 or 2, no drink package as guest 3 or later. Under 13: dining free.</div>
+                    <div class="offers-foot">Always included: 150 minutes of Wi-Fi per guest and a $50 excursion credit per port for guest 1.</div>
+                    <div class="offers-foot">Choose at least 24 hours before sailing. No changes onboard.</div>
                 </div>`;
         }
 

@@ -397,4 +397,6 @@ Rules kept:
 - The meal count in the Specialty Dining line comes from that ship's price summary line ("Specialty Dining - 1 Meal", "Specialty Dining - 2 Meals"), falling back to the sail length rule above.
 - The Wi-Fi minutes and the $50 credit are written into the page (not read daily). If NCL changes them, update `index.html` and this section.
 
-Phone length: the owner asked for one or two lines per blurb but also gave the exact wording. With that wording at 360 px wide (lines span the card's full width), Open Bar takes 5 lines, Specialty Dining 3, Plus 6, "Always included" 3 and the 24 hour line 2. Shorter wording would be needed to reach two lines.
+Phone length: the owner asked for one or two lines per blurb but also gave the exact wording. With that wording at 360 px wide (lines span the card's full width), Open Bar took 5 lines, Specialty Dining 3, Plus 6, "Always included" 3 and the 24 hour line 2.
+
+4.9.1: the owner supplied shorter wording, and the under 21 and under 13 rules moved to their own line below the switches. At 360 px wide every line takes 2 lines except the Plus line (3). Suggested to the owner, not applied: dropping "bottled water" from the Plus line makes it 2 lines.
