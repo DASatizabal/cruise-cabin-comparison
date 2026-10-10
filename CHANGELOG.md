@@ -2,6 +2,11 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.9.2] - 2026-10-10
+
+### Changed
+- Free at Sea Plus line, in every Free at Sea set: "Adds unlmt. Wi-Fi\\top shelf spirits\\Starbucks\\bottled water\\daily svc. chrg. $[adult rate]/adult/night." with a literal backslash between items and the adult rate from the data file. Checked on the rendered page: the backslashes show as typed. It takes 2 lines at 360 px wide.
+
 ## [4.9.1] - 2026-10-10
 
 ### Changed

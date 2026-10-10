@@ -663,7 +663,7 @@
     </footer>
 
     <script>
-        const APP_VERSION = "4.9.1";
+        const APP_VERSION = "4.9.2";
         const DATA_URL = "data/prices.json";
         const COUNTS_URL = "data/counts.json";
         const COUNTS_MAX_AGE_DAYS = 7;
@@ -933,7 +933,7 @@
         const BLURBS = {
             bar: () => "Premium spirits, 100+ cocktails, sodas and juices, plus drinks at Great Stirrup Cay.",
             dining: s => `${diningMeals(s)} specialty restaurant ${diningMeals(s) === 1 ? "meal" : "meals"} per guest, about a $40 to $60 value each.`,
-            plus: () => `Adds unlimited Wi-Fi, top shelf spirits, Starbucks, bottled water, and all crew gratuities. ${money(DATA.rates.free_at_sea_plus.adult_per_day)} per adult per night.`,
+            plus: () => `Adds unlmt. Wi-Fi\\top shelf spirits\\Starbucks\\bottled water\\daily svc. chrg. ${money(DATA.rates.free_at_sea_plus.adult_per_day)}/adult/night.`,   // "\\" shows one backslash
         };
 
         function totalBlock(k, nights, rowsHtml) {
