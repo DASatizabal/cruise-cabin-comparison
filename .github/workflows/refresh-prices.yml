@@ -11,10 +11,13 @@ name: Refresh prices
 # Scheduled runs only happen on the default branch (main). The push trigger below lets this
 # branch test both parts on GitHub's runners before it is merged; only main commits data
 # files and publishes.
-# GitHub's schedules are best effort (runs can be late or dropped), so there are two backup
-# times. The first job ("decide") makes later scheduled runs skip work already done today:
-# both files saved today skips everything, prices saved today but counts not runs only
-# counts. Manual runs and branch test runs always run fully. Keepalive runs every time.
+# GitHub's schedules are best effort and have been unreliable here (NOTES.md), so the main
+# trigger is a Cloudflare Worker (tools/refresh-trigger/) that starts this workflow at 10:20
+# and 15:05 UTC with source "timer". The three GitHub schedule times stay as backups.
+# The first job ("decide") makes timed runs (scheduled or timer) skip work already done
+# today: both files saved today skips everything, prices saved today but counts not runs
+# only counts. Manual runs and branch test runs always run fully.
+run-name: ${{ github.event_name == 'workflow_dispatch' && inputs.source == 'timer' && 'Refresh prices (timer)' || 'Refresh prices' }}
 on:
   schedule:
     - cron: "17 10 * * *"   # 10:17 UTC, 6:17 AM Miami time in summer (main time)
@@ -22,6 +25,11 @@ on:
     - cron: "37 19 * * *"   # 19:37 UTC, 3:37 PM Miami (backup 2)
   workflow_dispatch:
     inputs:
+      source:
+        description: "manual (always runs fully) or timer (skips work already done today; used by the Cloudflare Worker)"
+        type: choice
+        options: [manual, timer]
+        default: manual
       count_mode:
         description: "Cabin counts: auto (full every 3 days), full, or light"
         type: choice
@@ -62,7 +70,8 @@ jobs:
         id: decide
         env:
           EVENT: ${{ github.event_name }}
-        run: python3 tools/decide_run.py --event "$EVENT"
+          SOURCE: ${{ inputs.source }}
+        run: python3 tools/decide_run.py --event "$EVENT" --source "$SOURCE"
 
   refresh:
     needs: decide
@@ -187,10 +196,10 @@ jobs:
 
   # GitHub turns off scheduled workflows in public repos after 60 days without "repository
   # activity" and doesn't define activity. The daily data commit is probably enough; as a
-  # safety net, mark this workflow enabled again on every scheduled run, including runs that
-  # skip everything. Does not wait for any other job. Never fails the run.
+  # safety net, mark this workflow enabled again on every timed run (scheduled or timer),
+  # including runs that skip everything. Does not wait for any other job. Never fails the run.
   keepalive:
-    if: github.ref == 'refs/heads/main' && github.event_name == 'schedule'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.source == 'timer')
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:

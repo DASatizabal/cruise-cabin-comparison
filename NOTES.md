@@ -328,7 +328,7 @@ NCL glitch seen 2026-10-09 around 02:00 UTC: the availability call for the Getaw
 
 1. Price drop and low availability email alerts to the owner, possibly through Resend.
 2. A "Make Selection" button. When a family member has picked a trip and cabin, it opens a form for each guest's full name, date of birth, email address, Latitudes number if they have one, and anything else NCL needs to create a reservation, and sends it to the owner so the owner's NCL cruise consultant can book it. These are personal details and the repo and page are public, so the form must never store anything in the repo (or in the data files, or in browser storage beyond the open form). Options to weigh later: a button that opens the family member's own email app with everything filled in and addressed to the owner (nothing leaves their device except through their own email), or sending it through the owner's Cloudflare Worker by email (needs spam protection, for example the family passphrase).
-3. If GitHub's schedules still prove unreliable after the 4.8.0 backup times, start the refresh from outside GitHub with workflow_dispatch (the same as pressing "Run workflow"): either a cron trigger on the owner's Cloudflare Worker (the Deck Finder Worker) or a scheduled task on the owner's AI PC. Either one calls `POST https://api.github.com/repos/DASatizabal/cruise-cabin-comparison/actions/workflows/refresh-prices.yml/dispatches` with body `{"ref":"main"}` and a fine-grained token limited to this repository with "Actions: Read and write" (stored as a Worker secret or in the PC's credential store, never in a repo). Note: dispatched runs always run fully (the skip logic applies only to scheduled runs), so trigger it once a day, or change `decide_run.py` to treat that trigger like a scheduled run.
+3. Done in 4.10.0 (see "Cloudflare refresh trigger"): a separate Cloudflare Worker, not the Deck Finder Worker, starts the refresh with workflow_dispatch and source "timer". If Cloudflare's cron ever proves unreliable too, the fallback is a scheduled task on the owner's AI PC making the same request.
 
 ## 4.7.0 findings (2026-10-09)
 
@@ -400,3 +400,21 @@ Rules kept:
 Phone length: the owner asked for one or two lines per blurb but also gave the exact wording. With that wording at 360 px wide (lines span the card's full width), Open Bar took 5 lines, Specialty Dining 3, Plus 6, "Always included" 3 and the 24 hour line 2.
 
 4.9.1: the owner supplied shorter wording, and the under 21 and under 13 rules moved to their own line below the switches. At 360 px wide every line takes 2 lines except the Plus line (3). Suggested to the owner, not applied: dropping "bottled water" from the Plus line makes it 2 lines.
+
+## Cloudflare refresh trigger (4.10.0, 2026-10-12)
+
+GitHub schedule history for "Refresh prices" in this repo (start times UTC, from the Actions API):
+- 2026-10-08 and earlier: no scheduled run ever started (the 10:17 slot was the only one).
+- 2026-10-09: #13 at 16:59 (6 hours 42 minutes after 10:17), #15 at 23:25 (after the 4.8.0 merge added 14:47 and 19:37).
+- 2026-10-10: #16 at 15:52, #17 at 18:52, #18 at 22:52.
+- 2026-10-11: #19 at 16:19, #20 at 19:11, #21 at 23:05.
+- 2026-10-12: no scheduled run had started by 17:16, and nothing had been saved that day.
+- No scheduled run has ever started before 15:52 UTC, so the 10:17 slot has never fired on time; the others ran 1 to 7 hours after their slot (which slot a late run belongs to can't be told from the API). Prices on the family page were often a day old until mid afternoon Miami time.
+
+What changed:
+- "Refresh prices" has a workflow_dispatch input `source`: `manual` (default, "Run workflow" button, always runs fully) or `timer`. Timer runs get the same skip logic as scheduled runs (`tools/decide_run.py --source timer`), are titled "Refresh prices (timer)", and run keepalive.
+- `tools/refresh-trigger/worker.js`: Cloudflare Worker `cruise-refresh-trigger`, cron triggers `20 10 * * *` and `5 15 * * *` (UTC). Each sends `POST https://api.github.com/repos/DASatizabal/cruise-cabin-comparison/actions/workflows/refresh-prices.yml/dispatches` with `{"ref":"main","inputs":{"source":"timer"}}` and logs GitHub's status (204 means started; 401 bad or expired token; 403 or 404 missing permission; 422 the `source` input isn't on main). Any visit to its address returns a short plain text message and starts nothing.
+- Token: fine-grained personal access token, resource owner DASatizabal, only this repository, only "Actions: Read and write" (Metadata read-only is added by GitHub), expiring 2027-06-30. Stored only as the Worker secret `GITHUB_TOKEN`.
+- The three GitHub schedule times stay as backups. All timed runs share the concurrency group, so a second run waits and then skips.
+- Setup, test and daily check steps for the owner: `tools/refresh-trigger/README.md`.
+- Cloudflare dashboard testing: no confirmed button runs a cron trigger on demand, so the test is a temporary cron trigger 20 minutes ahead (cron changes can take several minutes to apply), removed afterwards.
