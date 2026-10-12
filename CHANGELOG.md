@@ -2,6 +2,19 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [4.10.0] - 2026-10-12
+
+An outside timer for the daily refresh, because GitHub's schedule has been unreliable for this repo.
+
+### Added
+- `tools/refresh-trigger/worker.js`: a small Cloudflare Worker (separate from the Deck Finder Worker) with cron triggers at 10:20 and 15:05 UTC. Each one asks GitHub to start "Refresh prices" on main with source "timer", using a fine-grained token stored only as the Worker secret `GITHUB_TOKEN`, and logs GitHub's answer. Visiting the Worker's address only returns a short message.
+- `tools/refresh-trigger/README.md`: steps to create the token, set up the Worker in the Cloudflare dashboard, test it, and check it the next morning.
+- "Refresh prices" workflow_dispatch input `source` (manual or timer). Timer runs use the same skip logic as scheduled runs, are titled "Refresh prices (timer)", and run the keepalive job. Manual runs still always run fully.
+
+### Changed
+- The GitHub schedule times (10:17, 14:47, 19:37 UTC) stay as backups.
+- NOTES.md: the GitHub schedule history for this repo (the 10:17 slot never fired on time; other runs came 1 to 7 hours late; none by 17:16 UTC on Oct 12).
+
 ## [4.9.2] - 2026-10-10
 
 ### Changed

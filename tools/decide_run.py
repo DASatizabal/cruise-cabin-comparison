@@ -2,12 +2,15 @@
 """First step of the "Refresh prices" workflow: decide what this run does.
 
   python3 tools/decide_run.py --event schedule
+  python3 tools/decide_run.py --event workflow_dispatch --source timer
 
-Scheduled runs (10:17, 14:47 and 19:37 UTC) skip work that is already done today:
+Timed runs skip work that is already done today. Timed runs are GitHub's scheduled runs
+(10:17, 14:47 and 19:37 UTC) and runs started by the Cloudflare Worker in
+tools/refresh-trigger/ (workflow_dispatch with source "timer", 10:20 and 15:05 UTC):
   - prices and counts both saved today (UTC date of saved_at): skip everything
   - prices saved today, counts not: skip the price job, run only counts
   - otherwise: run both
-Manual runs and branch test runs always run both.
+Manual runs (source "manual") and branch test runs always run both.
 
 Writes "prices=true|false" and "counts=true|false" to GITHUB_OUTPUT (or prints them when
 run by hand), and shows the case that applied as a notice on the run's summary page and
@@ -30,12 +33,15 @@ def saved_date(path):
         return None, f"unreadable ({e.__class__.__name__})"
 
 
-def decide(event, prices_path, counts_path, today):
+def decide(event, prices_path, counts_path, today, source=""):
     prices_day, prices_saved = saved_date(prices_path)
     counts_day, counts_saved = saved_date(counts_path)
     seen = f"prices saved_at {prices_saved}, counts saved_at {counts_saved}, today (UTC) {today}"
-    if event != "schedule":
-        return True, True, f"Full run: {event} runs always fetch prices and counts ({seen})."
+    if event == "workflow_dispatch" and source == "timer":
+        seen = "started by the Cloudflare timer, " + seen
+    elif event != "schedule":
+        kind = "manual" if event == "workflow_dispatch" else event
+        return True, True, f"Full run: {kind} runs always fetch prices and counts ({seen})."
     prices_done = prices_day == today
     counts_done = counts_day == today
     if prices_done and counts_done:
@@ -48,12 +54,13 @@ def decide(event, prices_path, counts_path, today):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--event", required=True)
+    ap.add_argument("--source", default="", help="workflow_dispatch input: manual or timer")
     ap.add_argument("--prices", default="data/prices.json")
     ap.add_argument("--counts", default="data/counts.json")
     ap.add_argument("--today", help="YYYY-MM-DD, for tests; default is today's UTC date")
     args = ap.parse_args()
     today = dt.date.fromisoformat(args.today) if args.today else dt.datetime.now(dt.timezone.utc).date()
-    prices, counts, why = decide(args.event, args.prices, args.counts, today)
+    prices, counts, why = decide(args.event, args.prices, args.counts, today, args.source)
     print(f"::notice title=Refresh decision::{why}")
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary:
