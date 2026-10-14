@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "saved_at": "2026-10-13T01:36:25Z",
+ "saved_at": "2026-10-14T10:22:34Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -14,14 +14,14 @@
    "child_per_day": 40.0,
    "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; 2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. Includes prepaid service charges.",
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-13"
+   "checked_at": "2026-10-14"
   },
   "open_bar": {
    "per_day_2_to_5_nights": 32.0,
    "per_day_6_plus_nights": 28.5,
    "soda_per_day": 12.5,
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-13"
+   "checked_at": "2026-10-14"
   },
   "service_charge": {
    "suite_haven_per_night": 25.0,
@@ -32,7 +32,7 @@
     "HAVEN"
    ],
    "source": "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge",
-   "checked_at": "2026-10-13"
+   "checked_at": "2026-10-14"
   }
  },
  "rate_warnings": [],
@@ -165,26 +165,26 @@
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-13",
+   "saved_at": "2026-10-14",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-13T01:35:14Z",
+     "as_of": "2026-10-14T10:21:23Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-13T01:35:14Z",
+     "as_of": "2026-10-14T10:21:23Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-13T01:35:14Z",
+     "as_of": "2026-10-14T10:21:23Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-13T01:35:14Z",
+     "as_of": "2026-10-14T10:21:23Z",
      "why": null
     }
    },
@@ -196,14 +196,14 @@
      "soda_under_21_position_2": 37.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-13"
+     "checked_at": "2026-10-14"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 1 Meal",
      "per_guest": 20,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-13"
+     "checked_at": "2026-10-14"
     }
    },
    "terminal": {
@@ -1976,14 +1976,18 @@
          "cabin_total": 7838
         },
         "3": {
-         "available": false,
+         "available": true,
          "sold_out": false,
-         "reason": "Sold out for this party size"
+         "price_pp": 2745.66,
+         "cabin_total": 8237,
+         "added_vs_2": 399
         },
         "4": {
-         "available": false,
+         "available": true,
          "sold_out": false,
-         "reason": "Sold out for this party size"
+         "price_pp": 2159.0,
+         "cabin_total": 8636,
+         "added_vs_2": 798
         },
         "5": {
          "available": false,
@@ -2017,26 +2021,26 @@
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-13",
+   "saved_at": "2026-10-14",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-13T01:35:47Z",
+     "as_of": "2026-10-14T10:21:58Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-13T01:35:47Z",
+     "as_of": "2026-10-14T10:21:58Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-13T01:35:47Z",
+     "as_of": "2026-10-14T10:21:58Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-13T01:35:47Z",
+     "as_of": "2026-10-14T10:21:58Z",
      "why": null
     }
    },
@@ -2048,14 +2052,14 @@
      "soda_under_21_position_2": 62.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-13"
+     "checked_at": "2026-10-14"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 2 Meals",
      "per_guest": 40,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-13"
+     "checked_at": "2026-10-14"
     }
    },
    "terminal": {
@@ -2958,8 +2962,8 @@
         },
         "5": {
          "available": false,
-         "sold_out": true,
-         "reason": "Sold out"
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
         }
        },
        "description": "Aft-Facing Balcony, Deck 9, aft",
@@ -3371,6 +3375,57 @@
        "shares_ncl_description_with": []
       },
       {
+       "code": "SR",
+       "title": "Family Suite with Master Bedroom & Balcony",
+       "guarantee": false,
+       "solo": false,
+       "capacity": 4,
+       "by_guests": {
+        "2": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2639.0,
+         "cabin_total": 5278
+        },
+        "3": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2005.66,
+         "cabin_total": 6017,
+         "added_vs_2": 739
+        },
+        "4": {
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1689.0,
+         "cabin_total": 6756,
+         "added_vs_2": 1478
+        },
+        "5": {
+         "available": false,
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
+        }
+       },
+       "description": "Family Suite with Master Bedroom & Balcony, Decks 9 to 16, midship",
+       "decks": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+       ],
+       "location": [
+        "midship"
+       ],
+       "size": "480 to 577 sq ft, balcony 137 to 234 sq ft",
+       "details_source": "NCL",
+       "shares_ncl_description_with": []
+      },
+      {
        "code": "SI",
        "title": "Aft-Facing Suite with Large Balcony",
        "guarantee": false,
@@ -3497,52 +3552,6 @@
         "aft"
        ],
        "size": "635 sq ft, balcony 370 sq ft",
-       "details_source": "NCL",
-       "shares_ncl_description_with": []
-      },
-      {
-       "code": "SR",
-       "title": "Family Suite with Master Bedroom & Balcony",
-       "guarantee": false,
-       "solo": false,
-       "capacity": null,
-       "by_guests": {
-        "2": {
-         "available": false,
-         "sold_out": false,
-         "reason": "Not available for 2 guests"
-        },
-        "3": {
-         "available": false,
-         "sold_out": false,
-         "reason": "Not available for 3 guests"
-        },
-        "4": {
-         "available": false,
-         "sold_out": false,
-         "reason": "Not available for 4 guests"
-        },
-        "5": {
-         "available": false,
-         "sold_out": false,
-         "reason": "Not available for 5 guests"
-        }
-       },
-       "description": "Family Suite with Master Bedroom & Balcony, Decks 9 to 16, midship",
-       "decks": [
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16
-       ],
-       "location": [
-        "midship"
-       ],
-       "size": "480 to 577 sq ft, balcony 137 to 234 sq ft",
        "details_source": "NCL",
        "shares_ncl_description_with": []
       }
