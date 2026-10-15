@@ -9,6 +9,7 @@ before it replaces the old one.
 """
 import datetime as dt
 import json
+import re
 import sys
 
 EXPECTED_SAILINGS = {"getaway-2027-06-11", "aura-2027-06-14"}
@@ -28,14 +29,32 @@ def is_date(v):
         return False
 
 
-def check(data):
+def check(data, allow_schema_2=False):
+    """Problems with a price file. Every file fetch_prices.py writes is schema 3.
+
+    allow_schema_2: only for the release check (tools/check_release.py) on the committed file,
+    which stays the schema 2 file written before 5.0.0 until the first refresh on main after
+    the merge. Such a file is checked as before (no ncl_ids or warnings). The refresh workflow's
+    check of each new file never allows it.
+    """
+    old = allow_schema_2 and data.get("schema_version") == 2
     errors = []
     err = errors.append
 
     if not isinstance(data, dict):
         return ["the file is not a JSON object"]
-    if data.get("schema_version") != 2:
-        err("schema_version must be 2")
+    if data.get("schema_version") != 3 and not old:
+        err("schema_version must be 3")
+    warnings = data.get("warnings") if not old else []
+    rate_warnings = data.get("rate_warnings")
+    if not isinstance(warnings, list) or not all(isinstance(w, str) for w in warnings) \
+            or not isinstance(rate_warnings, list) or not all(isinstance(w, str) for w in rate_warnings):
+        err("warnings and rate_warnings must be lists of text")
+        warnings, rate_warnings = [], []
+
+    def warned(ship, word):
+        """A missing number (null) is allowed only with a warning naming the ship and the item."""
+        return any(w.startswith(ship + ":") and word in w.lower() for w in warnings)
     try:
         dt.datetime.strptime(data.get("saved_at", ""), "%Y-%m-%dT%H:%M:%SZ")
     except (TypeError, ValueError):
@@ -58,7 +77,9 @@ def check(data):
             err("checks.ages must have one entry per sailing")
         else:
             for c in ages:
-                if c.get("ok") is not True:
+                # ok None: NCL's gratuities weren't found today; the sailing's gratuities are null
+                # (checked below) and the entry says why.
+                if c.get("ok") is False or (c.get("ok") is None and not c.get("why")) or c.get("ok") not in (True, False, None):
                     err(f"age cross check failed: {c}")
 
     rates = data.get("rates")
@@ -69,9 +90,17 @@ def check(data):
                 "open_bar": ["per_day_2_to_5_nights", "per_day_6_plus_nights", "soda_per_day"],
                 "service_charge": ["suite_haven_per_night", "standard_per_night"]}
         for key, fields in need.items():
-            r = rates.get(key)
-            if not isinstance(r, dict):
+            if key not in rates:
                 err(f"rates.{key} is missing")
+                continue
+            r = rates[key]
+            if r is None:
+                # Not found on NCL today and no earlier rate to keep: allowed only with a warning.
+                if not any(w.startswith(key + ":") for w in rate_warnings):
+                    err(f"rates.{key} is empty without a warning")
+                continue
+            if not isinstance(r, dict):
+                err(f"rates.{key} must be an object or null")
                 continue
             for f in fields:
                 if not isinstance(r.get(f), (int, float)) or isinstance(r.get(f), bool) or r[f] <= 0:
@@ -82,8 +111,8 @@ def check(data):
                 dt.date.fromisoformat(r.get("checked_at", ""))
             except (TypeError, ValueError):
                 err(f"rates.{key}.checked_at must be a date")
-        sc = rates.get("service_charge") or {}
-        if not is_int(sc.get("min_age")) or not isinstance(sc.get("suite_haven_types"), list):
+        sc = rates.get("service_charge")
+        if isinstance(sc, dict) and (not is_int(sc.get("min_age")) or not isinstance(sc.get("suite_haven_types"), list)):
             err("rates.service_charge needs min_age and suite_haven_types")
 
     sailings = data.get("sailings")
@@ -103,11 +132,36 @@ def check(data):
         for k in ("depart", "return", "saved_at"):
             if not is_date(s.get(k)):
                 err(f"{p}: {k} must be a YYYY-MM-DD date")
+        # NCL's ids, looked up on every run (fetch_prices.find_sailing), never typed in.
+        ids = s.get("ncl_ids")
+        if old:
+            pass
+        elif not isinstance(ids, dict) or not all(isinstance(ids.get(k), str) and ids[k] for k in ("itinerary_code", "package_id", "sailing_id", "ship_code", "found_on", "checked_at")):
+            err(f"{p}: ncl_ids needs itinerary_code, package_id, sailing_id, ship_code, found_on and checked_at")
+        elif ids["package_id"] != s.get("package_id") or ids["itinerary_code"] != s.get("itinerary_code"):
+            err(f"{p}: ncl_ids does not match package_id and itinerary_code")
+        elif not re.fullmatch(r"\d+", ids["package_id"]) or not re.fullmatch(r"\d+", ids["sailing_id"]):
+            err(f"{p}: ncl_ids package_id and sailing_id must be digits")
+        elif ids["found_on"] == "previous run" and not any(s.get("ship_short", "?") in w and "previous run" in w for w in data.get("warnings") or []):
+            err(f"{p}: ids from the previous run without a warning")
         if not is_int(s.get("nights")) or s.get("nights", 0) < 1:
             err(f"{p}: nights must be a positive whole number")
-        if not is_int(s.get("taxes_per_guest")) or s["taxes_per_guest"] <= 0:
-            err(f"{p}: taxes_per_guest must be a positive whole number")
+        tx = s.get("taxes_per_guest")
+        if tx is None:
+            if not warned(s.get("ship_short", "?"), "tax"):
+                err(f"{p}: taxes_per_guest is empty without a warning")
+        elif not isinstance(tx, (int, float)) or isinstance(tx, bool) or tx <= 0:
+            err(f"{p}: taxes_per_guest must be a positive number or null")
         grat = s.get("gratuities")
+        age = next((c for c in ((checks or {}).get("ages") or []) if isinstance(c, dict) and c.get("sailing") == s.get("id")), {})
+        if grat is None:
+            if not warned(s.get("ship_short", "?"), "gratuities"):
+                err(f"{p}: gratuities are empty without a warning")
+            if age.get("ok") is not None:
+                err(f"{p}: gratuities are empty but the age check says ok {age.get('ok')}")
+            grat = {"open_bar": {"title": "-", "per_guest": 0, "soda_under_21_position_2": 0}, "specialty_dining": {"title": "-", "per_guest": 0}}
+        elif age.get("ok") is None and age:
+            err(f"{p}: the age check found no gratuities, but gratuities are set")
         for k in ("open_bar", "specialty_dining"):
             g = grat.get(k) if isinstance(grat, dict) else None
             if not isinstance(g, dict) or not g.get("title") or not isinstance(g.get("per_guest"), (int, float)) or g["per_guest"] < 0:
@@ -115,6 +169,12 @@ def check(data):
         soda = (grat.get("open_bar") or {}).get("soda_under_21_position_2") if isinstance(grat, dict) else None
         if not isinstance(soda, (int, float)) or soda < 0:
             err(f"{p}: gratuities.open_bar.soda_under_21_position_2 must be a number")
+        if not old and "kids_sail_free" not in s:
+            err(f"{p}: kids_sail_free is missing (null when NCL doesn't list the offer)")
+        ksf = s.get("kids_sail_free")
+        if ksf is not None and (not isinstance(ksf, dict) or not ksf.get("title") or not isinstance(ksf.get("types"), list)
+                                or not all(isinstance(t, str) for t in ksf["types"]) or not isinstance(ksf.get("codes", []), list)):
+            err(f"{p}: kids_sail_free must be null or have a title and a list of types")
         if not isinstance((s.get("terminal") or {}).get("text"), str):
             err(f"{p}: terminal.text is missing")
         ports = s.get("ports")

@@ -294,7 +294,7 @@ How it's built:
 - `tools/fetch_prices.py` no longer makes cabin calls. `data/prices.json` no longer holds `cabins_left`, `count_reliable` or open-cabin details; `tools/check_prices.py` rejects them if they reappear.
 - `tools/fetch_counts.py --prices data/prices.json --previous data/counts.json --out data/counts.new.json --mode auto|full|light`. It reads today's categories, prices and availability from `prices.json`. `auto` is full when there's no usable previous file (missing or failing `check_counts.py`) or the last full sweep was 3 or more UTC calendar days ago; light otherwise. Light mode starts from the previous entries for categories still available today, re-checks the reliable counts under 50 (and calls the next pricier category for each), and keeps every other entry with its own `checked_at`. Unreliable counts are only retried on full sweeps.
 - Workflow "Refresh prices": `refresh` (prices) then `publish` (label prices); `counts` (`if: !cancelled()`, so it runs even if `refresh` failed, and checks out the branch head so it sees today's prices) then `publish-counts` (label counts); `keepalive`. Two publishes in one run use different artifact names (`github-pages-prices-<attempt>`, `github-pages-counts-<attempt>`), and the deploy job's concurrency group `pages` makes the second wait for the first.
-- Manual runs: Actions, "Refresh prices", "Run workflow", then choose the cabin counts mode (auto, full or light). Pushes to the development branch always do a full sweep.
+- Manual runs: Actions, "Refresh prices", "Run workflow", then choose the cabin counts mode (auto, full or light). Pushes to the development branch always did a full sweep until 5.0.0; they now skip counts (see "Branch test runs fetch prices only").
 - How to tell the days apart: the counts commit message ends in "(full)" or "(light)"; `counts.json` has `mode`, `mode_reason`, `calls` and `last_full_sweep`; the counts job's log starts with "Mode: full (...)" or "Mode: light (...)".
 - The page loads `counts.json` separately; any problem (missing, unreadable, wrong schema, more than 7 days old) hides the labels and the "Cabins left as of" date without touching prices. Descriptions are rebuilt on the page with the same rules as `fetch_prices.py`, filling missing decks or locations from `open_decks` and `open_locations` only while counts are fresh.
 
@@ -318,7 +318,7 @@ Page rules (4.6.0):
 - Switches per cabin: Open Bar (on), Specialty Dining (on), Free at Sea Plus (off). For 8 nights, the Getaway and the Aura each have their own set. The 3 night card and the 8 night card share the Getaway's set, and the 5 night card and the 8 night card share the Aura's, because each is the same cabin booking.
 - Free at Sea Plus on also turns Open Bar and Specialty Dining on, and turning either off turns Plus off. This follows the 2.x page's behavior (Plus is an upgrade of the Free at Sea beverage and dining offers); it is not separately confirmed in NCL's terms.
 - Free at Sea Plus can't be priced through the price summary (it is not among the offer groups the availability call lists), so it is computed from the terms rates.
-- Gratuities total = service charges + Open Bar gratuity + Specialty Dining gratuity. The prepay switch moves only the service charges between "Due before you sail" and "Charged onboard"; Free at Sea gratuities and Plus are always before sailing.
+- Gratuities total = service charges + Open Bar gratuity + Specialty Dining gratuity. The prepay switch moves only the service charges between "Due before you sail" and "Charged onboard"; Free at Sea gratuities and Plus are always before sailing. (Changed in 5.0.0: see "Prepay gratuities off by default" at the end.)
 
 Light count days: re-check only counts under 15 (was under 50), plus the next pricier category each one needs. On the 2026-10-09 counts that is 58 counts and about 75 calls (it was 87 counts and about 94 calls at under 50; a full sweep is about 140). Most remaining small counts are Haven and suite categories.
 
@@ -418,3 +418,186 @@ What changed:
 - The three GitHub schedule times stay as backups. All timed runs share the concurrency group, so a second run waits and then skips.
 - Setup, test and daily check steps for the owner: `tools/refresh-trigger/README.md`.
 - Cloudflare dashboard testing: no confirmed button runs a cron trigger on demand, so the test is a temporary cron trigger 20 minutes ahead (cron changes can take several minutes to apply), removed afterwards.
+
+## Eastern dates (5.0.0, 2026-10-15)
+
+Owner decisions (2026-10-15): port the Joy page's improvements (DASatizabal/joy-cabin-compare 1.4.0) on branch `june-joy-upgrades`, version 5.0.0, merged to `main` only after the owner approves. Every refresh stops from Jun 11, 2027 (Eastern). Commit messages use the Eastern date.
+
+What went wrong: `tools/decide_run.py` compared the UTC date of `saved_at` with today's UTC date. A manual run on Oct 12, 2026 at 9:35 PM Eastern saved `data/prices.json` at `2026-10-13T01:36:25Z` and `data/counts.json` at `2026-10-13T01:36:31Z`. By UTC date both counted as Oct 13, so the Cloudflare timer runs (10:20 and 15:05 UTC) and GitHub's scheduled runs on Oct 13 all skipped, and nothing was refreshed until Oct 14 at 10:22 UTC. The Joy page hit the same bug on Oct 13 to 14 while NCL cut Oceanview fares $30 per guest.
+
+What changed:
+- "Today" is the Eastern date (America/New_York), using the time zone, not a fixed UTC-5 or UTC-4 offset, because daylight saving time ends on 2026-11-01 (EDT is UTC-4 before, EST is UTC-5 after). An evening run belongs to that evening's day, so the next morning's timed run refreshes.
+- Where: `tools/decide_run.py` (prices, counts, the sail-date stop; for GitHub's schedule, "source: timer" runs from the Cloudflare Worker, and manual runs) and `tools/fetch_counts.py` (full sweep when the last one was 3 or more Eastern calendar days ago). `MIAMI = ZoneInfo("America/New_York")` lives in `tools/fetch_prices.py`. The Cloudflare Worker needed no change: it only starts the workflow, and `decide_run.py` decides.
+- Sail-date stop: from Jun 11, 2027 (Eastern), every run skips everything, manual runs too. After that the Getaway leaves NCL's site, Options 1 and 3 are gone, and the price fetch would fail anyway; the page keeps the last prices.
+- Commit messages: "Refresh prices DATE" and "Refresh cabin counts DATE (full|light)" use `TZ=America/New_York date`.
+- Tests: `tools/test_tools.py` (no NCL calls) runs `decide_run.py --now` on small data files, and is part of the release check workflow. On the real Oct 13 data files, main's old version said "Skipped" for the 10:20 UTC timer run and the new one says "Full run".
+
+NCL calls per day, before and after (no calls, runs or retries added):
+- GitHub prices job: 23 per full run (route-events 2, availability 8, price summaries 8, age tests 2, NCL pages 3: the promotion terms page was read twice, corrected in "Missing numbers" below; first written here as 22), at most one timed full run per day before (per UTC day) and after (per Eastern day). The fix only moves the day boundary from 8:00 PM Eastern (7:00 PM after Nov 1) to midnight Eastern. Manual runs still always run fully. Unchanged.
+- GitHub counts job: itinerary 2 plus cabin calls (about 140 on a full sweep every 3 days, about 75 on light days). The cadence counts Eastern days now, which can move a full sweep by at most one day. Unchanged in volume.
+- Cloudflare timer runs and skipped runs: 0 NCL calls (the decide job reads only the repo). Unchanged.
+- From Jun 11, 2027: 0 (before: the runs would have kept trying and failing).
+
+## Branch test runs fetch prices only (5.0.0, 2026-10-15)
+
+Owner's request: each push to `june-joy-upgrades` that touched the tools or the workflow ran prices (about 23 NCL calls) and a full counts sweep (about 140 calls, 9 minutes on 2026-10-15). With several pushes to come, that was too much load on NCL.
+
+Now `tools/decide_run.py` gives push runs "Prices only": the price job runs (fetch and format check, no commit, no publish) and the counts job is skipped. Counts run on a branch only from a manual run ("Run workflow" on the branch, choosing a count mode). Manual runs on `main` are unchanged (always both). Branch runs still never commit data files or publish.
+
+NCL calls per branch push: before about 163 (23 prices, about 140 counts); after about 23 (first written here as 162 and 22; see "Missing numbers" below). Timed and manual runs on `main`: unchanged.
+
+## Hold guard on every NCL answer (5.0.0, 2026-10-15)
+
+Owner's rules: the hold guard may only get stricter, never looser; no existing check is removed or relaxed. Match real hold signals only, so ordinary words that merely contain the letters ("household", "cardholder", "placeholder", "threshold") never fail a run. Test against saved NCL answers instead of new calls.
+
+Before and after:
+
+| Guard | Before | After |
+|---|---|---|
+| Address guard: `FORBIDDEN` (`manage-cabin` or `hold` in the address, case-insensitive), checked before any call in `request()`, `page_text()` and the Deck Finder read | every request | unchanged |
+| `HOLD_IN_RESPONSE` ("hold" or "heldUntil" anywhere in the answer bytes) | `cabin/availability` answers in `tools/fetch_counts.py` | unchanged, kept exactly as it was |
+| `hold_signal()` in `tools/fetch_prices.py`: a key with the word "hold", "holds" or "held" (camel case and underscores count as word breaks: `holdId`, `onHold`, `heldUntil`, `isHeld`, `HOLD_EXPIRY`); a reservation ID key (`reservationId`, `reservation_number`, `reservationCode`, `reservationNo`); a text value with "hold" as a word ("HOLD", "On Hold", "ON_HOLD", "recommendAndHold") or containing "heldUntil" | not checked | every NCL API answer, in `request()`: availability, price summary, age test, route-events, itinerary and cabin availability |
+| What a hold signal stops | the counts run (cabin availability only) | the whole run: `HoldSignal` is never retried, and the price fetch's per party size and age test error handlers re-raise it (before, any error there only failed that party size and the run went on) |
+
+One allowed exception, the owner's decision (2026-10-15, the same fix the owner approved in the private cruise-price-watch repo for the same NCL payment option): every saved Getaway Jun 11 price summary lists the ways to pay, `staterooms[].paymentOptions[]`, and one of them is `{"isDeposit": true, "paymentType": "HOLD", "amount": 150, "dueHours": 84, ...}` next to DEPOSIT, FULL and MONTHLY. That is a payment option NCL offers for sailings far out, not a hold on a cabin (no `heldUntil`, no cabin). In price-summary answers only, the value exactly `"HOLD"` at exactly `staterooms[].paymentOptions[].paymentType` is not a signal, and the run logs "NCL lists a HOLD payment option (not a hold)". Everything else still stops the run, including a `heldUntil` or hold key anywhere in that same answer, any other "HOLD" value (`"ON_HOLD"`, `"Hold"`, HOLD at another place), a reservation ID key, and the address guard. Without this exception every June price run would have stopped at its first price summary. The Joy page didn't see it because its Nov 2026 answers listed no HOLD option on 2026-10-13.
+
+Not checked, as before: web pages (the promotion terms and service charge FAQ pages, later the cruise pages), whose ordinary text can contain such words; nothing is ever sent to them.
+
+Tests (`tools/test_tools.py`, no NCL calls, run by the release check on every push):
+- Real hold signals found: 18 shapes, from a `heldUntil` key to "recommendAndHold" and a reservation ID key.
+- Never a signal: household, cardholder, `cardHolder`, placeholder, threshold, stakeholder, "holds up to 4 guests", Holder, Holiday, upholstery, the age test's `reservationOwner`.
+- The exception: allowed only as exactly "HOLD" at exactly that place in a price summary; 8 variations around it still stop.
+- Saved NCL answers in `tools/test_data/` (response bodies only, copied from the owner's local `probe/output` of 2026-10-06 and 07, which stays uncommitted; checked to hold no names, birth dates or emails): the 7 Getaway price summaries pass as price summaries, each lists the HOLD option, and each would stop if it came from any other call. The answer of NCL's `manage-cabin` call (a real hold, made by the browser probe on 2026-10-06) is found by its `results.cabin.heldUntil` key, and stops the run through `request()`.
+- `request()` with a stand-in for the network: the saved price summary passes and logs the note, a hold signal stops after exactly 1 call (never retried), an answer with "household" passes, and addresses with `manage-cabin` or `hold` are refused with 0 calls.
+- Scan of all 49 saved answers in `probe/output` (2026-10-15): the old broad check matched 17 of them; the new check flags the `manage-cabin` hold, the 7 price summaries' HOLD option when not read as a price summary, and two NCL text-label answers the tools never call (`i18n/vacation-builder`: "staterooms that hold {{n}} guests"; `i18n/module-login-register`: a `reservationNumber` label). "Placeholder" and "Threshold" labels no longer match.
+
+NCL calls added by this item: 0 (it only checks answers the tools already get).
+
+Privacy audit of `tools/test_data/` (owner's request, 2026-10-15; public repo): every saved answer was checked for hold IDs, cart or session IDs, tokens, cookies, auth headers, account, Latitudes or reservation numbers, IP addresses, and cabin numbers or times tied to a hold. Only response bodies were ever copied (no request headers, cookies or bodies). Found and replaced with "REMOVED", keys kept: in the `manage-cabin` answer, `cabinNumber`, `heldUntil` (the key stays, so the tests still catch it) and `deckNumber`; in each of the 7 price summaries, the HOLD payment option's `dueDate`. The real hold time was also removed from two test cases in `tools/test_tools.py`. Kept on purpose: three 40-character image names in the `manage-cabin` answer (NCL's public stateroom photos, the same in the plain availability answers), `guestRefNum` 1 to 4 (guest positions), `stateroomId` "0", `packageId` 24223992 (public), and the deposit and final payment dates. The first push of these files (commit b1a1b2d, branch `june-joy-upgrades` only, never on `main`) still holds the original values in its history.
+
+Refresh stop date (owner's confirmation, 2026-10-15): every refresh stops from Jun 11, 2027 (Eastern) for both sailings, Getaway and Aura. There is no separate stop date per sailing; the Aura's prices are not refreshed between Jun 11 and its Jun 14 sail date.
+
+## NCL ids looked up on every run (5.0.0, 2026-10-15)
+
+Same approach as the Joy page (DASatizabal/joy-cabin-compare), once per ship. `tools/fetch_prices.py` knows only, per sailing: the ship and its NCL ship code (GETAWAY, AURA), the sail date (2027-06-11, 2027-06-14), the length (3, 5 nights) and that it is a Miami round trip (itinerary code starting `GETAWAY3MIA` or `AURA5MIA`). Each run, per ship:
+
+1. Reads the ship's cruise page, `https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA` or `https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA` (GET, header `Accept: */*`), and its `data-pricing-sailings` list. The sailing departing on our date with a matching itinerary prefix gives the itinerary code and packageId. Only one cruise page per ship, tried once and never retried, to keep the calls down.
+2. Calls `https://www.ncl.com/api/vacation-builder/itinerary/<itineraryCode>?packageId=<packageId>` (GET). The sailing fails if the packageId, the date, the ship code or the length disagree, or there is no sailingId.
+3. If the cruise page can't be read, has no sailing list, or doesn't list our sailing, the previous run's itinerary code and packageId are tried instead, with a warning in the data file (`warnings`) and on the GitHub run's summary page; step 2 still has to confirm them. For the first run after the merge, the previous file is schema 2, so its `itinerary_code` and `package_id` are used.
+4. The ids are stored in `sailings[].ncl_ids` with `found_on` (the cruise page address, or "previous run") and `checked_at`. `tools/fetch_counts.py` takes the itinerary code and packageId from today's price file and confirms them again with its own itinerary call (it always made that call), now also checking the ship code.
+5. The run prints the ids it used as notices on the GitHub run's summary page ("NCL ids Getaway: itinerary ..., packageId ..., sailingId ..., from the cruise page").
+
+`data/prices.json` is now schema 3 (`warnings`, `sailings[].ncl_ids`). The committed file on `main` stays schema 2 until the first refresh after the merge, so `tools/check_release.py` (which also runs before every publish) accepts a schema 2 file as before; the refresh workflow's check of each new file accepts only schema 3. That allowance can be removed in a later release once `main` has a schema 3 file.
+
+Hold guards: unchanged. Every address goes through the address guard, the itinerary answer goes through `hold_signal()` like every NCL API answer, and the cruise page is a web page, which is not checked for hold signals (as before for NCL's terms pages).
+
+Known on 2026-10-15 (from earlier probes, before this change): Getaway itinerary `GETAWAY3MIANPINASMIA`, packageId 24223992, sailingId 60533; Aura itinerary `AURA5MIAPOPNPIMIA`, packageId 25729291, sailingId 62344.
+
+NCL calls per day, before and after:
+- GitHub prices job (one full run a day, plus manual runs): before 23 (route-events 2, availability 8, price summaries 8, age tests 2, NCL pages 3, the promotion terms page read twice). After 27: plus 2 cruise pages and 2 itinerary calls (first written here as 22 and 26; corrected in "Missing numbers" below, which also brings it to 26). No retries added: a cruise page is tried once, and if it fails the previous ids are used.
+- GitHub counts job: unchanged (it already made 1 itinerary call per ship; about 140 cabin calls on a full sweep, about 75 on light days).
+- Branch test runs: about 27 per push (prices only); 26 from "Missing numbers" on.
+- Cloudflare timer runs and skipped runs: 0, unchanged.
+
+## Merge plan for 5.0.0 (owner's decision, 2026-10-15)
+
+Branch history is not rewritten. Commit b1a1b2d on `june-joy-upgrades` still holds the original hold-linked values in `tools/test_data/` (removed again in 39e92be). When the owner approves the final merge, `june-joy-upgrades` is squash merged into `main` as one commit, so b1a1b2d never lands on `main`, and then the `june-joy-upgrades` branch is deleted on GitHub.
+
+## Missing numbers: "Not found on NCL today" (5.0.0, 2026-10-15)
+
+Same rules as the Joy page (DASatizabal/joy-cabin-compare NOTES.md, "Taxes, fees and Free at Sea per guest"). A number NCL doesn't show is never guessed. Order, per item:
+
+| Item | 1. Today | 2. Else the previous run's value | 3. Else |
+|---|---|---|---|
+| Taxes per guest (per ship) | the tax line of today's first good price summary | not kept (as on the Joy page) | null, warning "<Ship>: no tax line in NCL's price summary today; taxes per guest left empty" |
+| Free at Sea gratuities (per ship: Open Bar, soda, Specialty Dining) | the daily age test | kept if at most 3 days old and the previous age check passed | null, warning "<Ship>: Free at Sea gratuities not found on NCL today (...); left empty", age check `ok` null with the reason |
+| Rates (Free at Sea Plus, Open Bar per day, service charges) | NCL's promotion terms and service charge pages | kept at any age, marked `stale_since`, warning in `rate_warnings` | null, warning "<rate>: could not read ...; left empty" |
+
+Before 5.0.0 a missing tax line, missing gratuities with nothing recent to keep, or a missing rate with nothing to keep failed the whole run, and yesterday's complete file stayed published. Now the run publishes today's prices with that item empty.
+
+Format check (`tools/check_prices.py`): `taxes_per_guest`, `gratuities` and each entry of `rates` may be null only with a matching warning (taxes and gratuities: a warning starting with that ship's name and naming the item; rates: a `rate_warnings` entry starting with the rate's key). Null gratuities must come with an age check whose `ok` is null and has a reason; a $0 tax is still rejected; a rate key that disappears is still rejected.
+
+Page (`index.html`): the line says "Not found on NCL today" and the amount is left out of the total; the card says "Not included in the total because NCL didn't show the amount today: ..." (on the 8 night card each item is named with its ship, for example "Aura service charges"). Without the tax line the fare and taxes can't be split, so the card shows NCL's cabin price as "Cruise fare with taxes, fees and port expenses". Taxes are still in the total, because NCL's cabin price (`cabin_total`) includes them; the page never removes them. So taxes are never listed as "Not included": the tax line reads "Taxes, fees and port expenses (per-guest split not shown by NCL today)" with "Included above" in grey, and the card says "The Getaway cabin price includes taxes, fees and port expenses, and they are in the total. NCL didn't show the per-guest tax split today." (the 8 night card names only the ship without the tax line; "The Getaway and Aura cabin prices include ..." when both are missing). Corrected on 2026-10-15: the first version showed the tax line in amber as "Not found on NCL today", which looked like taxes were left out. A missing Plus rate shows "Price not found on NCL today, so it can't be added here." instead of the switch. The footer says the page never guesses.
+
+Tests:
+- `tools/test_tools.py` (no NCL calls): a copy of `data/prices.json` with the Getaway's taxes and gratuities and all three rates null, each with its warning, passes the format check; removing any one warning, or using the other ship's warning, fails it. The rate fallbacks (previous rate kept at any age with `stale_since`, else null) and the gratuity fallback (kept at 3 days, not at 4, not without a passing previous age check) are tested on the real functions.
+- Chromium at 360 px (Playwright, 2026-10-15), with today's data and with the null copy: no sideways scrolling (page width 360), no script errors. Null copy, 2 adults, Balcony: Getaway total $838 = NCL's cabin price only; Aura $3,678 = fare + taxes + Open Bar + Specialty Dining; 8 nights $4,516 = both; 10 "Not found on NCL today" lines (8 after the tax line correction above; the 2 tax lines now say "Included above"). The Getaway's $838 is the same as today's Balcony fare $538 + taxes $300 for 2 guests, so the taxes are inside it (`tools/page_test.py` checks this). Today's data: totals identical to `main`'s page in 12 combinations (Inside, Suite, The Haven; 2 adults, and 2 adults with kids 15 and 7).
+
+NCL calls: this item adds none. It also removes a duplicate: `fetch_rates` read NCL's promotion terms page twice (once for the Plus rates, once for the Open Bar rates). Like the Joy code, each page is now read once per run. So the price job made 23 calls before 5.0.0 (not 22 as first written in the sections above), 27 after the NCL id lookup, and 26 from this item on: cruise pages 2, itinerary 2, route-events 2, availability 8, price summaries 8, age tests 2, NCL pages 2. Branch test runs: about 26 per push. Counts and timer runs: unchanged.
+
+## "Prices as of" in Eastern time (5.0.0, 2026-10-15)
+
+The top of the page shows when the prices were saved as the Eastern date and time of day, for example "Oct 15, 6:17 AM ET", the same as the Joy page (`fmtEastern` in `index.html`: `toLocaleString` with `timeZone: "America/New_York"`, so daylight saving time is handled). Before, it showed only the date, which hid a late evening manual run or a timer run that came hours late. "Cabins left as of" and the "Not updated today" note keep the date only, as on the Joy page.
+
+Tests (`tools/page_test.py`, Chromium at 360 px, no NCL calls): the header matches "Mon D, H:MM AM ET" with today's data ("Oct 14, 6:22 AM ET" for `saved_at` 2026-10-14T10:22:34Z) and with the null copy; fixed times give 2026-10-15T10:17Z "Oct 15, 6:17 AM ET", 2026-10-13T01:36Z "Oct 12, 9:36 PM ET", 2026-11-02T01:36Z "Nov 1, 8:36 PM ET" (after daylight saving time ends), 2027-03-15T16:05Z "Mar 15, 12:05 PM ET". No sideways scrolling.
+
+NCL calls: none added (page only). The price job stays at 26 per run; counts and timer runs are unchanged. Hold guards unchanged.
+
+## Prepay gratuities off by default (5.0.0, 2026-10-15)
+
+Owner's request, matching the Joy page (DASatizabal/joy-cabin-compare NOTES.md, the prepay switch default of 2026-10-14). Page only: no NCL calls, no change to how any amount is worked out.
+
+- Default: off (service charges paid onboard). With it off, every total on the cards is what's paid now, without the service charges: the card says "Total to pay now for N guests", then "+ $X service charges paid onboard (can be removed at Guest Services)" under the per person line and again after the Total line; the service charge line in the breakdown is grey, "(paid onboard, not in the total)", with "$X onboard"; the subtotal reads "Gratuities paid now (service charges are paid onboard)"; cost per night says "(paid now)". The 8 night card's onboard amount is both ships' service charges added; each ship's line reads "<Ship> total to pay now".
+- On: totals include the service charges, the same as before 5.0.0.
+- The "Due before you sail" and "Charged onboard" lines are gone.
+- Switch text. Off: "Prepay gratuities (No)" / "Pay onboard on the last day. Service charges are not in the totals. They're charged to your onboard account and can be removed at Guest Services." On (unchanged): "Prepay gratuities" / "Service charges are paid with the cruise, before you sail. The amount is the same either way." "Daily gratuities can be adjusted or removed onboard at Guest Services." stays under the switch. The text and totals change as soon as the switch is flipped and follow a saved choice on page load.
+- Saved choices: the key moved from `cruise-decision-guide-v4` to `cruise-decision-guide-v5`, as the Joy page did, so earlier visitors get the new default. Unlike the Joy page, choices under the old key are read once and kept (guests, kid ages, cabins, Free at Sea switches), all but the prepay switch (the plan approved on 2026-10-15: reset only the prepay switch, keep saved guests and kid ages).
+- Service charges NCL didn't show today ("Not found on NCL today") are out of the total either way, so there is no onboard line for them.
+
+Before and after, today's data (`data/prices.json` of 2026-10-14), 2 adults, Balcony (Getaway BF, Aura's cheapest Balcony), Open Bar and Specialty Dining on:
+
+| Card | Before (4.10.0 to 8b33eda), either switch position | After, switch off (default) | After, switch on |
+|---|---|---|---|
+| Getaway | $1,190 (off: $1,070 due before you sail + $120 charged onboard) | $1,070 + $120 service charges paid onboard | $1,190 |
+| Aura | $3,878 (off: $3,678 + $200) | $3,678 + $200 service charges paid onboard | $3,878 |
+| 8 nights | $5,068 (off: $4,748 + $320) | $4,748 + $320 service charges paid onboard | $5,068 |
+
+Service charges: 2 guests x $20 x 3 nights = $120 (Getaway), 2 x $20 x 5 = $200 (Aura), $320 for 8 nights.
+
+Tests (`tools/page_test.py`, Chromium at 360 px): first visit is off with the off text; flipping on and back off swaps the title, subtitle and totals at once (on = off + $120, $200, $320); a saved "on" and a saved "off" load as saved; choices saved under the old key keep the kids and their ages and reset the switch to off, and a new "on" after that is kept; no "Due before you sail" or "Charged onboard"; no sideways scrolling either way; no script errors.
+
+## "Added cost" line removed (5.0.0, 2026-10-15)
+
+The line "Added cost in [cabin] (fare and taxes): guest 3 +$X, guest 4 +$X" under each card's total (one per ship on the 8 night card) is gone, as on the Joy page (DASatizabal/joy-cabin-compare CHANGELOG, owner's request). It showed only for 3 or more guests. Page only: the function, its two calls and its style were removed; no total, line or switch changed. `added_vs_2` stays in `data/prices.json` (written by `tools/fetch_prices.py`, required by `tools/check_prices.py`), so the data file and its checks are unchanged; the page no longer shows it.
+
+Tests (`tools/page_test.py`, Chromium at 360 px, today's data): 2 adults with kids 15 and 7, Balcony, in "Same cabin" and "Different cabin" modes, with the prepay switch off and on: no "Added cost" text anywhere; card totals the same as the page before this change (`bddfb24`); no sideways scrolling; no script errors.
+
+NCL calls: none added (page only). The price job stays at 26 per run. Hold guards unchanged.
+
+## Kids Sail Free (5.0.0, 2026-10-15)
+
+Ported from the Joy page (DASatizabal/joy-cabin-compare `kids_sail_free()`; on the Joy sailing NCL listed it on 2026-10-13 as promotion 34CHO, "3rd and 4th guests sailing in the same stateroom sail for taxes, fees, and port expenses only", Inside, Oceanview, Balcony and Club Balcony Suite).
+
+- Reading: `tools/fetch_prices.py` reads the offer (code `Kids-Sail-Free-Offer`, or the title "Kids Sail Free") from the `offerGroups` of the availability answers it already fetches (the first party size that lists it), and stores it per sailing as `kids_sail_free` (NCL's title, short text, description, promotion codes and cabin types, `checked_at`), or null. 0 extra NCL calls. Each run prints "Kids Sail Free <ship>: listed by NCL today ..." or "not listed by NCL today" as a notice on the GitHub run's summary page. `tools/check_prices.py`: the key must be present in a schema 3 file, null or with a title and a list of types.
+- The June check Joy didn't need: on Joy, NCL's prices for guests 3 and 4 are taxes only. On June (2026-10-14 data), every category charges guests 3 and 4 a fare beyond the taxes: Getaway Inside $149, Oceanview $159, Balcony $169, Club Balcony Suite $179, Haven $249 per guest; Aura $579 per guest in every type. So the page never says "sail free" on NCL's word alone.
+- Page: informational only, never changes a total (the prices are NCL's own). When the ship's offer lists the chosen cabin's NCL type, one line under the total (single cards; on the 8 night card one line per ship, with the ship's name):
+  - Prices agree (each of guests 3 and 4 that the cabin takes adds no more than that ship's taxes per guest, $2 allowed for rounding): "Kids Sail Free: 3rd and 4th guests sail free. They pay only taxes, fees and port expenses, already in the price above."
+  - Prices charge a fare: "NCL lists Kids Sail Free on this sailing, but today's prices charge the 3rd and 4th guests a fare. The total uses NCL's prices."
+  - A cabin that takes 3 guests but not 4: "Kids Sail Free: 3rd guest sails free. This guest pays only taxes, fees and port expenses, already in the price above." or "NCL lists Kids Sail Free on this sailing, but today's prices charge the 3rd guest a fare. The total uses NCL's prices." (wording approved by the owner 2026-10-15).
+  - On the 8 night card each line names its ship: "Kids Sail Free on the Getaway: 3rd and 4th guests sail free. ..." and "Kids Sail Free on the Aura: listed by NCL, but today's prices charge the 3rd and 4th guests a fare. The total uses NCL's prices." (the 3rd guest for a cabin for 3) (the same for a cabin for 3; owner's wording 2026-10-15, so the line never has two colons or names the offer twice). No line when NCL doesn't list the offer, the cabin type isn't listed, the cabin takes fewer than 3 guests, or NCL's tax line is missing (then the two cases can't be told apart).
+- Tests: `tools/test_tools.py` (reading the offer from a saved-shape answer, not listed, title only, the Free at Sea code reading unchanged, format check). `tools/page_test.py` (Chromium at 360 px) with a copy of the data file where NCL lists the offer on both ships and the Getaway BF prices for 3 and 4 guests are taxes only: Getaway BF shows the "applies" line, Aura BF (holds 2) shows none, Aura B4 shows the "charge a fare" line, the 8 night card shows both with ship names, an Aura Suite (type not listed) shows none, totals identical to today's data, no sideways scrolling, no script errors; with today's data (offer not stored yet) no line.
+
+NCL calls: 0 added per run. Testing used one prices-only branch run (26 calls). Hold guards unchanged.
+
+## Florida resident rates (item 9, on hold since 2026-10-15)
+
+The Joy page shows Florida resident fares read on the owner's AI PC from a browser profile signed in to a Florida resident NCL account (DASatizabal/joy-cabin-compare, `tools/fetch_florida.py`). Before building the same for June, a one-time proof checked whether June's fares differ at all when signed in.
+
+Proof, 2026-10-15 at 5:33 PM ET (between Joy's 3:00 PM and 7:00 PM runs; the profile was not in use), `tools/florida_proof.py`, 2 guests, fare per guest = (subtotal minus the Open Bar and Specialty Dining lines) / 2, checked against NCL's grand total:
+
+| Ship | Type | Cabin | Website | Signed in | Difference |
+|---|---|---|---|---|---|
+| Getaway | Inside | IF | $199.00 | $199.00 | $0.00 |
+| Getaway | Balcony | BF | $269.00 | $269.00 | $0.00 |
+| Getaway | Club Balcony Suite | MB | $319.00 | $319.00 | $0.00 |
+| Aura | Inside | IF | $1,019.00 | $1,019.00 | $0.00 |
+| Aura | Balcony | BF | $1,479.00 | $1,479.00 | $0.00 |
+| Aura | Club Balcony Suite | MB | $1,819.00 | $1,819.00 | $0.00 |
+
+All 6 differences were $0. 14 NCL API calls (2 anonymous availability, 6 anonymous price summaries, 6 signed-in price summaries), no retries, plus one ncl.com home page load in the signed-in browser. Every address passed June's address check and every answer `hold_signal()` (only the allowed HOLD payment option, once per price summary). The login was valid (expires 2026-12-13) and was working: Joy's 7:00 AM run the same day, same profile, got Florida fares on 17 of its 34 cabins ($60 to $80 off per guest). So NCL offered no Florida resident rate on either June sailing that day.
+
+Owner's decision (2026-10-15): item 9 is on hold, not dropped. There is no `data/florida.json`, no scheduled task and no wrapper for June. It can be re-checked later with the same 14-call proof: `py -3 tools\florida_proof.py`, run by hand between Joy's runs (7:00 AM, 11:00 AM, 3:00 PM, 7:00 PM). It writes nothing and commits nothing, and must never run on a schedule. If a later proof shows a difference, the approved item 9 plan applies (full sweep weekly, light check every 3 Eastern days, one shared "NCL Florida rates" task, age limits 8 and 15 days).
+
+## "Prices moved" warning (item 10): not applicable
+
+The Joy page's amber "NCL prices have moved since the last refresh" line compares the website fares its Florida runner reads (in `data/florida.json`, last 24 hours) with `data/prices.json`. June has no `data/florida.json` (item 9 on hold), so there is nothing to compare against. Not built (owner's decision 2026-10-15). If item 9 is ever built, this can be revisited.

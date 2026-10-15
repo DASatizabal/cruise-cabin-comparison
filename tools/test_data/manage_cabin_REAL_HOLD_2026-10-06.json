@@ -1,0 +1,75 @@
+{
+ "results": [
+  {
+   "mainCabin": true,
+   "filterId": "0",
+   "cabin": {
+    "cabinMeasurementInfo": {
+     "measureUnit": "SQF",
+     "cabinSquareFootage": "176",
+     "balconySquareFootage": "32",
+     "totalSquareFootage": "208"
+    },
+    "heldUntil": "REMOVED",
+    "isGTY": false,
+    "shipSide": "Starboard",
+    "shipLocation": "Middle",
+    "sizeInfo": {
+     "stateroomMin": "176",
+     "stateroomMax": "176",
+     "balconyMin": "32",
+     "balconyMax": "32",
+     "isMetric": false
+    },
+    "deckNumber": "REMOVED",
+    "stateroom": {
+     "stateroomMinSize": 204,
+     "description": "A prime location for families. Kids’ areas are conveniently nearby, keeping them close to the action. Plus many of these staterooms connect, making it easy to spread out yet stay together.",
+     "mainImages": [
+      {
+       "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/ncl_Gtwy_Balcony_BC.jpeg",
+       "title": "ncl_Gtwy_Balcony_BC.jpeg",
+       "alt": "8734ef3d682f9a327524b079cd1b4f84e8944c6d.png"
+      },
+      {
+       "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+       "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+       "alt": "dbbc7f2b54b517c76b2d1455ab320395c880746e.png"
+      }
+     ],
+     "isSailAway": false,
+     "stateroomMaxSize": 208,
+     "code": "GETAWAY.Family Balcony_B4.R2-2024",
+     "amenities": [],
+     "balconyMaxSize": 32,
+     "sizeInfo": {
+      "stateroomMin": "204",
+      "stateroomMax": "208",
+      "balconyMin": "32",
+      "balconyMax": "32",
+      "isMetric": false
+     },
+     "title": "Family Balcony",
+     "balconyMinSize": 32,
+     "floorplanImages": [
+      {
+       "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+       "title": "NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+       "alt": "b801bdf491227d422dd7dc70404a786884058c93.png"
+      }
+     ]
+    },
+    "cabinNumber": "REMOVED",
+    "pricedCategoryCode": "B4",
+    "stateroomType": {
+     "title": "Balcony",
+     "code": "BALCONY"
+    },
+    "categoryLocation": "Outside",
+    "maxOccupancy": 4,
+    "packageId": "24223992",
+    "isADA": false
+   }
+  }
+ ]
+}

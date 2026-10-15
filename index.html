@@ -308,8 +308,9 @@
         .row .k { color: var(--gray-600); }
         .row .v { font-weight: 600; color: var(--gray-900); text-align: right; white-space: nowrap; }
         .row.muted .v { color: var(--gray-500); font-weight: 500; white-space: normal; }
+        .row.missing .v { color: #92400e; font-weight: 600; white-space: normal; }
 
-        .addon {
+        .ksf-note {
             margin-top: 0.75rem;
             background: var(--gray-50);
             border-radius: 8px;
@@ -317,8 +318,6 @@
             font-size: 0.82rem;
             color: var(--gray-700);
         }
-
-        .addon strong { color: var(--gray-900); }
 
         .notice {
             border-radius: 8px;
@@ -567,7 +566,9 @@
         .offers-foot { font-size: 0.72rem; color: var(--gray-600); margin-top: 0.5rem; line-height: 1.35; }
         .drink-list { display: inline-block; margin-top: 0.35rem; font-size: 0.8rem; font-weight: 600; color: var(--ocean-blue); }
         .row.subtotal .k, .row.subtotal .v { font-weight: 700; color: var(--gray-900); }
-        .row.due .k { color: var(--gray-700); }
+        .row.onboard { border-bottom: 1px solid var(--gray-100); }
+        .row.onboard .k { color: var(--gray-700); font-size: 0.85rem; }
+        .onboard-note { font-size: 0.85rem; color: var(--gray-600); margin-top: 0.2rem; }
         .gauge { display: inline-block; margin-top: 0.25rem; padding: 0.05rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600; }
         .gauge.ok { background: #dcfce7; color: #166534; }
         .gauge.mid { background: var(--gold-wash); color: #92400e; }
@@ -641,10 +642,10 @@
         <section class="panel" aria-label="Gratuities">
             <div class="panel-title">Gratuities</div>
             <div class="toggle-container">
-                <input type="checkbox" class="toggle-switch" id="prepayToggle" checked aria-label="Prepay gratuities">
+                <input type="checkbox" class="toggle-switch" id="prepayToggle" aria-label="Prepay gratuities">
                 <div>
-                    <div class="toggle-label" id="prepayLabel">Prepay gratuities</div>
-                    <div class="toggle-price" id="prepayDesc">Service charges are paid with the cruise, before you sail</div>
+                    <div class="toggle-label" id="prepayLabel">Prepay gratuities (No)</div>
+                    <div class="toggle-price" id="prepayDesc">Pay onboard on the last day. Service charges are not in the totals. They're charged to your onboard account and can be removed at Guest Services.</div>
                 </div>
             </div>
             <p class="hint">Daily gratuities can be adjusted or removed onboard at Guest Services.</p>
@@ -657,20 +658,27 @@
         <div class="wrap">
             <strong>About these prices</strong>
             <p>Prices come from Norwegian Cruise Line's booking system and are checked once a day. They change often, so check NCL before booking.</p>
-            <p>Each total is the cruise fare, NCL's government taxes, fees and port expenses, the daily service charges (crew gratuities) for every guest 3 and older, the gratuities for the Free at Sea offers you keep switched on, and Free at Sea Plus if you choose it. Unlimited Open Bar: guests 21 and over pay the full gratuity, a guest under 21 who is guest 2 pays for a soda package instead, and other guests under 21 pay nothing. Specialty Dining: guests 13 and over pay, under 13 eat free. NCL lists adults first, then kids oldest first.</p>
+            <p>Each total is the cruise fare, NCL's government taxes, fees and port expenses, the daily service charges (crew gratuities) for every guest 3 and older when you prepay them (otherwise they're shown separately as paid onboard), the gratuities for the Free at Sea offers you keep switched on, and Free at Sea Plus if you choose it. Unlimited Open Bar: guests 21 and over pay the full gratuity, a guest under 21 who is guest 2 pays for a soda package instead, and other guests under 21 pay nothing. Specialty Dining: guests 13 and over pay, under 13 eat free. NCL lists adults first, then kids oldest first. If NCL doesn't show a number on a given day, this page says so instead of guessing.</p>
             <p id="footerVersion"></p>
         </div>
     </footer>
 
     <script>
-        const APP_VERSION = "4.10.0";
+        const APP_VERSION = "5.0.0";
         const DATA_URL = "data/prices.json";
         const COUNTS_URL = "data/counts.json";
         const COUNTS_MAX_AGE_DAYS = 7;
         const MIN_GUESTS = 2, MAX_GUESTS = 5;
         const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
-        const STORE_KEY = "cruise-decision-guide-v4";
+        const STORE_KEY = "cruise-decision-guide-v5";
+        // 5.0.0: the prepay switch default changed to off. Choices saved under the old key are
+        // carried over once (guests, kid ages, cabins, Free at Sea), all but the prepay switch.
+        const OLD_STORE_KEY = "cruise-decision-guide-v4";
         const GUARANTEE_TEXT = "Guarantee: NCL picks your cabin location";
+        // Shown on any line NCL didn't give a number for today (null in the data file, with a
+        // warning there). Never guessed; that item is left out of the total.
+        const NOT_FOUND = "Not found on NCL today";
+        const notFound = "not found on NCL today";   // the same, mid-sentence
 
         let DATA = null, G = null, A = null;   // data file, Getaway sailing, Aura sailing
         let COUNTS = null;                      // data/counts.json when present and at most 7 days old
@@ -682,7 +690,7 @@
             // Free at Sea choices per cabin (all guests in a cabin must choose the same offers).
             // The Getaway and the Aura are separate bookings, so each has its own set.
             offers: { G: { bar: true, dining: true, plus: false }, A: { bar: true, dining: true, plus: false } },
-            prepayGratuities: true,         // service charges before sailing, or onboard on the last day
+            prepayGratuities: false,        // service charges before sailing, or onboard on the last day (default onboard)
         };
 
         // ---------- helpers ----------
@@ -694,6 +702,8 @@
         const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const fmtDay = iso => { const d = new Date(iso + "T12:00:00Z"); return `${DAYS[d.getUTCDay()]}, ${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`; };
+        // "Oct 15, 6:17 AM ET": when the prices were saved, in Eastern time (America/New_York) with the time of day.
+        const fmtEastern = t => new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
         const fmtTime = hhmm => { if (!hhmm) return ""; let [h, m] = hhmm.split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12; return `${h}:${String(m).padStart(2, "0")} ${ap}`; };
         const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
         const guests = () => state.adults + state.kids.length;
@@ -702,7 +712,11 @@
         function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
         function restore() {
             try {
-                const s = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+                let s = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+                if (!s) {
+                    s = JSON.parse(localStorage.getItem(OLD_STORE_KEY) || "null");
+                    if (s) delete s.prepayGratuities;
+                }
                 if (!s || !Number.isInteger(s.adults) || !Array.isArray(s.kids)) return;
                 const kids = s.kids.map(a => Number.isInteger(a) && a >= 0 && a <= 20 ? a : null);
                 if (s.adults < 1 || s.adults + kids.length < MIN_GUESTS || s.adults + kids.length > MAX_GUESTS) return;
@@ -712,7 +726,7 @@
                     offers[k] = { bar: o.bar !== false, dining: o.dining !== false, plus: o.plus === true };
                     if (offers[k].plus && !(offers[k].bar && offers[k].dining)) offers[k].plus = false;
                 }
-                Object.assign(state, s, { kids, offers, prepayGratuities: s.prepayGratuities !== false });
+                Object.assign(state, s, { kids, offers, prepayGratuities: s.prepayGratuities === true });
             } catch (e) {}
         }
 
@@ -799,40 +813,51 @@
         //   later doesn't get it and isn't charged. It includes prepaid service charges.
         // Service charges (crew gratuities), per guest per night, for guests 3 and older (NCL's
         //   FAQ), at the Suite and Haven rate or the standard rate, except guests covered by Plus.
+        // Any of these that NCL didn't show today (null in the data file) is left out of the
+        // total and listed in k.missing; nothing is guessed.
         const shipKey = s => s === G ? "G" : "A";
-        function cost(s, c) {
+        function cost(s, c, off = state.offers[shipKey(s)]) {
             const n = guests();
             const e = entry(c, n);
             const nights = s.nights;
-            const taxes = s.taxes_per_guest * n;
-            const g = s.gratuities, R = DATA.rates;
-            const off = state.offers[shipKey(s)];
+            const taxes = s.taxes_per_guest == null ? null : s.taxes_per_guest * n;
+            const g = s.gratuities, R = DATA.rates || {};
+            const plusOn = off.plus && !!R.free_at_sea_plus;
             const order = guestOrder();
             const isAdult = a => a === null;
             const ageOf = a => isAdult(a) ? 99 : a;
+            const missing = [];
 
             // Free at Sea Plus
-            const plusAdult = off.plus ? order.filter(isAdult).length : 0;
-            const plusChild = off.plus ? order.filter((a, i) => !isAdult(a) && i <= 1 && a >= 3).length : 0;
+            const plusAdult = plusOn ? order.filter(isAdult).length : 0;
+            const plusChild = plusOn ? order.filter((a, i) => !isAdult(a) && i <= 1 && a >= 3).length : 0;
             const coveredByPlus = plusAdult + plusChild;
-            const plus = { on: off.plus, parts: [], total: 0 };
+            const plus = { on: plusOn, parts: [], total: 0 };
             if (plusAdult) plus.parts.push({ count: plusAdult, pp: R.free_at_sea_plus.adult_per_day, nights });
             if (plusChild) plus.parts.push({ count: plusChild, pp: R.free_at_sea_plus.child_per_day, nights, note: "child rate" });
             plus.total = plus.parts.reduce((t, p) => t + p.count * p.pp * p.nights, 0);
-            plus.notCovered = off.plus ? n - coveredByPlus : 0;
+            plus.notCovered = plusOn ? n - coveredByPlus : 0;
 
             // Service charges (crew gratuities)
-            const scRate = R.service_charge.suite_haven_types.includes((typeOfCat(s, c) || "").toUpperCase()) ? R.service_charge.suite_haven_per_night : R.service_charge.standard_per_night;
-            const scAge = R.service_charge.min_age;
-            const isPlusGuest = (a, i) => off.plus && (isAdult(a) || (i <= 1 && a >= 3));
-            const scPayers = order.filter((a, i) => ageOf(a) >= scAge && !isPlusGuest(a, i)).length;
-            const under3 = order.filter(a => ageOf(a) < scAge).length;
-            const sc = { title: "Service charges (crew gratuities)", parts: scPayers ? [{ count: scPayers, pp: scRate, nights }] : [], total: scPayers * scRate * nights,
-                         notes: [coveredByPlus ? `included in Free at Sea Plus for ${plural(coveredByPlus, "guest", "guests")}` : "", under3 ? `under ${scAge}: no charge` : ""].filter(Boolean) };
+            const sc = { title: "Service charges (crew gratuities)", parts: [], total: 0, notes: [], missing: !R.service_charge };
+            if (sc.missing) {
+                missing.push("service charges");
+            } else {
+                const scRate = R.service_charge.suite_haven_types.includes((typeOfCat(s, c) || "").toUpperCase()) ? R.service_charge.suite_haven_per_night : R.service_charge.standard_per_night;
+                const scAge = R.service_charge.min_age;
+                const isPlusGuest = (a, i) => plusOn && (isAdult(a) || (i <= 1 && a >= 3));
+                const scPayers = order.filter((a, i) => ageOf(a) >= scAge && !isPlusGuest(a, i)).length;
+                const under3 = order.filter(a => ageOf(a) < scAge).length;
+                if (scPayers) sc.parts.push({ count: scPayers, pp: scRate, nights });
+                sc.total = scPayers * scRate * nights;
+                if (coveredByPlus) sc.notes.push(`included in Free at Sea Plus for ${plural(coveredByPlus, "guest", "guests")}`);
+                if (under3) sc.notes.push(`under ${scAge}: no charge`);
+            }
 
             // Open Bar gratuity
-            const bar = { title: g.open_bar.title, on: off.bar, parts: [], total: 0, notes: [] };
-            if (off.bar) {
+            const bar = { title: g ? g.open_bar.title : "Unlimited Open Bar", on: off.bar, parts: [], total: 0, notes: [], missing: !g };
+            if (off.bar && !g) missing.push("Open Bar gratuity");
+            if (off.bar && g) {
                 const adults = order.filter(isAdult).length;
                 const soda = order.filter((a, i) => !isAdult(a) && i <= 1).length;
                 const free = order.filter((a, i) => !isAdult(a) && i >= 2).length;
@@ -843,8 +868,9 @@
             }
 
             // Specialty Dining gratuity
-            const dining = { title: g.specialty_dining.title, on: off.dining, parts: [], total: 0, notes: [] };
-            if (off.dining) {
+            const dining = { title: g ? g.specialty_dining.title : "Specialty Dining", on: off.dining, parts: [], total: 0, notes: [], missing: !g };
+            if (off.dining && !g) missing.push("Specialty Dining gratuity");
+            if (off.dining && g) {
                 const diners = order.filter(a => ageOf(a) >= 13).length;
                 if (diners) dining.parts.push({ count: diners, pp: g.specialty_dining.per_guest });
                 dining.total = diners * g.specialty_dining.per_guest;
@@ -854,7 +880,12 @@
             const gratuities = sc.total + bar.total + dining.total;
             const total = e.cabin_total + plus.total + gratuities;
             const onboard = state.prepayGratuities ? 0 : sc.total;
-            return { n, nights, cabin: e.cabin_total, fare: e.cabin_total - taxes, taxes, plus, sc, scRate, bar, dining, gratuities, total, onboard, before: total - onboard };
+            // "now": the amount shown as the total. Prepay on: everything. Prepay off (default):
+            // everything except the service charges, which are charged onboard.
+            // Without NCL's tax line the total still has taxes in it (cabin_total includes them);
+            // only the per-guest split is unknown, so taxes are never listed in k.missing.
+            const noTaxSplit = taxes === null ? [s.ship_short] : [];
+            return { n, nights, cabin: e.cabin_total, fare: taxes === null ? null : e.cabin_total - taxes, taxes, plus, sc, bar, dining, gratuities, total, onboard, now: total - onboard, missing, noTaxSplit };
         }
 
         // NCL broad type code (INSIDE, ..., SUITE, HAVEN) of a category on a ship.
@@ -863,23 +894,14 @@
             return t ? t.code : null;
         }
 
-        function addedCostLine(c) {
-            const n = guests();
-            if (n <= 2) return "";
-            const parts = [];
-            for (let k = 3; k <= n; k++) {
-                const prev = entry(c, k - 1), cur = entry(c, k);
-                if (prev.available && cur.available) parts.push(`guest ${k} +${money(cur.cabin_total - prev.cabin_total)}`);
-            }
-            return parts.length ? `<div class="addon">Added cost in ${catHtml(c)} (fare and taxes): <strong>${parts.join(", ")}</strong></div>` : "";
-        }
-
         function lineRows(s, k, indent = false) {
             const cls = indent ? "row sub" : "row";
             const part = p => `${plural(p.count, "guest", "guests")} x ${money(p.pp)}${p.nights ? ` x ${p.nights} nights` : ""}${p.note ? ` (${p.note})` : ""}`;
+            const missingRow = title => `<div class="${cls} missing"><span class="k">${esc(title)}</span><span class="v">${NOT_FOUND}</span></div>`;
             // Example: "Unlimited Open Bar: 1 guest x $96, 1 guest x $37.50 (soda package, under 21)"
             const line = (x, offText) => {
                 if (x.on === false) return `<div class="${cls} muted"><span class="k">${esc(x.title)}</span><span class="v">${offText}</span></div>`;
+                if (x.missing) return missingRow(x.title + " gratuity");
                 const notes = (x.notes || []).map(n => ` (${n})`).join("");
                 if (!x.parts.length) return `<div class="${cls} muted"><span class="k">${esc(x.title)}${notes}</span><span class="v">no one charged</span></div>`;
                 return `<div class="${cls}"><span class="k">${esc(x.title)}: ${x.parts.map(part).join(", ")}${notes}</span><span class="v">${money(x.total)}</span></div>`;
@@ -887,18 +909,48 @@
             const plusRow = !k.plus.on ? "" : k.plus.parts.length
                 ? `<div class="${cls}"><span class="k">Free at Sea Plus: ${k.plus.parts.map(part).join(", ")}${k.plus.notCovered ? ` (${plural(k.plus.notCovered, "guest", "guests")} not eligible: no charge)` : ""}</span><span class="v">${money(k.plus.total)}</span></div>`
                 : `<div class="${cls} muted"><span class="k">Free at Sea Plus</span><span class="v">no one eligible</span></div>`;
-            const when = state.prepayGratuities ? "" : " (charged onboard)";
-            const scRow = k.sc.parts.length
-                ? `<div class="${cls}"><span class="k">${esc(k.sc.title)}${when}: ${k.sc.parts.map(part).join(", ")}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">${money(k.sc.total)}</span></div>`
+            const when = state.prepayGratuities ? "" : " (paid onboard, not in the total)";
+            const scRow = k.sc.missing ? missingRow(k.sc.title) : k.sc.parts.length
+                ? `<div class="${cls}${state.prepayGratuities ? "" : " muted"}"><span class="k">${esc(k.sc.title)}${when}: ${k.sc.parts.map(part).join(", ")}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">${money(k.sc.total)}${state.prepayGratuities ? "" : " onboard"}</span></div>`
                 : `<div class="${cls} muted"><span class="k">${esc(k.sc.title)}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">$0</span></div>`;
+            // Taxes are inside NCL's cabin price either way; without NCL's tax line the two can't be split.
+            const fareRows = k.taxes === null
+                ? `<div class="${cls}"><span class="k">Cruise fare with taxes, fees and port expenses</span><span class="v">${money(k.cabin)}</span></div>
+                   <div class="${cls} muted"><span class="k">Taxes, fees and port expenses (per-guest split not shown by NCL today)</span><span class="v">Included above</span></div>`
+                : `<div class="${cls}"><span class="k">Cruise fare</span><span class="v">${money(k.fare)}</span></div>
+                   <div class="${cls}"><span class="k">Taxes, fees and port expenses: ${k.n} x ${money(s.taxes_per_guest)}</span><span class="v">${money(k.taxes)}</span></div>`;
             return `
-                <div class="${cls}"><span class="k">Cruise fare</span><span class="v">${money(k.fare)}</span></div>
-                <div class="${cls}"><span class="k">Taxes, fees and port expenses: ${k.n} x ${money(s.taxes_per_guest)}</span><span class="v">${money(k.taxes)}</span></div>
+                ${fareRows}
                 ${plusRow}
                 ${scRow}
                 ${line(k.bar, "not chosen")}
                 ${line(k.dining, "not chosen")}
-                <div class="${cls} subtotal"><span class="k">Gratuities total</span><span class="v">${money(k.gratuities)}</span></div>`;
+                <div class="${cls} subtotal"><span class="k">${k.onboard ? "Gratuities paid now (service charges are paid onboard)" : "Gratuities total"}</span><span class="v">${money(k.gratuities - k.onboard)}</span></div>`;
+        }
+
+        // NCL's Kids Sail Free offer, for the chosen cabin, only while NCL lists it for that ship
+        // and cabin type. Informational: it never changes a total (the prices are NCL's own). The
+        // page says the 3rd and 4th guests pay only taxes only where that cabin's own prices show
+        // it (each extra guest adds no more than the taxes per guest, $2 rounding allowed);
+        // otherwise it says NCL's prices charge them a fare. Nothing is shown when NCL's tax line
+        // or the 3 or 4 guest price is missing (NOTES.md, "Kids Sail Free").
+        function ksfNote(s, c, prefix = "") {
+            const k = s.kids_sail_free;
+            if (!k || s.taxes_per_guest == null || !k.types.includes((typeOfCat(s, c) || "").toUpperCase())) return "";
+            const pos = [3, 4].filter(g => c.by_guests[String(g)] && c.by_guests[String(g - 1)] && entry(c, g).available && entry(c, g - 1).available);
+            if (!pos.length) return "";
+            const fare = g => entry(c, g).cabin_total - entry(c, g - 1).cabin_total - s.taxes_per_guest;
+            const charged = pos.filter(g => fare(g) > 2);
+            const who = list => list.length === 2 ? "3rd and 4th guests" : `${list[0] === 3 ? "3rd" : "4th"} guest`;
+            // The 8 night card names the ship: "Kids Sail Free on the Getaway: ..." (one line per ship).
+            const lead = prefix ? `Kids Sail Free on the ${prefix}:` : "";
+            const text = !charged.length
+                ? (pos.length === 2
+                    ? "3rd and 4th guests sail free. They pay only taxes, fees and port expenses, already in the price above."
+                    : "3rd guest sails free. This guest pays only taxes, fees and port expenses, already in the price above.")
+                : `${lead ? "listed by NCL" : "NCL lists Kids Sail Free on this sailing"}, but today's prices charge the ${who(charged)} a fare. The total uses NCL's prices.`;
+            if (!lead) return `<div class="ksf-note">${esc(charged.length ? text : "Kids Sail Free: " + text)}</div>`;
+            return `<div class="ksf-note"><strong>${esc(lead)}</strong> ${esc(text)}</div>`;
         }
 
         // Prices kept from an earlier day for this party size (NCL failed today's check).
@@ -926,7 +978,7 @@
         // Specialty dining meals per guest: from NCL's price summary line ("Specialty Dining - 2 Meals"),
         // or by sail length when that line is missing (2 to 4 nights 1, 5 to 6 nights 2, 7 to 8 nights 3, 9+ nights 4).
         function diningMeals(s) {
-            const m = /(\d+)\s*Meal/i.exec((s.gratuities.specialty_dining || {}).title || "");
+            const m = /(\d+)\s*Meal/i.exec(((s.gratuities || {}).specialty_dining || {}).title || "");
             if (m) return Number(m[1]);
             return s.nights <= 4 ? 1 : s.nights <= 6 ? 2 : s.nights <= 8 ? 3 : 4;
         }
@@ -938,27 +990,36 @@
 
         function totalBlock(k, nights, rowsHtml) {
             const n = guests();
+            const missingNote = k.missing && k.missing.length
+                ? `<div class="notice info">Not included in the total because NCL didn't show the amount today: ${esc(k.missing.join(", "))}.</div>` : "";
+            const ships = k.noTaxSplit || [];
+            const taxNote = ships.length
+                ? `<div class="notice info">The ${esc(ships.join(" and "))} cabin ${ships.length > 1 ? "prices include" : "price includes"} taxes, fees and port expenses, and they are in the total. NCL didn't show the per-guest tax split today.</div>` : "";
             if (!agesKnown()) {
-                return `<div class="notice info">Choose every kid's age above to see the full total. Free at Sea charges depend on age.</div><div class="rows">${rowsHtml}</div>`;
+                return `${taxNote}<div class="notice info">Choose every kid's age above to see the full total. Free at Sea charges depend on age.</div><div class="rows">${rowsHtml}</div>`;
             }
-            const perNight = k.total / nights;
+            const perNight = k.now / nights;
+            const onboardText = `+ ${money(k.onboard)} service charges paid onboard (can be removed at Guest Services)`;
             return `
-                <div class="price-label">Total for ${plural(n, "guest", "guests")}</div>
-                <div class="price-total">${money(k.total)}</div>
-                <div class="price-pp">${moneyR(k.total / n)} per person</div>
+                ${missingNote}
+                ${taxNote}
+                <div class="price-label">${k.onboard ? "Total to pay now" : "Total"} for ${plural(n, "guest", "guests")}</div>
+                <div class="price-total">${money(k.now)}</div>
+                <div class="price-pp">${moneyR(k.now / n)} per person</div>
+                ${k.onboard ? `<div class="onboard-note">${onboardText}</div>` : ""}
                 <div class="rows">
                     ${rowsHtml}
-                    <div class="row total"><span class="k">Total</span><span class="v">${money(k.total)}</span></div>
-                    <div class="row due"><span class="k">Due before you sail</span><span class="v">${money(k.before)}</span></div>
-                    <div class="row due"><span class="k">Charged onboard</span><span class="v">${money(k.onboard)}</span></div>
-                    <div class="row"><span class="k">Cost per night</span><span class="v">${moneyR(perNight)} (${moneyR(perNight / n)} per person)</span></div>
+                    <div class="row total"><span class="k">Total</span><span class="v">${money(k.now)}</span></div>
+                    ${k.onboard ? `<div class="row onboard"><span class="k">${onboardText}</span></div>` : ""}
+                    <div class="row"><span class="k">Cost per night${k.onboard ? " (paid now)" : ""}</span><span class="v">${moneyR(perNight)} (${moneyR(perNight / n)} per person)</span></div>
                 </div>`;
         }
 
         // Free at Sea switches for one cabin (one ship). All guests in a cabin share the choice.
         function offerToggles(s, c, heading) {
-            const k = cost(s, c), key = shipKey(s), off = state.offers[key], R = DATA.rates;
-            const desc = x => x.parts.length ? "+" + money(x.total) + " (" + x.parts.map(p => `${plural(p.count, "guest", "guests")} x ${money(p.pp)}${p.nights ? ` x ${p.nights} nights` : ""}`).join(", ") + ")" : "no one charged";
+            const k = cost(s, c), key = shipKey(s), off = state.offers[key], R = DATA.rates || {};
+            const desc = x => x.missing ? "price " + notFound
+                : x.parts.length ? "+" + money(x.total) + " (" + x.parts.map(p => `${plural(p.count, "guest", "guests")} x ${money(p.pp)}${p.nights ? ` x ${p.nights} nights` : ""}`).join(", ") + ")" : "no one charged";
             const sw = (offer, label, on, text, extra = "") => `
                 <div class="toggle-container">
                     <input type="checkbox" class="toggle-switch" data-offer="${offer}" data-ship="${key}" ${on ? "checked" : ""} aria-label="${esc(label)} for the ${esc(s.ship_short)} cabin">
@@ -969,9 +1030,9 @@
                 </div>
                 <div class="toggle-blurb">${esc(BLURBS[offer](s))}</div>${extra}`;
             const plusPreview = (() => {   // what Plus would cost if switched on
+                if (!R.free_at_sea_plus) return "";
                 if (off.plus) return desc(k.plus) + ", includes prepaid service charges";
-                const save = state.offers[key]; state.offers[key] = { bar: true, dining: true, plus: true };
-                const kp = cost(s, c); state.offers[key] = save;
+                const kp = cost(s, c, { bar: true, dining: true, plus: true });
                 return kp.plus.parts.length ? desc(kp.plus) + ", includes prepaid service charges" : "no one in this cabin is eligible";
             })();
             return `
@@ -980,7 +1041,9 @@
                     <a class="drink-list" href="${DRINK_LIST_URL}" target="_blank" rel="noopener">See NCL's full drink list (PDF) &rarr;</a>
                     ${sw("bar", "Unlimited Open Bar", off.bar, off.bar ? desc(k.bar) : "off")}
                     ${sw("dining", "Specialty Dining", off.dining, off.dining ? desc(k.dining) : "off")}
-                    ${sw("plus", "Free at Sea Plus", off.plus, plusPreview, off.plus ? "" : `<div class="toggle-note">Turning this on also turns on Open Bar and Specialty Dining. ${money(R.free_at_sea_plus.child_per_day)} per night for a guest 1 or 2 aged 3 to 20.</div>`)}
+                    ${!R.free_at_sea_plus
+                        ? `<div class="toggle-container"><div><div class="toggle-label">Free at Sea Plus</div><div class="toggle-price">Price ${notFound}, so it can't be added here.</div></div></div>`
+                        : sw("plus", "Free at Sea Plus", off.plus, plusPreview, off.plus ? "" : `<div class="toggle-note">Turning this on also turns on Open Bar and Specialty Dining. ${money(R.free_at_sea_plus.child_per_day)} per night for a guest 1 or 2 aged 3 to 20.</div>`)}
                     <div class="offers-foot">Under 21: soda package as guest 1 or 2, no drink package as guest 3 or later. Under 13: dining free.</div>
                     <div class="offers-foot">Always included: 150 minutes of Wi-Fi per guest and a $50 excursion credit per port for guest 1.</div>
                     <div class="offers-foot">Choose at least 24 hours before sailing. No changes onboard.</div>
@@ -1042,7 +1105,7 @@
                     const full = findCat(s, c.code);
                     const k = cost(s, full);
                     picks = catPicker(s, tf.t, full, n) + offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`);
-                    body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k)) + addedCostLine(full);
+                    body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k)) + ksfNote(s, full);
                 }
             }
             return `
@@ -1116,13 +1179,15 @@
             if (chosen) {
                 const ks = chosen.map(([s, c]) => [s, c, cost(s, c)]);
                 const sum = f => ks.reduce((t, [, , k]) => t + k[f], 0);
-                const both = { total: sum("total"), before: sum("before"), onboard: sum("onboard") };
+                const both = { total: sum("total"), now: sum("now"), onboard: sum("onboard"),
+                               missing: ks.flatMap(([s, , k]) => k.missing.map(m => `${s.ship_short} ${m}`)),
+                               noTaxSplit: ks.flatMap(([, , k]) => k.noTaxSplit) };
                 pickers += ks.map(([s, c]) => offerToggles(s, c, `Free at Sea for the ${s.ship_short} cabin (its own booking)`)).join("");
                 const rows = ks.map(([s, c, k]) => `
                     <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</div>
                     ${lineRows(s, k, true)}
-                    <div class="row"><span class="k">${esc(s.ship_short)} total</span><span class="v">${agesKnown() ? money(k.total) : ""}</span></div>`).join("");
-                body += staleNote([G, A]) + totalBlock(both, nights, rows) + ks.map(([, c]) => addedCostLine(c)).join("");
+                    <div class="row"><span class="k">${esc(s.ship_short)} total${k.onboard ? " to pay now" : ""}</span><span class="v">${agesKnown() ? money(k.now) : ""}</span></div>`).join("");
+                body += staleNote([G, A]) + totalBlock(both, nights, rows) + ks.map(([s, c]) => ksfNote(s, c, s.ship_short)).join("");
             }
             return `
                 <article class="card featured">
@@ -1224,10 +1289,10 @@
         function renderPrepay() {
             const on = state.prepayGratuities;
             document.getElementById("prepayToggle").checked = on;
-            document.getElementById("prepayLabel").textContent = on ? "Prepay gratuities" : "Pay onboard on the last day";
+            document.getElementById("prepayLabel").textContent = on ? "Prepay gratuities" : "Prepay gratuities (No)";
             document.getElementById("prepayDesc").textContent = on
                 ? "Service charges are paid with the cruise, before you sail. The amount is the same either way."
-                : "Service charges are added to your onboard account. The amount is the same either way.";
+                : "Pay onboard on the last day. Service charges are not in the totals. They're charged to your onboard account and can be removed at Guest Services.";
         }
 
         function render(msg) {
@@ -1386,7 +1451,7 @@
                 G = d.sailings.find(s => s.id.startsWith("getaway"));
                 A = d.sailings.find(s => s.id.startsWith("aura"));
                 if (!G || !A) throw new Error("a sailing is missing");
-                document.getElementById("asOf").textContent = new Date(d.saved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
+                document.getElementById("asOf").textContent = fmtEastern(d.saved_at);
                 attachCounts();
                 render();
             })

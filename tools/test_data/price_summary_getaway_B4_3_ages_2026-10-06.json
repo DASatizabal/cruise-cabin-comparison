@@ -1,0 +1,422 @@
+{
+ "staterooms": [
+  {
+   "stateroomId": "0",
+   "pricing": {
+    "priceGroups": [
+     {
+      "price": 767,
+      "code": "STATEROOM",
+      "order": 1,
+      "title": "Stateroom",
+      "priceItems": [
+       {
+        "code": "stateroom-offer-strikethrough",
+        "inclusionText": "",
+        "order": 1,
+        "itemType": "strikethrough",
+        "title": "Family Balcony",
+        "isStateroom": true,
+        "guests": [],
+        "totalPrice": 1534,
+        "strikethrough": true,
+        "free": false
+       },
+       {
+        "promotionCodes": [
+         "DISC50"
+        ],
+        "code": "50-pct-Off-All-Cruises-Offer",
+        "inclusionText": "Free",
+        "order": 2,
+        "itemType": "stateroom-offer",
+        "offerTitle": "50% Off All Cruises",
+        "title": "50% Off All Cruises",
+        "isStateroom": false,
+        "guests": [
+         {
+          "price": 299,
+          "inclusionText": "Free",
+          "order": 1,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 299,
+          "inclusionText": "Free",
+          "order": 2,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 169,
+          "inclusionText": "Free",
+          "order": 3,
+          "eligible": true,
+          "free": false
+         }
+        ],
+        "totalPrice": 767,
+        "strikethrough": false,
+        "free": false
+       }
+      ]
+     },
+     {
+      "price": 232,
+      "code": "FREE-AT-SEA",
+      "order": 2,
+      "title": "Free at Sea™",
+      "priceItems": [
+       {
+        "shortTitle": "Bar",
+        "promotionCodes": [
+         "ALL4CHO"
+        ],
+        "code": "unlimited-open-bar-offer",
+        "inclusionText": "Included",
+        "order": 1,
+        "itemType": "beverage-package-offer",
+        "offerTitle": "Unlimited Open Bar",
+        "title": "Unlimited Open Bar",
+        "isStateroom": false,
+        "guests": [
+         {
+          "price": 96,
+          "inclusionText": "Included",
+          "order": 1,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 96,
+          "inclusionText": "Included",
+          "order": 2,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 0,
+          "inclusionText": "Included",
+          "order": 3,
+          "eligible": false,
+          "free": false
+         }
+        ],
+        "totalPrice": 192,
+        "strikethrough": false,
+        "free": false
+       },
+       {
+        "shortTitle": "Dining",
+        "promotionCodes": [
+         "ALL4CHO"
+        ],
+        "code": "specialty-dining-offer-2-4-nights",
+        "inclusionText": "Included",
+        "order": 2,
+        "itemType": "dining-offer",
+        "offerTitle": "Specialty Dining - 1 Meal",
+        "title": "Specialty Dining - 1 Meal",
+        "isStateroom": false,
+        "guests": [
+         {
+          "price": 20,
+          "inclusionText": "Included",
+          "order": 1,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 20,
+          "inclusionText": "Included",
+          "order": 2,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 0,
+          "inclusionText": "Included",
+          "order": 3,
+          "eligible": true,
+          "free": true
+         }
+        ],
+        "totalPrice": 40,
+        "strikethrough": false,
+        "free": false
+       },
+       {
+        "promotionCodes": [
+         "ALL4CHO"
+        ],
+        "code": "excursion-credits-offer",
+        "inclusionText": "Included",
+        "order": 3,
+        "itemType": "shorex-offer",
+        "offerTitle": "Excursion Credits",
+        "title": "Excursion Credits",
+        "isStateroom": false,
+        "guests": [],
+        "totalPrice": 0,
+        "strikethrough": false,
+        "free": true
+       },
+       {
+        "promotionCodes": [
+         "ALL4CHO"
+        ],
+        "code": "free-wifi-offer",
+        "inclusionText": "Included",
+        "order": 4,
+        "itemType": "wifi-package-offer",
+        "offerTitle": "Wi-Fi Package",
+        "title": "Wi-Fi Package",
+        "isStateroom": false,
+        "guests": [],
+        "totalPrice": 0,
+        "strikethrough": false,
+        "free": true
+       }
+      ]
+     },
+     {
+      "code": "FLIGHT-DEALS",
+      "title": "FLIGHTS",
+      "priceItems": [],
+      "order": 3
+     },
+     {
+      "price": 0,
+      "code": "MORE-OFFERS",
+      "order": 4,
+      "title": "More Offers",
+      "priceItems": [
+       {
+        "promotionCodes": [
+         "DISC50"
+        ],
+        "code": "50-off-all-cruises-offer",
+        "inclusionText": "Included",
+        "order": 1,
+        "itemType": "auto-included-offer",
+        "offerTitle": "50% Off All Cruises",
+        "title": "50% Off All Cruises",
+        "isStateroom": false,
+        "guests": [],
+        "totalPrice": 0,
+        "strikethrough": false,
+        "free": true
+       },
+       {
+        "promotionCodes": [],
+        "code": "2-For-1-Deposits-Offer",
+        "inclusionText": "Included",
+        "order": 2,
+        "itemType": "auto-included-offer",
+        "offerTitle": "2-For-1 Deposits",
+        "title": "2-For-1 Deposits",
+        "isStateroom": false,
+        "guests": [],
+        "totalPrice": 0,
+        "strikethrough": false,
+        "free": true
+       },
+       {
+        "promotionCodes": [],
+        "code": "Risk-Free-Cancellation-Offer",
+        "inclusionText": "Included",
+        "order": 3,
+        "itemType": "auto-included-offer",
+        "offerTitle": "Risk-Free Cancellation",
+        "title": "Risk-Free Cancellation",
+        "isStateroom": false,
+        "guests": [],
+        "totalPrice": 0,
+        "strikethrough": false,
+        "free": true
+       }
+      ]
+     },
+     {
+      "price": 600,
+      "code": "TAXES-AND-FEES",
+      "order": 5,
+      "title": "Gov. Taxes, Fees and Port Expenses",
+      "priceItems": [
+       {
+        "code": "taxes-and-fees",
+        "inclusionText": "",
+        "order": 1,
+        "itemType": "taxes-and-fees",
+        "title": "Gov. Taxes, Fees and Port Expenses",
+        "isStateroom": false,
+        "guests": [
+         {
+          "price": 200,
+          "inclusionText": "",
+          "order": 1,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 200,
+          "inclusionText": "",
+          "order": 2,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 200,
+          "inclusionText": "",
+          "order": 3,
+          "eligible": true,
+          "free": false
+         }
+        ],
+        "totalPrice": 600,
+        "strikethrough": false,
+        "free": false
+       }
+      ]
+     },
+     {
+      "price": 2598,
+      "code": "TOTALS",
+      "order": 6,
+      "title": "Totals",
+      "priceItems": [
+       {
+        "code": "subtotal",
+        "inclusionText": "",
+        "order": 1,
+        "itemType": "subtotal",
+        "title": "Subtotal",
+        "isStateroom": false,
+        "guests": [
+         {
+          "price": 415,
+          "inclusionText": "",
+          "order": 1,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 415,
+          "inclusionText": "",
+          "order": 2,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 169,
+          "inclusionText": "",
+          "order": 3,
+          "eligible": true,
+          "free": false
+         }
+        ],
+        "totalPrice": 999,
+        "strikethrough": false,
+        "free": false
+       },
+       {
+        "code": "grand-total",
+        "inclusionText": "",
+        "order": 2,
+        "itemType": "grand-total",
+        "title": "Total",
+        "isStateroom": false,
+        "guests": [
+         {
+          "price": 615,
+          "inclusionText": "",
+          "order": 1,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 615,
+          "inclusionText": "",
+          "order": 2,
+          "eligible": true,
+          "free": false
+         },
+         {
+          "price": 369,
+          "inclusionText": "",
+          "order": 3,
+          "eligible": true,
+          "free": false
+         }
+        ],
+        "totalPrice": 1599,
+        "strikethrough": false,
+        "free": false
+       }
+      ]
+     }
+    ],
+    "appliedFareCodes": [
+     {
+      "guestRefNum": "1",
+      "fareCodes": [
+       "ALL4CHO",
+       "DISC50",
+       "EASYFARE"
+      ]
+     },
+     {
+      "guestRefNum": "2",
+      "fareCodes": [
+       "ALL4CHO",
+       "DISC50",
+       "EASYFARE"
+      ]
+     },
+     {
+      "guestRefNum": "3",
+      "fareCodes": [
+       "ALL4CHO",
+       "DISC50",
+       "EASYFARE"
+      ]
+     }
+    ]
+   },
+   "paymentOptions": [
+    {
+     "paymentType": "DEPOSIT",
+     "amount": 150,
+     "dueHours": 74,
+     "dueDate": "2026-10-09T23:59:59"
+    },
+    {
+     "paymentType": "FULL",
+     "amount": 1599,
+     "dueDate": "2027-02-11T23:59:59"
+    },
+    {
+     "paymentType": "MONTHLY",
+     "amount": 1599
+    },
+    {
+     "isDeposit": true,
+     "paymentType": "HOLD",
+     "amount": 150,
+     "dueHours": 74,
+     "dueDate": "REMOVED"
+    }
+   ]
+  }
+ ],
+ "total": {
+  "subtotal": 999,
+  "taxesAndFees": 600,
+  "grandTotal": 1599
+ },
+ "currency": {
+  "code": "USD",
+  "symbol": ""
+ }
+}

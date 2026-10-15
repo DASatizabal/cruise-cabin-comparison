@@ -1,6 +1,7 @@
 name: Release check
 
-# Blocks a release when the data file is malformed or the version is inconsistent.
+# Blocks a release when the data file is malformed, the version is inconsistent, or an
+# offline tool test fails (tools/test_tools.py: no NCL calls).
 on:
   push:
   pull_request:
@@ -11,3 +12,4 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: python3 tools/check_release.py
+      - run: python3 tools/test_tools.py

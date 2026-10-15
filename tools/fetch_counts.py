@@ -13,7 +13,7 @@ Modes:
   light  only categories whose last reliable count was under 15, plus the next pricier
          category each one needs for the subtraction; everything else keeps its last count
   auto   full when there is no usable previous file or the last full sweep was 3 or more
-         days ago (by UTC date), light otherwise
+         days ago (by Eastern date, America/New_York), light otherwise
 
 Method (see NOTES.md, "Cabin counts"): NCL's cabin/availability call for a category returns it
 plus every pricier category of the same broad type, with per location totals (numberOfCabins).
@@ -25,7 +25,9 @@ category, or when the subtraction is not positive. Guarantee cabins have no coun
 
 Calls are 3 seconds apart, POST requests never follow redirects, redirects, 5xx and network
 errors are retried after 30, 60 and 120 seconds, the address guard against "manage-cabin" and
-"hold" applies, and the run stops if an answer mentions "hold" or "heldUntil".
+"hold" applies, and the run stops if an answer mentions "hold" or "heldUntil" anywhere (the
+older, broader check, kept as it was) or shows a real hold signal (fetch_prices.hold_signal,
+applied by fp.request to every NCL API answer, including the itinerary call).
 """
 import argparse
 import datetime as dt
@@ -73,18 +75,23 @@ def choose_mode(requested, previous, now):
         return "full", "requested"
     if requested == "light":
         return "light", "requested"
-    days = (now.date() - parse_iso(previous["last_full_sweep"]).date()).days
+    # Days counted in Miami time, like tools/decide_run.py (an evening sweep belongs to that evening's day).
+    days = (now.astimezone(fp.MIAMI).date() - parse_iso(previous["last_full_sweep"]).astimezone(fp.MIAMI).date()).days
     if days >= FULL_SWEEP_EVERY_DAYS:
         return "full", f"last full sweep was {days} days ago"
     return "light", f"last full sweep was {days} day(s) ago"
 
 
 def fetch_itinerary_sailing(cfg):
-    """Sailing details for cabin/availability, from NCL's public itinerary call."""
+    """Sailing details for cabin/availability (shipCode, sailingId, destinations, length), read
+    again from NCL's public itinerary call for the itinerary and packageId that today's price
+    run found. Never typed in."""
     it = fp.request(fp.ITINERARY_URL.format(code=cfg["itinerary_code"], package_id=cfg["package_id"]))
     s = it.get("sailing") or {}
     if str(s.get("packageId")) != cfg["package_id"] or not (s.get("sailStartDate") or "").startswith(cfg["depart"]):
         raise RuntimeError(f"NCL's itinerary for {cfg['itinerary_code']} does not match packageId {cfg['package_id']} on {cfg['depart']}")
+    if (it.get("ship") or {}).get("code") != cfg["ship_code"] or not s.get("sailingId"):
+        raise RuntimeError(f"NCL's itinerary for {cfg['itinerary_code']} is not the {cfg['ship']} or has no sailingId")
     return {
         "packageId": cfg["package_id"],
         "shipCode": (it.get("ship") or {}).get("code"),
@@ -142,7 +149,9 @@ def main():
 
     out_sailings, calls, rechecked = {}, 0, 0
     for s in prices["sailings"]:
-        cfg = next(c for c in fp.SAILINGS if c["id"] == s["id"])
+        # NCL's ids come from today's price file (found on NCL by that run), never typed in.
+        cfg = dict(next(c for c in fp.SAILINGS if c["id"] == s["id"]),
+                   itinerary_code=s["itinerary_code"], package_id=s["package_id"])
         prev_s = (previous or {}).get("sailings", {}).get(s["id"], {}) if mode == "light" else {}
         out = {}
         # Start from the previous entries (light mode) for categories still available today.
