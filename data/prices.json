@@ -1,6 +1,6 @@
 {
- "schema_version": 2,
- "saved_at": "2026-10-15T10:22:37Z",
+ "schema_version": 3,
+ "saved_at": "2026-10-16T10:22:14Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -14,14 +14,14 @@
    "child_per_day": 40.0,
    "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; 2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. Includes prepaid service charges.",
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-15"
+   "checked_at": "2026-10-16"
   },
   "open_bar": {
    "per_day_2_to_5_nights": 32.0,
    "per_day_6_plus_nights": 28.5,
    "soda_per_day": 12.5,
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-15"
+   "checked_at": "2026-10-16"
   },
   "service_charge": {
    "suite_haven_per_night": 25.0,
@@ -32,10 +32,11 @@
     "HAVEN"
    ],
    "source": "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge",
-   "checked_at": "2026-10-15"
+   "checked_at": "2026-10-16"
   }
  },
  "rate_warnings": [],
+ "warnings": [],
  "checks": {
   "extra_guest_mismatches": [],
   "formula": [
@@ -160,31 +161,45 @@
    "ship_short": "Getaway",
    "itinerary_code": "GETAWAY3MIANPINASMIA",
    "package_id": "24223992",
+   "ncl_ids": {
+    "itinerary_code": "GETAWAY3MIANPINASMIA",
+    "package_id": "24223992",
+    "found_on": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
+    "sailing_id": "60533",
+    "ship_code": "GETAWAY",
+    "destination_codes": [
+     "BAHAMAS",
+     "WEEKEND"
+    ],
+    "duration": 3,
+    "sail_start": "2027-06-11T00:00:00",
+    "checked_at": "2026-10-16T10:20:50Z"
+   },
    "depart": "2027-06-11",
    "return": "2027-06-14",
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-15",
+   "saved_at": "2026-10-16",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-15T10:21:26Z",
+     "as_of": "2026-10-16T10:20:50Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-15T10:21:26Z",
+     "as_of": "2026-10-16T10:20:50Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-15T10:21:26Z",
+     "as_of": "2026-10-16T10:20:50Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-15T10:21:26Z",
+     "as_of": "2026-10-16T10:20:50Z",
      "why": null
     }
    },
@@ -196,16 +211,17 @@
      "soda_under_21_position_2": 37.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-15"
+     "checked_at": "2026-10-16"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 1 Meal",
      "per_guest": 20,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-15"
+     "checked_at": "2026-10-16"
     }
    },
+   "kids_sail_free": null,
    "terminal": {
     "confirmed": false,
     "text": "Expected: Terminal B (confirm on your eDocs)"
@@ -2016,31 +2032,44 @@
    "ship_short": "Aura",
    "itinerary_code": "AURA5MIAPOPNPIMIA",
    "package_id": "25729291",
+   "ncl_ids": {
+    "itinerary_code": "AURA5MIAPOPNPIMIA",
+    "package_id": "25729291",
+    "found_on": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
+    "sailing_id": "62344",
+    "ship_code": "AURA",
+    "destination_codes": [
+     "CARIBBEAN"
+    ],
+    "duration": 5,
+    "sail_start": "2027-06-14T00:00:00",
+    "checked_at": "2026-10-16T10:21:33Z"
+   },
    "depart": "2027-06-14",
    "return": "2027-06-19",
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-15",
+   "saved_at": "2026-10-16",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-15T10:22:02Z",
+     "as_of": "2026-10-16T10:21:33Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-15T10:22:02Z",
+     "as_of": "2026-10-16T10:21:33Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-15T10:22:02Z",
+     "as_of": "2026-10-16T10:21:33Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-15T10:22:02Z",
+     "as_of": "2026-10-16T10:21:33Z",
      "why": null
     }
    },
@@ -2052,16 +2081,17 @@
      "soda_under_21_position_2": 62.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-15"
+     "checked_at": "2026-10-16"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 2 Meals",
      "per_guest": 40,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-15"
+     "checked_at": "2026-10-16"
     }
    },
+   "kids_sail_free": null,
    "terminal": {
     "confirmed": false,
     "text": "Expected: Terminal B (confirm on your eDocs)"
@@ -2938,27 +2968,32 @@
        "title": "Aft-Facing Balcony",
        "guarantee": false,
        "solo": false,
-       "capacity": null,
+       "capacity": 4,
        "by_guests": {
         "2": {
-         "available": false,
-         "sold_out": true,
-         "reason": "Sold out"
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2909.0,
+         "cabin_total": 5818
         },
         "3": {
-         "available": false,
-         "sold_out": true,
-         "reason": "Sold out"
+         "available": true,
+         "sold_out": false,
+         "price_pp": 2185.66,
+         "cabin_total": 6557,
+         "added_vs_2": 739
         },
         "4": {
-         "available": false,
-         "sold_out": true,
-         "reason": "Sold out"
+         "available": true,
+         "sold_out": false,
+         "price_pp": 1824.0,
+         "cabin_total": 7296,
+         "added_vs_2": 1478
         },
         "5": {
          "available": false,
-         "sold_out": true,
-         "reason": "Sold out"
+         "sold_out": false,
+         "reason": "Holds only 4 guests"
         }
        },
        "description": "Aft-Facing Balcony, Deck 9, aft",
@@ -3843,27 +3878,34 @@
        "title": "The Haven Premier Owner's Suite with Large Balcony",
        "guarantee": false,
        "solo": false,
-       "capacity": null,
+       "capacity": 8,
        "by_guests": {
         "2": {
-         "available": false,
-         "sold_out": true,
-         "reason": "Sold out"
+         "available": true,
+         "sold_out": false,
+         "price_pp": 11609.0,
+         "cabin_total": 23218
         },
         "3": {
-         "available": false,
-         "sold_out": true,
-         "reason": "Sold out"
+         "available": true,
+         "sold_out": false,
+         "price_pp": 7985.66,
+         "cabin_total": 23957,
+         "added_vs_2": 739
         },
         "4": {
-         "available": false,
-         "sold_out": true,
-         "reason": "Sold out"
+         "available": true,
+         "sold_out": false,
+         "price_pp": 6174.0,
+         "cabin_total": 24696,
+         "added_vs_2": 1478
         },
         "5": {
-         "available": false,
-         "sold_out": true,
-         "reason": "Sold out"
+         "available": true,
+         "sold_out": false,
+         "price_pp": 5087.0,
+         "cabin_total": 25435,
+         "added_vs_2": 2217
         }
        },
        "description": "The Haven Premier Owner's Suite with Large Balcony, Deck 14, aft",
