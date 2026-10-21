@@ -276,6 +276,44 @@ def test_request_guards():
         fp._no_redirect_opener, fp.urllib.request.build_opener, fp.log, fp.PAUSE_SECONDS = keep
 
 
+class RedirectOpener:
+    """Answers the first `redirects` calls with HTTP 302 to ncl.com.mx, then the saved answer."""
+    def __init__(self, redirects, answer):
+        self.redirects, self.ok, self.calls = redirects, FakeOpener(answer), 0
+
+    def open(self, req, timeout=None):
+        self.calls += 1
+        if self.calls <= self.redirects:
+            raise fp.urllib.error.HTTPError(req.full_url, 302, "Found",
+                                            {"Location": "https://www.ncl.com.mx/api/vacation-builder/cabin/availability"}, None)
+        return self.ok.open(req, timeout)
+
+
+def test_request_redirects():
+    """Oct 21, 2026: a 302 to ncl.com.mx crashed request() (UnboundLocalError) instead of retrying."""
+    keep = (fp._no_redirect_opener, fp.log, fp.PAUSE_SECONDS, fp.RETRY_WAITS)
+    logs = []
+    fp.log, fp.PAUSE_SECONDS, fp.RETRY_WAITS = logs.append, 0, [0] * len(fp.RETRY_WAITS)
+    try:
+        body = {"stateroomSearchFilter": {}}
+        fake = RedirectOpener(99, {})
+        fp._no_redirect_opener = fake
+        try:
+            fp.request(fp.CABIN_AVAILABILITY_URL, body, raw=True)
+            check("request(): 302 every time fails", "returned", "RuntimeError")
+        except fp.HoldSignal:
+            check("request(): 302 every time fails", "HoldSignal", "RuntimeError")
+        except RuntimeError as e:
+            check("request(): 302 every time fails cleanly", "Request failed" in str(e) and "ncl.com.mx" in str(e), True)
+        check("request(): 302 is retried, 4 calls in all", fake.calls, len(fp.RETRY_WAITS) + 1)
+        fake = RedirectOpener(1, {"results": {}})
+        fp._no_redirect_opener = fake
+        res, raw = fp.request(fp.CABIN_AVAILABILITY_URL, body, raw=True)
+        check("request(): one 302 then an answer succeeds", (res, fake.calls), ({"results": {}}, 2))
+    finally:
+        fp._no_redirect_opener, fp.log, fp.PAUSE_SECONDS, fp.RETRY_WAITS = keep
+
+
 def ms(iso):
     return int(dt.datetime.strptime(iso, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc).timestamp() * 1000)
 
@@ -591,6 +629,7 @@ if __name__ == "__main__":
     test_counts_cadence()
     test_hold_signal()
     test_request_guards()
+    test_request_redirects()
     test_find_sailing()
     test_check_prices_ids()
     test_missing_numbers()

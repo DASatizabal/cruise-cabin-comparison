@@ -242,6 +242,7 @@ def request(url, body=None, raw=False, page=False):
             else:
                 log(f"  NCL answered HTTP {e.code} for {url}")
             last = f"HTTP {e.code}" + (f" to {location}" if location else "")
+            continue   # no answer to check: retry (a redirect is never followed)
         except Exception as e:
             log(f"  {type(e).__name__} for {url}: {e}")
             last = f"{type(e).__name__}: {e}"

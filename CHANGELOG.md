@@ -2,6 +2,11 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [5.0.1] - 2026-10-21
+
+### Fixed
+- A redirect from NCL crashed the run (UnboundLocalError in `request()`) instead of being retried. Since the hold guard was added in 5.0.0, the redirect branch fell through to the hold check with no answer. Redirects, 5xx and network errors are retried after 30, 60 and 120 seconds again, then the run fails with a clear message. Seen on the Oct 21 counts run: NCL answered cabin/availability with a 302 to ncl.com.mx. New offline test for it. 0 extra NCL calls.
+
 ## [5.0.0] - 2026-10-15
 
 Improvements carried over from the Norwegian Joy page (DASatizabal/joy-cabin-compare 1.4.0), built on branch `june-joy-upgrades`. This entry grows as each part is added.
