@@ -1,6 +1,6 @@
 {
  "schema_version": 3,
- "saved_at": "2026-10-26T10:21:42Z",
+ "saved_at": "2026-10-27T10:21:46Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -14,14 +14,14 @@
    "child_per_day": 40.0,
    "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; 2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. Includes prepaid service charges.",
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-26"
+   "checked_at": "2026-10-27"
   },
   "open_bar": {
    "per_day_2_to_5_nights": 32.0,
    "per_day_6_plus_nights": 28.5,
    "soda_per_day": 12.5,
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-26"
+   "checked_at": "2026-10-27"
   },
   "service_charge": {
    "suite_haven_per_night": 25.0,
@@ -32,7 +32,7 @@
     "HAVEN"
    ],
    "source": "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge",
-   "checked_at": "2026-10-26"
+   "checked_at": "2026-10-27"
   }
  },
  "rate_warnings": [],
@@ -173,33 +173,33 @@
     ],
     "duration": 3,
     "sail_start": "2027-06-11T00:00:00",
-    "checked_at": "2026-10-26T10:20:22Z"
+    "checked_at": "2026-10-27T10:20:27Z"
    },
    "depart": "2027-06-11",
    "return": "2027-06-14",
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-26",
+   "saved_at": "2026-10-27",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-26T10:20:22Z",
+     "as_of": "2026-10-27T10:20:27Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-26T10:20:22Z",
+     "as_of": "2026-10-27T10:20:27Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-26T10:20:22Z",
+     "as_of": "2026-10-27T10:20:27Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-26T10:20:22Z",
+     "as_of": "2026-10-27T10:20:27Z",
      "why": null
     }
    },
@@ -211,14 +211,14 @@
      "soda_under_21_position_2": 37.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-26"
+     "checked_at": "2026-10-27"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 1 Meal",
      "per_guest": 20,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-26"
+     "checked_at": "2026-10-27"
     }
    },
    "kids_sail_free": null,
@@ -258,11 +258,8 @@
      "type": "INSIDE",
      "category": "IX",
      "fare_code": "ALL4CHO",
-     "fare_total": 358,
-     "fare_per_guest": [
-      179,
-      179
-     ],
+     "fare_total": 0,
+     "fare_per_guest": [],
      "taxes_per_guest": [
       150,
       150
@@ -288,12 +285,8 @@
      "type": "INSIDE",
      "category": "IX",
      "fare_code": "ALL4CHO",
-     "fare_total": 507,
-     "fare_per_guest": [
-      179,
-      179,
-      149
-     ],
+     "fare_total": 0,
+     "fare_per_guest": [],
      "taxes_per_guest": [
       150,
       150,
@@ -322,13 +315,8 @@
      "type": "INSIDE",
      "category": "IX",
      "fare_code": "ALL4CHO",
-     "fare_total": 656,
-     "fare_per_guest": [
-      179,
-      179,
-      149,
-      149
-     ],
+     "fare_total": 0,
+     "fare_per_guest": [],
      "taxes_per_guest": [
       150,
       150,
@@ -360,14 +348,8 @@
      "type": "OCEANVIEW",
      "category": "O5",
      "fare_code": "ALL4CHO",
-     "fare_total": 1135,
-     "fare_per_guest": [
-      329,
-      329,
-      159,
-      159,
-      159
-     ],
+     "fare_total": 0,
+     "fare_per_guest": [],
      "taxes_per_guest": [
       150,
       150,
@@ -1535,21 +1517,21 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 509.0,
-         "cabin_total": 1018
+         "price_pp": 519.0,
+         "cabin_total": 1038
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 449.0,
-         "cabin_total": 1347,
+         "price_pp": 455.66,
+         "cabin_total": 1367,
          "added_vs_2": 329
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 419.0,
-         "cabin_total": 1676,
+         "price_pp": 424.0,
+         "cabin_total": 1696,
          "added_vs_2": 658
         },
         "5": {
@@ -2043,33 +2025,33 @@
     ],
     "duration": 5,
     "sail_start": "2027-06-14T00:00:00",
-    "checked_at": "2026-10-26T10:21:02Z"
+    "checked_at": "2026-10-27T10:21:06Z"
    },
    "depart": "2027-06-14",
    "return": "2027-06-19",
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-26",
+   "saved_at": "2026-10-27",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-26T10:21:02Z",
+     "as_of": "2026-10-27T10:21:06Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-26T10:21:02Z",
+     "as_of": "2026-10-27T10:21:06Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-26T10:21:02Z",
+     "as_of": "2026-10-27T10:21:06Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-26T10:21:02Z",
+     "as_of": "2026-10-27T10:21:06Z",
      "why": null
     }
    },
@@ -2081,14 +2063,14 @@
      "soda_under_21_position_2": 62.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-26"
+     "checked_at": "2026-10-27"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 2 Meals",
      "per_guest": 40,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-26"
+     "checked_at": "2026-10-27"
     }
    },
    "kids_sail_free": null,
@@ -2136,11 +2118,8 @@
      "type": "INSIDE",
      "category": "IF",
      "fare_code": "ALL4CHO",
-     "fare_total": 2038,
-     "fare_per_guest": [
-      1019,
-      1019
-     ],
+     "fare_total": 0,
+     "fare_per_guest": [],
      "taxes_per_guest": [
       160,
       160
@@ -2166,12 +2145,8 @@
      "type": "INSIDE",
      "category": "I4",
      "fare_code": "ALL4CHO",
-     "fare_total": 2837,
-     "fare_per_guest": [
-      1129,
-      1129,
-      579
-     ],
+     "fare_total": 0,
+     "fare_per_guest": [],
      "taxes_per_guest": [
       160,
       160,
@@ -2200,13 +2175,8 @@
      "type": "INSIDE",
      "category": "I4",
      "fare_code": "ALL4CHO",
-     "fare_total": 3416,
-     "fare_per_guest": [
-      1129,
-      1129,
-      579,
-      579
-     ],
+     "fare_total": 0,
+     "fare_per_guest": [],
      "taxes_per_guest": [
       160,
       160,
@@ -2238,14 +2208,8 @@
      "type": "HAVEN",
      "category": "H6",
      "fare_code": "CHOALL4M",
-     "fare_total": 13435,
-     "fare_per_guest": [
-      5849,
-      5849,
-      579,
-      579,
-      579
-     ],
+     "fare_total": 0,
+     "fare_per_guest": [],
      "taxes_per_guest": [
       160,
       160,
@@ -2592,8 +2556,8 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1349.0,
-         "cabin_total": 2698
+         "price_pp": 1299.0,
+         "cabin_total": 2598
         },
         "3": {
          "available": false,
@@ -2634,14 +2598,14 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1459.0,
-         "cabin_total": 2918
+         "price_pp": 1409.0,
+         "cabin_total": 2818
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1219.0,
-         "cabin_total": 3657,
+         "price_pp": 1185.66,
+         "cabin_total": 3557,
          "added_vs_2": 739
         },
         "4": {
@@ -2676,21 +2640,21 @@
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1619.0,
-         "cabin_total": 3238
+         "price_pp": 1569.0,
+         "cabin_total": 3138
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1325.66,
-         "cabin_total": 3977,
+         "price_pp": 1292.33,
+         "cabin_total": 3877,
          "added_vs_2": 739
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1179.0,
-         "cabin_total": 4716,
+         "price_pp": 1154.0,
+         "cabin_total": 4616,
          "added_vs_2": 1478
         },
         "5": {
