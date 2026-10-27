@@ -84,6 +84,8 @@
 
         .as-of-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
         .as-of[hidden] { display: none; }
+        .as-of.old { background: rgba(245, 158, 11, 0.35); }
+        .toggle-price[hidden] { display: none; }
 
         .as-of {
             display: inline-flex;
@@ -605,6 +607,7 @@
             <div class="as-of-row">
                 <span class="as-of">Prices as of <strong id="asOf">loading...</strong></span>
                 <span class="as-of" id="countsAsOf" hidden>Cabins left as of <strong id="countsAsOfDate"></strong></span>
+                <span class="as-of" id="flAsOf" hidden>Florida rates as of <strong id="flAsOfDate"></strong></span>
             </div>
         </div>
         <div class="wave-container"><div class="wave"></div></div>
@@ -639,8 +642,15 @@
             <p class="hint">Prices are for one cabin with everyone above in it.</p>
         </section>
 
-        <section class="panel" aria-label="Gratuities">
-            <div class="panel-title">Gratuities</div>
+        <section class="panel" aria-label="Florida resident rate and gratuities">
+            <div class="panel-title">Florida resident rate and gratuities</div>
+            <div class="toggle-container">
+                <input type="checkbox" class="toggle-switch" id="flToggle" checked aria-label="Florida resident rate">
+                <div>
+                    <div class="toggle-label" id="flLabel">Florida resident rate</div>
+                    <div class="toggle-price" id="flDesc" hidden></div>
+                </div>
+            </div>
             <div class="toggle-container">
                 <input type="checkbox" class="toggle-switch" id="prepayToggle" aria-label="Prepay gratuities">
                 <div>
@@ -659,15 +669,25 @@
             <strong>About these prices</strong>
             <p>Prices come from Norwegian Cruise Line's booking system and are checked once a day. They change often, so check NCL before booking.</p>
             <p>Each total is the cruise fare, NCL's government taxes, fees and port expenses, the daily service charges (crew gratuities) for every guest 3 and older when you prepay them (otherwise they're shown separately as paid onboard), the gratuities for the Free at Sea offers you keep switched on, and Free at Sea Plus if you choose it. Unlimited Open Bar: guests 21 and over pay the full gratuity, a guest under 21 who is guest 2 pays for a soda package instead, and other guests under 21 pay nothing. Specialty Dining: guests 13 and over pay, under 13 eat free. NCL lists adults first, then kids oldest first. If NCL doesn't show a number on a given day, this page says so instead of guessing.</p>
+            <p>Florida resident rates aren't on NCL's public website. They are read from NCL once a week while signed in to a Florida resident account ("Florida rates as of" at the top). When NCL offers a discount, each cabin's own amount comes off the fare for guests 1 and 2 (for 8 nights, each ship's own amount). Cabins not checked, or not checked in the last 15 days, show NCL's website price. Switch it off to see NCL's published prices.</p>
             <p id="footerVersion"></p>
         </div>
     </footer>
 
     <script>
-        const APP_VERSION = "5.0.1";
+        const APP_VERSION = "5.1.0";
         const DATA_URL = "data/prices.json";
         const COUNTS_URL = "data/counts.json";
         const COUNTS_MAX_AGE_DAYS = 7;
+        // Florida resident rates: NOT on NCL's public pages. data/florida.json holds, per ship and
+        // category, NCL's website fare and Florida fare per guest at 2 guests, read once a week by
+        // tools/fetch_florida.py on the owner's AI PC while signed in to a Florida resident NCL
+        // account (a light check of 5 cabins per ship; every cabin while NCL offers a discount).
+        // The page works out from the file whether there is a discount, so nothing here changes
+        // when NCL's offer does. Amber after 9 days, not used after 15 (NOTES.md).
+        const FLORIDA_URL = "data/florida.json";
+        const FL_OLD_DAYS = 9, FL_MAX_AGE_DAYS = 15;
+        const FL_MIN_OFF = 1;   // dollars off per guest that count as a discount (cents are rounding)
         const MIN_GUESTS = 2, MAX_GUESTS = 5;
         const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
         const STORE_KEY = "cruise-decision-guide-v5";
@@ -682,6 +702,7 @@
 
         let DATA = null, G = null, A = null;   // data file, Getaway sailing, Aura sailing
         let COUNTS = null;                      // data/counts.json when present and at most 7 days old
+        let FLORIDA = null, FL_SEEN = null;     // data/florida.json at most 15 days old; any readable one (for its date)
         const state = {
             adults: 2, kids: [],            // kids: ages 0 to 20, or null until chosen
             type: "balcony", mode: "same",
@@ -691,6 +712,7 @@
             // The Getaway and the Aura are separate bookings, so each has its own set.
             offers: { G: { bar: true, dining: true, plus: false }, A: { bar: true, dining: true, plus: false } },
             prepayGratuities: false,        // service charges before sailing, or onboard on the last day (default onboard)
+            flResident: true,               // Florida resident rates when NCL offers them (default on)
         };
 
         // ---------- helpers ----------
@@ -706,6 +728,10 @@
         const fmtEastern = t => new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
         const fmtTime = hhmm => { if (!hhmm) return ""; let [h, m] = hhmm.split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12; return `${h}:${String(m).padStart(2, "0")} ${ap}`; };
         const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+        // Eastern dates: "Oct 27, 2026" and "Oct 27".
+        const fmtDate = t => new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
+        const fmtShort = t => new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" });
+        const daysSince = t => (Date.now() - Date.parse(t)) / 86400000;
         const guests = () => state.adults + state.kids.length;
         const agesKnown = () => state.kids.every(a => Number.isInteger(a));
 
@@ -726,7 +752,7 @@
                     offers[k] = { bar: o.bar !== false, dining: o.dining !== false, plus: o.plus === true };
                     if (offers[k].plus && !(offers[k].bar && offers[k].dining)) offers[k].plus = false;
                 }
-                Object.assign(state, s, { kids, offers, prepayGratuities: s.prepayGratuities === true });
+                Object.assign(state, s, { kids, offers, prepayGratuities: s.prepayGratuities === true, flResident: s.flResident !== false });
             } catch (e) {}
         }
 
@@ -877,15 +903,27 @@
                 if (n - diners) dining.notes.push("under 13 eat free");
             }
 
+            // Florida resident rate: only on a ship where the latest check found a discount. The
+            // checked dollar amount for this category comes off the fare of guests 1 and 2 (never
+            // more than the fare). Cabins not checked, and a Florida fare at or above the website
+            // fare, get no discount.
+            const fare = taxes === null ? null : e.cabin_total - taxes;
+            const fl = { shown: state.flResident && flShipActive(s), entry: null, perGuest: 0, guests: Math.min(n, 2), amount: 0 };
+            if (fl.shown) {
+                fl.entry = flEntry(s, c.code);
+                fl.perGuest = flOff(fl.entry);
+                fl.amount = Math.min(fl.perGuest * fl.guests, fare === null ? e.cabin_total : fare);
+            }
+
             const gratuities = sc.total + bar.total + dining.total;
-            const total = e.cabin_total + plus.total + gratuities;
+            const total = e.cabin_total - fl.amount + plus.total + gratuities;
             const onboard = state.prepayGratuities ? 0 : sc.total;
             // "now": the amount shown as the total. Prepay on: everything. Prepay off (default):
             // everything except the service charges, which are charged onboard.
             // Without NCL's tax line the total still has taxes in it (cabin_total includes them);
             // only the per-guest split is unknown, so taxes are never listed in k.missing.
             const noTaxSplit = taxes === null ? [s.ship_short] : [];
-            return { n, nights, cabin: e.cabin_total, fare: taxes === null ? null : e.cabin_total - taxes, taxes, plus, sc, bar, dining, gratuities, total, onboard, now: total - onboard, missing, noTaxSplit };
+            return { n, nights, cabin: e.cabin_total, fare, taxes, fl, plus, sc, bar, dining, gratuities, total, onboard, now: total - onboard, missing, noTaxSplit };
         }
 
         // NCL broad type code (INSIDE, ..., SUITE, HAVEN) of a category on a ship.
@@ -919,8 +957,14 @@
                    <div class="${cls} muted"><span class="k">Taxes, fees and port expenses (per-guest split not shown by NCL today)</span><span class="v">Included above</span></div>`
                 : `<div class="${cls}"><span class="k">Cruise fare</span><span class="v">${money(k.fare)}</span></div>
                    <div class="${cls}"><span class="k">Taxes, fees and port expenses: ${k.n} x ${money(s.taxes_per_guest)}</span><span class="v">${money(k.taxes)}</span></div>`;
+            const fl = k.fl, flWhen = fl.entry ? fmtShort(fl.entry.checked_at) : "";
+            const flRow = !fl.shown ? ""
+                : !fl.entry ? `<div class="${cls} muted"><span class="k">Florida resident rate: not checked for this cabin</span><span class="v">no discount</span></div>`
+                : !fl.amount ? `<div class="${cls} muted"><span class="k">Florida resident rate (checked ${esc(flWhen)}): no discount for this cabin</span><span class="v">$0</span></div>`
+                : `<div class="${cls}"><span class="k">Florida resident rate (checked ${esc(flWhen)}): ${plural(fl.guests, "guest", "guests")} x ${money(fl.perGuest)} off the fare</span><span class="v">&minus;${money(fl.amount)}</span></div>`;
             return `
                 ${fareRows}
+                ${flRow}
                 ${plusRow}
                 ${scRow}
                 ${line(k.bar, "not chosen")}
@@ -1245,7 +1289,7 @@
                 <section class="panel" aria-label="Every ${esc(s.ship_short)} cabin">
                     <div class="panel-title">Every ${esc(s.ship_short)} cabin for ${plural(n, "guest", "guests")} (fare and taxes)</div>
                     <table class="cabins"><tbody>${rows}</tbody></table>
-                    <p class="hint">Tap an available cabin to choose it. Free at Sea gratuities are added in the option cards above.</p>
+                    <p class="hint">Tap an available cabin to choose it. Free at Sea gratuities are added in the option cards above.${state.flResident && flShipActive(s) ? " Prices here are NCL's website prices; Florida resident discounts come off in the option cards above." : ""}</p>
                 </section>`;
         }
 
@@ -1295,8 +1339,39 @@
                 : "Pay onboard on the last day. Service charges are not in the totals. They're charged to your onboard account and can be removed at Guest Services.";
         }
 
+        // Text under the Florida switch, and the "Florida rates as of" date at the top.
+        function renderFl() {
+            const on = state.flResident;
+            document.getElementById("flToggle").checked = on;
+            let text = "";
+            if (on && !FLORIDA) {
+                text = FL_SEEN ? `Florida resident prices haven't been checked since ${fmtDate(FL_SEEN.saved_at)}, so NCL's website prices are shown.`
+                    : "Florida resident prices aren't available right now, so NCL's website prices are shown.";
+            } else if (on) {
+                const when = fmtDate(FLORIDA.saved_at);
+                const ships = [G, A].filter(flShipActive);
+                if (!ships.length) {
+                    text = `Selected. NCL isn't offering a Florida resident discount on these sailings right now (checked ${when}).`;
+                } else {
+                    const one = ships.length === 1 ? ships[0] : null;
+                    const old = daysSince(FLORIDA.saved_at) > FL_OLD_DAYS ? " They may be out of date." : "";
+                    text = `NCL's Florida resident prices${one ? ` on the ${one.ship_short}` : ""}, checked ${when}.${old} The discount comes off the fare for guests 1 and 2 and varies by cabin. Cabins not checked show the website price.${one ? ` The ${otherShip(one).ship_short} has no Florida resident discount right now.` : ""} Confirm with NCL.`;
+                }
+            }
+            const desc = document.getElementById("flDesc");
+            desc.textContent = text;
+            desc.hidden = !text;
+            const pill = document.getElementById("flAsOf");
+            pill.hidden = !FLORIDA;
+            if (FLORIDA) {
+                document.getElementById("flAsOfDate").textContent = fmtDate(FLORIDA.saved_at);
+                pill.classList.toggle("old", daysSince(FLORIDA.saved_at) > FL_OLD_DAYS);
+            }
+        }
+
         function render(msg) {
             renderPrepay();
+            renderFl();
             normalize();
             renderGuests(msg);
             renderTypes();
@@ -1361,6 +1436,11 @@
                 render();
                 return;
             }
+            if (e.target.id === "flToggle") {
+                state.flResident = e.target.checked;
+                render();
+                return;
+            }
             if (e.target.id === "prepayToggle") {
                 state.prepayGratuities = e.target.checked;
                 render();
@@ -1383,6 +1463,29 @@
                 if (Date.now() - saved > COUNTS_MAX_AGE_DAYS * 86400000) return null;
                 return cnt;
             } catch (e) { return null; }
+        }
+
+        // Florida rates: any readable file is kept for its date (FL_SEEN); it is used only when
+        // at most 15 days old (FLORIDA). Any problem shows NCL's website prices.
+        function loadFlorida(f) {
+            try {
+                if (!f || f.schema_version !== 1 || typeof f.sailings !== "object" || !Number.isFinite(Date.parse(f.saved_at))) return;
+                FL_SEEN = f;
+                if (daysSince(f.saved_at) <= FL_MAX_AGE_DAYS) FLORIDA = f;
+            } catch (e) {}
+        }
+        // This category's entry in the latest check (at most 15 days old), or null if not checked.
+        function flEntry(s, code) {
+            const sl = FLORIDA && FLORIDA.sailings[s.id];
+            const e = sl && sl.categories && sl.categories[code];
+            if (!e || !Number.isFinite(e.off_pp) || !(daysSince(e.checked_at) <= FL_MAX_AGE_DAYS)) return null;
+            return e;
+        }
+        const flOff = e => e && e.off_pp >= FL_MIN_OFF ? e.off_pp : 0;
+        // True when the latest check found a discount on any cabin of this ship.
+        function flShipActive(s) {
+            const sl = FLORIDA && FLORIDA.sailings[s.id];
+            return !!(sl && sl.categories && Object.keys(sl.categories).some(code => flOff(flEntry(s, code)) > 0));
         }
 
         const LOCATION_ORDER = ["forward", "midship", "aft"];
@@ -1442,12 +1545,17 @@
         const countsPromise = fetch(COUNTS_URL, { cache: "no-cache" })
             .then(r => r.ok ? r.json() : null)
             .catch(() => null);
+        // Florida rates are optional too: any problem shows NCL's website prices.
+        const floridaPromise = fetch(FLORIDA_URL, { cache: "no-cache" })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null);
         fetch(DATA_URL, { cache: "no-cache" })
             .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-            .then(d => countsPromise.then(cnt => [d, cnt]))
-            .then(([d, cnt]) => {
+            .then(d => Promise.all([countsPromise, floridaPromise]).then(([cnt, fl]) => [d, cnt, fl]))
+            .then(([d, cnt, fl]) => {
                 DATA = d;
                 COUNTS = usableCounts(cnt);
+                loadFlorida(fl);
                 G = d.sailings.find(s => s.id.startsWith("getaway"));
                 A = d.sailings.find(s => s.id.startsWith("aura"));
                 if (!G || !A) throw new Error("a sailing is missing");

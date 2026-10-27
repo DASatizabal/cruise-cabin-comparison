@@ -5,6 +5,7 @@
 
 Fails when:
   - data/prices.json does not pass the format check (tools/check_prices.py)
+  - data/florida.json, when present, does not pass its format check (tools/check_florida.py)
   - the version in index.html (APP_VERSION) is not Semantic Versioning, or
     does not match the newest entry in CHANGELOG.md
   - index.html no longer reads data/prices.json
@@ -15,6 +16,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
+import check_florida  # noqa: E402
 import check_prices  # noqa: E402
 
 SEMVER = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
@@ -34,6 +36,15 @@ def main():
         problems += ["data/prices.json: " + e for e in check_prices.check(data, allow_schema_2=True)]
     except Exception as e:
         problems.append(f"data/prices.json cannot be read: {e}")
+
+    # Written by the owner's AI PC (tools/fetch_florida.py); optional, the page shows website
+    # prices without it.
+    if os.path.exists(os.path.join(ROOT, "data", "florida.json")):
+        try:
+            florida = json.loads(read("data/florida.json"))
+            problems += ["data/florida.json: " + e for e in check_florida.check(florida)]
+        except Exception as e:
+            problems.append(f"data/florida.json cannot be read: {e}")
 
     page = read("index.html")
     m = re.search(r'const APP_VERSION = "([^"]+)"', page)

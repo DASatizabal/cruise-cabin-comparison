@@ -580,7 +580,7 @@ Ported from the Joy page (DASatizabal/joy-cabin-compare `kids_sail_free()`; on t
 
 NCL calls: 0 added per run. Testing used one prices-only branch run (26 calls). Hold guards unchanged.
 
-## Florida resident rates (item 9, on hold since 2026-10-15)
+## Florida resident rates (item 9, built in 5.1.0)
 
 The Joy page shows Florida resident fares read on the owner's AI PC from a browser profile signed in to a Florida resident NCL account (DASatizabal/joy-cabin-compare, `tools/fetch_florida.py`). Before building the same for June, a one-time proof checked whether June's fares differ at all when signed in.
 
@@ -597,8 +597,49 @@ Proof, 2026-10-15 at 5:33 PM ET (between Joy's 3:00 PM and 7:00 PM runs; the pro
 
 All 6 differences were $0. 14 NCL API calls (2 anonymous availability, 6 anonymous price summaries, 6 signed-in price summaries), no retries, plus one ncl.com home page load in the signed-in browser. Every address passed June's address check and every answer `hold_signal()` (only the allowed HOLD payment option, once per price summary). The login was valid (expires 2026-12-13) and was working: Joy's 7:00 AM run the same day, same profile, got Florida fares on 17 of its 34 cabins ($60 to $80 off per guest). So NCL offered no Florida resident rate on either June sailing that day.
 
-Owner's decision (2026-10-15): item 9 is on hold, not dropped. There is no `data/florida.json`, no scheduled task and no wrapper for June. It can be re-checked later with the same 14-call proof: `py -3 tools\florida_proof.py`, run by hand between Joy's runs (7:00 AM, 11:00 AM, 3:00 PM, 7:00 PM). It writes nothing and commits nothing, and must never run on a schedule. If a later proof shows a difference, the approved item 9 plan applies (full sweep weekly, light check every 3 Eastern days, one shared "NCL Florida rates" task, age limits 8 and 15 days).
+Owner's decision (2026-10-15): item 9 on hold, not dropped; the proof could be re-run by hand.
 
-## "Prices moved" warning (item 10): not applicable
+Second proof, 2026-10-27 at 4:40 PM ET (Joy's 3:00 PM run had finished with result 0, its next run was 7:00 PM, no Chrome had the profile open), same script, 14 NCL calls (6 signed in), no retries, only the allowed HOLD payment option:
 
-The Joy page's amber "NCL prices have moved since the last refresh" line compares the website fares its Florida runner reads (in `data/florida.json`, last 24 hours) with `data/prices.json`. June has no `data/florida.json` (item 9 on hold), so there is nothing to compare against. Not built (owner's decision 2026-10-15). If item 9 is ever built, this can be revisited.
+| Ship | Type | Cabin | Website | Signed in | Difference |
+|---|---|---|---|---|---|
+| Getaway | Inside | IF | $199.00 | $199.00 | $0.00 |
+| Getaway | Balcony | BF | $289.00 | $289.00 | $0.00 |
+| Getaway | Club Balcony Suite | MB | $339.00 | $339.00 | $0.00 |
+| Aura | Inside | IF | $1,019.00 | $1,019.00 | $0.00 |
+| Aura | Balcony | BF | $1,479.00 | $1,479.00 | $0.00 |
+| Aura | Club Balcony Suite | MB | $1,819.00 | $1,819.00 | $0.00 |
+
+No Florida resident discount on either sailing. The login worked (expires 2026-12-13): Joy's run the same day got Florida fares on Joy's Club Balcony Suites ($20 to $110 off per guest), and a $0.50 difference on Joy's IX, which is rounding. The Getaway BF and MB website fares rose $20 since Oct 15 (website change, the same signed in).
+
+### Built in 5.1.0 (owner's approval 2026-10-27)
+
+The owner approved a switch on the page plus a light weekly check instead of a daily full run, to use few signed-in NCL calls. The proof script stays as it was, manual only.
+
+- Runner: `tools/fetch_florida.py --push` on the AI PC, from a separate clone `D:\Repos\cruise-cabin-comparison` (setup: `tools/florida-runner/README.md`). Scheduled task "June Florida rates", daily at 9:00 AM, 1:00 PM and 5:00 PM (2 hours from any of Joy's runs at 7:00 AM, 11:00 AM, 3:00 PM and 7:00 PM). Runs that aren't due make no NCL calls, so the later runs are only retries (for example when the PC was off).
+- Light check, due when the last check is 7 or more Eastern days old and found no discount: per ship 1 anonymous availability call (2 guests), then for the cheapest available non-Guarantee Inside, Oceanview, Balcony, Club Balcony Suite and Haven category 1 anonymous and 1 signed-in price summary. 2 + 10 + 10 = **22 NCL calls, 10 signed in** (the proof's 6 cabins plus Oceanview and Haven, added by the owner: a discount only on those types would otherwise go unseen; Joy's discounts moved between types, 17 of 34 cabins on Oct 15, mostly Club Balcony Suites on Oct 27). A type with nothing available is skipped. If a light cabin fails and none of the others shows a discount, the file is not changed and the next run repeats the light check.
+- Full check, only when a light check finds a real discount ($1 or more off per guest on any cabin): the same run checks every available cabin at 2 guests on both ships (Studio and solo cabins left out, Guarantee cabins in), without asking the light cabins again. 60 cabins today (Getaway 32, Aura 28): 2 + 60 + 60 = **122 NCL calls, 60 signed in**, the discovery day included. While a discount is active the full check repeats every 7 days; when a full check finds no discount anywhere, the next check (7 days later) is a light one. Cabins that fail in a full check are listed in `missing` and retried on that day and the next (1 availability call per ship with missing cabins, 2 per cabin); after that they wait for the next weekly check and the page says "not checked for this cabin".
+- Amounts are NCL's own: each cabin's website fare and Florida fare per guest, read the same way signed in and out ((subtotal minus the Open Bar and Specialty Dining lines) / 2, checked against NCL's grand total), and their difference. Never a percentage or an estimate (the Joy discounts were fixed dollar amounts per category).
+- `data/florida.json` (schema 1, public repo, numbers, codes and dates only; `tools/check_florida.py` rejects any other key): `saved_at` (UTC), `guests` 2, `source`, `check` (light or full), `checked_on` (Eastern date the latest check started), `sailings[<sailing id>]`: `package_id`, `missing` (codes, full check only), `categories[<code>]`: `type`, `website_fare_pp`, `florida_fare_pp`, `off_pp` (website minus Florida), `checked_at`, `source` ("logged-in NCL account"). Each check replaces the categories; a retry adds to them. The format check runs before the file is written and in the release check.
+- Guards: before any NCL call the profile must be free (Chrome's lockfile, the "Joy Florida rates" task not running and not due within 20 minutes; it waits 2 minutes up to 3 times, then exits with no calls), and with `--push` the clone must be on main with Git email exactly `174554998+DASatizabal@users.noreply.github.com`. June's address check (`fetch_prices.FORBIDDEN`) on every address and `hold_signal()` on every answer, anonymous (`fetch_prices.request`) and signed in (in the runner); the only exception is the HOLD payment option in price summaries. A hold signal stops the run. Commits "Refresh Florida rates DATE (light|full)", DATE Eastern; pull with rebase and push `HEAD:main`, tried 4 times. Days are Eastern dates (America/New_York); nothing runs from Jun 11, 2027 (Eastern). It reads only the login token's expiry and warns in the log 14 days before it.
+- The browser profile `D:\AI-VAULT\ncl-profile` is shared with Joy's runner. Joy's README says to delete it after Joy's cruise (Nov 20, 2026); for June it must be kept until Jun 11, 2027 (June's README says so; Joy's repo unchanged, owner's decision).
+- Page: the "Florida resident rate" switch, on by default, first in the card "Florida resident rate and gratuities". From the file it works out whether there is a discount (any cabin of that ship with `off_pp` of $1 or more in a file at most 15 days old):
+  - No discount on either ship: "Selected. NCL isn't offering a Florida resident discount on these sailings right now (checked Oct 27, 2026)." Website prices, no Florida line in the cards.
+  - A discount: the cabin's own amount x 2 (guests 1 and 2 only, never more than the fare) comes off the total, with the line "Florida resident rate (checked Oct 27): 2 guests x $60 off the fare". On that ship, a cabin with $0 (or a Florida fare above the website) says "no discount for this cabin", one not in the check "not checked for this cabin". The 8 night total uses each ship's own amount. Text under the switch: "NCL's Florida resident prices, checked [date]. The discount comes off the fare for guests 1 and 2 and varies by cabin. Cabins not checked show the website price. Confirm with NCL." (with "on the Getaway" and "The Aura has no Florida resident discount right now." when only one ship has one). The full tables keep website prices and say so.
+  - Switch off: website prices and nothing under the switch.
+  - "Florida rates as of [date]" at the top; amber after 9 days (a weekly check 2 days late); after 15 days (two missed weeks) the file is not used: no date at the top, and "Florida resident prices haven't been checked since [date], so NCL's website prices are shown." No file: "Florida resident prices aren't available right now, so NCL's website prices are shown." The age limits replace the 2026-10-15 plan's 8 and 15 days, and its light check every 3 days.
+- Tests: `tools/test_tools.py` (cadence including the Nov 1 time change, light to full to light, retries, call counts and cabins against a stand-in for NCL, hold signals on signed-in answers, the commit guard, the format check) and `tools/page_test.py` (Chromium at 360 px with test copies of the file).
+
+NCL calls per week, before and after (prices 26 per day; counts from the last week, Oct 21 to 27: full sweeps of 141 on Oct 21, 24 and 27, light days of 76 or 77):
+
+| | Prices | Counts | Florida (signed in) | Total |
+|---|---|---|---|---|
+| Before 5.1.0 | 182 | 729 | 0 (0) | 911 |
+| After, no discount | 182 | 729 | 22 (10) | 933 |
+| After, while a discount is active | 182 | 729 | 122 (60) | 1,033 |
+
+Retries add 2 calls per failed cabin plus 1 availability call per ship. The proof script (14 calls) is not part of the schedule.
+
+## "Prices moved" warning (item 10): not built
+
+The Joy page's amber "NCL prices have moved since the last refresh" line compares the website fares its Florida runner reads (in `data/florida.json`, last 24 hours) with `data/prices.json`. June's `data/florida.json` is weekly (5.1.0), so it is not a same-day comparison. Not built (owner's decision 2026-10-15).
