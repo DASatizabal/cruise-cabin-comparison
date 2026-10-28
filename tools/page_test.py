@@ -6,8 +6,12 @@ Two copies of the page are served from a temporary folder: one with today's data
 one with the null copy from test_tools.null_copy (Getaway taxes and gratuities and every rate null,
 each with its warning). Checks: no sideways scrolling, no script errors, "Prices as of" in Eastern
 time with the time of day, the "Not found on NCL today" rules (NOTES.md, "Missing numbers"), and the
-prepay gratuities switch (NOTES.md, "Prepay gratuities off by default").
+prepay gratuities switch (NOTES.md, "Prepay gratuities off by default"), and the Florida resident
+rate switch with test copies of data/florida.json: no discount ("Selected..."), a Florida fare above
+the website, amber after 9 days, not used after 15, a discount on both ships and on one, 4 guests,
+and the switch off (NOTES.md, "Florida resident rates").
 """
+import datetime as dt
 import functools
 import http.server
 import json
@@ -17,13 +21,18 @@ import shutil
 import sys
 import tempfile
 import threading
+from zoneinfo import ZoneInfo
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SHOTS = sys.argv[1] if len(sys.argv) > 1 else None
+sys.stdout.reconfigure(errors="replace")   # the page's minus sign on a Windows console
 sys.path.insert(0, os.path.join(REPO, "tools"))
+import check_florida  # noqa: E402
 import test_tools  # noqa: E402  (null_copy, schema3)
 
 from playwright.sync_api import sync_playwright  # noqa: E402
+
+MIAMI = ZoneInfo("America/New_York")
 
 with open(os.path.join(REPO, "data", "prices.json"), encoding="utf-8") as f:
     real = json.load(f)
@@ -49,6 +58,41 @@ def ksf_copy(data):
     return d
 
 
+def fl_copy(off, days_ago, skip=()):
+    """A data/florida.json for the test: every cabin available at 2 guests on both ships, saved
+    days_ago days before now, with the given dollars off per guest ((ship, code): amount)."""
+    when = dt.datetime.now(dt.timezone.utc).replace(microsecond=0) - dt.timedelta(days=days_ago)
+    at = when.strftime("%Y-%m-%dT%H:%M:%SZ")
+    sailings = {}
+    for s in real["sailings"]:
+        cats = {}
+        for t in s["types"]:
+            if t["code"] == "STUDIO":
+                continue
+            for c in t["categories"]:
+                e = c["by_guests"]["2"]
+                if c["solo"] or not e["available"] or (s["ship_short"], c["code"]) in skip:
+                    continue
+                web = round((e["cabin_total"] - 2 * s["taxes_per_guest"]) / 2, 2)
+                o = off.get((s["ship_short"], c["code"]), 0)
+                cats[c["code"]] = {"type": t["code"], "website_fare_pp": web, "florida_fare_pp": round(web - o, 2), "off_pp": o,
+                                   "checked_at": at, "source": "logged-in NCL account"}
+        sailings[s["id"]] = {"package_id": s["package_id"], "categories": cats, "missing": []}
+    d = {"schema_version": 1, "saved_at": at, "guests": 2, "source": "test", "check": "full",
+         "checked_on": when.astimezone(MIAMI).date().isoformat(), "sailings": sailings}
+    assert not check_florida.check(d), check_florida.check(d)
+    e = when.astimezone(MIAMI)
+    return d, f"{e:%b} {e.day}, {e.year}"
+
+
+FL_SITES = {"none": fl_copy({}, 0), "higher": fl_copy({("Getaway", "BF"): -20}, 0), "old": fl_copy({}, 10),
+            "stale": fl_copy({}, 16), "both": fl_copy({("Getaway", "BF"): 60, ("Aura", "B4"): 25}, 1, skip={("Getaway", "B4")}),
+            "one": fl_copy({("Getaway", "BF"): 60}, 0)}
+FL_SITES_WHEN = {k: v[1] for k, v in FL_SITES.items()}
+for name in FL_SITES:
+    sites[name] = test_tools.schema3(real)
+
+
 sites["ksf"] = ksf_copy(real)
 site_root = tempfile.mkdtemp(prefix="june-page-")
 for name, data in sites.items():
@@ -60,6 +104,9 @@ for name, data in sites.items():
         shutil.copy(counts, os.path.join(d, "data"))
     with open(os.path.join(d, "data", "prices.json"), "w", encoding="utf-8") as f:
         json.dump(data, f)
+    if name in FL_SITES:
+        with open(os.path.join(d, "data", "florida.json"), "w", encoding="utf-8") as f:
+            json.dump(FL_SITES[name][0], f)
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a):
@@ -73,6 +120,12 @@ base = f"http://127.0.0.1:{srv.server_address[1]}"
 
 money = lambda t: float(re.sub(r"[^\d.]", "", t))
 fails = []
+
+
+def console_error(m):
+    """A console error, except the 404 of an optional file the page does without (florida.json:
+    until the AI PC's first check, the page shows website prices)."""
+    return m.type == "error" and not (m.location or {}).get("url", "").endswith("/data/florida.json")
 
 
 def check(name, ok, detail=""):
@@ -106,7 +159,7 @@ with sync_playwright() as pw:
         page = browser.new_page(viewport={"width": 360, "height": 800})
         errors = []
         page.on("pageerror", lambda e: errors.append(str(e)))
-        page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
+        page.on("console", lambda m: errors.append(m.text) if console_error(m) else None)
         page.goto(f"{base}/{name}/index.html")
         page.wait_for_selector(".card .price-total")
         width = page.evaluate("Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)")
@@ -331,6 +384,104 @@ with sync_playwright() as pw:
                 page.query_selector_all(".card")[0].screenshot(path=os.path.join(SHOTS, "ksf_getaway.png"))
                 page.query_selector_all(".card")[1].screenshot(path=os.path.join(SHOTS, "ksf_aura.png"))
         check(f"Kids Sail Free ({name}): no script errors", not errors, errors[:3])
+        page.close()
+
+    # Florida resident rate (5.1.0): switch on by default, in the gratuities card. The page works
+    # out from data/florida.json whether NCL offers a discount; each cabin's own amount comes off
+    # the fare of guests 1 and 2; switched off, website prices and nothing extra.
+
+    def same(name, got, want):
+        check(name, got == want, "" if got == want else f"got {got}, expected {want}")
+
+    def fl_open(name, stored=None):
+        page = browser.new_page(viewport={"width": 360, "height": 800})
+        errs = []
+        page.on("pageerror", lambda e: errs.append(str(e)))
+        page.on("console", lambda m: errs.append(m.text) if console_error(m) else None)
+        page.goto(f"{base}/{name}/index.html")
+        page.evaluate("s => { localStorage.clear(); if (s) localStorage.setItem('cruise-decision-guide-v5', JSON.stringify(s)); }", stored)
+        page.reload()
+        page.wait_for_selector(".card .price-total")
+        return page, errs
+
+    def fl_state(page):
+        cards = page.query_selector_all(".card")[:3]
+        desc = page.query_selector("#flDesc")
+        pill = page.query_selector("#flAsOf")
+        return {"checked": page.is_checked("#flToggle"), "label": page.inner_text("#flLabel"),
+                "title": page.inner_text("section[aria-label='Florida resident rate and gratuities'] .panel-title"),
+                "desc": desc.inner_text() if desc.is_visible() else None,
+                "pill": " ".join(page.inner_text("#flAsOf").split()) if pill.is_visible() else None,
+                "amber": "old" in (pill.get_attribute("class") or ""),
+                "totals": [money(c.query_selector(".price-total").inner_text()) for c in cards],
+                "rows": [[(k, v) for k, v in rows_of(c) if k.startswith("Florida")] for c in cards],
+                "width": page.evaluate("Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)")}
+
+    page, errs = fl_open("real")
+    base_st = fl_state(page)
+    page.click('button[data-pick="pickA"][data-code="B4"]')
+    base_b4 = fl_state(page)["totals"]
+    page.close()
+    same("Florida, no file: switch on by default, in the 'Florida resident rate and gratuities' card",
+          (base_st["checked"], base_st["label"], base_st["title"].upper()), (True, "Florida resident rate", "FLORIDA RESIDENT RATE AND GRATUITIES"))
+    same("Florida, no file: website prices shown, says so", base_st["desc"], "Florida resident prices aren't available right now, so NCL's website prices are shown.")
+    same("Florida, no file: no 'Florida rates as of' and no Florida lines", (base_st["pill"], base_st["rows"]), (None, [[], [], []]))
+    check("Florida, no file: no script errors", not errs, errs[:3])
+
+    for name, when in FL_SITES_WHEN.items():
+        page, errs = fl_open(name)
+        st = fl_state(page)
+        where = f"Florida {name}"
+        if name in ("none", "higher", "old"):
+            same(f"{where}: 'Selected' message with the check date", st["desc"], f"Selected. NCL isn't offering a Florida resident discount on these sailings right now (checked {when}).")
+            same(f"{where}: totals are website prices", st["totals"], base_st["totals"])
+            same(f"{where}: no Florida lines in the cards", st["rows"], [[], [], []])
+            same(f"{where}: 'Florida rates as of {when}'", st["pill"], f"Florida rates as of {when}")
+            same(f"{where}: date amber only after 9 days", st["amber"], name == "old")
+        elif name == "stale":
+            same(f"{where} (16 days): not used, says when it was last checked", st["desc"], f"Florida resident prices haven't been checked since {when}, so NCL's website prices are shown.")
+            same(f"{where}: no 'Florida rates as of', website totals", (st["pill"], st["totals"]), (None, base_st["totals"]))
+        elif name == "both":
+            same(f"{where}: discount text", st["desc"], f"NCL's Florida resident prices, checked {when}. The discount comes off the fare for guests 1 and 2 and varies by cabin. Cabins not checked show the website price. Confirm with NCL.")
+            same(f"{where}: Getaway BF $60 off for 2 guests, Aura BF no discount",
+                  st["rows"][:2], [[(f"Florida resident rate (checked {when.rsplit(',', 1)[0]}): 2 guests x $60 off the fare", "−$120")],
+                                   [(f"Florida resident rate (checked {when.rsplit(',', 1)[0]}): no discount for this cabin", "$0")]])
+            same(f"{where}: Getaway total $120 lower, Aura the same, 8 nights $120 lower",
+                  [round(a - b, 2) for a, b in zip(st["totals"], base_st["totals"])], [-120, 0, -120])
+            same(f"{where}: 8 night card shows each ship's line", st["rows"][2], st["rows"][0] + st["rows"][1])
+            page.click('button[data-pick="pickA"][data-code="B4"]')
+            st2 = fl_state(page)
+            same(f"{where}: Aura B4 uses its own amount ($25 x 2)", [round(a - b, 2) for a, b in zip(st2["totals"], base_b4)], [-120, -50, -170])
+            page.click('button[data-pick="pickG"][data-code="B4"]')
+            gb4 = fl_state(page)["rows"][0]
+            same(f"{where}: a cabin the check didn't cover says so", gb4, [("Florida resident rate: not checked for this cabin", "no discount")])
+            page.click("#flToggle")
+            off = fl_state(page)
+            same(f"{where}: switched off: website totals, no Florida lines, nothing under the switch",
+                  (off["checked"], off["rows"], off["desc"]), (False, [[], [], []], None))
+            page.reload()
+            page.wait_for_selector(".card .price-total")
+            same(f"{where}: 'off' is kept on reload", page.is_checked("#flToggle"), False)
+            # 4 guests (2 adults, kids 15 and 7): the discount is for guests 1 and 2 only.
+            page4, errs4 = fl_open(name, {"adults": 2, "kids": [15, 7], "type": "balcony", "mode": "same"})
+            four = fl_state(page4)
+            errs += errs4
+            same(f"{where}, 4 guests: still 2 guests x $60 on the Getaway", four["rows"][0][:1], [(f"Florida resident rate (checked {when.rsplit(',', 1)[0]}): 2 guests x $60 off the fare", "−$120")])
+            check(f"{where}, 4 guests: 8 night total = Getaway + Aura", abs(four["totals"][2] - four["totals"][0] - four["totals"][1]) < 0.01, four["totals"])
+            check(f"{where}, 4 guests: no sideways scrolling at 360 px", four["width"] <= 360, four["width"])
+            if SHOTS:
+                page4.query_selector("section[aria-label='Florida resident rate and gratuities']").screenshot(path=os.path.join(SHOTS, "florida_switch.png"))
+                page4.query_selector_all(".card")[0].screenshot(path=os.path.join(SHOTS, "florida_getaway_4.png"))
+                page4.query_selector_all(".card")[2].screenshot(path=os.path.join(SHOTS, "florida_8_nights_4.png"))
+            page4.close()
+        elif name == "one":
+            same(f"{where}: discount on the Getaway only, names both ships", st["desc"],
+                  f"NCL's Florida resident prices on the Getaway, checked {when}. The discount comes off the fare for guests 1 and 2 and varies by cabin. Cabins not checked show the website price. The Aura has no Florida resident discount right now. Confirm with NCL.")
+            same(f"{where}: no Florida line on the Aura card", st["rows"][1], [])
+        check(f"{where}: no sideways scrolling at 360 px", st["width"] <= 360, st["width"])
+        check(f"{where}: no script errors", not errs, errs[:3])
+        if SHOTS and name in ("none", "old"):
+            page.screenshot(path=os.path.join(SHOTS, f"florida_{name}_360.png"))
         page.close()
     browser.close()
 srv.shutdown()

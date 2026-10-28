@@ -54,6 +54,9 @@ jobs:
           cp data/prices.json _site/data/prices.json
           # Counts are optional: the page hides count labels when this file is missing or old.
           if [ -f data/counts.json ]; then cp data/counts.json _site/data/counts.json; fi
+          # Florida rates are optional too (written weekly by the owner's AI PC): without the
+          # file the page shows NCL's website prices.
+          if [ -f data/florida.json ]; then cp data/florida.json _site/data/florida.json; fi
 
       - name: Name the artifact for this run attempt
         id: name

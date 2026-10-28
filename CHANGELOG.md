@@ -2,6 +2,21 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [5.1.0] - 2026-10-27
+
+### Added
+- Florida resident rate switch, first in the card now called "Florida resident rate and gratuities" (before the prepay switch), on by default and saved with the other choices, as on the Joy page. The page reads `data/florida.json` and works out from it whether NCL offers a discount, so nothing in the page changes when NCL's offer does:
+  - No discount in the latest check: "Selected. NCL isn't offering a Florida resident discount on these sailings right now (checked Oct 27, 2026)." Totals are website prices.
+  - A discount: each cabin's own dollar amount comes off the fare of guests 1 and 2, with a line in the total ("Florida resident rate (checked Oct 27): 2 guests x $60 off the fare"). Cabins the check didn't cover say "not checked for this cabin" and use the website price. The 8 night total uses each ship's own amount. A discount on one ship only is named under the switch.
+  - A Florida fare above the website fare counts as no discount and is never added. Less than $1 per guest is rounding, not a discount.
+  - Switch off: website prices, nothing extra.
+  - "Florida rates as of [date]" at the top; amber after 9 days; after 15 days the file is not used and the switch says when prices were last checked. Without the file, the switch says Florida prices aren't available and website prices are shown.
+- `tools/fetch_florida.py`: the weekly check on the owner's AI PC, from a separate clone that only pushes main (`tools/florida-runner/README.md`). A light check of 5 cabins per ship (cheapest Inside, Oceanview, Balcony, Club Balcony Suite and Haven; 22 NCL calls, 10 signed in) once a week; only if it finds a discount, every available cabin on both ships the same day (122 calls today, 60 signed in), repeated weekly while the discount lasts, then back to light checks. Runs that aren't due make no NCL calls. Eastern dates; nothing from Jun 11, 2027. Hold guard on every NCL answer, address check on every address, refuses to commit unless the Git email is the owner's noreply address, waits while Joy's task has the browser profile, never starts within 20 minutes of Joy's next run. Scheduled task "June Florida rates" at 9:00 AM, 1:00 PM and 5:00 PM.
+- `tools/check_florida.py`: format check for `data/florida.json` (numbers, codes and dates only), run by the release check when the file is present. "Deploy site" publishes the file when present.
+- Tests: `tools/test_tools.py` (cadence, runs against a stand-in for NCL with call counts, the hold guard on signed-in answers, the commit guard, the format check); `tools/page_test.py` (no discount, a Florida fare above the website, amber, unused, a discount on both ships and on one, 4 guests, switch off, 360 px).
+
+NCL calls per week: about 911 before, 933 after with no discount, 1,033 while a discount is active (NOTES.md, "Florida resident rates").
+
 ## [5.0.1] - 2026-10-21
 
 ### Fixed
