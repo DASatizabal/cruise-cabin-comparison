@@ -31,7 +31,14 @@ Built on branch `family-tools-5.2.0` in the order the owner set: the DoubleUp wa
   - "Prices can change until NCL confirms the booking." Nothing typed is saved anywhere. Sending goes through the family alerts Worker (part B); until then the window checks every field and says nothing was sent.
 - Tests: `tools/page_test.py` covers the window on every card at 360 px (deposits, credits, DoubleUp cases, a Haven, the Florida answer, 8 nights, field checks, a schema 3 file, sending to a stand-in Worker).
 
+- Option tiles: the three options at the top are compact tiles in one row (stacked on a phone) with the label, ship(s), dates and nights, port chips, and the Aura's maiden voyage badge, christening note and video link. Each tile is an on/off button; pick one, two or all three to compare. Nothing is selected on the first visit ("Pick one or more options to compare."), and the choice is remembered on the device with the other saved choices.
+- The full card of each selected option shows below the tiles in tile order, side by side on wide screens and stacked on a phone. The 8 night card has a Day by day for each ship.
+- Tests: tiles at 360 px and 1280 px, remembered choices, list prices against card totals in 144 switch combinations, and the service charge line in both prepay states.
+
 ### Changed
+- Every cabin price in the lists (each card's list, both 8 night pickers, the full tables) is now the cabin total with your choices (party, Free at Sea, Free at Sea Plus, the Florida discount, and service charges when prepaid), always equal to the card's Total for that cabin, and labelled as such. The 8 night pickers show the 8 night total with the other ship's chosen cabin. Lists are cheapest first by that price.
+- Service charges paid onboard: the "+ $X service charges paid onboard" line under the total is gone; the service charge line now sits directly below the Total line ("Service charges (crew gratuities) (paid onboard, not in the total): 2 guests x $20 x 3 nights", "$120 onboard", "Can be removed at Guest Services."), one per ship for 8 nights. Prepaid, it stays inside the total.
+- Every date-only field in `data/prices.json` is the Eastern date (checked dates of rates, gratuities and deposits, the Suite and Haven rule's date, each sailing's date), like every other "done that day" date. They were UTC dates.
 - `data/prices.json` is schema 4. `tools/check_prices.py` checks the payment data; the release check still accepts the committed schema 3 file until the first refresh on main after the merge.
 
 NCL calls: the price job goes from 26 to 27 a day (1 page load for the DoubleUp watch; the payment data and Make Selection add none). Per week about 918 instead of 911 (940 instead of 933 in a week with the Florida light check). NOTES.md, "DoubleUp watch" and "Payment data".

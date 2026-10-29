@@ -193,16 +193,41 @@
 
         .seg.small button { padding: 0.45rem 0.85rem; font-size: 0.85rem; }
 
-        /* Option cards */
-        .options {
-            display: grid;
-            gap: 1.25rem;
-            margin-top: 1.5rem;
+        /* Option tiles (5.2.0): on/off buttons for the options to compare, one row on wide screens */
+        .tiles { display: grid; gap: 0.75rem; margin-top: 1.5rem; }
+        @media (min-width: 760px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        .tile {
+            background: var(--white); border: 2px solid var(--gray-200); border-radius: 14px;
+            padding: 0.8rem 0.9rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); cursor: pointer;
+        }
+        .tile:hover { border-color: var(--teal-light); }
+        .tile.on { border-color: var(--teal); background: var(--teal-wash); box-shadow: 0 0 0 1px var(--teal); }
+        .tile-btn { display: block; width: 100%; padding: 0; border: none; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+        .tile-top { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .tile .option-badge { margin-bottom: 0; }
+        .tile-state { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 700; color: var(--gray-500); white-space: nowrap; }
+        .tile.on .tile-state { color: var(--teal); }
+        .tile-box {
+            display: inline-flex; align-items: center; justify-content: center; width: 1.3rem; height: 1.3rem; flex-shrink: 0;
+            border: 2px solid var(--gray-300); border-radius: 6px; background: var(--white); color: var(--white); font-size: 0.85rem; line-height: 1;
+        }
+        .tile.on .tile-box { background: var(--teal); border-color: var(--teal); }
+        .tile-title { display: block; font-size: 1.05rem; font-weight: 700; color: var(--gray-900); margin-top: 0.45rem; line-height: 1.25; }
+        .tile-dates { display: block; font-size: 0.85rem; color: var(--gray-600); margin-top: 0.1rem; }
+        .tile .stops { margin-top: 0.45rem; }
+        .tiles-prompt {
+            margin-top: 0.9rem; padding: 0.8rem 1rem; border: 2px dashed var(--gray-300); border-radius: 12px;
+            background: var(--white); text-align: center; font-weight: 600; color: var(--gray-700);
         }
 
-        @media (min-width: 1000px) {
-            .options { grid-template-columns: repeat(3, 1fr); align-items: start; }
+        /* Option cards: the selected options, side by side on wide screens */
+        .options { display: grid; gap: 1.25rem; margin-top: 1.25rem; align-items: start; }
+        .options > .card { min-width: 0; }
+        @media (min-width: 760px) {
+            .options.n1 { max-width: 40rem; margin-left: auto; margin-right: auto; }
+            .options.n2, .options.n3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
+        @media (min-width: 1000px) { .options.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
         .card {
             background: var(--white);
@@ -502,6 +527,8 @@
         .gty { color: #92400e; }
 
         .cat-list { list-style: none; margin-top: 0.9rem; }
+        .cat-list-note { font-size: 0.75rem; color: var(--gray-600); margin-top: 0.25rem; line-height: 1.35; }
+        .cat-list-note + .cat-list { margin-top: 0.5rem; }
 
         .cat-list-title {
             font-size: 0.75rem;
@@ -568,9 +595,8 @@
         .offers-foot { font-size: 0.72rem; color: var(--gray-600); margin-top: 0.5rem; line-height: 1.35; }
         .drink-list { display: inline-block; margin-top: 0.35rem; font-size: 0.8rem; font-weight: 600; color: var(--ocean-blue); }
         .row.subtotal .k, .row.subtotal .v { font-weight: 700; color: var(--gray-900); }
-        .row.onboard { border-bottom: 1px solid var(--gray-100); }
-        .row.onboard .k { color: var(--gray-700); font-size: 0.85rem; }
-        .onboard-note { font-size: 0.85rem; color: var(--gray-600); margin-top: 0.2rem; }
+        .row.onboard { border-bottom: none; padding-bottom: 0.15rem; }
+        .onboard-small { font-size: 0.75rem; color: var(--gray-500); padding-bottom: 0.45rem; border-bottom: 1px solid var(--gray-100); }
         .gauge { display: inline-block; margin-top: 0.25rem; padding: 0.05rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600; }
         .gauge.ok { background: #dcfce7; color: #166534; }
         .gauge.mid { background: var(--gold-wash); color: #92400e; }
@@ -767,6 +793,9 @@
         const CRUISENEXT = { credit: 250, cost: 125, signup: "https://www.ncl.com/account-access/register",
                              readyOn: "2026-11-26", sailingEnds: "Nov 23, 2026" };
         const MIN_GUESTS = 2, MAX_GUESTS = 5;
+        // Option tiles (5.2.0), in tile order. Each tile is an on/off button; the full card of each
+        // selected option shows below the tiles, in this order. None is selected on the first visit.
+        const OPTIONS = [{ key: "G", label: "Option 1: 3 nights" }, { key: "A", label: "Option 2: 5 nights" }, { key: "8", label: "Option 3: 8 nights" }];
         const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
         const STORE_KEY = "cruise-decision-guide-v5";
         // 5.0.0: the prepay switch default changed to off. Choices saved under the old key are
@@ -794,6 +823,7 @@
             offers: { G: { bar: true, dining: true, plus: false }, A: { bar: true, dining: true, plus: false } },
             prepayGratuities: false,        // service charges before sailing, or onboard on the last day (default onboard)
             flResident: true,               // Florida resident rates when NCL offers them (default on)
+            compare: [],                    // option tiles selected ("G", "A", "8"), none on the first visit
         };
 
         // ---------- helpers ----------
@@ -837,7 +867,8 @@
                     offers[k] = { bar: o.bar !== false, dining: o.dining !== false, plus: o.plus === true };
                     if (offers[k].plus && !(offers[k].bar && offers[k].dining)) offers[k].plus = false;
                 }
-                Object.assign(state, s, { kids, offers, prepayGratuities: s.prepayGratuities === true, flResident: s.flResident !== false });
+                const compare = Array.isArray(s.compare) ? OPTIONS.map(o => o.key).filter(k => s.compare.includes(k)) : [];
+                Object.assign(state, s, { kids, offers, compare, prepayGratuities: s.prepayGratuities === true, flResident: s.flResident !== false });
             } catch (e) {}
         }
 
@@ -870,9 +901,10 @@
             return { missing: true };
         }
 
-        // Available categories of a broad type for the party, cheapest first.
-        function availableIn(t, n) {
-            return catsOf(t).filter(c => isAvail(c, n)).sort((a, b) => entry(a, n).cabin_total - entry(b, n).cabin_total);
+        // Available categories of a broad type for the party, cheapest first by the price the
+        // lists show (listPrice).
+        function availableIn(s, t, n) {
+            return catsOf(t).filter(c => isAvail(c, n)).sort(byListPrice(s, n));
         }
 
         function noneAvailableText(s, t, n) {
@@ -885,7 +917,7 @@
         // The chosen category for a ship in "same type" mode: the saved pick if it is still
         // available in this type for this party, otherwise the cheapest available one.
         function chosenInType(s, t, n) {
-            const list = availableIn(t, n);
+            const list = availableIn(s, t, n);
             const saved = s === G ? state.pickG : state.pickA;
             return list.find(c => c.code === saved) || defaultPick(list);
         }
@@ -1012,15 +1044,41 @@
             return { n, nights, cabin: e.cabin_total, fare, taxes, fl, plus, sc, bar, dining, gratuities, total, onboard, now: total - onboard, missing, noTaxSplit };
         }
 
+        // The price every cabin list shows (each card's list, both 8 night pickers and the full
+        // tables, 5.2.0): the cabin's total for the whole cabin with the current choices (party,
+        // Free at Sea switches, Free at Sea Plus, the Florida discount, and service charges only
+        // when prepaid), always the card's Total for that cabin (cost().now). Until every kid's age
+        // is set the cards show no total, so the lists show NCL's cabin price (fare and taxes).
+        function listPrice(s, c) {
+            return agesKnown() ? cost(s, c).now : entry(c, guests()).cabin_total;
+        }
+        // List order: the price the lists show, then NCL's cabin price.
+        const byListPrice = (s, n) => (a, b) => listPrice(s, a) - listPrice(s, b) || entry(a, n).cabin_total - entry(b, n).cabin_total;
+        // What the list prices are, under each list's title. where: "card", "8" (both ships
+        // added) or the option label of a full table.
+        function listNote(where) {
+            const n = guests();
+            if (!agesKnown()) {
+                return `<div class="cat-list-note">${where === "8" ? `Each price is NCL's fare with taxes for both cabins (this cabin plus the cabin chosen on the other ship) for ${n} guests.` : `Each price is NCL's fare with taxes for ${n} guests.`} Choose every kid's age above to see each cabin's total with your choices.</div>`;
+            }
+            const same = where === "card" || where === "8" ? "the same as the Total below" : `the same as the Total on the ${where} card`;
+            return `<div class="cat-list-note">${where === "8"
+                ? `Each price is the 8 night total with your choices: this cabin plus the cabin chosen on the other ship, ${same}.`
+                : `Each price is the cabin total for ${n} guests with your choices, ${same}.`}</div>`;
+        }
+
         // NCL broad type code (INSIDE, ..., SUITE, HAVEN) of a category on a ship.
         function typeOfCat(s, c) {
             const t = s.types.find(t => t.categories.some(x => x.code === c.code));
             return t ? t.code : null;
         }
 
+        // "2 guests x $20 x 3 nights"
+        const partText = p => `${plural(p.count, "guest", "guests")} x ${money(p.pp)}${p.nights ? ` x ${p.nights} nights` : ""}${p.note ? ` (${p.note})` : ""}`;
+
         function lineRows(s, k, indent = false) {
             const cls = indent ? "row sub" : "row";
-            const part = p => `${plural(p.count, "guest", "guests")} x ${money(p.pp)}${p.nights ? ` x ${p.nights} nights` : ""}${p.note ? ` (${p.note})` : ""}`;
+            const part = partText;
             const missingRow = title => `<div class="${cls} missing"><span class="k">${esc(title)}</span><span class="v">${NOT_FOUND}</span></div>`;
             // Example: "Unlimited Open Bar: 1 guest x $96, 1 guest x $37.50 (soda package, under 21)"
             const line = (x, offText) => {
@@ -1033,9 +1091,9 @@
             const plusRow = !k.plus.on ? "" : k.plus.parts.length
                 ? `<div class="${cls}"><span class="k">Free at Sea Plus: ${k.plus.parts.map(part).join(", ")}${k.plus.notCovered ? ` (${plural(k.plus.notCovered, "guest", "guests")} not eligible: no charge)` : ""}</span><span class="v">${money(k.plus.total)}</span></div>`
                 : `<div class="${cls} muted"><span class="k">Free at Sea Plus</span><span class="v">no one eligible</span></div>`;
-            const when = state.prepayGratuities ? "" : " (paid onboard, not in the total)";
-            const scRow = k.sc.missing ? missingRow(k.sc.title) : k.sc.parts.length
-                ? `<div class="${cls}${state.prepayGratuities ? "" : " muted"}"><span class="k">${esc(k.sc.title)}${when}: ${k.sc.parts.map(part).join(", ")}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">${money(k.sc.total)}${state.prepayGratuities ? "" : " onboard"}</span></div>`
+            // Paid onboard: shown below the Total line instead (onboardRows).
+            const scRow = k.onboard ? "" : k.sc.missing ? missingRow(k.sc.title) : k.sc.parts.length
+                ? `<div class="${cls}"><span class="k">${esc(k.sc.title)}: ${k.sc.parts.map(part).join(", ")}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">${money(k.sc.total)}</span></div>`
                 : `<div class="${cls} muted"><span class="k">${esc(k.sc.title)}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">$0</span></div>`;
             // Taxes are inside NCL's cabin price either way; without NCL's tax line the two can't be split.
             const fareRows = k.taxes === null
@@ -1118,7 +1176,15 @@
             plus: () => `Adds unlmt. Wi-Fi\\top shelf spirits\\Starbucks\\bottled water\\daily svc. chrg. ${money(DATA.rates.free_at_sea_plus.adult_per_day)}/adult/night.`,   // "\\" shows one backslash
         };
 
-        function totalBlock(k, nights, rowsHtml) {
+        // Prepay gratuities off: the service charges, directly below the Total line (paid onboard,
+        // not in the total), with "Can be removed at Guest Services." under them. The 8 night card
+        // has one line per ship, with the ship's name.
+        function onboardRows(items, named) {
+            const rows = items.filter(([, k]) => k.onboard).map(([s, k]) => `<div class="row muted onboard"><span class="k">${named ? esc(s.ship_short) + " service charges" : "Service charges"} (crew gratuities) (paid onboard, not in the total): ${k.sc.parts.map(partText).join(", ")}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">${money(k.sc.total)} onboard</span></div>`);
+            return rows.length ? rows.join("") + `<div class="onboard-small">Can be removed at Guest Services.</div>` : "";
+        }
+
+        function totalBlock(k, nights, rowsHtml, onboardHtml = "") {
             const n = guests();
             const missingNote = k.missing && k.missing.length
                 ? `<div class="notice info">Not included in the total because NCL didn't show the amount today: ${esc(k.missing.join(", "))}.</div>` : "";
@@ -1126,21 +1192,19 @@
             const taxNote = ships.length
                 ? `<div class="notice info">The ${esc(ships.join(" and "))} cabin ${ships.length > 1 ? "prices include" : "price includes"} taxes, fees and port expenses, and they are in the total. NCL didn't show the per-guest tax split today.</div>` : "";
             if (!agesKnown()) {
-                return `${taxNote}<div class="notice info">Choose every kid's age above to see the full total. Free at Sea charges depend on age.</div><div class="rows">${rowsHtml}</div>`;
+                return `${taxNote}<div class="notice info">Choose every kid's age above to see the full total. Free at Sea charges depend on age.</div><div class="rows">${rowsHtml}${onboardHtml}</div>`;
             }
             const perNight = k.now / nights;
-            const onboardText = `+ ${money(k.onboard)} service charges paid onboard (can be removed at Guest Services)`;
             return `
                 ${missingNote}
                 ${taxNote}
                 <div class="price-label">${k.onboard ? "Total to pay now" : "Total"} for ${plural(n, "guest", "guests")}</div>
                 <div class="price-total">${money(k.now)}</div>
                 <div class="price-pp">${moneyR(k.now / n)} per person</div>
-                ${k.onboard ? `<div class="onboard-note">${onboardText}</div>` : ""}
                 <div class="rows">
                     ${rowsHtml}
                     <div class="row total"><span class="k">Total</span><span class="v">${money(k.now)}</span></div>
-                    ${k.onboard ? `<div class="row onboard"><span class="k">${onboardText}</span></div>` : ""}
+                    ${onboardHtml}
                     <div class="row"><span class="k">Cost per night${k.onboard ? " (paid now)" : ""}</span><span class="v">${moneyR(perNight)} (${moneyR(perNight / n)} per person)</span></div>
                 </div>`;
         }
@@ -1189,27 +1253,29 @@
 
         // One cabin button. When it is the only available option it is shown already selected,
         // with no tap action and no hover effect (no data-pick, so the click handler ignores it).
-        function catButton(c, n, field, pressed, only) {
+        function catButton(c, n, field, pressed, only, price) {
             const attrs = only
                 ? `class="only" aria-pressed="true" aria-disabled="true" tabindex="-1"`
                 : `data-pick="${field}" data-code="${esc(c.code)}" aria-pressed="${pressed}"`;
             return `<li><button type="button" ${attrs}>
                     <span>${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}${gaugeHtml(c, n)}</span>
-                    <span class="price">${money(entry(c, n).cabin_total)}</span>
+                    <span class="price">${money(price)}</span>
                 </button></li>`;
         }
 
-        // Tap list of the available categories in this type, cheapest first.
-        function catPicker(s, t, chosen, n) {
-            const list = availableIn(t, n);
+        // Tap list of the available categories in this type, cheapest first. Each price is
+        // listPrice, plus add (the 8 night card: the other ship's chosen cabin), and note says what
+        // the prices are.
+        function catPicker(s, t, chosen, n, add = 0, note = "") {
+            const list = availableIn(s, t, n);
             if (!list.length) return "";
             const field = s === G ? "pickG" : "pickA";
             const only = list.length === 1;
-            return `<div class="cat-list-title">${esc(t.title)} cabins on the ${esc(s.ship_short)} for ${n} guests</div><ul class="cat-list">${list.map(c => catButton(c, n, field, c.code === chosen.code, only)).join("")}</ul>`;
+            return `<div class="cat-list-title">${esc(t.title)} cabins on the ${esc(s.ship_short)} for ${n} guests</div>${note}<ul class="cat-list">${list.map(c => catButton(c, n, field, c.code === chosen.code, only, listPrice(s, c) + add)).join("")}</ul>`;
         }
 
-        function daysList(s) {
-            return `<details class="days"><summary>Day by day</summary><ol>${s.ports.map(d => `
+        function daysList(s, title = "Day by day") {
+            return `<details class="days"><summary>${esc(title)}</summary><ol>${s.ports.map(d => `
                 <li><span>${fmtDay(d.date)}: ${d.sea ? "At sea" : esc(d.port)}</span><span>${d.sea ? "" : [d.arrive && "arrive " + fmtTime(d.arrive), d.depart && "leave " + fmtTime(d.depart)].filter(Boolean).join(", ")}</span></li>`).join("")}</ol></details>`;
         }
 
@@ -1234,19 +1300,17 @@
                 } else {
                     const full = findCat(s, c.code);
                     const k = cost(s, full);
-                    picks = catPicker(s, tf.t, full, n) + offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`);
+                    picks = catPicker(s, tf.t, full, n, 0, listNote("card")) + offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`);
                     SELECTIONS[shipKey(s)] = { label, items: [[s, full]] };
-                    body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k)) + ksfNote(s, full) + selectButton(shipKey(s));
+                    body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k), onboardRows([[s, k]], false)) + ksfNote(s, full) + selectButton(shipKey(s));
                 }
             }
             return `
-                <article class="card">
+                <article class="card" data-option="${shipKey(s)}">
                     <div class="card-head">
                         <span class="option-badge">${label}</span>
                         <h2 class="card-title">${esc(s.ship)}</h2>
-                        ${s === A ? auraBadge() : ""}
                         <div class="card-dates">${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)</div>
-                        ${stops(s)}
                     </div>
                     ${picks ? `<div class="card-picks">${picks}</div>` : ""}
                     <div class="card-body">${body}${daysList(s)}</div>
@@ -1254,17 +1318,18 @@
                 </article>`;
         }
 
-        // Different cabins mode: any available category on the ship, grouped by type.
-        function diffSelect(s, field) {
+        // Different cabins mode: any available category on the ship, grouped by type. Each price is
+        // listPrice plus add (the other ship's chosen cabin).
+        function diffSelect(s, field, add) {
             const n = guests();
             const groups = types(s).map(t => {
-                const list = availableIn(t, n);
+                const list = availableIn(s, t, n);
                 if (!list.length) return "";
-                return `<optgroup label="${esc(t.title)}">${list.map(c => `<option value="${esc(c.code)}" ${state[field] === c.code ? "selected" : ""}>${esc(catLabel(c))}: ${money(entry(c, n).cabin_total)}${gauge(c, n) ? `, ${esc(gauge(c, n).toLowerCase())}` : ""}</option>`).join("")}</optgroup>`;
+                return `<optgroup label="${esc(t.title)}">${list.map(c => `<option value="${esc(c.code)}" ${state[field] === c.code ? "selected" : ""}>${esc(catLabel(c))}: ${money(listPrice(s, c) + add)}${gauge(c, n) ? `, ${esc(gauge(c, n).toLowerCase())}` : ""}</option>`).join("")}</optgroup>`;
             }).join("");
-            const all = types(s).flatMap(t => availableIn(t, n));
+            const all = types(s).flatMap(t => availableIn(s, t, n));
             if (all.length === 1) {
-                return `<div class="pick-label">${esc(s.ship_short)} cabin (${s.nights} nights)</div><ul class="cat-list">${catButton(all[0], n, field, true, true)}</ul>`;
+                return `<div class="pick-label">${esc(s.ship_short)} cabin (${s.nights} nights)</div><ul class="cat-list">${catButton(all[0], n, field, true, true, listPrice(s, all[0]) + add)}</ul>`;
             }
             return `<label for="${field}">${esc(s.ship_short)} cabin (${s.nights} nights)</label><select id="${field}" data-field="${field}">${groups}</select>`;
         }
@@ -1298,14 +1363,16 @@
                     } else {
                         chosen = picks.map(([s, , c]) => [s, findCat(s, c.code)]);
                         body += `<div class="cabin-line">Matched: ${catHtml(chosen[0][1])} on the Getaway and ${catHtml(chosen[1][1])} on the Aura. Pick a different one on each ship above.</div>`;
-                        pickers = picks.map(([s, t, c]) => catPicker(s, t, c, n)).join("");
+                        const other = s => chosen.find(([x]) => x !== s);
+                        pickers = listNote("8") + picks.map(([s, t, c]) => catPicker(s, t, c, n, listPrice(...other(s)))).join("");
                     }
                 }
             } else {
-                pickers = `<div class="ship-pick">${diffSelect(G, "diffG")}${diffSelect(A, "diffA")}</div>`;
                 const cg = findCat(G, state.diffG), ca = findCat(A, state.diffA);
                 if (cg && ca && isAvail(cg, n) && isAvail(ca, n)) chosen = [[G, cg], [A, ca]];
                 else body += `<div class="notice bad">Pick an available cabin on each ship.</div>`;
+                pickers = (chosen ? listNote("8") : listNote("card"))
+                    + `<div class="ship-pick">${diffSelect(G, "diffG", chosen ? listPrice(A, ca) : 0)}${diffSelect(A, "diffA", chosen ? listPrice(G, cg) : 0)}</div>`;
             }
             if (chosen) {
                 const ks = chosen.map(([s, c]) => [s, c, cost(s, c)]);
@@ -1318,21 +1385,50 @@
                     <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</div>
                     ${lineRows(s, k, true)}
                     <div class="row"><span class="k">${esc(s.ship_short)} total${k.onboard ? " to pay now" : ""}</span><span class="v">${agesKnown() ? money(k.now) : ""}</span></div>`).join("");
-                SELECTIONS["8"] = { label: "Option 3: 8 nights", items: chosen };
-                body += staleNote([G, A]) + totalBlock(both, nights, rows) + ks.map(([s, c]) => ksfNote(s, c, s.ship_short)).join("") + selectButton("8");
+                SELECTIONS["8"] = { label: OPTIONS[2].label, items: chosen };
+                body += staleNote([G, A]) + totalBlock(both, nights, rows, onboardRows(ks.map(([s, , k]) => [s, k]), true))
+                    + ks.map(([s, c]) => ksfNote(s, c, s.ship_short)).join("") + selectButton("8");
             }
             return `
-                <article class="card featured">
+                <article class="card featured" data-option="8">
                     <div class="card-head">
-                        <span class="option-badge">Option 3: 8 nights</span>
+                        <span class="option-badge">${OPTIONS[2].label}</span>
                         <h2 class="card-title">Getaway, then Aura</h2>
-                        ${auraBadge()}
                         <div class="card-dates">${fmtDay(G.depart)} to ${fmtDay(A.return)}, 2027 (${nights} nights)</div>
-                        <div class="stops"><span class="stop">Both trips back to back</span><span class="stop">Change ships in Miami</span></div>
                     </div>
                     <div class="card-picks">${toggle}${pickers}</div>
-                    <div class="card-body">${body}</div>
+                    <div class="card-body">${body}${daysList(G, "Day by day on the Getaway")}${daysList(A, "Day by day on the Aura")}</div>
                 </article>`;
+        }
+
+        // The option tiles (5.2.0): label, ship(s), dates and nights, the port chips, and for the
+        // Aura the maiden voyage badge, christening note and video link. A tap anywhere on a tile
+        // (but the video link) turns it on or off; the button inside is what a keyboard or screen
+        // reader uses (aria-pressed).
+        function tiles() {
+            const tile = (o, title, dates, chips, extra) => {
+                const on = state.compare.includes(o.key);
+                return `
+                <div class="tile${on ? " on" : ""}" data-tile="${o.key}">
+                    <button type="button" class="tile-btn" aria-pressed="${on}">
+                        <span class="tile-top"><span class="option-badge">${o.label}</span><span class="tile-state"><span class="tile-box" aria-hidden="true">${on ? "&#10003;" : ""}</span>${on ? "Selected" : "Tap to compare"}</span></span>
+                        <span class="tile-title">${esc(title)}</span>
+                        <span class="tile-dates">${dates}</span>
+                    </button>
+                    ${chips}${extra}
+                </div>`;
+            };
+            const dates = (a, b, nights) => `${fmtDay(a)} to ${fmtDay(b)}, 2027 (${nights} nights)`;
+            return `
+                <section class="tiles-wrap" aria-label="Options to compare">
+                    <div class="tiles">
+                        ${tile(OPTIONS[0], G.ship, dates(G.depart, G.return, G.nights), stops(G), "")}
+                        ${tile(OPTIONS[1], A.ship, dates(A.depart, A.return, A.nights), stops(A), auraBadge())}
+                        ${tile(OPTIONS[2], "Getaway, then Aura", dates(G.depart, A.return, G.nights + A.nights),
+                               `<div class="stops"><span class="stop">Both trips back to back</span><span class="stop">Change ships in Miami</span></div>`, auraBadge())}
+                    </div>
+                    ${state.compare.length ? "" : `<p class="tiles-prompt">Pick one or more options to compare.</p>`}
+                </section>`;
         }
 
         function explainer() {
@@ -1360,24 +1456,21 @@
                 chosenCode = c ? c.code : null;
             }
             const rows = types(s).map(t => {
-                const cats = catsOf(t).slice().sort((a, b) => {
-                    const ea = entry(a, n), eb = entry(b, n);
-                    if (ea.available !== eb.available) return ea.available ? -1 : 1;
-                    return (ea.cabin_total || 1e9) - (eb.cabin_total || 1e9);
-                });
+                const cats = [...availableIn(s, t, n), ...catsOf(t).filter(c => !isAvail(c, n))];
                 return `<tr class="group"><td colspan="2">${esc(t.title)}</td></tr>` + cats.map(c => {
                     const e = entry(c, n);
                     const meta = [c.size, c.capacity && !c.description.includes("holds up to") ? `holds up to ${c.capacity}` : "", c.guarantee ? GUARANTEE_TEXT : ""].filter(Boolean).join(". ");
                     return e.available
-                        ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}${gaugeHtml(c, n)}</td><td>${money(e.cabin_total)}<span class="pp-small">${moneyR(e.price_pp)} pp</span></td></tr>`
+                        ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}${gaugeHtml(c, n)}</td><td>${money(listPrice(s, c))}<span class="pp-small">${moneyR(listPrice(s, c) / n)} pp</span></td></tr>`
                         : `<tr class="off"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${esc(e.reason)}</td></tr>`;
                 }).join("");
             }).join("");
             return `
                 <section class="panel" aria-label="Every ${esc(s.ship_short)} cabin">
-                    <div class="panel-title">Every ${esc(s.ship_short)} cabin for ${plural(n, "guest", "guests")} (fare and taxes)</div>
+                    <div class="panel-title">Every ${esc(s.ship_short)} cabin for ${plural(n, "guest", "guests")}</div>
+                    ${listNote(OPTIONS[s === G ? 0 : 1].label.split(":")[0])}
                     <table class="cabins"><tbody>${rows}</tbody></table>
-                    <p class="hint">Tap an available cabin to choose it. Free at Sea gratuities are added in the option cards above.${state.flResident && flShipActive(s) ? " Prices here are NCL's website prices; Florida resident discounts come off in the option cards above." : ""}</p>
+                    <p class="hint">Tap an available cabin to choose it.</p>
                 </section>`;
         }
 
@@ -1898,7 +1991,7 @@
                 const c = findCat(s, state[f]);
                 if (!c || !isAvail(c, n)) {
                     const tf = typeFor(s, state.type);
-                    const best = (!tf.missing && defaultPick(availableIn(tf.t, n))) || defaultPick(allCats(s).filter(c => isAvail(c, n)).sort((a, b) => entry(a, n).cabin_total - entry(b, n).cabin_total));
+                    const best = (!tf.missing && defaultPick(availableIn(s, tf.t, n))) || defaultPick(allCats(s).filter(c => isAvail(c, n)).sort(byListPrice(s, n)));
                     state[f] = best ? best.code : null;
                 }
             }
@@ -1950,12 +2043,12 @@
             normalize();
             renderGuests(msg);
             renderTypes();
+            // The tiles, then the full card of each selected option, in tile order.
+            const cards = { G: () => singleCard(G, OPTIONS[0].label), A: () => singleCard(A, OPTIONS[1].label), "8": eightCard };
+            const picked = OPTIONS.filter(o => state.compare.includes(o.key));
             document.getElementById("app").innerHTML = `
-                <div class="options">
-                    ${singleCard(G, "Option 1: 3 nights")}
-                    ${singleCard(A, "Option 2: 5 nights")}
-                    ${eightCard()}
-                </div>
+                ${tiles()}
+                ${picked.length ? `<div class="options n${picked.length}">${picked.map(o => cards[o.key]()).join("")}</div>` : ""}
                 ${explainer()}
                 <div class="tables">${cabinTable(G)}${cabinTable(A)}</div>`;
             save();
@@ -1983,6 +2076,17 @@
             const sel = e.target.closest("button[data-select]");
             if (sel) { openSelection(sel.dataset.select); return; }
             if (e.target.closest("[data-ms-close]")) { document.getElementById("msDialog").close(); return; }
+            const tile = e.target.closest("[data-tile]");
+            if (tile && !e.target.closest("a")) {
+                // Turn the option on or off; the cards stay in tile order.
+                const key = tile.dataset.tile;
+                const refocus = !!(document.activeElement && tile.contains(document.activeElement));
+                state.compare = state.compare.includes(key) ? state.compare.filter(k => k !== key)
+                    : OPTIONS.map(o => o.key).filter(k => k === key || state.compare.includes(k));
+                render();
+                if (refocus) document.querySelector(`[data-tile="${key}"] .tile-btn`).focus({ preventScroll: true });
+                return;
+            }
             const b = e.target.closest("button[data-count], button[data-type], button[data-mode], button[data-pick], tr.pickable");
             if (!b) return;
             let msg = "";

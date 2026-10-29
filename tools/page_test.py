@@ -19,6 +19,12 @@ Florida answer overriding the page switch, 8 nights as two bookings with totals,
 every field (a kid's date of birth that doesn't match the age on the page), a schema 3 price
 file (deposit not found), and sending to a stand-in for the Worker (the request it gets, nothing
 saved in the browser).
+
+Layout (5.2.0): the option tiles at 360 px and 1280 px (none selected and the prompt on the first
+visit, cards in tile order, side by side on a wide screen and stacked on a phone, remembered on
+return, no sideways scrolling), every cabin list price equal to the card's Total for that cabin in
+every switch combination, and the service charge line below the Total when not prepaid. Every
+other check starts with all three tiles selected (new_page).
 """
 import datetime as dt
 import functools
@@ -173,11 +179,31 @@ AS_OF_CASES = [
     ("2027-03-15T16:05:00Z", "Mar 15, 12:05 PM ET"),   # EDT again
 ]
 
+# Every check but the tile checks starts with all three option tiles selected: saved choices
+# without tiles get all three, and a first visit gets the defaults with all three.
+ALL_TILES = """(() => { try {
+    for (const key of ["cruise-decision-guide-v5", "cruise-decision-guide-v4"]) {
+        const s = JSON.parse(localStorage.getItem(key) || "null");
+        if (s && !("compare" in s)) localStorage.setItem(key, JSON.stringify(Object.assign(s, { compare: ["G", "A", "8"] })));
+    }
+    if (!localStorage.getItem("cruise-decision-guide-v5") && !localStorage.getItem("cruise-decision-guide-v4"))
+        localStorage.setItem("cruise-decision-guide-v5", JSON.stringify({ adults: 2, kids: [], type: "balcony", mode: "same", compare: ["G", "A", "8"] }));
+} catch (e) {} })()"""
+
 real_rows = {}
 with sync_playwright() as pw:
     browser = pw.chromium.launch()
+
+    def same(name, got, want):
+        check(name, got == want, "" if got == want else f"got {got}, expected {want}")
+
+    def new_page(viewport=None, tiles=True):
+        page = browser.new_page(viewport=viewport or {"width": 360, "height": 800})
+        if tiles:
+            page.add_init_script(ALL_TILES)
+        return page
     for name in ("real", "nulls"):
-        page = browser.new_page(viewport={"width": 360, "height": 800})
+        page = new_page(viewport={"width": 360, "height": 800})
         errors = []
         page.on("pageerror", lambda e: errors.append(str(e)))
         page.on("console", lambda m: errors.append(m.text) if console_error(m) else None)
@@ -248,7 +274,9 @@ with sync_playwright() as pw:
         page.close()
 
     # Prepay gratuities switch (5.0.0): off by default; off = service charges out of every total,
-    # shown as "+ $X service charges paid onboard"; on = in the totals. Today's data, 2 adults, Balcony.
+    # on a line directly below the Total (5.2.0: "Service charges (crew gratuities) (paid onboard,
+    # not in the total): 2 guests x $20 x 3 nights", "$60 onboard", one line per ship on the 8 night
+    # card, "Can be removed at Guest Services." under it); on = in the totals. Today's data, 2 adults, Balcony.
     OFF_TITLE, ON_TITLE = "Prepay gratuities (No)", "Prepay gratuities"
     OFF_DESC = "Pay onboard on the last day. Service charges are not in the totals. They're charged to your onboard account and can be removed at Guest Services."
     ON_DESC = "Service charges are paid with the cruise, before you sail. The amount is the same either way."
@@ -257,29 +285,51 @@ with sync_playwright() as pw:
     want_onboard = [2 * R["standard_per_night"] * nights["getaway"], 2 * R["standard_per_night"] * nights["aura"]]
     want_onboard.append(want_onboard[0] + want_onboard[1])   # 8 nights: both ships' service charges
 
+    fm = lambda x: f"${int(x):,}" if x == int(x) else f"${x:,.2f}"
+    sc_part = lambda ship: f"2 guests x {fm(R['standard_per_night'])} x {nights[ship]} nights"
+    want_lines = [[(f"Service charges (crew gratuities) (paid onboard, not in the total): {sc_part('getaway')}", f"{fm(want_onboard[0])} onboard")],
+                  [(f"Service charges (crew gratuities) (paid onboard, not in the total): {sc_part('aura')}", f"{fm(want_onboard[1])} onboard")],
+                  [(f"Getaway service charges (crew gratuities) (paid onboard, not in the total): {sc_part('getaway')}", f"{fm(want_onboard[0])} onboard"),
+                   (f"Aura service charges (crew gratuities) (paid onboard, not in the total): {sc_part('aura')}", f"{fm(want_onboard[1])} onboard")]]
+
     def state(page):
         cards = page.query_selector_all(".card")
-        notes = [c.query_selector(".onboard-note") for c in cards[:3]]
         return {"checked": page.is_checked("#prepayToggle"),
                 "title": page.inner_text("#prepayLabel"), "desc": page.inner_text("#prepayDesc"),
                 "totals": [money(c.query_selector(".price-total").inner_text()) for c in cards[:3]],
                 "labels": [c.query_selector(".price-label").inner_text() for c in cards[:3]],
-                "notes": [n.inner_text() if n else None for n in notes],
+                "onboard": [[(r.query_selector(".k").inner_text(), r.query_selector(".v").inner_text()) for r in c.query_selector_all(".row.onboard")] for c in cards[:3]],
+                # What follows the Total line: the onboard lines, then the small note, then the cost per night.
+                "after_total": [c.eval_on_selector(".row.total", """t => { const out = []; for (let n = t.nextElementSibling; n; n = n.nextElementSibling)
+                                    out.push(n.classList.contains("onboard-small") ? "note: " + n.textContent : n.classList.contains("onboard") ? "onboard" : n.querySelector(".k").textContent.split(" (")[0]); return out; }""")
+                                for c in cards[:3]],
+                "sc_in_breakdown": [[(k, v) for k, v in rows_of(c)[:rows_of(c).index(next(x for x in rows_of(c) if x[0] == "Total"))] if k.startswith(("Service charges", "Getaway service charges", "Aura service charges"))] for c in cards[:3]],
+                "old_note": page.query_selector(".onboard-note") is not None,
                 "text": page.inner_text("#app")}
 
     def is_off(st, where):
         check(f"prepay off ({where}): switch unchecked, title and subtitle", (st["checked"], st["title"], st["desc"]) == (False, OFF_TITLE, OFF_DESC), (st["checked"], st["title"], st["desc"]))
-        check(f"prepay off ({where}): '+ $X service charges paid onboard' under each total (8 nights adds both ships)",
-              st["notes"] == [f"+ ${int(x) if x == int(x) else x:,} service charges paid onboard (can be removed at Guest Services)" for x in want_onboard], st["notes"])
+        same(f"prepay off ({where}): service charge line below the Total with the real numbers (8 nights: one per ship)", st["onboard"], want_lines)
+        same(f"prepay off ({where}): directly below the Total, then 'Can be removed at Guest Services.', then the cost per night", st["after_total"],
+             [["onboard", "note: Can be removed at Guest Services.", "Cost per night"], ["onboard", "note: Can be removed at Guest Services.", "Cost per night"],
+              ["onboard", "onboard", "note: Can be removed at Guest Services.", "Cost per night"]])
+        same(f"prepay off ({where}): no service charge line above the Total", st["sc_in_breakdown"], [[], [], []])
+        check(f"prepay off ({where}): no '+ $X service charges paid onboard' line under the big total",
+              not st["old_note"] and "service charges paid onboard (can be removed" not in st["text"], "")
         check(f"prepay off ({where}): 'Total to pay now'", all(l.startswith("TOTAL TO PAY NOW") or l.startswith("Total to pay now") for l in st["labels"]), st["labels"])
-        check(f"prepay off ({where}): service charge line marked onboard, not in the total", st["text"].count("(paid onboard, not in the total)") >= 4, st["text"].count("(paid onboard, not in the total)"))
+        same(f"prepay off ({where}): '(paid onboard, not in the total)' only on those 4 lines", st["text"].count("(paid onboard, not in the total)"), 4)
 
     def is_on(st, where):
         check(f"prepay on ({where}): switch checked, title and subtitle", (st["checked"], st["title"], st["desc"]) == (True, ON_TITLE, ON_DESC), (st["checked"], st["title"], st["desc"]))
-        check(f"prepay on ({where}): no onboard note", st["notes"] == [None, None, None], st["notes"])
+        same(f"prepay on ({where}): no onboard line, nothing between the Total and the cost per night", (st["onboard"], st["after_total"]), ([[], [], []], [["Cost per night"]] * 3))
+        same(f"prepay on ({where}): service charges inside the total, above it (8 nights: in each ship's part)",
+             st["sc_in_breakdown"], [[(f"Service charges (crew gratuities): {sc_part('getaway')}", fm(want_onboard[0]))],
+                                     [(f"Service charges (crew gratuities): {sc_part('aura')}", fm(want_onboard[1]))],
+                                     [(f"Service charges (crew gratuities): {sc_part('getaway')}", fm(want_onboard[0])),
+                                      (f"Service charges (crew gratuities): {sc_part('aura')}", fm(want_onboard[1]))]])
         check(f"prepay on ({where}): no line marked onboard", "paid onboard" not in st["text"], "")
 
-    page = browser.new_page(viewport={"width": 360, "height": 800})
+    page = new_page(viewport={"width": 360, "height": 800})
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.goto(f"{base}/real/index.html")
@@ -353,7 +403,7 @@ with sync_playwright() as pw:
     FARE3 = "NCL lists Kids Sail Free on this sailing, but today's prices charge the 3rd guest a fare. The total uses NCL's prices."
     real_totals = {}
     for name in ("real", "ksf"):
-        page = browser.new_page(viewport={"width": 360, "height": 800})
+        page = new_page(viewport={"width": 360, "height": 800})
         errors = []
         page.on("pageerror", lambda e: errors.append(str(e)))
         page.goto(f"{base}/{name}/index.html")
@@ -411,11 +461,8 @@ with sync_playwright() as pw:
     # out from data/florida.json whether NCL offers a discount; each cabin's own amount comes off
     # the fare of guests 1 and 2; switched off, website prices and nothing extra.
 
-    def same(name, got, want):
-        check(name, got == want, "" if got == want else f"got {got}, expected {want}")
-
     def fl_open(name, stored=None):
-        page = browser.new_page(viewport={"width": 360, "height": 800})
+        page = new_page(viewport={"width": 360, "height": 800})
         errs = []
         page.on("pageerror", lambda e: errs.append(str(e)))
         page.on("console", lambda m: errs.append(m.text) if console_error(m) else None)
@@ -523,7 +570,7 @@ with sync_playwright() as pw:
                       " remove() {}, reset() {} };")
 
     def ms_open(site, stored=None, offers=None, ready=".card .price-total"):
-        page = browser.new_page(viewport={"width": 360, "height": 800})
+        page = new_page(viewport={"width": 360, "height": 800})
         errs, sent = [], []
         page.on("pageerror", lambda e: errs.append(str(e)))
         page.on("console", lambda m: errs.append(m.text) if console_error(m) else None)
@@ -787,6 +834,218 @@ with sync_playwright() as pw:
     # 9. A kid without an age: no Make Selection button.
     page, errs, _ = ms_open("ms_api", stored={"adults": 2, "kids": [None], "type": "balcony", "mode": "same"}, ready=".card .rows")
     same("Make Selection: no button until every kid's age is chosen", page.eval_on_selector_all("button[data-select]", "els => els.length"), 0)
+    page.close()
+
+
+    # Option tiles (5.2.0): three on/off tiles, none selected on the first visit, the full card of
+    # each selected option below them in tile order, remembered on the device. 360 px and wide.
+    def ys(page, sel):
+        return [round(b["y"]) for b in page.eval_on_selector_all(sel, "els => els.map(e => e.getBoundingClientRect().toJSON())")]
+
+    def xs(page, sel):
+        return [round(b["x"]) for b in page.eval_on_selector_all(sel, "els => els.map(e => e.getBoundingClientRect().toJSON())")]
+
+    def tiles_state(page):
+        return {"pressed": page.eval_on_selector_all(".tile-btn", "els => els.map(e => e.getAttribute('aria-pressed'))"),
+                "on": page.eval_on_selector_all(".tile", "els => els.map(e => e.classList.contains('on'))"),
+                "words": page.eval_on_selector_all(".tile-state", "els => els.map(e => e.lastChild.textContent.trim())"),
+                "cards": page.eval_on_selector_all(".card", "els => els.map(e => e.dataset.option)"),
+                "prompt": page.inner_text(".tiles-prompt") if page.query_selector(".tiles-prompt") else None,
+                "width": wide(page)}
+
+    PROMPT = "Pick one or more options to compare."
+    for w in (360, 1280):
+        page = new_page({"width": w, "height": 900}, tiles=False)
+        errs = []
+        page.on("pageerror", lambda e: errs.append(str(e)))
+        page.on("console", lambda m: errs.append(m.text) if console_error(m) else None)
+        page.goto(f"{base}/real/index.html")
+        page.wait_for_selector(".tile")
+        st = tiles_state(page)
+        where = f"tiles at {w} px"
+        same(f"{where}: first visit, no tile selected", (st["pressed"], st["on"], st["words"]), (["false"] * 3, [False] * 3, ["Tap to compare"] * 3))
+        same(f"{where}: first visit, the prompt under the tiles and no cards", (st["prompt"], st["cards"]), (PROMPT, []))
+        check(f"{where}: first visit, no sideways scrolling", st["width"] <= w, st["width"])
+        tile_text = page.eval_on_selector_all(".tile", "els => els.map(e => e.innerText)")
+        check(f"{where}: each tile has its label, ship, dates and nights",
+              all(all(x in t for x in want) for t, want in zip(tile_text, [("OPTION 1: 3 NIGHTS", "Norwegian Getaway", "Jun 11 to", "(3 nights)", "Nassau"),
+                                                                           ("OPTION 2: 5 NIGHTS", "Norwegian Aura", "Jun 14 to", "(5 nights)", "Puerto Plata"),
+                                                                           ("OPTION 3: 8 NIGHTS", "Getaway, then Aura", "Jun 11 to", "(8 nights)", "Change ships in Miami")])), tile_text)
+        same(f"{where}: maiden voyage badge, christening note and video link on the Aura tiles only",
+             [page.eval_on_selector(f'[data-tile="{k}"]', "e => [!!e.querySelector('.maiden-badge'), !!e.querySelector('.maiden-text'), !!e.querySelector('a.maiden-link')]") for k in "GA8"],
+             [[False] * 3, [True] * 3, [True] * 3])
+        tops = ys(page, ".tile")
+        if w == 360:
+            check(f"{where}: tiles stacked", tops[0] < tops[1] < tops[2] and len(set(xs(page, ".tile"))) == 1, tops)
+        else:
+            check(f"{where}: tiles in one row", len(set(tops)) == 1, tops)
+        order = [ys(page, s)[0] for s in ("section[aria-label='Who is in the cabin']", "section[aria-label='Cabin type']",
+                                          "section[aria-label='Florida resident rate and gratuities']", ".tiles-wrap")]
+        check(f"{where}: page order: who, cabin type, Florida and gratuities, then the tiles", order == sorted(order), order)
+
+        page.click('[data-tile="8"] .tile-title')
+        page.click('[data-tile="G"] .tile-btn')
+        st = tiles_state(page)
+        same(f"{where}: two tiles selected (8 nights first): shown selected, cards in tile order, no prompt",
+             (st["pressed"], st["on"], st["words"], st["cards"], st["prompt"]),
+             (["true", "false", "true"], [True, False, True], ["Selected", "Tap to compare", "Selected"], ["G", "8"], None))
+        cards_y = ys(page, ".card")
+        check(f"{where}: selected cards below the tiles", min(cards_y) > max(ys(page, ".tile")), (cards_y, ys(page, ".tile")))
+        if w == 360:
+            check(f"{where}: two cards stacked", cards_y[0] < cards_y[1] and len(set(xs(page, ".card"))) == 1, cards_y)
+        else:
+            check(f"{where}: two cards side by side", len(set(cards_y)) == 1 and xs(page, ".card")[0] < xs(page, ".card")[1], cards_y)
+        check(f"{where}: two cards, no sideways scrolling", st["width"] <= w, st["width"])
+        card8 = page.query_selector('.card[data-option="8"]')
+        same(f"{where}: the 8 night card keeps its same or different toggle, both ship pickers and Day by day",
+             (len(card8.query_selector_all("button[data-mode]")), len(card8.query_selector_all(".cat-list")), len(card8.query_selector_all("details.days")),
+              len(card8.query_selector_all("button[data-select]")), len(card8.query_selector_all("input[data-offer]"))), (2, 2, 2, 1, 6))
+        cardg = page.query_selector('.card[data-option="G"]')
+        same(f"{where}: the Getaway card has its switches, cabin list, total, Make Selection and Day by day",
+             (len(cardg.query_selector_all("input[data-offer]")) == 3, bool(cardg.query_selector(".cat-list")), bool(cardg.query_selector(".price-total")),
+              bool(cardg.query_selector("button[data-select]")), bool(cardg.query_selector("details.days"))), (True,) * 5)
+        # The video link opens NCL's video and never turns the tile on or off.
+        page.eval_on_selector('[data-tile="A"] a.maiden-link', "a => a.addEventListener('click', e => e.preventDefault(), { once: true })")
+        page.click('[data-tile="A"] a.maiden-link')
+        same(f"{where}: the video link doesn't toggle the tile", tiles_state(page)["pressed"], ["true", "false", "true"])
+        page.reload()
+        page.wait_for_selector(".card")
+        st = tiles_state(page)
+        same(f"{where}: return visit shows the tiles picked last", (st["pressed"], st["cards"]), (["true", "false", "true"], ["G", "8"]))
+        same(f"{where}: saved with the other choices", page.evaluate("JSON.parse(localStorage.getItem('cruise-decision-guide-v5')).compare"), ["G", "8"])
+        page.click('[data-tile="A"] .tile-dates')
+        st = tiles_state(page)
+        same(f"{where}: all three selected, in tile order", st["cards"], ["G", "A", "8"])
+        cards_y = ys(page, ".card")
+        if w == 360:
+            check(f"{where}: three cards stacked", cards_y == sorted(cards_y) and len(set(cards_y)) == 3, cards_y)
+        else:
+            check(f"{where}: three cards side by side", len(set(cards_y)) == 1, cards_y)
+        check(f"{where}: three cards, no sideways scrolling", st["width"] <= w, st["width"])
+        if SHOTS:
+            page.screenshot(path=os.path.join(SHOTS, f"tiles_three_{w}.png"), full_page=True)
+        page.focus('[data-tile="G"] .tile-btn')
+        page.keyboard.press("Enter")
+        st = tiles_state(page)
+        same(f"{where}: keyboard: Enter on a tile turns it off and keeps the focus there",
+             (st["cards"], page.evaluate("document.activeElement.closest('[data-tile]') && document.activeElement.closest('[data-tile]').dataset.tile")), (["A", "8"], "G"))
+        page.reload()
+        page.wait_for_selector(".card")
+        same(f"{where}: a tile turned off stays off on return", tiles_state(page)["cards"], ["A", "8"])
+        page.click('[data-tile="A"] .tile-btn')
+        page.click('[data-tile="8"] .tile-btn')
+        st = tiles_state(page)
+        same(f"{where}: none selected again: the prompt is back", (st["cards"], st["prompt"]), ([], PROMPT))
+        page.reload()
+        page.wait_for_selector(".tile")
+        same(f"{where}: none selected is remembered too", (tiles_state(page)["cards"], tiles_state(page)["prompt"]), ([], PROMPT))
+        check(f"{where}: no script errors", not errs, errs[:3])
+        page.close()
+
+    # Cabin list prices (5.2.0): every price in every list (each card's list, both 8 night pickers
+    # in both modes, the full tables) is the cabin total with the current choices and equals the
+    # card's Total once that cabin is chosen. Every switch combination, with a Florida discount on
+    # some cabins (the "both" test file) and several parties.
+    LIST_CHECK = """cfg => {
+        Object.assign(state, cfg, { compare: ["G", "A", "8"] });
+        render();
+        const num = t => Number(String(t).replace(/[^\\d.]/g, ""));
+        const card = k => document.querySelector(`.card[data-option="${k}"]`);
+        const total = k => num(card(k).querySelector(".price-total").textContent);
+        const shipLine = ship => num([...card("8").querySelectorAll(".rows .row")].find(r => r.querySelector(".k").textContent.startsWith(ship + " total")).querySelector(".v").textContent);
+        const out = [], order = [];
+        const seen = (where, code, shown, got) => out.push([where, code, shown, got]);
+        const sorted = () => document.querySelectorAll(".cat-list").forEach(l => {
+            const p = [...l.querySelectorAll(".price")].map(x => num(x.textContent));
+            if (p.some((x, i) => i && x < p[i - 1])) order.push(p);
+        });
+        sorted();
+        for (const k of ["G", "A", "8"]) {
+            const only = card(k).querySelectorAll(".cat-list button.only");
+            only.forEach(b => seen(k, "only", num(b.querySelector(".price").textContent), total(k)));
+            const picks = [...card(k).querySelectorAll(".cat-list button[data-pick]")].map(b => [b.dataset.pick, b.dataset.code]);
+            for (const [f, code] of picks) {
+                const b = card(k).querySelector(`button[data-pick="${f}"][data-code="${code}"]`);
+                const shown = num(b.querySelector(".price").textContent);
+                b.click();
+                seen(k + " list", f + " " + code, shown, total(k));
+                sorted();
+            }
+            for (const field of ["diffG", "diffA"]) {
+                const sel = () => card(k).querySelector(`select[data-field="${field}"]`);
+                if (!sel()) continue;
+                for (const v of [...sel().options].map(o => o.value)) {
+                    const o = [...sel().options].find(x => x.value === v);
+                    const shown = num(/: (\\$[\\d,.]+)/.exec(o.textContent)[1]);
+                    sel().value = v;
+                    sel().dispatchEvent(new Event("change", { bubbles: true }));
+                    seen("8 picker", field + " " + v, shown, total("8"));
+                }
+            }
+        }
+        for (const ship of ["G", "A"]) {
+            const codes = [...document.querySelectorAll(`tr.pickable[data-ship="${ship}"]`)].map(r => r.dataset.code);
+            for (const code of codes) {
+                const r = document.querySelector(`tr.pickable[data-ship="${ship}"][data-code="${code}"]`);
+                const shown = num(r.querySelector("td:last-child").childNodes[0].textContent);
+                const pp = num(r.querySelector(".pp-small").textContent);
+                r.click();
+                // Same cabin mode: the option card now shows that cabin. Different cabins: the 8 night card's ship line.
+                const got = state.mode === "same" ? total(ship) : shipLine(ship === "G" ? "Getaway" : "Aura");
+                seen("table " + ship, code + " pp " + pp, shown, got);
+            }
+        }
+        return { out, order };
+    }"""
+    page = new_page({"width": 360, "height": 800})
+    errs = []
+    page.on("pageerror", lambda e: errs.append(str(e)))
+    page.goto(f"{base}/both/index.html")
+    page.wait_for_selector(".card .price-total")
+    parties = [(2, []), (2, [15, 7]), (1, [10, 2])]
+    offer_sets = [{"bar": b, "dining": d, "plus": p} for b, d, p in ((False, False, False), (True, False, False), (False, True, False), (True, True, False), (True, True, True))]
+    offer_pairs = [(o, o) for o in offer_sets] + [(offer_sets[4], offer_sets[0])]
+    compared, bad, unsorted, combos = 0, [], [], 0
+    for adults, kids in parties:
+        for og, oa in offer_pairs:
+            for prepay in (False, True):
+                for fl in (True, False):
+                    for mode in ("same", "different"):
+                        cfg = {"adults": adults, "kids": kids, "type": "balcony", "mode": mode, "prepayGratuities": prepay, "flResident": fl,
+                               "offers": {"G": og, "A": oa}, "pickG": None, "pickA": None, "diffG": None, "diffA": None}
+                        res = page.evaluate(LIST_CHECK, cfg)
+                        combos += 1
+                        compared += len(res["out"])
+                        bad += [(cfg, r) for r in res["out"] if abs(r[2] - r[3]) > 0.005]
+                        unsorted += res["order"]
+    check(f"list prices = card totals: {compared} prices in {combos} combinations (parties, Free at Sea, Plus, prepay, Florida, both 8 night modes)",
+          compared > 5000 and not bad, bad[:3])
+    check("list prices: every list cheapest first by the price it shows", not unsorted, unsorted[:3])
+    # Florida discount really in the list prices: Getaway BF is $60 x 2 lower with the switch on.
+    page.evaluate("""() => { Object.assign(state, { adults: 2, kids: [], type: "balcony", mode: "same", prepayGratuities: false, flResident: true, pickG: "BF",
+                              offers: { G: { bar: true, dining: true, plus: false }, A: { bar: true, dining: true, plus: false } } }); render(); }""")
+    price_bf = lambda: money(page.inner_text('.card[data-option="G"] button[data-code="BF"] .price'))
+    on_bf = price_bf()
+    page.click("#flToggle")
+    same("list prices include the Florida discount (Getaway BF: 2 guests x $60)", round(price_bf() - on_bf, 2), 120)
+    page.click("#flToggle")
+    # Labels: what the price is, under each list's title.
+    notes = page.eval_on_selector_all(".cat-list-note", "els => els.map(e => e.textContent)")
+    same("list labels: card lists, the 8 night pickers and the full tables", sorted(set(notes)), sorted({
+        "Each price is the cabin total for 2 guests with your choices, the same as the Total below.",
+        "Each price is the 8 night total with your choices: this cabin plus the cabin chosen on the other ship, the same as the Total below.",
+        "Each price is the cabin total for 2 guests with your choices, the same as the Total on the Option 1 card.",
+        "Each price is the cabin total for 2 guests with your choices, the same as the Total on the Option 2 card."}))
+    # A kid without an age: no totals yet, so the lists show NCL's fare with taxes and say so.
+    page.evaluate("() => { Object.assign(state, { kids: [null] }); render(); }")
+    gbf = next(c for t in gw["types"] for c in t["categories"] if c["code"] == "BF")
+    same("list prices before every kid's age is set: NCL's fare with taxes, labelled",
+         (price_bf(), page.inner_text('.card[data-option="G"] .cat-list-note')),
+         (gbf["by_guests"]["3"]["cabin_total"], "Each price is NCL's fare with taxes for 3 guests. Choose every kid's age above to see each cabin's total with your choices."))
+    check("list price checks: no script errors", not errs, errs[:3])
+    if SHOTS:
+        page.evaluate("() => { Object.assign(state, { kids: [] }); render(); }")
+        page.query_selector('.card[data-option="G"]').screenshot(path=os.path.join(SHOTS, "list_prices_getaway.png"))
     page.close()
 
     browser.close()

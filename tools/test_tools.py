@@ -1221,6 +1221,42 @@ RATES_PAGE = ("Prices are Per Person Per Day 1-8 (Adult) $49.99 1-2 (Child) $40 
               "All guests 3 years or older")
 
 
+def test_eastern_dates():
+    """Every date-only field fetch_prices.py writes is the Eastern date (5.2.0): the evening run of
+    Oct 28 at 10:14 PM Eastern is Oct 29 by UTC date."""
+    utc = lambda s: dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
+    check("Eastern date: 10:14 PM Eastern on Oct 28 (Oct 29 by UTC date)", fp.eastern_day(utc("2026-10-29T02:14:00Z")), "2026-10-28")
+    check("Eastern date: 10 PM Eastern on Nov 1 (after daylight saving time ends)", fp.eastern_day(utc("2026-11-02T03:00:00Z")), "2026-11-01")
+    check("Eastern date: morning run", fp.eastern_day(utc("2026-10-29T10:20:00Z")), "2026-10-29")
+    cfg = {"id": "getaway-2027-06-11", "ship_short": "Getaway"}
+    keep_log = fp.log
+    fp.log = lambda m: None
+    try:
+        status = {str(g): {"updated": True, "as_of": "2026-10-29T02:14:00Z"} for g in fp.GUEST_COUNTS}
+        summaries = {g: {"type": "BALCONY", "category": "BF", "deposit": 50.0 * g, "deposit_due_hours": 73,
+                         "final_payment_due": "2027-02-11", "fare_total": 1000} for g in fp.GUEST_COUNTS}
+        pay = fp.payment_info(cfg, summaries, status, None, {}, utc("2026-10-29T02:14:00Z"), {"deposits": []}, [])
+        check("deposit checked date: the Eastern date of an evening run", (pay["standard_deposit_per_guest"], pay["standard_deposit_checked_at"]), (50.0, "2026-10-28"))
+        # No standard deposit today: the previous one is kept for 3 Eastern days.
+        kept = {str(g): {"updated": False, "as_of": "2026-10-25T10:20:00Z"} for g in fp.GUEST_COUNTS}
+        prev_s = {"payment": {"standard_deposit_per_guest": 50, "standard_deposit_checked_at": "2026-10-25", "final_payment_due": "2027-02-11"}}
+        pay = fp.payment_info(cfg, {}, kept, prev_s, {}, utc("2026-10-29T02:14:00Z"), {"deposits": []}, [])
+        check("deposit kept 3 Eastern days (4 by UTC date)", pay["standard_deposit_checked_at"], "2026-10-25")
+        pay = fp.payment_info(cfg, {}, kept, prev_s, {}, utc("2026-10-29T10:20:00Z"), {"deposits": []}, [])
+        check("deposit not kept after 4 Eastern days", pay["standard_deposit_per_guest"], None)
+        grat = {"open_bar": {"title": "Unlimited Open Bar", "per_guest": 96, "soda_under_21_position_2": 37.5, "checked_at": "2026-10-13"},
+                "specialty_dining": {"title": "Specialty Dining - 1 Meal", "per_guest": 20, "checked_at": "2026-10-13"}}
+        previous = {"saved_at": "2026-10-13T10:00:00Z", "sailings": [{"id": cfg["id"], "gratuities": grat}],
+                    "checks": {"ages": [{"sailing": cfg["id"], "ok": True, "expected": 1, "ncl_total": 1}]}}
+        g, _ = fp.kept_gratuities(cfg, previous["sailings"][0], previous, utc("2026-10-17T02:00:00Z"), RuntimeError("x"), [])
+        check("gratuities kept 3 Eastern days (Oct 16, 10 PM Eastern; 4 by UTC date)", g is grat, True)
+        rules = fp.deposit_rules({"deposits": [{"rule": fp.PERCENT_RULE, "ok": True, "sailing": "aura-2027-06-14", "category": "H6", "guests": 5}]},
+                                 None, fp.eastern_day(utc("2026-10-29T02:14:00Z")), [])
+        check("Suite and Haven rule confirmed on the Eastern date", rules["confirmed_on"], "2026-10-28")
+    finally:
+        fp.log = keep_log
+
+
 def price_run(ncl, folder, previous=None, name="prices.json"):
     """One whole fetch_prices.py run (main) against the stand-in for NCL, no network. Returns the
     data file it wrote and what it printed for the GitHub run page."""
@@ -1407,6 +1443,7 @@ if __name__ == "__main__":
     test_florida_clone_guard()
     test_offers()
     test_payment()
+    test_eastern_dates()
     test_no_em_dashes()
     print(f"\n{'All tests passed' if not FAILED else str(len(FAILED)) + ' FAILED: ' + '; '.join(FAILED)}")
     sys.exit(1 if FAILED else 0)

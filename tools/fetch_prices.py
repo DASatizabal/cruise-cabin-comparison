@@ -270,6 +270,12 @@ def utc(ms):
     return dt.datetime.fromtimestamp(ms / 1000, dt.timezone.utc)
 
 
+def eastern_day(t):
+    """The Eastern date (America/New_York) of a time, as YYYY-MM-DD. Every date-only field this
+    tool writes (checked dates, the sailings' saved_at) uses it, like every "done that day" check."""
+    return t.astimezone(MIAMI).strftime("%Y-%m-%d")
+
+
 def hhmm(text):
     """'4:00 PM' -> '16:00'."""
     if not text:
@@ -710,7 +716,7 @@ def payment_info(cfg, summaries, status, prev_s, offers, now, checks, warnings):
     """
     ship = cfg["ship_short"]
     now_iso = now.strftime("%Y-%m-%dT%H:%M:%SZ")
-    today = now.strftime("%Y-%m-%d")
+    today = eastern_day(now)
     prev_pay = (prev_s or {}).get("payment") or {}
     by_guests, per_guest, dates = {}, {}, {}
     for g in GUEST_COUNTS:
@@ -757,7 +763,7 @@ def payment_info(cfg, summaries, status, prev_s, offers, now, checks, warnings):
                             f"({', '.join(f'{g} guests ${v:g}' for g, v in per_guest.items())}); standard deposit left empty")
             log("Warning: " + warnings[-1])
     elif prev_pay.get("standard_deposit_per_guest") and prev_pay.get("standard_deposit_checked_at") \
-            and (now.date() - dt.date.fromisoformat(prev_pay["standard_deposit_checked_at"])).days <= MAX_STALE_DAYS:
+            and (dt.date.fromisoformat(today) - dt.date.fromisoformat(prev_pay["standard_deposit_checked_at"])).days <= MAX_STALE_DAYS:
         standard, standard_on = prev_pay["standard_deposit_per_guest"], prev_pay["standard_deposit_checked_at"]
         log(f"  no standard cabin deposit today; keeping ${standard:g} per guest from {standard_on}")
     else:
@@ -822,10 +828,10 @@ def kept_gratuities(cfg, prev_s, previous, now, error, warnings):
     most 3 days old and came with a passing age check; otherwise null, never guessed, with a
     warning naming the ship. Returns (gratuities, age_check)."""
     prev_g = (prev_s or {}).get("gratuities")
-    kept_on = (prev_g["open_bar"].get("checked_at") or previous["saved_at"][:10]) if prev_g else None
+    kept_on = (prev_g["open_bar"].get("checked_at") or eastern_day(dt.datetime.fromisoformat(previous["saved_at"].replace("Z", "+00:00")))) if prev_g else None
     prev_age = next((x for x in ((previous or {}).get("checks") or {}).get("ages", [])
                      if x.get("sailing") == cfg["id"] and x.get("ok") is True), None)
-    if prev_g and prev_age and (now.date() - dt.date.fromisoformat(kept_on)).days <= MAX_STALE_DAYS:
+    if prev_g and prev_age and (dt.date.fromisoformat(eastern_day(now)) - dt.date.fromisoformat(kept_on)).days <= MAX_STALE_DAYS:
         log(f"  age test FAILED ({error}); keeping gratuities from {kept_on}")
         return prev_g, dict(prev_age, kept_from=kept_on)
     warnings.append(f"{cfg['ship_short']}: Free at Sea gratuities not found on NCL today ({error}); left empty")
@@ -968,7 +974,7 @@ def fetch_sailing(cfg, checks, warnings, previous=None):
         # in position 3 or later nothing; Specialty Dining 13 and over pay, under 13 free.
         if not (b[0] > 0 and 0 < b[1] < b[0] and b[2] == 0 and d[0] > 0 and d[1] == d[0] and d[2] == 0):
             raise RuntimeError(f"NCL's age rules changed: Open Bar {b}, Specialty Dining {d}")
-        read_on = now.strftime("%Y-%m-%d")
+        read_on = eastern_day(now)
         gratuities = {
             "open_bar": {"title": bar["title"], "per_guest": b[0], "soda_under_21_position_2": b[1],
                          "under_21_position_3_plus": 0, "source": "NCL price-summary (age test)", "checked_at": read_on},
@@ -1019,7 +1025,7 @@ def fetch_sailing(cfg, checks, warnings, previous=None):
         "nights": nights,
         "url": f"https://www.ncl.com/cruises/{cfg['itinerary_code']}",
         "source": "NCL vacation-builder API",
-        "saved_at": now.strftime("%Y-%m-%d"),
+        "saved_at": eastern_day(now),
         "party_sizes": status,
         "taxes_per_guest": taxes_per_guest,
         "gratuities": gratuities,
@@ -1064,7 +1070,7 @@ def fetch_rates(previous):
     (with `stale_since`). With no previous rate it is left empty (null) with a warning, and the
     page says it wasn't found. Each page is read once per run, even when two rates come from it.
     """
-    today = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
+    today = eastern_day(dt.datetime.now(dt.timezone.utc))
     prev = (previous or {}).get("rates") or {}
     rates, warnings, pages = {}, [], {}
 
@@ -1126,7 +1132,7 @@ def main():
     checks = {"extra_guest_mismatches": [], "formula": [], "ages": [], "rates": [], "deposits": []}
     warnings = []
     sailings = [fetch_sailing(cfg, checks, warnings, previous) for cfg in SAILINGS]
-    rules = deposit_rules(checks, previous, dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d"), warnings)
+    rules = deposit_rules(checks, previous, eastern_day(dt.datetime.now(dt.timezone.utc)), warnings)
     rates, rate_warnings = fetch_rates(previous)
     for w in rate_warnings:
         log("Warning: " + w)
