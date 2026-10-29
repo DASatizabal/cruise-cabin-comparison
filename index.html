@@ -193,16 +193,41 @@
 
         .seg.small button { padding: 0.45rem 0.85rem; font-size: 0.85rem; }
 
-        /* Option cards */
-        .options {
-            display: grid;
-            gap: 1.25rem;
-            margin-top: 1.5rem;
+        /* Option tiles (5.2.0): on/off buttons for the options to compare, one row on wide screens */
+        .tiles { display: grid; gap: 0.75rem; margin-top: 1.5rem; }
+        @media (min-width: 760px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        .tile {
+            background: var(--white); border: 2px solid var(--gray-200); border-radius: 14px;
+            padding: 0.8rem 0.9rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); cursor: pointer;
+        }
+        .tile:hover { border-color: var(--teal-light); }
+        .tile.on { border-color: var(--teal); background: var(--teal-wash); box-shadow: 0 0 0 1px var(--teal); }
+        .tile-btn { display: block; width: 100%; padding: 0; border: none; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+        .tile-top { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .tile .option-badge { margin-bottom: 0; }
+        .tile-state { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 700; color: var(--gray-500); white-space: nowrap; }
+        .tile.on .tile-state { color: var(--teal); }
+        .tile-box {
+            display: inline-flex; align-items: center; justify-content: center; width: 1.3rem; height: 1.3rem; flex-shrink: 0;
+            border: 2px solid var(--gray-300); border-radius: 6px; background: var(--white); color: var(--white); font-size: 0.85rem; line-height: 1;
+        }
+        .tile.on .tile-box { background: var(--teal); border-color: var(--teal); }
+        .tile-title { display: block; font-size: 1.05rem; font-weight: 700; color: var(--gray-900); margin-top: 0.45rem; line-height: 1.25; }
+        .tile-dates { display: block; font-size: 0.85rem; color: var(--gray-600); margin-top: 0.1rem; }
+        .tile .stops { margin-top: 0.45rem; }
+        .tiles-prompt {
+            margin-top: 0.9rem; padding: 0.8rem 1rem; border: 2px dashed var(--gray-300); border-radius: 12px;
+            background: var(--white); text-align: center; font-weight: 600; color: var(--gray-700);
         }
 
-        @media (min-width: 1000px) {
-            .options { grid-template-columns: repeat(3, 1fr); align-items: start; }
+        /* Option cards: the selected options, side by side on wide screens */
+        .options { display: grid; gap: 1.25rem; margin-top: 1.25rem; align-items: start; }
+        .options > .card { min-width: 0; }
+        @media (min-width: 760px) {
+            .options.n1 { max-width: 40rem; margin-left: auto; margin-right: auto; }
+            .options.n2, .options.n3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
+        @media (min-width: 1000px) { .options.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
         .card {
             background: var(--white);
@@ -498,13 +523,21 @@
         .cat-meta { font-size: 0.78rem; color: var(--gray-500); margin-top: 0.1rem; }
         .cat-code { font-size: 0.75rem; color: var(--gray-500); font-weight: 400; white-space: nowrap; }
         .card-picks { padding: 0.9rem 1.25rem 0; }
-        .card-picks .cat-list-title { margin-top: 0; }
+        /* Free at Sea first, then the cabin lists (5.2.0), each list title with a line above it */
+        .card-picks .cat-list-title, .pick-section { margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--gray-200); }
+        .card-picks > :first-child { margin-top: 0; padding-top: 0; border-top: none; }
+        .pick-section .cat-list-note + .cat-list-title, .pick-section .type-pick + .cat-list-title { margin-top: 0.9rem; padding-top: 0; border-top: none; }
+        .type-pick-title { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ocean-blue); margin-bottom: 0.4rem; }
+        .seg + .type-pick { margin-top: 0.9rem; }
+        .type-pick + .cat-list-note { margin-top: 0.75rem; }
         .gty { color: #92400e; }
 
         .cat-list { list-style: none; margin-top: 0.9rem; }
+        .cat-list-note { font-size: 0.75rem; color: var(--gray-600); margin-top: 0.25rem; line-height: 1.35; }
+        .cat-list-note + .cat-list { margin-top: 0.5rem; }
 
         .cat-list-title {
-            font-size: 0.75rem;
+            font-size: 0.9rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.04em;
@@ -568,9 +601,8 @@
         .offers-foot { font-size: 0.72rem; color: var(--gray-600); margin-top: 0.5rem; line-height: 1.35; }
         .drink-list { display: inline-block; margin-top: 0.35rem; font-size: 0.8rem; font-weight: 600; color: var(--ocean-blue); }
         .row.subtotal .k, .row.subtotal .v { font-weight: 700; color: var(--gray-900); }
-        .row.onboard { border-bottom: 1px solid var(--gray-100); }
-        .row.onboard .k { color: var(--gray-700); font-size: 0.85rem; }
-        .onboard-note { font-size: 0.85rem; color: var(--gray-600); margin-top: 0.2rem; }
+        .row.onboard { border-bottom: none; padding-bottom: 0.15rem; }
+        .onboard-small { font-size: 0.75rem; color: var(--gray-500); padding-bottom: 0.45rem; border-bottom: 1px solid var(--gray-100); }
         .gauge { display: inline-block; margin-top: 0.25rem; padding: 0.05rem 0.5rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600; }
         .gauge.ok { background: #dcfce7; color: #166534; }
         .gauge.mid { background: var(--gold-wash); color: #92400e; }
@@ -596,6 +628,82 @@
 
         .tables { display: grid; gap: 1.25rem; }
         @media (min-width: 900px) { .tables { grid-template-columns: 1fr 1fr; } }
+
+        /* Make Selection (5.2.0) */
+        .ms-open {
+            display: block; width: 100%; margin-top: 0.9rem; padding: 0.75rem 1rem; border: none; border-radius: 9999px;
+            background: var(--teal); color: var(--white); font: inherit; font-size: 1rem; font-weight: 700; cursor: pointer;
+        }
+        .ms-open:hover { background: var(--teal-light); }
+        dialog.ms {
+            width: calc(100% - 1rem); max-width: 40rem; max-height: calc(100dvh - 1rem); margin: auto; padding: 0; overflow-y: auto;
+            border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); color: var(--gray-800); background: var(--white);
+        }
+        dialog.ms::backdrop { background: rgba(10, 37, 64, 0.6); }
+        .ms-head {
+            position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;
+            padding: 0.85rem 1rem; background: var(--deep-ocean); color: var(--white);
+        }
+        .ms-head h2 { font-size: 1.1rem; }
+        .ms-close { width: 2.25rem; height: 2.25rem; flex-shrink: 0; border: none; border-radius: 50%; background: rgba(255, 255, 255, 0.15); color: var(--white); font: inherit; font-size: 1.3rem; cursor: pointer; }
+        .ms-body { padding: 0 1rem 1.25rem; }
+        .ms-sec { margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--gray-200); }
+        .ms-sec:first-child { border-top: none; }
+        .ms-sec h3 { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ocean-blue); margin-bottom: 0.5rem; }
+        .ms-warn { background: var(--gold-wash); border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 0.85rem; font-weight: 600; margin-top: 0.75rem; }
+        .ms-note { background: var(--gray-50); border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 0.85rem; color: var(--gray-700); margin-top: 0.5rem; }
+        .ms-note[hidden], .ms-sec[hidden], .ms-fields[hidden], .hint[hidden] { display: none; }
+        .ms-wait { font-size: 0.875rem; color: var(--gray-600); }
+        .ms-item { font-size: 0.875rem; padding: 0.45rem 0; border-bottom: 1px dashed var(--gray-200); }
+        .ms-list { font-size: 0.875rem; margin-top: 0.4rem; }
+        .ms-list div { padding: 0.15rem 0; }
+        .ms fieldset { border: none; }
+        .ms legend, .ms-sub { font-size: 0.9rem; font-weight: 700; color: var(--gray-900); margin-top: 0.6rem; }
+        .ms-choice {
+            display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.55rem 0.7rem; margin-top: 0.4rem;
+            border: 2px solid var(--gray-200); border-radius: 10px; font-size: 0.875rem; cursor: pointer;
+        }
+        .ms-choice:has(input:checked) { border-color: var(--teal); background: var(--teal-wash); }
+        .ms-choice input, .ms-check input { margin-top: 0.2rem; flex-shrink: 0; width: 1.1rem; height: 1.1rem; accent-color: var(--teal); }
+        .ms-check { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.9rem; font-weight: 600; margin-top: 0.4rem; }
+        .ms-field { margin-top: 0.55rem; }
+        .ms-field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.2rem; }
+        .ms-field input, .ms-field select {
+            width: 100%; padding: 0.5rem 0.6rem; border: 2px solid var(--gray-200); border-radius: 8px;
+            font: inherit; font-size: 1rem; background: var(--white); color: var(--gray-900);
+        }
+        .ms [aria-invalid="true"] { border-color: var(--red); }
+        .ms-guest { margin-top: 0.75rem; padding: 0.25rem 0.75rem 0.75rem; background: var(--gray-50); border-radius: 10px; }
+        .ms-booking { margin-top: 0.9rem; }
+        .ms-booking .ship-head { font-size: 0.9rem; }
+        .ms-math { margin-top: 0.6rem; }
+        .ms-steps { padding-left: 1.2rem; font-size: 0.875rem; }
+        .ms-steps li { margin: 0.35rem 0; }
+        .ms-steps a { color: var(--ocean-blue); font-weight: 600; word-break: break-word; }
+        .ms-explain { font-size: 0.85rem; color: var(--gray-700); margin-top: 0.4rem; }
+        .ms-lines { margin-top: 0.4rem; }
+        .ms-send { display: block; width: 100%; margin-top: 0.75rem; padding: 0.8rem 1rem; border: none; border-radius: 9999px; background: var(--teal); color: var(--white); font: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; }
+        .ms-send:disabled { background: var(--gray-300); cursor: default; }
+        .ms-status { margin-top: 0.75rem; font-size: 0.875rem; }
+        .ms-status:empty { display: none; }
+        .ms-status.bad { background: var(--red-wash); color: var(--red); border-radius: 8px; padding: 0.6rem 0.75rem; }
+        .ms-status.bad ul { padding-left: 1.1rem; margin-top: 0.3rem; }
+        .ms-status.info, .ms-status.ok { background: var(--teal-wash); color: var(--gray-800); border-radius: 8px; padding: 0.6rem 0.75rem; }
+        #msTurnstile, #pwTurnstile { margin-top: 0.75rem; min-height: 0; }
+        /* Price watch (5.2.0) */
+        .pw-open { margin-top: 0.5rem; background: var(--white); color: var(--teal); border: 2px solid var(--teal); }
+        .pw-open:hover { background: var(--teal-wash); }
+        .pw-price { font-size: 1.4rem; font-weight: 800; color: var(--gray-900); }
+        .pw-watch { padding: 0.6rem 0; border-bottom: 1px dashed var(--gray-200); font-size: 0.875rem; }
+        .pw-label { white-space: pre-line; }
+        .pw-choices { padding-left: 1.1rem; margin-top: 0.3rem; color: var(--gray-700); }
+        .ms-check input:disabled + span { color: var(--gray-500); }
+        #pwFreqQ { margin-top: 0.75rem; }
+        .pw-stop {
+            margin-top: 0.45rem; padding: 0.35rem 0.9rem; border: 2px solid var(--red); border-radius: 9999px;
+            background: var(--white); color: var(--red); font: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+        }
+        .pw-stop:disabled { border-color: var(--gray-300); color: var(--gray-500); cursor: default; }
     </style>
 </head>
 <body>
@@ -636,12 +744,6 @@
             <div class="guest-summary" id="guestSummary"></div>
         </section>
 
-        <section class="panel" aria-label="Cabin type">
-            <div class="panel-title">Cabin type</div>
-            <div class="seg small" id="typeButtons" role="group" aria-label="Cabin type"></div>
-            <p class="hint">Prices are for one cabin with everyone above in it.</p>
-        </section>
-
         <section class="panel" aria-label="Florida resident rate and gratuities">
             <div class="panel-title">Florida resident rate and gratuities</div>
             <div class="toggle-container">
@@ -664,6 +766,9 @@
         <div id="app"><div class="loading">Loading prices...</div></div>
     </main>
 
+    <dialog class="ms" id="msDialog" aria-labelledby="msTitle"></dialog>
+    <dialog class="ms" id="pwDialog" aria-labelledby="pwTitle"></dialog>
+
     <footer class="footer">
         <div class="wrap">
             <strong>About these prices</strong>
@@ -675,7 +780,7 @@
     </footer>
 
     <script>
-        const APP_VERSION = "5.1.0";
+        const APP_VERSION = "5.2.0";
         const DATA_URL = "data/prices.json";
         const COUNTS_URL = "data/counts.json";
         const COUNTS_MAX_AGE_DAYS = 7;
@@ -688,7 +793,26 @@
         const FLORIDA_URL = "data/florida.json";
         const FL_OLD_DAYS = 9, FL_MAX_AGE_DAYS = 15;
         const FL_MIN_OFF = 1;   // dollars off per guest that count as a discount (cents are rounding)
+        // Make Selection (5.2.0): the booking request window. Deposits and the final payment date
+        // come from data/prices.json (schema 4, read daily from NCL's price summaries); two
+        // CruiseNext credits only while data/offers.json (the DoubleUp watch, at most 3 days old)
+        // allows them. Sent through the cruise-family-alerts Worker (tools/family-alerts/, with
+        // Cloudflare Turnstile) to the owner's Gmail. Nothing typed in the window is saved.
+        // The same Worker runs the family price watch ("Watch this price", 5.2.0).
+        const OFFERS_URL = "data/offers.json";
+        const OFFERS_MAX_AGE_DAYS = 3;
+        const FAMILY_API = "https://cruise-family-alerts.dasatizabal.workers.dev";  // the cruise-family-alerts Worker's address
+        const TURNSTILE_SITE_KEY = "0x4AAAAAAFraPQ22zRVXxf0b";                      // Cloudflare Turnstile site key (public)
+        const CHANGE_TEXT = "Prices can change until NCL confirms the booking.";
+        // NCL's CruiseNext terms (NOTES.md, "Research for 5.2.0"): a $250 credit, which David buys
+        // for $125; the full deposit up to a Club Balcony Suite, part of it above that. David's
+        // credits reach his account within 3 days after his sailing ends on Nov 23, 2026.
+        const CRUISENEXT = { credit: 250, cost: 125, signup: "https://www.ncl.com/account-access/register",
+                             readyOn: "2026-11-26", sailingEnds: "Nov 23, 2026" };
         const MIN_GUESTS = 2, MAX_GUESTS = 5;
+        // Option tiles (5.2.0), in tile order. Each tile is an on/off button; the full card of each
+        // selected option shows below the tiles, in this order. None is selected on the first visit.
+        const OPTIONS = [{ key: "G", label: "Option 1: 3 nights" }, { key: "A", label: "Option 2: 5 nights" }, { key: "8", label: "Option 3: 8 nights" }];
         const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
         const STORE_KEY = "cruise-decision-guide-v5";
         // 5.0.0: the prepay switch default changed to off. Choices saved under the old key are
@@ -703,6 +827,9 @@
         let DATA = null, G = null, A = null;   // data file, Getaway sailing, Aura sailing
         let COUNTS = null;                      // data/counts.json when present and at most 7 days old
         let FLORIDA = null, FL_SEEN = null;     // data/florida.json at most 15 days old; any readable one (for its date)
+        let OFFERS = null;                      // data/offers.json when readable (the DoubleUp watch)
+        let SELECTIONS = {};                    // each card's chosen cabins, for its Make Selection button
+        let MS = null;                          // the open Make Selection window (never saved)
         const state = {
             adults: 2, kids: [],            // kids: ages 0 to 20, or null until chosen
             type: "balcony", mode: "same",
@@ -713,6 +840,7 @@
             offers: { G: { bar: true, dining: true, plus: false }, A: { bar: true, dining: true, plus: false } },
             prepayGratuities: false,        // service charges before sailing, or onboard on the last day (default onboard)
             flResident: true,               // Florida resident rates when NCL offers them (default on)
+            compare: [],                    // option tiles selected ("G", "A", "8"), none on the first visit
         };
 
         // ---------- helpers ----------
@@ -732,6 +860,10 @@
         const fmtDate = t => new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
         const fmtShort = t => new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" });
         const daysSince = t => (Date.now() - Date.parse(t)) / 86400000;
+        // Today's Eastern date as YYYY-MM-DD, and a YYYY-MM-DD date as "Feb 11, 2027".
+        const todayEastern = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+        const fmtIso = iso => { const d = new Date(iso + "T12:00:00Z"); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`; };
+        const isoDays = (a, b) => Math.round((Date.parse(b + "T12:00:00Z") - Date.parse(a + "T12:00:00Z")) / 86400000);
         const guests = () => state.adults + state.kids.length;
         const agesKnown = () => state.kids.every(a => Number.isInteger(a));
 
@@ -752,7 +884,8 @@
                     offers[k] = { bar: o.bar !== false, dining: o.dining !== false, plus: o.plus === true };
                     if (offers[k].plus && !(offers[k].bar && offers[k].dining)) offers[k].plus = false;
                 }
-                Object.assign(state, s, { kids, offers, prepayGratuities: s.prepayGratuities === true, flResident: s.flResident !== false });
+                const compare = Array.isArray(s.compare) ? OPTIONS.map(o => o.key).filter(k => s.compare.includes(k)) : [];
+                Object.assign(state, s, { kids, offers, compare, prepayGratuities: s.prepayGratuities === true, flResident: s.flResident !== false });
             } catch (e) {}
         }
 
@@ -785,9 +918,10 @@
             return { missing: true };
         }
 
-        // Available categories of a broad type for the party, cheapest first.
-        function availableIn(t, n) {
-            return catsOf(t).filter(c => isAvail(c, n)).sort((a, b) => entry(a, n).cabin_total - entry(b, n).cabin_total);
+        // Available categories of a broad type for the party, cheapest first by the price the
+        // lists show (listPrice).
+        function availableIn(s, t, n) {
+            return catsOf(t).filter(c => isAvail(c, n)).sort(byListPrice(s, n));
         }
 
         function noneAvailableText(s, t, n) {
@@ -800,7 +934,7 @@
         // The chosen category for a ship in "same type" mode: the saved pick if it is still
         // available in this type for this party, otherwise the cheapest available one.
         function chosenInType(s, t, n) {
-            const list = availableIn(t, n);
+            const list = availableIn(s, t, n);
             const saved = s === G ? state.pickG : state.pickA;
             return list.find(c => c.code === saved) || defaultPick(list);
         }
@@ -842,7 +976,8 @@
         // Any of these that NCL didn't show today (null in the data file) is left out of the
         // total and listed in k.missing; nothing is guessed.
         const shipKey = s => s === G ? "G" : "A";
-        function cost(s, c, off = state.offers[shipKey(s)]) {
+        // flOn: the Florida resident rate (the page switch, or the Make Selection answer).
+        function cost(s, c, off = state.offers[shipKey(s)], flOn = state.flResident) {
             const n = guests();
             const e = entry(c, n);
             const nights = s.nights;
@@ -908,7 +1043,7 @@
             // more than the fare). Cabins not checked, and a Florida fare at or above the website
             // fare, get no discount.
             const fare = taxes === null ? null : e.cabin_total - taxes;
-            const fl = { shown: state.flResident && flShipActive(s), entry: null, perGuest: 0, guests: Math.min(n, 2), amount: 0 };
+            const fl = { shown: flOn && flShipActive(s), entry: null, perGuest: 0, guests: Math.min(n, 2), amount: 0 };
             if (fl.shown) {
                 fl.entry = flEntry(s, c.code);
                 fl.perGuest = flOff(fl.entry);
@@ -926,15 +1061,41 @@
             return { n, nights, cabin: e.cabin_total, fare, taxes, fl, plus, sc, bar, dining, gratuities, total, onboard, now: total - onboard, missing, noTaxSplit };
         }
 
+        // The price every cabin list shows (each card's list, both 8 night pickers and the full
+        // tables, 5.2.0): the cabin's total for the whole cabin with the current choices (party,
+        // Free at Sea switches, Free at Sea Plus, the Florida discount, and service charges only
+        // when prepaid), always the card's Total for that cabin (cost().now). Until every kid's age
+        // is set the cards show no total, so the lists show NCL's cabin price (fare and taxes).
+        function listPrice(s, c) {
+            return agesKnown() ? cost(s, c).now : entry(c, guests()).cabin_total;
+        }
+        // List order: the price the lists show, then NCL's cabin price.
+        const byListPrice = (s, n) => (a, b) => listPrice(s, a) - listPrice(s, b) || entry(a, n).cabin_total - entry(b, n).cabin_total;
+        // What the list prices are, under each list's title. where: "card", "8" (both ships
+        // added) or the option label of a full table.
+        function listNote(where) {
+            const n = guests();
+            if (!agesKnown()) {
+                return `<div class="cat-list-note">${where === "8" ? `Each price is NCL's fare with taxes for both cabins (this cabin plus the cabin chosen on the other ship) for ${n} guests.` : `Each price is NCL's fare with taxes for ${n} guests.`} Choose every kid's age above to see each cabin's total with your choices.</div>`;
+            }
+            const same = where === "card" || where === "8" ? "the same as the Total below" : `the same as the Total on the ${where} card`;
+            return `<div class="cat-list-note">${where === "8"
+                ? `Each price is the 8 night total with your choices: this cabin plus the cabin chosen on the other ship, ${same}.`
+                : `Each price is the cabin total for ${n} guests with your choices, ${same}.`}</div>`;
+        }
+
         // NCL broad type code (INSIDE, ..., SUITE, HAVEN) of a category on a ship.
         function typeOfCat(s, c) {
             const t = s.types.find(t => t.categories.some(x => x.code === c.code));
             return t ? t.code : null;
         }
 
+        // "2 guests x $20 x 3 nights"
+        const partText = p => `${plural(p.count, "guest", "guests")} x ${money(p.pp)}${p.nights ? ` x ${p.nights} nights` : ""}${p.note ? ` (${p.note})` : ""}`;
+
         function lineRows(s, k, indent = false) {
             const cls = indent ? "row sub" : "row";
-            const part = p => `${plural(p.count, "guest", "guests")} x ${money(p.pp)}${p.nights ? ` x ${p.nights} nights` : ""}${p.note ? ` (${p.note})` : ""}`;
+            const part = partText;
             const missingRow = title => `<div class="${cls} missing"><span class="k">${esc(title)}</span><span class="v">${NOT_FOUND}</span></div>`;
             // Example: "Unlimited Open Bar: 1 guest x $96, 1 guest x $37.50 (soda package, under 21)"
             const line = (x, offText) => {
@@ -947,9 +1108,9 @@
             const plusRow = !k.plus.on ? "" : k.plus.parts.length
                 ? `<div class="${cls}"><span class="k">Free at Sea Plus: ${k.plus.parts.map(part).join(", ")}${k.plus.notCovered ? ` (${plural(k.plus.notCovered, "guest", "guests")} not eligible: no charge)` : ""}</span><span class="v">${money(k.plus.total)}</span></div>`
                 : `<div class="${cls} muted"><span class="k">Free at Sea Plus</span><span class="v">no one eligible</span></div>`;
-            const when = state.prepayGratuities ? "" : " (paid onboard, not in the total)";
-            const scRow = k.sc.missing ? missingRow(k.sc.title) : k.sc.parts.length
-                ? `<div class="${cls}${state.prepayGratuities ? "" : " muted"}"><span class="k">${esc(k.sc.title)}${when}: ${k.sc.parts.map(part).join(", ")}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">${money(k.sc.total)}${state.prepayGratuities ? "" : " onboard"}</span></div>`
+            // Paid onboard: shown below the Total line instead (onboardRows).
+            const scRow = k.onboard ? "" : k.sc.missing ? missingRow(k.sc.title) : k.sc.parts.length
+                ? `<div class="${cls}"><span class="k">${esc(k.sc.title)}: ${k.sc.parts.map(part).join(", ")}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">${money(k.sc.total)}</span></div>`
                 : `<div class="${cls} muted"><span class="k">${esc(k.sc.title)}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">$0</span></div>`;
             // Taxes are inside NCL's cabin price either way; without NCL's tax line the two can't be split.
             const fareRows = k.taxes === null
@@ -1032,7 +1193,15 @@
             plus: () => `Adds unlmt. Wi-Fi\\top shelf spirits\\Starbucks\\bottled water\\daily svc. chrg. ${money(DATA.rates.free_at_sea_plus.adult_per_day)}/adult/night.`,   // "\\" shows one backslash
         };
 
-        function totalBlock(k, nights, rowsHtml) {
+        // Prepay gratuities off: the service charges, directly below the Total line (paid onboard,
+        // not in the total), with "Can be removed at Guest Services." under them. The 8 night card
+        // has one line per ship, with the ship's name.
+        function onboardRows(items, named) {
+            const rows = items.filter(([, k]) => k.onboard).map(([s, k]) => `<div class="row muted onboard"><span class="k">${named ? esc(s.ship_short) + " service charges" : "Service charges"} (crew gratuities) (paid onboard, not in the total): ${k.sc.parts.map(partText).join(", ")}${k.sc.notes.map(n => ` (${n})`).join("")}</span><span class="v">${money(k.sc.total)} onboard</span></div>`);
+            return rows.length ? rows.join("") + `<div class="onboard-small">Can be removed at Guest Services.</div>` : "";
+        }
+
+        function totalBlock(k, nights, rowsHtml, onboardHtml = "") {
             const n = guests();
             const missingNote = k.missing && k.missing.length
                 ? `<div class="notice info">Not included in the total because NCL didn't show the amount today: ${esc(k.missing.join(", "))}.</div>` : "";
@@ -1040,21 +1209,19 @@
             const taxNote = ships.length
                 ? `<div class="notice info">The ${esc(ships.join(" and "))} cabin ${ships.length > 1 ? "prices include" : "price includes"} taxes, fees and port expenses, and they are in the total. NCL didn't show the per-guest tax split today.</div>` : "";
             if (!agesKnown()) {
-                return `${taxNote}<div class="notice info">Choose every kid's age above to see the full total. Free at Sea charges depend on age.</div><div class="rows">${rowsHtml}</div>`;
+                return `${taxNote}<div class="notice info">Choose every kid's age above to see the full total. Free at Sea charges depend on age.</div><div class="rows">${rowsHtml}${onboardHtml}</div>`;
             }
             const perNight = k.now / nights;
-            const onboardText = `+ ${money(k.onboard)} service charges paid onboard (can be removed at Guest Services)`;
             return `
                 ${missingNote}
                 ${taxNote}
                 <div class="price-label">${k.onboard ? "Total to pay now" : "Total"} for ${plural(n, "guest", "guests")}</div>
                 <div class="price-total">${money(k.now)}</div>
                 <div class="price-pp">${moneyR(k.now / n)} per person</div>
-                ${k.onboard ? `<div class="onboard-note">${onboardText}</div>` : ""}
                 <div class="rows">
                     ${rowsHtml}
                     <div class="row total"><span class="k">Total</span><span class="v">${money(k.now)}</span></div>
-                    ${k.onboard ? `<div class="row onboard"><span class="k">${onboardText}</span></div>` : ""}
+                    ${onboardHtml}
                     <div class="row"><span class="k">Cost per night${k.onboard ? " (paid now)" : ""}</span><span class="v">${moneyR(perNight)} (${moneyR(perNight / n)} per person)</span></div>
                 </div>`;
         }
@@ -1103,27 +1270,29 @@
 
         // One cabin button. When it is the only available option it is shown already selected,
         // with no tap action and no hover effect (no data-pick, so the click handler ignores it).
-        function catButton(c, n, field, pressed, only) {
+        function catButton(c, n, field, pressed, only, price) {
             const attrs = only
                 ? `class="only" aria-pressed="true" aria-disabled="true" tabindex="-1"`
                 : `data-pick="${field}" data-code="${esc(c.code)}" aria-pressed="${pressed}"`;
             return `<li><button type="button" ${attrs}>
                     <span>${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}${gaugeHtml(c, n)}</span>
-                    <span class="price">${money(entry(c, n).cabin_total)}</span>
+                    <span class="price">${money(price)}</span>
                 </button></li>`;
         }
 
-        // Tap list of the available categories in this type, cheapest first.
-        function catPicker(s, t, chosen, n) {
-            const list = availableIn(t, n);
+        // Tap list of the available categories in this type, cheapest first. Each price is
+        // listPrice, plus add (the 8 night card: the other ship's chosen cabin), and note says what
+        // the prices are.
+        function catPicker(s, t, chosen, n, add = 0, note = "") {
+            const list = availableIn(s, t, n);
             if (!list.length) return "";
             const field = s === G ? "pickG" : "pickA";
             const only = list.length === 1;
-            return `<div class="cat-list-title">${esc(t.title)} cabins on the ${esc(s.ship_short)} for ${n} guests</div><ul class="cat-list">${list.map(c => catButton(c, n, field, c.code === chosen.code, only)).join("")}</ul>`;
+            return `<div class="cat-list-title">${esc(t.title)} cabins on the ${esc(s.ship_short)} for ${n} guests</div>${note}<ul class="cat-list">${list.map(c => catButton(c, n, field, c.code === chosen.code, only, listPrice(s, c) + add)).join("")}</ul>`;
         }
 
-        function daysList(s) {
-            return `<details class="days"><summary>Day by day</summary><ol>${s.ports.map(d => `
+        function daysList(s, title = "Day by day") {
+            return `<details class="days"><summary>${esc(title)}</summary><ol>${s.ports.map(d => `
                 <li><span>${fmtDay(d.date)}: ${d.sea ? "At sea" : esc(d.port)}</span><span>${d.sea ? "" : [d.arrive && "arrive " + fmtTime(d.arrive), d.depart && "leave " + fmtTime(d.depart)].filter(Boolean).join(", ")}</span></li>`).join("")}</ol></details>`;
         }
 
@@ -1137,7 +1306,7 @@
         function singleCard(s, label) {
             const n = guests();
             const tf = typeFor(s, state.type);
-            let body = "", picks = "";
+            let body = "", offersHtml = "", listHtml = "";
             if (tf.missing) {
                 body = `<div class="notice bad">${esc(typeName(state.type))}: not offered on the ${esc(s.ship_short)}</div>`;
             } else {
@@ -1148,36 +1317,37 @@
                 } else {
                     const full = findCat(s, c.code);
                     const k = cost(s, full);
-                    picks = catPicker(s, tf.t, full, n) + offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`);
-                    body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k)) + ksfNote(s, full);
+                    offersHtml = offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`);
+                    listHtml = catPicker(s, tf.t, full, n, 0, listNote("card"));
+                    SELECTIONS[shipKey(s)] = { label, items: [[s, full]] };
+                    body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k), onboardRows([[s, k]], false)) + ksfNote(s, full) + selectButton(shipKey(s));
                 }
             }
             return `
-                <article class="card">
+                <article class="card${s === A ? " featured" : ""}" data-option="${shipKey(s)}">
                     <div class="card-head">
                         <span class="option-badge">${label}</span>
                         <h2 class="card-title">${esc(s.ship)}</h2>
-                        ${s === A ? auraBadge() : ""}
                         <div class="card-dates">${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)</div>
-                        ${stops(s)}
                     </div>
-                    ${picks ? `<div class="card-picks">${picks}</div>` : ""}
+                    <div class="card-picks">${offersHtml}<div class="pick-section">${typeButtons()}${listHtml}</div></div>
                     <div class="card-body">${body}${daysList(s)}</div>
                     <a class="ncl-link" href="${esc(s.url)}" target="_blank" rel="noopener">See this sailing on NCL &rarr;</a>
                 </article>`;
         }
 
-        // Different cabins mode: any available category on the ship, grouped by type.
-        function diffSelect(s, field) {
+        // Different cabins mode: any available category on the ship, grouped by type. Each price is
+        // listPrice plus add (the other ship's chosen cabin).
+        function diffSelect(s, field, add) {
             const n = guests();
             const groups = types(s).map(t => {
-                const list = availableIn(t, n);
+                const list = availableIn(s, t, n);
                 if (!list.length) return "";
-                return `<optgroup label="${esc(t.title)}">${list.map(c => `<option value="${esc(c.code)}" ${state[field] === c.code ? "selected" : ""}>${esc(catLabel(c))}: ${money(entry(c, n).cabin_total)}${gauge(c, n) ? `, ${esc(gauge(c, n).toLowerCase())}` : ""}</option>`).join("")}</optgroup>`;
+                return `<optgroup label="${esc(t.title)}">${list.map(c => `<option value="${esc(c.code)}" ${state[field] === c.code ? "selected" : ""}>${esc(catLabel(c))}: ${money(listPrice(s, c) + add)}${gauge(c, n) ? `, ${esc(gauge(c, n).toLowerCase())}` : ""}</option>`).join("")}</optgroup>`;
             }).join("");
-            const all = types(s).flatMap(t => availableIn(t, n));
+            const all = types(s).flatMap(t => availableIn(s, t, n));
             if (all.length === 1) {
-                return `<div class="pick-label">${esc(s.ship_short)} cabin (${s.nights} nights)</div><ul class="cat-list">${catButton(all[0], n, field, true, true)}</ul>`;
+                return `<div class="pick-label">${esc(s.ship_short)} cabin (${s.nights} nights)</div><ul class="cat-list">${catButton(all[0], n, field, true, true, listPrice(s, all[0]) + add)}</ul>`;
             }
             return `<label for="${field}">${esc(s.ship_short)} cabin (${s.nights} nights)</label><select id="${field}" data-field="${field}">${groups}</select>`;
         }
@@ -1189,7 +1359,7 @@
                     <button type="button" data-mode="same" aria-pressed="${state.mode === "same"}">Same cabin on both ships</button>
                     <button type="button" data-mode="different" aria-pressed="${state.mode === "different"}">Different cabin on each ship</button>
                 </div>`;
-            let body = "", chosen = null, pickers = "";
+            let body = "", chosen = null, pickers = "", offerSets = "";
             if (state.mode === "same") {
                 const tfs = [[G, typeFor(G, state.type)], [A, typeFor(A, state.type)]];
                 const missing = tfs.filter(([, tf]) => tf.missing);
@@ -1211,14 +1381,16 @@
                     } else {
                         chosen = picks.map(([s, , c]) => [s, findCat(s, c.code)]);
                         body += `<div class="cabin-line">Matched: ${catHtml(chosen[0][1])} on the Getaway and ${catHtml(chosen[1][1])} on the Aura. Pick a different one on each ship above.</div>`;
-                        pickers = picks.map(([s, t, c]) => catPicker(s, t, c, n)).join("");
+                        const other = s => chosen.find(([x]) => x !== s);
+                        pickers = listNote("8") + picks.map(([s, t, c]) => catPicker(s, t, c, n, listPrice(...other(s)))).join("");
                     }
                 }
             } else {
-                pickers = `<div class="ship-pick">${diffSelect(G, "diffG")}${diffSelect(A, "diffA")}</div>`;
                 const cg = findCat(G, state.diffG), ca = findCat(A, state.diffA);
                 if (cg && ca && isAvail(cg, n) && isAvail(ca, n)) chosen = [[G, cg], [A, ca]];
                 else body += `<div class="notice bad">Pick an available cabin on each ship.</div>`;
+                pickers = (chosen ? listNote("8") : listNote("card"))
+                    + `<div class="ship-pick">${diffSelect(G, "diffG", chosen ? listPrice(A, ca) : 0)}${diffSelect(A, "diffA", chosen ? listPrice(G, cg) : 0)}</div>`;
             }
             if (chosen) {
                 const ks = chosen.map(([s, c]) => [s, c, cost(s, c)]);
@@ -1226,25 +1398,55 @@
                 const both = { total: sum("total"), now: sum("now"), onboard: sum("onboard"),
                                missing: ks.flatMap(([s, , k]) => k.missing.map(m => `${s.ship_short} ${m}`)),
                                noTaxSplit: ks.flatMap(([, , k]) => k.noTaxSplit) };
-                pickers += ks.map(([s, c]) => offerToggles(s, c, `Free at Sea for the ${s.ship_short} cabin (its own booking)`)).join("");
+                offerSets = ks.map(([s, c]) => offerToggles(s, c, `Free at Sea for the ${s.ship_short} cabin (its own booking)`)).join("");
                 const rows = ks.map(([s, c, k]) => `
                     <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</div>
                     ${lineRows(s, k, true)}
                     <div class="row"><span class="k">${esc(s.ship_short)} total${k.onboard ? " to pay now" : ""}</span><span class="v">${agesKnown() ? money(k.now) : ""}</span></div>`).join("");
-                body += staleNote([G, A]) + totalBlock(both, nights, rows) + ks.map(([s, c]) => ksfNote(s, c, s.ship_short)).join("");
+                SELECTIONS["8"] = { label: OPTIONS[2].label, items: chosen };
+                body += staleNote([G, A]) + totalBlock(both, nights, rows, onboardRows(ks.map(([s, , k]) => [s, k]), true))
+                    + ks.map(([s, c]) => ksfNote(s, c, s.ship_short)).join("") + selectButton("8");
             }
             return `
-                <article class="card featured">
+                <article class="card" data-option="8">
                     <div class="card-head">
-                        <span class="option-badge">Option 3: 8 nights</span>
+                        <span class="option-badge">${OPTIONS[2].label}</span>
                         <h2 class="card-title">Getaway, then Aura</h2>
-                        ${auraBadge()}
                         <div class="card-dates">${fmtDay(G.depart)} to ${fmtDay(A.return)}, 2027 (${nights} nights)</div>
-                        <div class="stops"><span class="stop">Both trips back to back</span><span class="stop">Change ships in Miami</span></div>
                     </div>
-                    <div class="card-picks">${toggle}${pickers}</div>
-                    <div class="card-body">${body}</div>
+                    <div class="card-picks">${offerSets}<div class="pick-section">${toggle}${state.mode === "same" ? typeButtons() : ""}${pickers}</div></div>
+                    <div class="card-body">${body}${daysList(G, "Day by day on the Getaway")}${daysList(A, "Day by day on the Aura")}</div>
                 </article>`;
+        }
+
+        // The option tiles (5.2.0): label, ship(s), dates and nights, the port chips, and for the
+        // Aura the maiden voyage badge, christening note and video link. A tap anywhere on a tile
+        // (but the video link) turns it on or off; the button inside is what a keyboard or screen
+        // reader uses (aria-pressed).
+        function tiles() {
+            const tile = (o, title, dates, chips, extra) => {
+                const on = state.compare.includes(o.key);
+                return `
+                <div class="tile${on ? " on" : ""}" data-tile="${o.key}">
+                    <button type="button" class="tile-btn" aria-pressed="${on}">
+                        <span class="tile-top"><span class="option-badge">${o.label}</span><span class="tile-state"><span class="tile-box" aria-hidden="true">${on ? "&#10003;" : ""}</span>${on ? "Selected" : "Tap to compare"}</span></span>
+                        <span class="tile-title">${esc(title)}</span>
+                        <span class="tile-dates">${dates}</span>
+                    </button>
+                    ${chips}${extra}
+                </div>`;
+            };
+            const dates = (a, b, nights) => `${fmtDay(a)} to ${fmtDay(b)}, 2027 (${nights} nights)`;
+            return `
+                <section class="tiles-wrap" aria-label="Options to compare">
+                    <div class="tiles">
+                        ${tile(OPTIONS[0], G.ship, dates(G.depart, G.return, G.nights), stops(G), "")}
+                        ${tile(OPTIONS[1], A.ship, dates(A.depart, A.return, A.nights), stops(A), auraBadge())}
+                        ${tile(OPTIONS[2], "Getaway, then Aura", dates(G.depart, A.return, G.nights + A.nights),
+                               `<div class="stops"><span class="stop">Both trips back to back</span><span class="stop">Change ships in Miami</span></div>`, auraBadge())}
+                    </div>
+                    ${state.compare.length ? "" : `<p class="tiles-prompt">Pick one or more options to compare.</p>`}
+                </section>`;
         }
 
         function explainer() {
@@ -1272,26 +1474,732 @@
                 chosenCode = c ? c.code : null;
             }
             const rows = types(s).map(t => {
-                const cats = catsOf(t).slice().sort((a, b) => {
-                    const ea = entry(a, n), eb = entry(b, n);
-                    if (ea.available !== eb.available) return ea.available ? -1 : 1;
-                    return (ea.cabin_total || 1e9) - (eb.cabin_total || 1e9);
-                });
+                const cats = [...availableIn(s, t, n), ...catsOf(t).filter(c => !isAvail(c, n))];
                 return `<tr class="group"><td colspan="2">${esc(t.title)}</td></tr>` + cats.map(c => {
                     const e = entry(c, n);
                     const meta = [c.size, c.capacity && !c.description.includes("holds up to") ? `holds up to ${c.capacity}` : "", c.guarantee ? GUARANTEE_TEXT : ""].filter(Boolean).join(". ");
                     return e.available
-                        ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}${gaugeHtml(c, n)}</td><td>${money(e.cabin_total)}<span class="pp-small">${moneyR(e.price_pp)} pp</span></td></tr>`
+                        ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}${gaugeHtml(c, n)}</td><td>${money(listPrice(s, c))}<span class="pp-small">${moneyR(listPrice(s, c) / n)} pp</span></td></tr>`
                         : `<tr class="off"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${esc(e.reason)}</td></tr>`;
                 }).join("");
             }).join("");
             return `
                 <section class="panel" aria-label="Every ${esc(s.ship_short)} cabin">
-                    <div class="panel-title">Every ${esc(s.ship_short)} cabin for ${plural(n, "guest", "guests")} (fare and taxes)</div>
+                    <div class="panel-title">Every ${esc(s.ship_short)} cabin for ${plural(n, "guest", "guests")}</div>
+                    ${listNote(OPTIONS[s === G ? 0 : 1].label.split(":")[0])}
                     <table class="cabins"><tbody>${rows}</tbody></table>
-                    <p class="hint">Tap an available cabin to choose it. Free at Sea gratuities are added in the option cards above.${state.flResident && flShipActive(s) ? " Prices here are NCL's website prices; Florida resident discounts come off in the option cards above." : ""}</p>
+                    <p class="hint">Tap an available cabin to choose it.</p>
                 </section>`;
         }
+
+        // ---------- Make Selection (5.2.0) ----------
+        // A booking request to David from one option card: the selection, the price without
+        // gratuities (fare plus taxes, fees and port expenses, minus any Florida discount; the
+        // gratuities and Free at Sea Plus are listed below it, not added), the deposit (NCL's, or
+        // David's CruiseNext credits), the balance with NCL's final payment date, and each guest's
+        // details. 8 nights is two bookings, each with its own deposit, credits and balance, plus
+        // combined totals. Nothing typed here is saved (no browser storage); the window is cleared
+        // when it closes. NOTES.md, "Make Selection".
+
+        // The buttons under a card's total (Make Selection and Watch this price), once a cabin is
+        // chosen and every kid's age is set. Hidden from the sail date on (Eastern).
+        function selectButton(key) {
+            const sel = SELECTIONS[key];
+            if (!sel || !agesKnown() || sel.items.some(([s]) => todayEastern() >= s.depart)) return "";
+            // One watch per cabin: the 8 night card has one per ship.
+            const watch = key === "8" ? sel.items.map(([s]) => `<button type="button" class="ms-open pw-open" data-watch="8${shipKey(s)}">Watch the ${esc(s.ship_short)} cabin price</button>`).join("")
+                : `<button type="button" class="ms-open pw-open" data-watch="${key}">Watch this price</button>`;
+            return `<button type="button" class="ms-open" data-select="${key}">Make Selection</button>${watch}`;
+        }
+
+        // NCL's broad types whose deposit is NCL's percentage rule (Suite and Haven).
+        const suiteHaven = (s, c) => ((DATA.deposit_rules || {}).suite_haven_types || ["SUITE", "HAVEN"]).includes(typeOfCat(s, c));
+
+        // NCL's deposit for this cabin and party, never guessed (null when not found):
+        //   Inside to Club Balcony Suite: NCL's deposit per guest, read today, x guests (with NCL's
+        //     deposit offer, like 2-For-1 Deposits, as NCL words it)
+        //   Suite and Haven: NCL's rule, 10% of the cruise fare (after any Florida discount),
+        //     confirmed daily on a Suite or Haven price summary (deposit_rules)
+        // The hours to pay it come from today's summary for this party size when it is the same
+        // kind of cabin.
+        function depositFor(s, c, k) {
+            const pay = s.payment, rules = DATA.deposit_rules;
+            if (!pay || !rules) return null;
+            const suite = suiteHaven(s, c);
+            const e = pay.by_guests && pay.by_guests[String(k.n)];
+            const hours = e && e.deposit !== null && rules.suite_haven_types.includes(e.deposit_type) === suite ? e.due_hours : null;
+            if (suite) {
+                if (!rules.percent_of_fare || k.fare === null) return null;
+                return { amount: Math.round((k.fare - k.fl.amount) * rules.percent_of_fare) / 100, hours, partial: true, offer: null,
+                         rule: `${rules.percent_of_fare}% of the cruise fare, NCL's rule for Suites and The Haven` };
+            }
+            const per = pay.standard_deposit_per_guest;
+            if (!per) return null;
+            return { amount: Math.round(per * k.n * 100) / 100, hours, partial: false, offer: pay.deposit_offer, rule: `${money(per)} per guest x ${k.n}` };
+        }
+
+        // Two CruiseNext credits only while NCL's DoubleUp offer is listed (read at most 3 days
+        // ago), covers this cabin's NCL type, and today (Eastern) is early enough before sailing.
+        // Wording the DoubleUp watch couldn't read (null) never allows two.
+        function doubleUp(s, c) {
+            const d = OFFERS && OFFERS.doubleup;
+            if (!d || d.listed !== true || !Array.isArray(d.types) || !d.read_on) return false;
+            if (isoDays(d.read_on, todayEastern()) > OFFERS_MAX_AGE_DAYS || !d.types.includes(typeOfCat(s, c))) return false;
+            const last = new Date(s.depart + "T12:00:00Z");
+            if (Number.isInteger(d.min_days)) last.setUTCDate(last.getUTCDate() - d.min_days);
+            else if (Number.isInteger(d.min_months)) last.setUTCMonth(last.getUTCMonth() - d.min_months);
+            else return false;
+            return todayEastern() <= last.toISOString().slice(0, 10);
+        }
+
+        // One booking's numbers for the deposit choice ("ncl", "credit1", "credit2" or null). The
+        // price is the card's Total with the window's Florida answer (owner's change 2026-10-29): the
+        // Free at Sea gratuities and Plus are in it (NCL adds them to the booking, paid with the
+        // balance), service charges only when prepaid. Credits: $250 each toward the cruise. Up to a Club Balcony Suite a credit is the whole
+        // deposit; for Suites and The Haven the rest of NCL's deposit is still due at booking.
+        // After NCL's final payment date the whole price is due at booking.
+        function bookingMath(s, c, choice) {
+            const cents = x => Math.round(x * 100) / 100;
+            const k = cost(s, c, state.offers[shipKey(s)], MS.florida);
+            const price = cents(k.now);
+            const final = (s.payment && s.payment.final_payment_due) || null;
+            const past = !!final && todayEastern() > final;
+            const dep = depositFor(s, c, k);
+            const credits = choice === "credit2" ? 2 : choice === "credit1" ? 1 : 0;
+            const creditValue = credits * CRUISENEXT.credit;
+            let dueNow = null;
+            if (choice && past) dueNow = Math.max(0, price - creditValue);
+            else if (choice === "ncl") dueNow = dep ? dep.amount : null;
+            else if (credits) dueNow = !suiteHaven(s, c) ? 0 : dep ? Math.max(0, cents(dep.amount - creditValue)) : null;
+            const balance = dueNow === null ? null : Math.max(0, cents(price - creditValue - dueNow));
+            return { s, c, k, price, dep, choice, credits, creditValue, dueNow, balance, final, past,
+                     payDavid: credits * CRUISENEXT.cost, two: doubleUp(s, c) };
+        }
+
+        // David's CruiseNext explainer (his words), under "How to pay the deposit".
+        const cnExplain = () => `<p class="ms-explain">Use David's CruiseNext credit and save ${money(CRUISENEXT.cost)}. CruiseNext credits are a perk NCL only sells on board, so David will pick some up on his next cruise. He buys a ${money(CRUISENEXT.credit)} credit for ${money(CRUISENEXT.cost)}, it goes toward your deposit, and you just pay him back the ${money(CRUISENEXT.cost)}. On a Balcony or higher cabin, while NCL's DoubleUp offer is running, you can use two: ${money(2 * CRUISENEXT.credit)} toward your cruise for ${money(2 * CRUISENEXT.cost)}. Above a Club Balcony Suite, a credit covers part of the deposit rather than all of it. The credit has to be moved to your NCL account before we book, so this option adds a few days.</p>`;
+        const msRow = (label, value, cls = "") => `<div class="row ${cls}"><span class="k">${label}</span><span class="v">${value}</span></div>`;
+        const dueText = b => !b.final ? "due by NCL's final payment date (not found on NCL today)" : b.past ? "due when booking" : `due by ${fmtIso(b.final)}`;
+
+        // explain: the CruiseNext explainer goes under the first booking's "How to pay the deposit".
+        function bookingHtml(b, number, explain) {
+            const { s, c, k } = b, key = shipKey(s);
+            const head = `${number ? `Booking ${number}: ` : ""}${esc(s.ship)}, ${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)`;
+            const missing = k.missing.length ? `<div class="notice info">Not included in the total because NCL didn't show the amount today: ${esc(k.missing.join(", "))}.</div>` : "";
+
+            const d = b.dep, name = `msDep${key}`;
+            const opt = (value, html) => `<label class="ms-choice"><input type="radio" name="${name}" value="${value}" data-ms-dep="${key}" ${b.choice === value ? "checked" : ""}><span>${html}</span></label>`;
+            const nclText = b.past ? `Pay NCL in full when booking (NCL's final payment date, ${fmtIso(b.final)}, has passed)`
+                : d ? `NCL's deposit: <strong>${money(d.amount)}</strong> (${esc(d.rule)})${d.hours ? `, due within ${d.hours} hours of booking` : ""}`
+                : `NCL's deposit (${notFound}; David will confirm it)`;
+            const offer = d && d.offer && !b.past ? `<span class="cat-meta" style="display:block">Includes NCL's ${esc(d.offer.title)} offer${d.offer.description ? `: ${esc(d.offer.description)}` : ""}</span>` : "";
+            const partial = suiteHaven(s, c) ? `<span class="cat-meta" style="display:block">On a ${esc(c.typeTitle)} cabin a credit covers part of NCL's deposit, not all of it.</span>` : "";
+            const choices = opt("ncl", nclText + offer)
+                + opt("credit1", `One of David's CruiseNext credits: ${money(CRUISENEXT.credit)} toward the cruise, you pay David ${money(CRUISENEXT.cost)}${partial}`)
+                + (b.two ? opt("credit2", `Two of David's CruiseNext credits (NCL's DoubleUp offer): ${money(2 * CRUISENEXT.credit)} toward the cruise, you pay David ${money(2 * CRUISENEXT.cost)}${partial}`) : "");
+
+            let math = "";
+            if (b.choice) {
+                const confirm = "David will confirm";
+                math = `<div class="rows ms-math">
+                    ${msRow("Total", money(b.price))}
+                    ${b.credits ? msRow(`CruiseNext ${b.credits === 2 ? "credits" : "credit"} toward the cruise: ${b.credits} x ${money(CRUISENEXT.credit)}`, "&minus;" + money(b.creditValue)) : ""}
+                    ${msRow(b.past ? "Paid to NCL at booking" : b.credits ? (suiteHaven(s, c) ? "Rest of NCL's deposit, due at booking" : "Deposit due at booking (the credit is the deposit)") : "Deposit to NCL at booking",
+                            b.dueNow === null ? confirm : money(b.dueNow))}
+                    ${msRow(`Balance, ${dueText(b)}`, b.balance === null ? confirm : money(b.balance), "total")}
+                    ${b.credits ? msRow("Pay David for the credits", money(b.payDavid), "subtotal") : ""}
+                </div>`;
+            }
+            return `
+                <div class="ms-booking" data-booking="${key}">
+                    <div class="ship-head">${head}</div>
+                    <div class="cabin-line" style="margin:0.2rem 0 0">${catHtml(c)}</div>
+                    ${missing}
+                    <div class="rows ms-lines">
+                        ${lineRows(s, k)}
+                        ${msRow("Total", money(b.price), "total")}
+                        ${onboardRows([[s, k]], false)}
+                    </div>
+                    <fieldset class="ms-q"><legend>How to pay the deposit${number ? ` for the ${esc(s.ship_short)}` : ""}</legend>${explain ? cnExplain() : ""}${choices}</fieldset>
+                    ${math}
+                </div>`;
+        }
+
+        // 8 nights: the two bookings added together, once both deposit choices are made.
+        function totalsHtml(books) {
+            if (!books.every(b => b.choice)) return `<p class="ms-wait" style="margin-top:0.9rem">Choose how to pay each deposit to see the totals for both bookings.</p>`;
+            const sum = f => books.some(b => b[f] === null) ? null : books.reduce((t, b) => t + b[f], 0);
+            const show = v => v === null ? "David will confirm" : money(v);
+            const credits = sum("creditValue"), david = sum("payDavid");
+            return `
+                <div class="ms-booking">
+                    <div class="ship-head">Both bookings together</div>
+                    <div class="rows">
+                        ${msRow("Total", show(sum("price")))}
+                        ${credits ? msRow("CruiseNext credits toward the cruises", "&minus;" + money(credits)) : ""}
+                        ${msRow("Paid to NCL at booking", show(sum("dueNow")))}
+                        ${msRow(`Balances: ${books.map(b => `${esc(b.s.ship_short)} ${dueText(b)}`).join(", ")}`, show(sum("balance")), "total")}
+                        ${david ? msRow("Pay David for the credits", money(david), "subtotal") : ""}
+                    </div>
+                </div>`;
+        }
+
+        function partyText() {
+            const kids = guestOrder().filter(a => a !== null);
+            return plural(state.adults, "adult", "adults") + (kids.length ? ` and ${plural(kids.length, "kid", "kids")} (${kids.length === 1 ? "age" : "ages"} ${kids.join(" and ")} on ${ageDateText()})` : "");
+        }
+        const offersText = s => { const o = state.offers[shipKey(s)]; return `Unlimited Open Bar ${o.bar ? "yes" : "no"}, Specialty Dining ${o.dining ? "yes" : "no"}, Free at Sea Plus ${o.plus ? "yes" : "no"}`; };
+        const msField = (id, label, type = "text", extra = "") => `<div class="ms-field"><label for="${id}">${label}</label><input type="${type}" id="${id}" name="${id}" ${extra}></div>`;
+
+        function guestFields(a, i) {
+            const p = `g${i}`;
+            return `<fieldset class="ms-guest"><legend>Guest ${i + 1} (${a === null ? "adult" : `age ${a} on ${esc(ageDateText())}`})</legend>
+                ${msField(p + "_first", "First name, as on the passport or ID")}
+                ${msField(p + "_middle", "Middle name (optional)")}
+                ${msField(p + "_last", "Last name, as on the passport or ID")}
+                ${msField(p + "_dob", "Date of birth", "date", `max="${todayEastern()}"`)}
+                <div class="ms-field"><label for="${p}_gender">Gender, as on the passport or ID</label><select id="${p}_gender" name="${p}_gender"><option value="">Choose</option><option>Female</option><option>Male</option></select></div>
+                ${msField(p + "_citizenship", "Citizenship (country)")}
+                ${i === 0 ? msField("g0_email", "Email", "email") + msField("g0_phone", "Mobile phone", "tel") : ""}
+                ${msField(p + "_latitudes", i === 0 ? `Latitudes number <span id="msLatNeed">(if guest 1 has one)</span>` : "Latitudes number (if they have one)", "text", 'inputmode="numeric"')}
+            </fieldset>`;
+        }
+
+        function selectionForm() {
+            const review = MS.items.map(([s, c]) => `
+                <div class="ms-item"><strong>${esc(s.ship)}</strong>, ${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)
+                    <div>${esc(c.typeTitle)}: ${catHtml(c)}</div>
+                    ${c.guarantee ? `<div class="cat-meta gty">${GUARANTEE_TEXT}</div>` : ""}
+                    <div class="cat-meta">Free at Sea: ${esc(offersText(s))}</div>
+                </div>`).join("");
+            const early = todayEastern() < CRUISENEXT.readyOn;
+            return `
+                <form id="msForm" novalidate autocomplete="off">
+                    <div class="ms-head"><h2 id="msTitle">Make Selection</h2><button type="button" class="ms-close" data-ms-close aria-label="Close">&times;</button></div>
+                    <div class="ms-body">
+                        <p class="ms-warn">${CHANGE_TEXT}</p>
+                        <section class="ms-sec">
+                            <h3>Your selection: ${esc(MS.label)}</h3>
+                            ${review}
+                            <div class="ms-list">
+                                <div>Party: ${esc(partyText())}</div>
+                                <div>Prepay gratuities: ${state.prepayGratuities ? "yes" : "no, service charges are paid onboard"}</div>
+                                <div>Florida resident rate switch on the page: ${state.flResident ? "on" : "off"}</div>
+                            </div>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Florida resident rate</h3>
+                            <fieldset class="ms-q" id="msFlQ"><legend>Are guest 1 and guest 2 Florida residents?</legend>
+                                <label class="ms-choice"><input type="radio" name="msFl" value="yes"><span>Yes</span></label>
+                                <label class="ms-choice"><input type="radio" name="msFl" value="no"><span>No</span></label>
+                            </fieldset>
+                            <p class="hint">NCL's Florida resident rate is for guests who live in Florida, and NCL asks for proof of residency. David will confirm with NCL.</p>
+                            <div class="ms-note" id="msFlNote" hidden></div>
+                            <div class="ms-fields" id="msAddr" hidden>
+                                <div class="ms-sub">Guest 1's Florida home address</div>
+                                ${msField("msStreet", "Street address")}
+                                ${msField("msCity", "City")}
+                                ${msField("msState", "State", "text", 'value="FL"')}
+                                ${msField("msZip", "ZIP code", "text", 'inputmode="numeric"')}
+                            </div>
+                        </section>
+                        <section class="ms-sec" id="msMath"></section>
+                        <section class="ms-sec" id="msCn" hidden>
+                            <h3>CruiseNext steps</h3>
+                            ${early ? `<p class="ms-note">David's credits reach his NCL account within 3 days after his cruise ends on ${CRUISENEXT.sailingEnds}, so a CruiseNext request can't be completed before about ${fmtIso(CRUISENEXT.readyOn)}.</p>` : ""}
+                            <ol class="ms-steps">
+                                <li>Guest 1 (21 or older) creates a free NCL account at <a href="${CRUISENEXT.signup}" target="_blank" rel="noopener">${CRUISENEXT.signup.replace("https://www.", "")}</a> to get a Latitudes number.</li>
+                                <li>Enter guest 1's Latitudes number below and send this request to David.</li>
+                                <li>David moves the credit to guest 1's NCL account by emailing cruisenext@ncl.com.</li>
+                                <li>Then the booking is made. Credits only work on a new booking, so the booking waits until the credit is in the account.</li>
+                            </ol>
+                            <p class="hint" id="msTwoNote" hidden>If NCL ends its DoubleUp offer before the booking is made, only one credit can be used.</p>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Guest details</h3>
+                            <p class="hint">Names exactly as on each guest's passport or ID, in NCL's order (adults first, then kids oldest first). No passport or card numbers: those come later, at NCL's online check-in.</p>
+                            ${guestOrder().map(guestFields).join("")}
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Who is sending this</h3>
+                            <label class="ms-check"><input type="checkbox" id="msMe"><span>I'm guest 1</span></label>
+                            <div class="ms-fields" id="msSender">
+                                ${msField("msName", "Your name")}
+                                ${msField("msEmail", "Your email", "email")}
+                            </div>
+                            <p class="hint">David gets the full request. You get a copy by email with your selection and the amounts, without the other guests' dates of birth or Latitudes numbers.</p>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Send</h3>
+                            <p class="ms-warn">${CHANGE_TEXT}</p>
+                            <div id="msTurnstile"></div>
+                            <button type="submit" class="ms-send" id="msSend">Send my selection to David</button>
+                            <div class="ms-status" id="msStatus" role="status" aria-live="polite"></div>
+                            <p class="hint">Nothing you type here is saved, on this page or anywhere else. It goes only into the two emails.</p>
+                        </section>
+                    </div>
+                </form>`;
+        }
+
+        // The price, deposit and balance part of the window. Shown once the Florida question is
+        // answered (the answer decides the Florida discount in this window).
+        function renderMsMath() {
+            const box = document.getElementById("msMath");
+            if (!box) return;
+            if (MS.florida === null) {
+                box.innerHTML = `<h3>Price, deposit and balance</h3><p class="ms-wait">Answer the Florida question above to see the price, the deposit and the balance.</p>`;
+                MS.books = null;
+            } else {
+                const books = MS.items.map(([s, c]) => bookingMath(s, c, MS.deposit[shipKey(s)] || null));
+                MS.books = books;
+                const many = books.length > 1;
+                box.innerHTML = `<h3>Price, deposit and balance</h3>
+                    ${many ? `<p class="hint">Two separate bookings, one on each ship, each with its own deposit, balance and final payment date.</p>` : ""}
+                    ${books.map((b, i) => bookingHtml(b, many ? i + 1 : 0, i === 0)).join("")}
+                    ${many ? totalsHtml(books) : ""}
+                    <p class="ms-warn">${CHANGE_TEXT}</p>`;
+            }
+            const cn = !!MS.books && MS.books.some(b => b.credits);
+            document.getElementById("msCn").hidden = !cn;
+            document.getElementById("msTwoNote").hidden = !(MS.books && MS.books.some(b => b.credits === 2));
+            document.getElementById("msLatNeed").textContent = cn ? "(required for CruiseNext)" : "(if guest 1 has one)";
+        }
+
+        // The window says when its Florida answer differs from the page's switch, and when NCL
+        // isn't offering a Florida discount on this selection (the answer then changes nothing).
+        function renderFlNote() {
+            const note = document.getElementById("msFlNote");
+            const parts = [];
+            if (MS.florida !== state.flResident) {
+                parts.push(MS.florida ? "The Florida resident rate switch on the page is off. Your answer turns the Florida resident rate on for this request."
+                                      : "The Florida resident rate switch on the page is on. Your answer turns the Florida resident rate off for this request.");
+            }
+            if (!MS.items.some(([s]) => flShipActive(s))) parts.push("NCL isn't offering a Florida resident discount on this selection right now, so the price is the same either way.");
+            note.textContent = parts.join(" ");
+            note.hidden = !parts.length;
+        }
+
+        function msChange(el) {
+            if (!MS) return;
+            if (el.name === "msFl") {
+                MS.florida = el.value === "yes";
+                document.getElementById("msAddr").hidden = !MS.florida;
+                renderFlNote();
+                renderMsMath();
+            } else if (el.dataset.msDep) {
+                MS.deposit[el.dataset.msDep] = el.value;
+                renderMsMath();
+            } else if (el.id === "msMe") {
+                document.getElementById("msSender").hidden = el.checked;
+            }
+        }
+
+        function openSelection(key) {
+            const sel = SELECTIONS[key];
+            if (!sel) return;
+            MS = { key, label: sel.label, items: sel.items, florida: null, deposit: {}, books: null, token: null, widget: null, sending: false };
+            const dlg = document.getElementById("msDialog");
+            dlg.innerHTML = selectionForm();
+            renderMsMath();
+            dlg.showModal();
+            dlg.scrollTop = 0;
+            startTurnstile(MS, "#msTurnstile");
+        }
+
+        // Closing the window clears everything typed in it.
+        function closeSelection() {
+            if (MS && MS.widget !== null && window.turnstile) { try { window.turnstile.remove(MS.widget); } catch (e) {} }
+            MS = null;
+            document.getElementById("msDialog").innerHTML = "";
+        }
+
+        // Cloudflare Turnstile, loaded only when a window that sends opens and the Worker is set
+        // up. st: the open window's state (MS or PW), which keeps the widget and its token.
+        function startTurnstile(st, sel) {
+            if (!FAMILY_API || !TURNSTILE_SITE_KEY) return;
+            const show = () => {
+                if ((st !== MS && st !== PW) || !document.querySelector(sel)) return;
+                st.widget = window.turnstile.render(sel, { sitekey: TURNSTILE_SITE_KEY,
+                    callback: t => { st.token = t; }, "expired-callback": () => { st.token = null; } });
+            };
+            if (window.turnstile) return show();
+            window.onTurnstileReady = show;
+            if (!document.getElementById("tsScript")) {
+                const sc = document.createElement("script");
+                sc.id = "tsScript";
+                sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileReady";
+                sc.async = true;
+                document.head.appendChild(sc);
+            }
+        }
+
+        const msValue = id => { const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+        // Age on a date (YYYY-MM-DD) for a date of birth (YYYY-MM-DD).
+        function ageOn(dob, on) {
+            const [y, m, d] = dob.split("-").map(Number), [Y, M, D] = on.split("-").map(Number);
+            return Y - y - (M < m || (M === m && D < d) ? 1 : 0);
+        }
+        const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // Everything the request needs, in the window's order. Returns the problems as text.
+        function validateSelection() {
+            const errs = [];
+            const bad = (id, text) => { const el = document.getElementById(id); if (el) el.setAttribute("aria-invalid", "true"); errs.push(text); };
+            const need = (id, text) => { if (!msValue(id)) bad(id, text); };
+            if (MS.florida === null) errs.push("Answer whether guest 1 and guest 2 are Florida residents.");
+            for (const [s] of MS.items) if (!MS.deposit[shipKey(s)]) errs.push(`Choose how to pay the deposit${MS.items.length > 1 ? ` for the ${s.ship_short} booking` : ""}.`);
+            if (MS.florida) {
+                need("msStreet", "Enter guest 1's street address.");
+                need("msCity", "Enter guest 1's city.");
+                need("msState", "Enter guest 1's state.");
+                if (!/^\d{5}(-\d{4})?$/.test(msValue("msZip"))) bad("msZip", "Enter guest 1's 5 digit ZIP code.");
+            }
+            const today = todayEastern(), sail = G.depart, credit = !!MS.books && MS.books.some(b => b.credits);
+            guestOrder().forEach((a, i) => {
+                const p = `g${i}`, who = `guest ${i + 1}`;
+                need(p + "_first", `Enter ${who}'s first name.`);
+                need(p + "_last", `Enter ${who}'s last name.`);
+                const dob = msValue(p + "_dob");
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(dob) || dob > today) bad(p + "_dob", `Enter ${who}'s date of birth.`);
+                else {
+                    const age = ageOn(dob, sail);
+                    if (a === null && age < 21) bad(p + "_dob", `Guest ${i + 1} is an adult on this page, so they must be 21 or older on ${ageDateText()}.`);
+                    if (a !== null && age !== a) bad(p + "_dob", `Guest ${i + 1}'s date of birth makes them ${age} on ${ageDateText()}, but the page says ${a}. Change the date, or the kid's age on the page.`);
+                    if (i === 0 && credit && ageOn(dob, today) < 21) bad(p + "_dob", "CruiseNext credits can only be used by someone 21 or older, so guest 1 must be 21 today.");
+                }
+                need(p + "_gender", `Choose ${who}'s gender as on the passport or ID.`);
+                need(p + "_citizenship", `Enter ${who}'s citizenship.`);
+                const lat = msValue(p + "_latitudes");
+                if (lat && !/^\d{4,15}$/.test(lat)) bad(p + "_latitudes", `${who[0].toUpperCase() + who.slice(1)}'s Latitudes number should be digits only.`);
+            });
+            if (!EMAIL_RE.test(msValue("g0_email"))) bad("g0_email", "Enter guest 1's email.");
+            if (msValue("g0_phone").replace(/\D/g, "").length < 10) bad("g0_phone", "Enter guest 1's mobile phone number.");
+            if (credit && !msValue("g0_latitudes")) bad("g0_latitudes", "Enter guest 1's Latitudes number. CruiseNext needs it to move the credit.");
+            if (!document.getElementById("msMe").checked) {
+                need("msName", "Enter your name.");
+                if (!EMAIL_RE.test(msValue("msEmail"))) bad("msEmail", "Enter your email.");
+            }
+            if (FAMILY_API && !MS.token) errs.push("Complete the check above the Send button.");
+            return errs;
+        }
+
+        // The request the Worker turns into the two emails (5.2.0 part B). Amounts are the
+        // window's own numbers; the Worker formats them and never stores anything.
+        // The price lines of one booking in the window, as shown ("Cruise fare", "$3,138").
+        const shownLines = (key, sel) => [...document.querySelectorAll(`#msMath [data-booking="${key}"] .ms-lines ${sel}`)]
+            .map(r => ({ item: r.querySelector(".k").textContent.trim(), value: r.querySelector(".v").textContent.trim() }));
+
+        function selectionRequest() {
+            const order = guestOrder();
+            const v = msValue;
+            const me = document.getElementById("msMe").checked;
+            return {
+                kind: "booking",
+                page_version: APP_VERSION,
+                prices_saved_at: DATA.saved_at,
+                note: CHANGE_TEXT,
+                option: MS.label,
+                party: { adults: state.adults, kid_ages: order.filter(a => a !== null) },
+                page_switches: { prepay_gratuities: state.prepayGratuities, florida_resident_rate: state.flResident },
+                florida: { residents: MS.florida, address: MS.florida ? { street: v("msStreet"), city: v("msCity"), state: v("msState"), zip: v("msZip") } : null },
+                bookings: MS.books.map(b => ({
+                    ship: b.s.ship, depart: b.s.depart, return: b.s.return, nights: b.s.nights,
+                    cabin_type: b.c.typeTitle, category: b.c.code, description: b.c.description, guarantee: b.c.guarantee,
+                    free_at_sea: Object.assign({}, state.offers[shipKey(b.s)]),
+                    lines: shownLines(shipKey(b.s), ".row:not(.total):not(.onboard)"), total: b.price, onboard: shownLines(shipKey(b.s), ".row.onboard"),
+                    deposit_choice: b.choice,
+                    ncl_deposit: b.dep ? { amount: b.dep.amount, rule: b.dep.rule, due_hours: b.dep.hours, offer: b.dep.offer ? b.dep.offer.title : null } : null,
+                    credits: b.credits, credit_value: b.creditValue, due_at_booking: b.dueNow, balance: b.balance,
+                    balance_due: b.past ? "when booking" : b.final, pay_david: b.payDavid,
+                })),
+                guests: order.map((a, i) => ({
+                    position: i + 1, adult: a === null, age_on_sail_date: a,
+                    first: v(`g${i}_first`), middle: v(`g${i}_middle`), last: v(`g${i}_last`), date_of_birth: v(`g${i}_dob`),
+                    gender: v(`g${i}_gender`), citizenship: v(`g${i}_citizenship`), latitudes: v(`g${i}_latitudes`) || null,
+                })),
+                guest1: { email: v("g0_email"), phone: v("g0_phone") },
+                sender: me ? { is_guest1: true, name: [v("g0_first"), v("g0_last")].join(" "), email: v("g0_email") }
+                           : { is_guest1: false, name: v("msName"), email: v("msEmail") },
+                turnstile: MS.token,
+            };
+        }
+
+        async function sendSelection() {
+            if (!MS || MS.sending) return;
+            document.querySelectorAll("#msDialog [aria-invalid]").forEach(el => el.removeAttribute("aria-invalid"));
+            const status = document.getElementById("msStatus"), button = document.getElementById("msSend");
+            const errs = validateSelection();
+            if (errs.length) {
+                status.className = "ms-status bad";
+                status.innerHTML = `<strong>Please fix these first:</strong><ul>${errs.map(e => `<li>${esc(e)}</li>`).join("")}</ul>`;
+                const first = document.querySelector("#msDialog [aria-invalid='true']");
+                if (first) first.focus();
+                return;
+            }
+            if (!FAMILY_API) {
+                status.className = "ms-status info";
+                status.textContent = "Everything is filled in, but sending isn't switched on yet, so nothing was sent.";
+                return;
+            }
+            MS.sending = true;
+            button.disabled = true;
+            status.className = "ms-status info";
+            status.textContent = "Sending...";
+            try {
+                const body = selectionRequest();
+                const r = await fetch(FAMILY_API + "/booking", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+                const ans = await r.json().catch(() => ({}));
+                if (!r.ok || !ans.ok) throw Object.assign(new Error(ans.error || "HTTP " + r.status), { text: ans.message });
+                document.querySelector("#msDialog .ms-body").innerHTML = `
+                    <div class="ms-status ok" style="margin-top:1rem"><strong>Sent.</strong> David will confirm by email. ${ans.copy === false
+                        ? `Your copy couldn't be sent to ${esc(body.sender.email)}, but David has everything.` : `A copy of your selection is on its way to ${esc(body.sender.email)}.`}</div>
+                    <p class="ms-warn">${CHANGE_TEXT}</p>
+                    <button type="button" class="ms-send" data-ms-close>Close</button>`;
+            } catch (err) {
+                if (!MS) return;
+                status.className = "ms-status bad";
+                status.textContent = err.text || `Not sent (${err.message}). Please try again in a few minutes.`;
+                if (MS.widget !== null && window.turnstile) { try { window.turnstile.reset(MS.widget); } catch (e) {} }
+                MS.token = null;
+            } finally {
+                if (MS) MS.sending = false;
+                if (document.getElementById("msSend")) document.getElementById("msSend").disabled = false;
+            }
+        }
+
+
+        // ---------- Price watch (5.2.0; NOTES.md, "Family price watch and booking emails") ----------
+        // "Watch this price" under each card's total opens a window: the cabin and party size, the
+        // Florida question (it only decides which price is watched) and an email address. The
+        // cruise-family-alerts Worker keeps the watch in its own database (never in this repo or
+        // this browser), emails a link to start it, and checks the published prices twice a day.
+        // The links in its emails come back to this page (#confirm=, #unsubscribe=, #manage=): the
+        // page removes the token from the address bar and sends it to the Worker. No NCL calls.
+        let PW = null;
+        const WATCH_LINK = /^#(confirm|unsubscribe|manage)=([A-Za-z0-9_-]{43})$/;
+        const WATCH_TITLES = { form: "Watch this price", confirm: "Start your price watch", unsubscribe: "Stop a price watch", manage: "Your price watches" };
+
+        const WATCH_DROP = 20, WATCH_DROP_MAX = 1000;   // dollars per guest: the default, and the most allowed
+        // The watched price, the Worker's rule: NCL's cabin price for the party (fare with taxes,
+        // fees and port expenses) minus the cabin's own Florida discount when the answer is Yes.
+        const watchedPrice = (s, c, florida) => { const k = cost(s, c, state.offers[shipKey(s)], florida); return k.cabin - k.fl.amount; };
+        const watchHead = mode => `<div class="ms-head"><h2 id="pwTitle">${WATCH_TITLES[mode]}</h2><button type="button" class="ms-close" data-pw-close aria-label="Close">&times;</button></div>`;
+
+        function watchForm() {
+            const n = guests(), [s, c] = [PW.ship, PW.cabin];
+            const review = `
+                <div class="ms-item"><strong>${esc(s.ship)}</strong>, ${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)
+                    <div>${esc(c.typeTitle)}: ${catHtml(c)}</div>
+                    ${c.guarantee ? `<div class="cat-meta gty">${GUARANTEE_TEXT}</div>` : ""}
+                </div>`;
+            const check = (id, on, text, off = "") => `<label class="ms-check"><input type="checkbox" id="${id}" ${on ? "checked" : ""} ${off ? "disabled" : ""}><span>${text}${off ? `<span class="cat-meta" style="display:block">${off}</span>` : ""}</span></label>`;
+            return `
+                <form id="pwForm" novalidate autocomplete="off">
+                    ${watchHead("form")}
+                    <div class="ms-body">
+                        <section class="ms-sec">
+                            <h3>What you're watching: ${esc(PW.label)}</h3>
+                            ${review}
+                            <div class="ms-list"><div>${plural(n, "guest", "guests")} in the cabin. The price depends on how many guests there are, not their ages.</div>
+                                ${PW.key === "8" ? `<div>This watches the ${esc(s.ship_short)} cabin of the 8 night trip. The other ship's cabin has its own button.</div>` : ""}</div>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Florida resident</h3>
+                            <fieldset class="ms-q" id="pwFlQ"><legend>Are you a Florida resident?</legend>
+                                <label class="ms-choice"><input type="radio" name="pwFl" value="yes"><span>Yes</span></label>
+                                <label class="ms-choice"><input type="radio" name="pwFl" value="no"><span>No</span></label>
+                            </fieldset>
+                            <p class="hint">It only decides which price is watched: NCL's Florida resident price or the website price.</p>
+                            <div id="pwPrice"></div>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>What to email you about</h3>
+                            <div class="ms-field"><label for="pwDrop">Email me when the price drops by at least this much per guest (dollars)</label>
+                                <input type="number" id="pwDrop" name="pwDrop" min="1" max="${WATCH_DROP_MAX}" step="1" inputmode="numeric" value="${WATCH_DROP}"></div>
+                            <p class="hint" id="pwDropNote"></p>
+                            ${check("pwFew", !c.guarantee, `Tell me when only a few cabins are left (fewer than 10 for ${plural(n, "guest", "guests")})`, c.guarantee ? "Not for a Guarantee cabin: NCL doesn't show how many are left." : "")}
+                            ${check("pwSold", true, `Tell me if it sells out for ${plural(n, "guest", "guests")}`)}
+                            <fieldset class="ms-q" id="pwFreqQ"><legend>How often</legend>
+                                <label class="ms-choice"><input type="radio" name="pwFreq" value="now" checked><span>As soon as it happens (prices are checked twice a day)</span></label>
+                                <label class="ms-choice"><input type="radio" name="pwFreq" value="daily"><span>At most once a day, in the morning</span></label>
+                            </fieldset>
+                            <p class="hint">After a price drop email, the new price is the one watched. The few left and sell out emails are sent once. Every email has a link to stop the watch. Watches end on Jun 11, 2027.</p>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Your email</h3>
+                            ${msField("pwEmail", "Email", "email")}
+                            <p class="hint">Your email goes only to David's price watch list, never on this page or in the public repo. It is deleted when you stop watching, and on Jun 11, 2027. Up to 10 watches per email.</p>
+                            <div id="pwTurnstile"></div>
+                            <button type="submit" class="ms-send" id="pwSend">Start watching</button>
+                            <div class="ms-status" id="pwStatus" role="status" aria-live="polite"></div>
+                            <p class="hint">You'll get an email with a link to start the watch. Nothing is watched until you open it, within 48 hours.</p>
+                        </section>
+                    </div>
+                </form>`;
+        }
+
+        function renderPwPrice() {
+            const box = document.getElementById("pwPrice");
+            if (!box) return;
+            if (PW.florida === null) {
+                box.innerHTML = `<p class="ms-wait">Answer the question above to see the price that will be watched.</p>`;
+                return;
+            }
+            const n = guests(), [s, c] = [PW.ship, PW.cabin], price = watchedPrice(s, c, PW.florida);
+            const noDiscount = PW.florida && !cost(s, c, state.offers[shipKey(s)], true).fl.amount;
+            box.innerHTML = `
+                <div class="ms-note">
+                    <div>Price watched today (${PW.florida ? "Florida resident price" : "website price"}):</div>
+                    <div class="pw-price" id="pwAmount">${money(price)}</div>
+                    <div id="pwPerGuest">${money(price / n)} per guest. NCL's cruise fare with taxes, fees and port expenses for ${plural(n, "guest", "guests")}, before gratuities and Free at Sea extras.</div>
+                    ${noDiscount ? `<div style="margin-top:0.4rem">NCL isn't offering a Florida resident discount on this cabin right now, so this is the website price. If NCL offers one, the lower price counts as a drop.</div>` : ""}
+                </div>`;
+        }
+
+        // The drop entered, in dollars per guest, or null when it isn't a whole number from 1 to 1,000.
+        function dropEntered() {
+            const v = msValue("pwDrop");
+            return /^\d+$/.test(v) && Number(v) >= 1 && Number(v) <= WATCH_DROP_MAX ? Number(v) : null;
+        }
+        function renderPwDrop() {
+            const d = dropEntered(), n = guests();
+            document.getElementById("pwDropNote").textContent = d === null ? `Enter a whole number of dollars from $1 to ${money(WATCH_DROP_MAX)}.`
+                : `With ${plural(n, "guest", "guests")}, that's a drop of ${money(d * n)} or more for the cabin.`;
+        }
+
+        // key: "G", "A", or "8G" and "8A" (one cabin of the 8 night trip).
+        function openWatch(key) {
+            const option = key.startsWith("8") ? "8" : key, sel = SELECTIONS[option];
+            const item = sel && (option === "8" ? sel.items.find(([s]) => shipKey(s) === key[1]) : sel.items[0]);
+            if (!item) return;
+            const dlg = document.getElementById("pwDialog");
+            dropTurnstile();
+            PW = { mode: "form", key: option, label: option === "8" ? `${sel.label}, the ${item[0].ship_short} cabin` : sel.label,
+                   ship: item[0], cabin: item[1], florida: null, token: null, widget: null, sending: false };
+            dlg.innerHTML = watchForm();
+            renderPwPrice();
+            renderPwDrop();
+            if (!dlg.open) dlg.showModal();
+            dlg.scrollTop = 0;
+            startTurnstile(PW, "#pwTurnstile");
+        }
+
+        const dropTurnstile = () => { if (PW && PW.widget && window.turnstile) { try { window.turnstile.remove(PW.widget); } catch (e) {} } };
+        // Closing the window clears everything typed in it, and any token from a link. (The close
+        // event comes a moment later: if a link has opened the window again since, keep it.)
+        function closeWatch() {
+            if (document.getElementById("pwDialog").open) return;
+            dropTurnstile();
+            PW = null;
+            document.getElementById("pwDialog").innerHTML = "";
+        }
+
+        async function sendWatch() {
+            if (!PW || PW.mode !== "form" || PW.sending) return;
+            document.querySelectorAll("#pwDialog [aria-invalid]").forEach(el => el.removeAttribute("aria-invalid"));
+            const status = document.getElementById("pwStatus"), button = document.getElementById("pwSend");
+            const errs = [], email = msValue("pwEmail"), drop = dropEntered();
+            if (PW.florida === null) errs.push("Answer whether you're a Florida resident.");
+            if (drop === null) { document.getElementById("pwDrop").setAttribute("aria-invalid", "true"); errs.push(`Enter the drop per guest: a whole number of dollars from $1 to ${money(WATCH_DROP_MAX)}.`); }
+            if (!EMAIL_RE.test(email)) { document.getElementById("pwEmail").setAttribute("aria-invalid", "true"); errs.push("Enter your email."); }
+            if (FAMILY_API && !PW.token) errs.push("Complete the check above the button.");
+            if (errs.length) {
+                status.className = "ms-status bad";
+                status.innerHTML = `<strong>Please fix these first:</strong><ul>${errs.map(e => `<li>${esc(e)}</li>`).join("")}</ul>`;
+                return;
+            }
+            if (!FAMILY_API) {
+                status.className = "ms-status info";
+                status.textContent = "Everything is filled in, but the price watch isn't switched on yet, so nothing was sent.";
+                return;
+            }
+            PW.sending = true;
+            button.disabled = true;
+            status.className = "ms-status info";
+            status.textContent = "Sending...";
+            const st = PW;
+            try {
+                const body = { option: PW.key, ship: shipKey(PW.ship), cabin: PW.cabin.code, guests: guests(), florida: PW.florida, drop_pp: drop,
+                               few: document.getElementById("pwFew").checked, sold_out: document.getElementById("pwSold").checked,
+                               frequency: document.querySelector("input[name='pwFreq']:checked").value,
+                               email, page: location.origin + location.pathname, turnstile: PW.token };
+                const r = await fetch(FAMILY_API + "/watch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+                const ans = await r.json().catch(() => ({}));
+                if (!r.ok || !ans.ok) throw Object.assign(new Error(ans.error || "HTTP " + r.status), { text: ans.message });
+                if (PW !== st) return;
+                document.querySelector("#pwDialog .ms-body").innerHTML = `
+                    <div class="ms-status ok" style="margin-top:1rem"><strong>Almost done.</strong> Check your email (${esc(email)}) and open the link in it within 48 hours to start the watch. Nothing is watched until then.</div>
+                    <button type="button" class="ms-send" data-pw-close>Close</button>`;
+            } catch (err) {
+                if (PW !== st) return;
+                status.className = "ms-status bad";
+                status.textContent = err.text || `Not sent (${err.message}). Please try again in a few minutes.`;
+                if (PW.widget && window.turnstile) { try { window.turnstile.reset(PW.widget); } catch (e) {} }
+                PW.token = null;
+            } finally {
+                if (PW === st) PW.sending = false;
+                if (document.getElementById("pwSend")) document.getElementById("pwSend").disabled = false;
+            }
+        }
+
+        // A link from a price watch email: the token goes to the Worker, never stays in the address bar.
+        function openLink() {
+            const m = location.hash.match(WATCH_LINK);
+            if (!m) return;
+            history.replaceState(null, "", location.pathname + location.search);
+            const dlg = document.getElementById("pwDialog");
+            dropTurnstile();
+            PW = { mode: m[1], token: m[2], busy: false };
+            dlg.innerHTML = `${watchHead(m[1])}<div class="ms-body"><div class="ms-sec" id="pwResult"><p class="ms-wait">One moment...</p></div></div>`;
+            if (!dlg.open) dlg.showModal();
+            linkCall({});
+        }
+
+        const watchCard = (w, stop) => `
+            <div class="pw-watch">
+                <div class="pw-label">${esc(w.label)}</div>
+                <div>Price watched: <strong>${money(w.watched)}</strong>${w.price !== null && w.price !== w.watched ? ` (latest price ${money(w.price)})` : ""}</div>
+                ${(w.choices || []).length ? `<ul class="pw-choices">${w.choices.map(x => `<li>${esc(x[0].toUpperCase() + x.slice(1))}</li>`).join("")}</ul>` : ""}
+                ${stop ? `<button type="button" class="pw-stop" data-pw-stop="${esc(w.id)}">Stop this watch</button>` : ""}
+            </div>`;
+
+        function linkResult(ans) {
+            if (PW.mode === "confirm") {
+                return `<div class="ms-status ok"><strong>${ans.already ? "You were already watching this price. Your new choices replace the old ones." : "Your price watch has started."}</strong> Every email has a link to stop the watch.</div>${watchCard(ans.watch, false)}`;
+            }
+            if (PW.mode === "unsubscribe") {
+                return `<div class="ms-status ok"><strong>Stopped.</strong> You won't get emails about this price any more.</div>${watchCard(ans.watch, false)}`;
+            }
+            const waiting = ans.waiting ? `<p class="hint">${plural(ans.waiting, "watch is", "watches are")} waiting for the link in its email (deleted after 48 hours if it isn't opened).</p>` : "";
+            if (!ans.watches.length) return `<div class="ms-status ok">You have no price watches running.</div>${waiting}`;
+            return `<p class="ms-wait">${plural(ans.watches.length, "price watch", "price watches")} running for this email address:</p>
+                ${ans.watches.map(w => watchCard(w, true)).join("")}
+                ${ans.watches.length > 1 ? `<button type="button" class="pw-stop" data-pw-stop="all" style="margin-top:0.9rem">Stop all of them</button>` : ""}
+                ${waiting}`;
+        }
+
+        async function linkCall(extra) {
+            const box = document.getElementById("pwResult"), st = PW;
+            if (!box || !st || st.busy) return;
+            if (!FAMILY_API) {
+                box.innerHTML = `<div class="ms-status info">The price watch isn't switched on yet.</div>`;
+                return;
+            }
+            st.busy = true;
+            box.querySelectorAll("button").forEach(b => { b.disabled = true; });
+            try {
+                const r = await fetch(`${FAMILY_API}/${st.mode}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: st.token, ...extra }) });
+                const ans = await r.json().catch(() => ({}));
+                if (PW !== st) return;
+                box.innerHTML = r.ok && ans.ok ? linkResult(ans)
+                    : `<div class="ms-status bad">${esc(ans.message || "Something went wrong. Please try the link again in a few minutes.")}</div>`;
+            } catch (err) {
+                if (PW === st) box.innerHTML = `<div class="ms-status bad">David's price watch service couldn't be reached. Please try the link again in a few minutes.</div>`;
+            } finally {
+                st.busy = false;
+            }
+        }
+
 
         // ---------- render ----------
         // Ages are taken on the first sail date (the Getaway, Jun 11, 2027).
@@ -1311,9 +2219,11 @@
             document.getElementById("guestSummary").textContent = parts.join(". ") + ".";
         }
 
-        function renderTypes() {
-            document.getElementById("typeButtons").innerHTML = allTypes().map(k =>
-                `<button type="button" data-type="${k}" aria-pressed="${state.type === k}">${esc(typeName(k))}</button>`).join("");
+        // The cabin type buttons, in each card after Free at Sea and above the cabin list (5.2.0).
+        // One choice for the whole page: a tap in any card changes every card.
+        function typeButtons() {
+            return `<div class="type-pick"><div class="type-pick-title">Cabin type</div><div class="seg small" role="group" aria-label="Cabin type">${allTypes().map(k =>
+                `<button type="button" data-type="${k}" aria-pressed="${state.type === k}">${esc(typeName(k))}</button>`).join("")}</div></div>`;
         }
 
         // Keep every saved pick valid for the current party.
@@ -1324,7 +2234,7 @@
                 const c = findCat(s, state[f]);
                 if (!c || !isAvail(c, n)) {
                     const tf = typeFor(s, state.type);
-                    const best = (!tf.missing && defaultPick(availableIn(tf.t, n))) || defaultPick(allCats(s).filter(c => isAvail(c, n)).sort((a, b) => entry(a, n).cabin_total - entry(b, n).cabin_total));
+                    const best = (!tf.missing && defaultPick(availableIn(s, tf.t, n))) || defaultPick(allCats(s).filter(c => isAvail(c, n)).sort(byListPrice(s, n)));
                     state[f] = best ? best.code : null;
                 }
             }
@@ -1370,17 +2280,17 @@
         }
 
         function render(msg) {
+            SELECTIONS = {};
             renderPrepay();
             renderFl();
             normalize();
             renderGuests(msg);
-            renderTypes();
+            // The tiles, then the full card of each selected option, in tile order.
+            const cards = { G: () => singleCard(G, OPTIONS[0].label), A: () => singleCard(A, OPTIONS[1].label), "8": eightCard };
+            const picked = OPTIONS.filter(o => state.compare.includes(o.key));
             document.getElementById("app").innerHTML = `
-                <div class="options">
-                    ${singleCard(G, "Option 1: 3 nights")}
-                    ${singleCard(A, "Option 2: 5 nights")}
-                    ${eightCard()}
-                </div>
+                ${tiles()}
+                ${picked.length ? `<div class="options n${picked.length}">${picked.map(o => cards[o.key]()).join("")}</div>` : ""}
                 ${explainer()}
                 <div class="tables">${cabinTable(G)}${cabinTable(A)}</div>`;
             save();
@@ -1405,9 +2315,27 @@
         // ---------- events ----------
         document.addEventListener("click", e => {
             if (!DATA) return;
+            const sel = e.target.closest("button[data-select]");
+            if (sel) { openSelection(sel.dataset.select); return; }
+            const watch = e.target.closest("button[data-watch]");
+            if (watch) { openWatch(watch.dataset.watch); return; }
+            if (e.target.closest("[data-ms-close]")) { document.getElementById("msDialog").close(); return; }
+            const tile = e.target.closest("[data-tile]");
+            if (tile && !e.target.closest("a")) {
+                // Turn the option on or off; the cards stay in tile order.
+                const key = tile.dataset.tile;
+                const refocus = !!(document.activeElement && tile.contains(document.activeElement));
+                state.compare = state.compare.includes(key) ? state.compare.filter(k => k !== key)
+                    : OPTIONS.map(o => o.key).filter(k => k === key || state.compare.includes(k));
+                render();
+                if (refocus) document.querySelector(`[data-tile="${key}"] .tile-btn`).focus({ preventScroll: true });
+                return;
+            }
             const b = e.target.closest("button[data-count], button[data-type], button[data-mode], button[data-pick], tr.pickable");
             if (!b) return;
             let msg = "";
+            const card = b.closest(".card[data-option]");
+            const anchor = card && b.matches("button") ? { sel: `.card[data-option="${card.dataset.option}"] button${["type", "mode", "pick", "code"].filter(a => b.dataset[a]).map(a => `[data-${a}="${b.dataset[a]}"]`).join("")}`, top: b.getBoundingClientRect().top } : null;
             if (b.dataset.count) msg = changeCount(b.dataset.count, Number(b.dataset.step));
             else if (b.dataset.mode) state.mode = b.dataset.mode;
             else if (b.dataset.pick) state[b.dataset.pick] = b.dataset.code;
@@ -1422,10 +2350,17 @@
                 }
             }
             render(msg);
+            const again = anchor && document.querySelector(anchor.sel);
+            if (again) window.scrollBy(0, again.getBoundingClientRect().top - anchor.top);
         });
 
         document.addEventListener("change", e => {
             if (!DATA) return;
+            if (e.target.closest("#msDialog")) { msChange(e.target); return; }
+            if (e.target.closest("#pwDialog")) {
+                if (e.target.name === "pwFl" && PW) { PW.florida = e.target.value === "yes"; renderPwPrice(); }
+                return;
+            }
             const offer = e.target.closest("input[data-offer]");
             if (offer) {
                 const o = state.offers[offer.dataset.ship];
@@ -1549,13 +2484,37 @@
         const floridaPromise = fetch(FLORIDA_URL, { cache: "no-cache" })
             .then(r => r.ok ? r.json() : null)
             .catch(() => null);
+        // The DoubleUp watch is optional: without it Make Selection offers one CruiseNext credit.
+        const offersPromise = fetch(OFFERS_URL, { cache: "no-cache" })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null);
+        document.getElementById("msDialog").addEventListener("close", closeSelection);
+        document.addEventListener("input", e => {
+            if (e.target.closest("#msDialog, #pwDialog")) e.target.removeAttribute("aria-invalid");
+            if (e.target.id === "pwDrop" && PW) renderPwDrop();
+        });
+        document.addEventListener("submit", e => {
+            if (e.target.id === "msForm") { e.preventDefault(); sendSelection(); }
+            if (e.target.id === "pwForm") { e.preventDefault(); sendWatch(); }
+        });
+        // The price watch window and the links from its emails (these work even if the prices can't load).
+        const pwDialog = document.getElementById("pwDialog");
+        pwDialog.addEventListener("close", closeWatch);
+        pwDialog.addEventListener("click", e => {
+            if (e.target.closest("[data-pw-close]")) { pwDialog.close(); return; }
+            const stop = e.target.closest("button[data-pw-stop]");
+            if (stop && PW && PW.mode === "manage") linkCall({ stop: stop.dataset.pwStop });
+        });
+        window.addEventListener("hashchange", openLink);
+        openLink();
         fetch(DATA_URL, { cache: "no-cache" })
             .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-            .then(d => Promise.all([countsPromise, floridaPromise]).then(([cnt, fl]) => [d, cnt, fl]))
-            .then(([d, cnt, fl]) => {
+            .then(d => Promise.all([countsPromise, floridaPromise, offersPromise]).then(([cnt, fl, of]) => [d, cnt, fl, of]))
+            .then(([d, cnt, fl, of]) => {
                 DATA = d;
                 COUNTS = usableCounts(cnt);
                 loadFlorida(fl);
+                OFFERS = of && of.schema_version === 1 && of.doubleup ? of : null;
                 G = d.sailings.find(s => s.id.startsWith("getaway"));
                 A = d.sailings.find(s => s.id.startsWith("aura"));
                 if (!G || !A) throw new Error("a sailing is missing");

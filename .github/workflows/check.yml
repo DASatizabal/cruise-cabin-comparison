@@ -1,7 +1,10 @@
 name: Release check
 
-# Blocks a release when the data file is malformed, the version is inconsistent, or an
-# offline tool test fails (tools/test_tools.py: no NCL calls).
+# Blocks a release when a data file is malformed, the version is inconsistent, the family alerts
+# Worker still accepts the preview's address (TEST_ORIGIN), an offline tool test fails
+# (tools/test_tools.py: no NCL calls), a test of the family alerts Worker or its Apps Script fails
+# (node --test, no network), or a workflow file has a mistake (actionlint, pinned image, which
+# also runs shellcheck on every run: block).
 on:
   push:
   pull_request:
@@ -11,5 +14,16 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
-      - run: python3 tools/check_release.py
       - run: python3 tools/test_tools.py
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Test the family alerts Worker and its Apps Script
+        run: node --test "tools/family-alerts/test/*.test.mjs"
+      - name: Lint the workflow files (actionlint)
+        uses: docker://rhysd/actionlint:1.7.7
+        with:
+          args: -color
+      # Last, so the tests and the lint still run while it fails on purpose (TEST_ORIGIN on a
+      # branch being tested from the preview).
+      - run: python3 tools/check_release.py

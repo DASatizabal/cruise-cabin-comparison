@@ -15,6 +15,10 @@ import sys
 EXPECTED_SAILINGS = {"getaway-2027-06-11", "aura-2027-06-14"}
 GUEST_KEYS = ["2", "3", "4", "5"]
 MATCH_KEYS = {"studio", "inside", "oceanview", "balcony", "mini_suite", "suite", "haven"}
+PERCENT_RULE = "10% of the cruise fare"
+PER_GUEST_RULE = "same deposit per guest"
+PAYMENT_KEYS = {"source", "final_payment_due", "standard_deposit_per_guest", "standard_deposit_checked_at", "by_guests", "deposit_offer"}
+DEPOSIT_ENTRY_KEYS = {"deposit", "deposit_type", "deposit_category", "due_hours", "as_of", "why"}
 
 
 def is_int(v):
@@ -29,23 +33,27 @@ def is_date(v):
         return False
 
 
-def check(data, allow_schema_2=False):
-    """Problems with a price file. Every file fetch_prices.py writes is schema 3.
+def is_money(v):
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and v > 0
 
-    allow_schema_2: only for the release check (tools/check_release.py) on the committed file,
-    which stays the schema 2 file written before 5.0.0 until the first refresh on main after
-    the merge. Such a file is checked as before (no ncl_ids or warnings). The refresh workflow's
-    check of each new file never allows it.
+
+def check(data, allow_schema_3=False):
+    """Problems with a price file. Every file fetch_prices.py writes is schema 4.
+
+    allow_schema_3: only for the release check (tools/check_release.py) on the committed file,
+    which stays the schema 3 file written before 5.2.0 until the first refresh on main after
+    the merge. Such a file is checked as before (no payment, deposit_rules or deposit checks).
+    The refresh workflow's check of each new file never allows it.
     """
-    old = allow_schema_2 and data.get("schema_version") == 2
+    if not isinstance(data, dict):
+        return ["the file is not a JSON object"]
+    old = allow_schema_3 and data.get("schema_version") == 3
     errors = []
     err = errors.append
 
-    if not isinstance(data, dict):
-        return ["the file is not a JSON object"]
-    if data.get("schema_version") != 3 and not old:
-        err("schema_version must be 3")
-    warnings = data.get("warnings") if not old else []
+    if data.get("schema_version") != 4 and not old:
+        err("schema_version must be 4")
+    warnings = data.get("warnings")
     rate_warnings = data.get("rate_warnings")
     if not isinstance(warnings, list) or not all(isinstance(w, str) for w in warnings) \
             or not isinstance(rate_warnings, list) or not all(isinstance(w, str) for w in rate_warnings):
@@ -81,6 +89,39 @@ def check(data, allow_schema_2=False):
                 # (checked below) and the entry says why.
                 if c.get("ok") is False or (c.get("ok") is None and not c.get("why")) or c.get("ok") not in (True, False, None):
                     err(f"age cross check failed: {c}")
+
+    # Deposits (schema 4): a deposit check that failed is allowed (logged), but then the number it
+    # checks must be empty (null): the Suite and Haven rule, or that ship's standard deposit.
+    deposit_checks = []
+    if not old:
+        deposit_checks = (checks or {}).get("deposits") if isinstance(checks, dict) else None
+        if not isinstance(deposit_checks, list):
+            err("checks.deposits must be a list")
+            deposit_checks = []
+        for c in deposit_checks:
+            if not isinstance(c, dict) or c.get("sailing") not in EXPECTED_SAILINGS or c.get("rule") not in (PERCENT_RULE, PER_GUEST_RULE) \
+                    or not isinstance(c.get("ok"), bool) or not is_money(c.get("deposit")) or not is_money(c.get("expected")):
+                err(f"checks.deposits entry is malformed: {c}")
+        rules = data.get("deposit_rules")
+        if not isinstance(rules, dict):
+            err("deposit_rules is missing")
+        else:
+            pct = rules.get("percent_of_fare")
+            if pct is None:
+                if not any(w.startswith("Deposits:") for w in warnings):
+                    err("deposit_rules.percent_of_fare is empty without a warning")
+                if rules.get("confirmed_on") is not None:
+                    err("deposit_rules: confirmed_on must be null when the rule is empty")
+            elif not is_money(pct) or pct > 100:
+                err("deposit_rules.percent_of_fare must be a percentage or null")
+            elif not is_date(rules.get("confirmed_on")) or not rules.get("confirmed_by"):
+                err("deposit_rules needs confirmed_on and confirmed_by")
+            if any(isinstance(c, dict) and c.get("rule") == PERCENT_RULE and c.get("ok") is False for c in deposit_checks) and pct is not None:
+                err("a Suite or Haven deposit check failed but deposit_rules.percent_of_fare is set")
+            if rules.get("suite_haven_types") != ["SUITE", "HAVEN"]:
+                err("deposit_rules.suite_haven_types must be SUITE and HAVEN")
+            if not str(rules.get("source", "")).startswith("https://www.ncl.com/"):
+                err("deposit_rules.source must be an NCL page")
 
     rates = data.get("rates")
     if not isinstance(rates, dict):
@@ -134,9 +175,7 @@ def check(data, allow_schema_2=False):
                 err(f"{p}: {k} must be a YYYY-MM-DD date")
         # NCL's ids, looked up on every run (fetch_prices.find_sailing), never typed in.
         ids = s.get("ncl_ids")
-        if old:
-            pass
-        elif not isinstance(ids, dict) or not all(isinstance(ids.get(k), str) and ids[k] for k in ("itinerary_code", "package_id", "sailing_id", "ship_code", "found_on", "checked_at")):
+        if not isinstance(ids, dict) or not all(isinstance(ids.get(k), str) and ids[k] for k in ("itinerary_code", "package_id", "sailing_id", "ship_code", "found_on", "checked_at")):
             err(f"{p}: ncl_ids needs itinerary_code, package_id, sailing_id, ship_code, found_on and checked_at")
         elif ids["package_id"] != s.get("package_id") or ids["itinerary_code"] != s.get("itinerary_code"):
             err(f"{p}: ncl_ids does not match package_id and itinerary_code")
@@ -169,12 +208,14 @@ def check(data, allow_schema_2=False):
         soda = (grat.get("open_bar") or {}).get("soda_under_21_position_2") if isinstance(grat, dict) else None
         if not isinstance(soda, (int, float)) or soda < 0:
             err(f"{p}: gratuities.open_bar.soda_under_21_position_2 must be a number")
-        if not old and "kids_sail_free" not in s:
+        if "kids_sail_free" not in s:
             err(f"{p}: kids_sail_free is missing (null when NCL doesn't list the offer)")
         ksf = s.get("kids_sail_free")
         if ksf is not None and (not isinstance(ksf, dict) or not ksf.get("title") or not isinstance(ksf.get("types"), list)
                                 or not all(isinstance(t, str) for t in ksf["types"]) or not isinstance(ksf.get("codes", []), list)):
             err(f"{p}: kids_sail_free must be null or have a title and a list of types")
+        if not old:
+            check_payment(s, p, deposit_checks, warned, err)
         if not isinstance((s.get("terminal") or {}).get("text"), str):
             err(f"{p}: terminal.text is missing")
         ports = s.get("ports")
@@ -273,6 +314,61 @@ def check(data, allow_schema_2=False):
             if not ok:
                 err(f"{p}: no cabin is available for {g} guests")
     return errors
+
+
+def check_payment(s, p, deposit_checks, warned, err):
+    """A sailing's payment block (schema 4): deposits and the final payment date from NCL's price
+    summaries. Each empty (null) number needs a warning naming the ship."""
+    ship = s.get("ship_short", "?")
+    pay = s.get("payment")
+    if not isinstance(pay, dict) or set(pay) != PAYMENT_KEYS:
+        err(f"{p}: payment must have exactly {sorted(PAYMENT_KEYS)}")
+        return
+    if pay["source"] != "NCL price-summary paymentOptions":
+        err(f"{p}: payment.source must be NCL price-summary paymentOptions")
+    due = pay["final_payment_due"]
+    if due is None:
+        if not warned(ship, "final payment"):
+            err(f"{p}: payment.final_payment_due is empty without a warning")
+    elif not is_date(due) or (is_date(s.get("depart")) and due >= s["depart"]):
+        err(f"{p}: payment.final_payment_due must be a date before the sail date")
+    per = pay["standard_deposit_per_guest"]
+    if per is None:
+        if pay["standard_deposit_checked_at"] is not None:
+            err(f"{p}: payment.standard_deposit_checked_at must be null when the deposit is empty")
+        if not warned(ship, "deposit"):
+            err(f"{p}: payment.standard_deposit_per_guest is empty without a warning")
+    elif not is_money(per) or not is_date(pay["standard_deposit_checked_at"]):
+        err(f"{p}: payment.standard_deposit_per_guest must be a positive number with a checked_at date")
+    if per is not None and any(isinstance(c, dict) and c.get("sailing") == s.get("id") and c.get("rule") == PER_GUEST_RULE
+                               and c.get("ok") is False for c in deposit_checks):
+        err(f"{p}: a deposit per guest check failed but payment.standard_deposit_per_guest is set")
+    bg = pay["by_guests"]
+    if not isinstance(bg, dict) or sorted(bg) != GUEST_KEYS:
+        err(f"{p}: payment.by_guests must have exactly the keys 2, 3, 4, 5")
+    else:
+        for g, e in bg.items():
+            ep = f"{p}: payment.by_guests.{g}"
+            if not isinstance(e, dict) or set(e) != DEPOSIT_ENTRY_KEYS:
+                err(f"{ep} must have exactly {sorted(DEPOSIT_ENTRY_KEYS)}")
+                continue
+            if e["deposit"] is None:
+                if not e["why"] or not warned(ship, "deposit"):
+                    err(f"{ep}: an empty deposit needs a why and a warning")
+                if e["due_hours"] is not None:
+                    err(f"{ep}: due_hours without a deposit")
+            elif not is_money(e["deposit"]) or not isinstance(e["deposit_type"], str) or not isinstance(e["deposit_category"], str):
+                err(f"{ep}: deposit must be a positive number with its cabin type and category")
+            if e["due_hours"] is not None and (not isinstance(e["due_hours"], int) or isinstance(e["due_hours"], bool) or e["due_hours"] < 1):
+                err(f"{ep}: due_hours must be a positive whole number or null")
+            try:
+                dt.datetime.strptime(e["as_of"] or "", "%Y-%m-%dT%H:%M:%SZ")
+            except (TypeError, ValueError):
+                err(f"{ep}: as_of must be a time")
+    offer = pay["deposit_offer"]
+    if offer is not None and (not isinstance(offer, dict) or not offer.get("title") or not isinstance(offer.get("types"), list)
+                              or not isinstance(offer.get("codes"), list)):
+        err(f"{p}: payment.deposit_offer must be null or have a title, types and codes")
 
 
 def main():

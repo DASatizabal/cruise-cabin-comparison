@@ -2,6 +2,54 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [5.2.0] - 2026-10-29
+
+Built on branch `family-tools-5.2.0` in the order the owner set: the DoubleUp watch, the payment data, Make Selection, the layout changes, then the price watch. Tested by the owner from raw.githack.com previews before the merge; the preview address (`TEST_ORIGIN`) is switched off in the merged Worker.
+
+### Added
+- DoubleUp watch (alerts to the owner only). The daily price job reads NCL's CruiseNext page (https://www.ncl.com/cruise-deals/cruisenext) once, before the prices, with `tools/fetch_offers.py`: whether the "Limited-Time Offer: DoubleUp!" banner is there, its exact text, and the cabin types and time before sailing read from that text (today: Balcony and above, at least 90 days). Wording it can't read is saved as null with a warning and never guessed. A page that can't be read keeps the previous state with a warning, never fails the price run and never opens an issue.
+- `data/offers.json` (schema 1, public NCL text, dates and codes only), committed with the prices, checked by the new `tools/check_offers.py` before it replaces the old file and in the release check, and published by "Deploy site".
+- One GitHub issue per change (main only): "DoubleUp watch started" on the first run (to test that the alert reaches the owner's email and phone), then "appeared", "ended" or "text changed", with the old and new text, the Eastern date and the link. Each change has its own marker, so a retry never opens a second issue, and a change whose issue couldn't be opened is tried again on the next run. The issue mentions the owner, so GitHub notifies by email and on the phone.
+- Release check workflow: actionlint (pinned Docker image `rhysd/actionlint:1.7.7`, with shellcheck) on every push and pull request.
+- Tests: `tools/test_tools.py` (NCL's real banner markup saved 2026-10-28, every kind of change, one issue per change, retries, unreadable pages and wording, Eastern dates, the format check, and no em dash in any tracked file).
+
+- Payment data in `data/prices.json` (schema 4), read from the price summaries and availability answers the job already makes (no extra NCL calls), for Make Selection:
+  - per ship, `payment`: the final payment date (NCL's "pay in full" date: Feb 11, 2027 for the Getaway, Feb 14, 2027 for the Aura), the deposit NCL lists at each party size with its cabin type and hours to pay, the Inside to Club Balcony Suite deposit per guest ($50 today), and NCL's deposit offer as NCL words it ("2-For-1 Deposits" today);
+  - `deposit_rules`: Suite and Haven deposits are 10% of the cruise fare (NCL's rule), confirmed daily on any Suite or Haven price summary the job makes (the Aura at 5 guests is a Haven today);
+  - `checks.deposits`: every deposit read today against its rule. A check that fails never stops the run; the number it checks is left empty (null) with a warning, as with other missing numbers.
+  - A notice per ship on the GitHub run page ("Deposits Getaway: $50 per guest up to Club Balcony Suite, ...").
+- Tests: whole runs of `tools/fetch_prices.py` against a stand-in for NCL (same 26 calls as before, failed party sizes, kept prices from before 5.2.0, deposit checks that fail, dates that disagree, no deposit offer) and a saved NCL answer.
+
+- Make Selection: a button under each option card's total (once a cabin is chosen and every kid's age is set) opens a booking request window:
+  - the selection (option, ship and dates, cabin and its description, party, Free at Sea choices, prepay and Florida switches);
+  - "Are guest 1 and guest 2 Florida residents?" (Yes or No, nothing selected, required). The answer sets the Florida discount in the window even if the page switch differs, and the window says so; Yes asks for guest 1's Florida home address, which goes only to David;
+  - the same price lines and Total as the card, with the window's Florida answer: cruise fare, taxes, the Florida resident rate, Free at Sea Plus, Unlimited Open Bar, Specialty Dining, the Total, and with prepay off the service charges paid onboard below the Total with "Can be removed at Guest Services.";
+  - the deposit for each booking: NCL's deposit (read daily from NCL: $50 per guest up to Club Balcony Suite today, with NCL's 2-For-1 Deposits text; 10% of the cruise fare for Suites and The Haven, NCL's rule), or one of David's CruiseNext credits, or two while NCL's DoubleUp offer covers the cabin, with David's explainer under "How to pay the deposit";
+  - the math: what's due at booking, the balance (the Total minus credits and what's paid at booking) and NCL's final payment date (Feb 11, 2027 Getaway, Feb 14, 2027 Aura), and what to pay David; 8 nights as two bookings plus both together;
+  - the CruiseNext steps (NCL's sign-up page, cruisenext@ncl.com, Latitudes number required, guest 1 21 or older, not before about Nov 26, 2026);
+  - each guest's details (names as on the passport or ID, date of birth checked against the ages on the page, gender, citizenship, Latitudes number; guest 1's email and phone) and the sender;
+  - "Prices can change until NCL confirms the booking." Nothing typed is saved anywhere. Sending goes through the family alerts Worker (part B); until then the window checks every field and says nothing was sent.
+- Tests: `tools/page_test.py` covers the window on every card at 360 px (deposits, credits, DoubleUp cases, a Haven, the Florida answer, 8 nights, field checks, a schema 3 file, sending to a stand-in Worker).
+
+- Option tiles: the three options at the top are compact tiles in one row (stacked on a phone) with the label, ship(s), dates and nights, port chips, and the Aura's maiden voyage badge, christening note and video link. Each tile is an on/off button; pick one, two or all three to compare. Nothing is selected on the first visit ("Pick one or more options to compare."), and the choice is remembered on the device with the other saved choices.
+- The full card of each selected option shows below the tiles in tile order, side by side on wide screens and stacked on a phone. The 8 night card has a Day by day for each ship.
+- Tests: tiles at 360 px and 1280 px, remembered choices, list prices against card totals in 144 switch combinations, and the service charge line in both prepay states.
+
+- Family price watch: "Watch this price" next to Make Selection on each card, one per cabin ("Watch the Getaway cabin price" and "Watch the Aura cabin price" on the 8 night card). The window shows the cabin and party size, asks "Are you a Florida resident?" (it only decides which price is watched: the Florida resident price or the website price), shows the price watched today for the cabin and per guest, and asks what to email about: a drop of at least an amount per guest (default $20), "only a few cabins left" and "sells out" (both ticked to start; no "few left" for Guarantee cabins), and how often (as soon as it happens, or at most once a day in the morning). A confirmation email has to be opened within 48 hours to start the watch. After a drop email the new price is watched; the few left and sold out emails come once. Checked twice a day after the refreshes; every email has a link to stop that watch and one to see or stop all of them; everything ends on Jun 11, 2027.
+- The links in those emails open the page, which sends the token to the Worker and removes it from the address bar.
+- New Cloudflare Worker `cruise-family-alerts` (`tools/family-alerts/worker.js`, separate from the other Workers) with a D1 database for the watches, Cloudflare Turnstile, and an Apps Script (`tools/family-alerts/apps-script/Code.gs`) that sends from the owner's Gmail within its daily limit, keeping 20 sends a day for booking requests. Only the page's address may call it. Tokens are stored only as SHA-256; logs hold no personal data. Setup steps: `tools/family-alerts/README.md`.
+- Make Selection now sends: David gets the full request, the sender a copy without dates of birth or Latitudes numbers. Nothing from a booking request is stored or logged.
+- Release check: fails while the Worker still accepts the raw.githack.com preview (`TEST_ORIGIN`, for testing only), or when the page has only one of the Worker's address and the Turnstile key. The release check workflow runs the Worker and Apps Script tests (`node --test`, Node 24).
+- Tests: 28 Node tests (watches and their choices, one ship of 8 nights, limits, links, checks with drops, few left, sold out, once a day, skipped party sizes, waiting alerts, the Florida price, cleanup, the end date, booking emails and what the copy leaves out, nothing stored, nothing personal in the logs, no other addresses called; the Apps Script's secret, limits and reserve); `tools/page_test.py` covers the watch window and the links at 360 px, and checks the page's price watched against the Worker's own rule.
+
+### Changed
+- Every cabin price in the lists (each card's list, both 8 night pickers, the full tables) is now the cabin total with your choices (party, Free at Sea, Free at Sea Plus, the Florida discount, and service charges when prepaid), always equal to the card's Total for that cabin, and labelled as such. The 8 night pickers show the 8 night total with the other ship's chosen cabin. Lists are cheapest first by that price.
+- Service charges paid onboard: the "+ $X service charges paid onboard" line under the total is gone; the service charge line now sits directly below the Total line ("Service charges (crew gratuities) (paid onboard, not in the total): 2 guests x $20 x 3 nights", "$120 onboard", "Can be removed at Guest Services."), one per ship for 8 nights. Prepaid, it stays inside the total.
+- Every date-only field in `data/prices.json` is the Eastern date (checked dates of rates, gratuities and deposits, the Suite and Haven rule's date, each sailing's date), like every other "done that day" date. They were UTC dates.
+- `data/prices.json` is schema 4. `tools/check_prices.py` checks the payment data; the release check still accepts the committed schema 3 file until the first refresh on main after the merge.
+
+NCL calls: the price job goes from 26 to 27 a day (1 page load for the DoubleUp watch; the payment data, Make Selection and the price watch add none: the Worker reads the published data files). Per week about 918 instead of 911 (940 instead of 933 in a week with the Florida light check). NOTES.md, "DoubleUp watch" and "Payment data".
+
 ## [5.1.0] - 2026-10-27
 
 ### Added

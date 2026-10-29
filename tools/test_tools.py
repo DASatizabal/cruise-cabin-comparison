@@ -25,10 +25,22 @@ Florida resident rates (5.1.0): tools/fetch_florida.py's weekly cadence (light, 
 to light, Eastern dates), its runs against a stand-in for NCL (call counts, the light cabins, each
 cabin's own amount, the hold guard on signed-in answers, the sail-date stop), the --push guard
 (noreply email, main only) and tools/check_florida.py.
+
+DoubleUp watch (5.2.0): tools/fetch_offers.py on NCL's real banner markup (tools/test_data/
+cruisenext_doubleup.html, saved 2026-10-28) and on stand-in pages: started, ended, appeared and
+changed, one issue per change with its own marker, retries of an unreported change, pages that
+can't be read, wording that can't be read, Eastern dates, and tools/check_offers.py. Also: no
+em dash in any tracked file.
+
+Payment data (5.2.0, prices schema 4): deposits, the final payment date and NCL's deposit offer
+read from the price summaries and availability answers fetch_prices.py already makes (a saved
+NCL answer and whole runs of fetch_prices.py against a stand-in for NCL: the same call count as
+before, failed party sizes, kept schema 3 prices, deposit checks that fail), and the format check.
 """
 import datetime as dt
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -40,6 +52,7 @@ import fetch_counts  # noqa: E402
 import fetch_prices as fp  # noqa: E402
 
 TEST_DATA = os.path.join(TOOLS, "test_data")
+EM_DASH = chr(0x2014)
 
 FAILED = []
 
@@ -449,17 +462,20 @@ def test_check_prices_ids():
     import check_prices
     with open(os.path.join(os.path.dirname(TOOLS), "data", "prices.json"), encoding="utf-8") as f:
         old = json.load(f)
-    if old.get("schema_version") == 2:
-        check("release check accepts the committed schema 2 file", check_prices.check(old, allow_schema_2=True), [])
-        check("the refresh's check of a new file never accepts schema 2", "schema_version must be 3" in check_prices.check(old), True)
-    new = json.loads(json.dumps(old))
-    new["schema_version"], new["warnings"] = 3, []
+    if old.get("schema_version") == 3:
+        check("release check accepts the committed schema 3 file", check_prices.check(old, allow_schema_3=True), [])
+        check("the refresh's check of a new file never accepts schema 3", "schema_version must be 4" in check_prices.check(old), True)
+        bad = json.loads(json.dumps(old))
+        bad["sailings"][0]["ncl_ids"]["package_id"] = "1"
+        check("release check of a schema 3 file still checks ncl_ids", any("does not match" in e for e in check_prices.check(bad, allow_schema_3=True)), True)
+    new = schema4(old)
+    new["warnings"] = []
     for s in new["sailings"]:
         s["ncl_ids"] = {"itinerary_code": s["itinerary_code"], "package_id": s["package_id"], "sailing_id": "60533",
                         "ship_code": s["ship_short"].upper(), "found_on": f"https://www.ncl.com/cruises/{s['itinerary_code']}",
                         "checked_at": "2026-10-15T10:20:00Z"}
         s.setdefault("kids_sail_free", None)
-    check("schema 3 file with ncl_ids passes", check_prices.check(new), [])
+    check("schema 4 file with ncl_ids passes", check_prices.check(new), [])
     bad = json.loads(json.dumps(new))
     bad["sailings"][0]["ncl_ids"]["package_id"] = "1"
     check("ncl_ids that don't match the sailing fail", any("does not match" in e for e in check_prices.check(bad)), True)
@@ -470,23 +486,46 @@ def test_check_prices_ids():
     check("ids from the previous run with the warning pass", check_prices.check(prev), [])
 
 
-def schema3(data):
-    """A schema 3 copy of a price file (adds warnings and ncl_ids when the file is still schema 2)."""
+def schema4(data):
+    """A schema 4 copy of a price file. A schema 3 file (the committed one until the first refresh
+    after 5.2.0) gets the payment data fetch_prices.py would write from its price summaries, with
+    NCL's rules as the 2026-10-28 research saw them: $50 per guest up to Club Balcony Suite, 10% of
+    the cruise fare for Suite and Haven, final payment 120 days before sailing, 2-For-1 Deposits."""
     d = json.loads(json.dumps(data))
-    d["schema_version"] = 3
+    d["schema_version"] = 4
     d.setdefault("warnings", [])
+    d["checks"].setdefault("deposits", [])
+    d.setdefault("deposit_rules", dict({"suite_haven_types": fp.DEPOSIT_PERCENT_TYPES, "source": fp.DEPOSIT_RULE_SOURCE,
+                                        "percent_of_fare": fp.DEPOSIT_PERCENT}, **fp.DEPOSIT_RESEARCH))
     for s in d["sailings"]:
         s.setdefault("kids_sail_free", None)
         s.setdefault("ncl_ids", {"itinerary_code": s["itinerary_code"], "package_id": s["package_id"], "sailing_id": "1",
                                  "ship_code": s["ship_short"].upper(), "found_on": "https://www.ncl.com/cruises/x",
                                  "checked_at": "2026-10-15T10:20:00Z"})
+        if "payment" in s:
+            continue
+        by = {}
+        for ps in s["price_summaries"]:
+            pct = ps["type"] in fp.DEPOSIT_PERCENT_TYPES
+            ps.update(deposit=round(ps["fare_total"] * fp.DEPOSIT_PERCENT / 100, 2) if pct else 50 * ps["guests"],
+                      deposit_due_hours=23 if pct else 76,
+                      final_payment_due=(dt.date.fromisoformat(s["depart"]) - dt.timedelta(days=120)).isoformat())
+            by[str(ps["guests"])] = {"deposit": ps["deposit"], "deposit_type": ps["type"], "deposit_category": ps["category"],
+                                     "due_hours": ps["deposit_due_hours"], "as_of": s["party_sizes"][str(ps["guests"])]["as_of"], "why": None}
+        s["payment"] = {"source": "NCL price-summary paymentOptions",
+                        "final_payment_due": s["price_summaries"][0]["final_payment_due"],
+                        "standard_deposit_per_guest": 50, "standard_deposit_checked_at": d["saved_at"][:10],
+                        "by_guests": by,
+                        "deposit_offer": {"title": "2-For-1 Deposits", "short": None, "codes": [], "types": [],
+                                          "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
+                                          "checked_at": d["saved_at"]}}
     return d
 
 
 def null_copy(data):
     """The test copy for "Not found on NCL today": Getaway taxes and gratuities, and every rate,
     null, each with the warning fetch_prices.py would write."""
-    d = schema3(data)
+    d = schema4(data)
     g = next(s for s in d["sailings"] if s["id"].startswith("getaway"))
     g["taxes_per_guest"] = None
     g["gratuities"] = None
@@ -617,7 +656,7 @@ def test_kids_sail_free():
     check("Kids Sail Free by title only", fp.kids_sail_free({"offerGroups": [{"promotionsInGroup": [{"promotion": {"offers": [{"title": "KIDS SAIL FREE"}]}}]}]})["types"], [])
     check("Kids Sail Free: the Free at Sea code is still read the same way", fp.default_fare_codes(KSF_ANSWER), {"INSIDE": "ALL4CHO", "BALCONY": "ALL4CHO"})
     with open(os.path.join(os.path.dirname(TOOLS), "data", "prices.json"), encoding="utf-8") as f:
-        real = schema3(json.load(f))
+        real = schema4(json.load(f))
     check("format check: kids_sail_free null passes", check_prices.check(real), [])
     d = json.loads(json.dumps(real))
     d["sailings"][0]["kids_sail_free"] = dict(k, checked_at="2026-10-15T10:20:00Z")
@@ -626,7 +665,7 @@ def test_kids_sail_free():
         d["sailings"][0]["kids_sail_free"] = bad
         check(f"format check: kids_sail_free {bad!r} rejected", any("kids_sail_free must be null" in e for e in check_prices.check(d)), True)
     del d["sailings"][0]["kids_sail_free"]
-    check("format check: kids_sail_free missing from a schema 3 file rejected", any("kids_sail_free is missing" in e for e in check_prices.check(d)), True)
+    check("format check: kids_sail_free missing from a schema 4 file rejected", any("kids_sail_free is missing" in e for e in check_prices.check(d)), True)
 
 
 # ---------- Florida resident rates (5.1.0) ----------
@@ -939,6 +978,474 @@ def test_florida_clone_guard():
         ff.ROOT, ff.log = old
 
 
+def offers_page(banner_text=None, title="Limited-Time Offer: DoubleUp!", terms=True):
+    """A small stand-in for NCL's CruiseNext page."""
+    parts = ['<h2 class="cmp-title__text">How It works</h2><div class="cmp-text"><p>Buy credits on board.</p></div>']
+    if banner_text is not None:
+        parts.append(f'<h3 class="cmp-title__text">{title}</h3><div class="cmp-text"><div><p>{banner_text}</p></div></div>')
+    if terms:
+        parts.append("<p><sub>*CruiseNext Credits can only be applied to new reservations. Only one CNC or CNHC "
+                     "can be applied per stateroom.</sub></p>")
+    return "<html><body>" + "".join(parts) + "</body></html>"
+
+
+def test_offers():
+    """DoubleUp watch (5.2.0): tools/fetch_offers.py reads the banner, one issue per change, and
+    tools/check_offers.py. A stand-in for NCL's page; no NCL calls."""
+    import check_offers as co
+    import fetch_offers as fo
+    day = lambda d, h=10: dt.datetime(2026, 10, d, h, 21, tzinfo=dt.timezone.utc)
+    with open(os.path.join(TEST_DATA, "cruisenext_doubleup.html"), encoding="utf-8") as f:
+        real = f.read()
+    now_text = ("Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply TWO "
+                "CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*")
+
+    # First run on NCL's real markup (saved 2026-10-28): the "watch started" issue.
+    first = fo.build(real, None, day(29))
+    du = first["doubleup"]
+    check("DoubleUp: banner read from NCL's real markup", (du["listed"], du["title"], du["text"]),
+          (True, "Limited-Time Offer: DoubleUp!", now_text))
+    check("DoubleUp: Balcony and above", du["types"], ["BALCONY", "MINISUITE", "SUITE", "HAVEN"])
+    check("DoubleUp: 90 days before sailing", (du["min_days"], du["min_months"]), (90, None))
+    check("DoubleUp: first run is a started change, not yet reported",
+          (first["last_change"]["kind"], first["last_change"]["reported"], first["last_change"]["old_listed"]),
+          ("started", False, None))
+    check("DoubleUp: first file passes the format check", co.check(first), [])
+    title, body, marker = fo.issue(first)
+    check("DoubleUp: started issue title", title, "DoubleUp watch started (Oct 29, 2026)")
+    check("DoubleUp: issue mentions the owner, the link and the new text",
+          ["@DASatizabal" in body, fo.CRUISENEXT_URL in body, now_text in body, marker in body], [True] * 4)
+    check("DoubleUp: issue text has no em dash", EM_DASH in title + body, False)
+
+    # Not reported yet (the issue couldn't be opened): the next day tries again with the same marker.
+    retry = fo.build(real, first, day(30))
+    check("DoubleUp: an unreported change is tried again with the same marker",
+          (fo.issue(retry) or (None, None, None))[2], marker)
+    check("DoubleUp: state date kept while nothing changes", retry["doubleup"]["since"], "2026-10-29")
+
+    # Reported: the next days open nothing.
+    first["last_change"]["reported"] = True
+    same = fo.build(real, first, day(30))
+    check("DoubleUp: same text the next day opens no issue", fo.issue(same), None)
+    check("DoubleUp: same text keeps the last change as it was", same["last_change"], first["last_change"])
+    check("DoubleUp: read_on moves to today", same["doubleup"]["read_on"], "2026-10-30")
+    check("DoubleUp: same-day file passes", co.check(same), [])
+
+    # The banner ends, changes, comes back: one issue each, each with its own marker.
+    ended = fo.build(offers_page(None), same, day(31))
+    check("DoubleUp: banner gone is an ended change", (ended["last_change"]["kind"], ended["doubleup"]["listed"]), ("ended", False))
+    check("DoubleUp: ended file passes", co.check(ended), [])
+    e_title, e_body, e_marker = fo.issue(ended)
+    check("DoubleUp: ended issue title and texts", (e_title, "(no DoubleUp banner on the page)" in e_body, now_text in e_body),
+          ("DoubleUp offer ended (Oct 31, 2026)", True, True))
+    ended["last_change"]["reported"] = True
+    back = fo.build(offers_page(now_text), ended, day(31, 20))
+    check("DoubleUp: banner back is an appeared change", back["last_change"]["kind"], "appeared")
+    check("DoubleUp: every change has its own marker",
+          len({marker, e_marker, back["last_change"]["marker"]}), 3)
+    back["last_change"]["reported"] = True
+    new_text = "Book ANY stateroom on any sailing booked at least 6 months in advance and apply TWO CruiseNext credits."
+    changed = fo.build(offers_page(new_text), back, dt.datetime(2026, 11, 2, 14, tzinfo=dt.timezone.utc))
+    check("DoubleUp: new text is a changed change", changed["last_change"]["kind"], "changed")
+    check("DoubleUp: any stateroom, 6 months", (changed["doubleup"]["types"], changed["doubleup"]["min_days"], changed["doubleup"]["min_months"]),
+          (fo.TYPE_ORDER, None, 6))
+    check("DoubleUp: changed file passes", co.check(changed), [])
+    c_body = fo.issue(changed)[1]
+    check("DoubleUp: changed issue shows old and new text", (f'Old text: "{now_text}"' in c_body, f'New text: "{new_text}"' in c_body), (True, True))
+    check("DoubleUp: Eastern date, not UTC (Nov 2 at 3:30 AM UTC is Nov 1, 10:30 PM in Miami)",
+          fo.build(offers_page(None), back, dt.datetime(2026, 11, 2, 3, 30, tzinfo=dt.timezone.utc))["checked_on"], "2026-11-01")
+    check("DoubleUp: evening run belongs to the Eastern day",
+          fo.build(offers_page(None), back, dt.datetime(2026, 11, 3, 2, 0, tzinfo=dt.timezone.utc))["checked_on"], "2026-11-02")
+
+    # Pages that can't be read keep the previous state, warn, and open nothing.
+    for name, page, error in [("a page without CruiseNext terms", offers_page(now_text, terms=False), None),
+                              ("an error loading the page", None, "RuntimeError: NCL answered HTTP 403"),
+                              ("a DoubleUp heading with no text", offers_page("").replace("<p></p>", ""), None),
+                              ("offer text far from the heading", offers_page(now_text).replace(
+                                  "</h3>", "</h3><div>" + " " * (fo.NEAR + 10) + "</div>"), None)]:
+        kept = fo.build(page, same, day(31), page_error=error)
+        check(f"DoubleUp: {name} keeps the state", (kept["read_ok"], kept["doubleup"], kept["last_change"]),
+              (False, same["doubleup"], same["last_change"]))
+        check(f"DoubleUp: {name} opens no issue and warns", (fo.issue(kept), len(kept["warnings"])), (None, 1))
+        check(f"DoubleUp: {name} passes the format check", co.check(kept), [])
+    none_yet = fo.build(None, None, day(29), page_error="URLError: timed out")
+    check("DoubleUp: no previous file and no page: nothing read yet, no issue", (none_yet["doubleup"], fo.issue(none_yet)), (None, None))
+    check("DoubleUp: nothing read yet passes", co.check(none_yet), [])
+
+    # Wording that can't be read: saved as null with a warning, never guessed.
+    odd = fo.build(offers_page("Book something special stateroom and apply TWO credits."), same, day(31))
+    check("DoubleUp: unknown wording gives null types and lead time",
+          (odd["doubleup"]["types"], odd["doubleup"]["min_days"], odd["doubleup"]["min_months"], len(odd["warnings"])), (None, None, None, 2))
+    check("DoubleUp: unknown wording passes the format check", co.check(odd), [])
+    check("DoubleUp: unknown wording means one credit", "one CruiseNext credit" in fo.issue(odd)[1], True)
+    for text, want in [("Book a Club Balcony Suite and above stateroom", ["MINISUITE", "SUITE", "HAVEN"]),
+                       ("Book a Balcony, Club Balcony Suite or Suite stateroom", ["BALCONY", "MINISUITE", "SUITE"]),
+                       ("Book a Suite or The Haven stateroom", ["SUITE", "HAVEN"]),
+                       ("Book a ANY stateroom", fo.TYPE_ORDER),
+                       ("Apply two credits", None)]:
+        check(f"DoubleUp types: {text}", fo.read_types(text), want)
+    check("DoubleUp: 120 days before sailing", fo.read_lead_time("at least 120 days before sailing"), (120, None))
+
+    # The format check refuses anything outside its lists.
+    bad_cases = {
+        "an extra key": dict(same, guest_email="x"),
+        "read_ok true with nothing read": dict(same, doubleup=None),
+        "a banner with a new line": dict(same, doubleup=dict(same["doubleup"], text="two\nlines")),
+        "unknown cabin type": dict(same, doubleup=dict(same["doubleup"], types=["YACHT"])),
+        "no banner but text": dict(ended, doubleup=dict(ended["doubleup"], text="x")),
+        "bad marker": dict(same, last_change=dict(same["last_change"], marker="x")),
+        "read_ok false without a warning": dict(same, read_ok=False, warnings=[]),
+        "types null without a warning": dict(same, doubleup=dict(same["doubleup"], types=None)),
+    }
+    for name, data in bad_cases.items():
+        check(f"DoubleUp format check refuses {name}", bool(co.check(data)), True)
+
+    # main(): exactly 1 NCL page load at the CruiseNext address, the issue files, --mark-reported.
+    folder = tempfile.mkdtemp(prefix="june-offers-")
+    calls = []
+    old_request = fo.fp.request
+
+    def fake_request(url, body=None, raw=False, page=False):
+        calls.append((url, page))
+        return real
+    fo.fp.request = fake_request
+    try:
+        out, issue_dir = os.path.join(folder, "offers.new.json"), os.path.join(folder, "issue")
+        fo.main(["--out", out, "--issue-dir", issue_dir])
+        check("DoubleUp main: 1 NCL page load at the CruiseNext address", calls, [(fo.CRUISENEXT_URL, True)])
+        check("DoubleUp main: issue files written", sorted(os.listdir(issue_dir)), ["body.md", "marker.txt", "title.txt"])
+        fo.main(["--mark-reported", out])
+        with open(out, encoding="utf-8") as f:
+            saved_file = json.load(f)
+        check("DoubleUp main: --mark-reported marks the change", saved_file["last_change"]["reported"], True)
+        check("DoubleUp main: the written file passes", co.check(saved_file), [])
+        issue_dir2 = os.path.join(folder, "issue2")
+        fo.main(["--previous", out, "--out", os.path.join(folder, "next.json"), "--issue-dir", issue_dir2])
+        check("DoubleUp main: next run with the same banner writes no issue", os.path.exists(issue_dir2), False)
+    finally:
+        fo.fp.request = old_request
+    check("DoubleUp: the CruiseNext address passes the address guard", bool(fo.fp.FORBIDDEN.search(fo.CRUISENEXT_URL)), False)
+
+
+# ---------- Payment data (5.2.0, prices schema 4) ----------
+
+class PaymentNCL:
+    """A stand-in for every NCL call fetch_prices.py makes, with NCL's payment options as the
+    2026-10-28 research saw them: $50 per guest up to Club Balcony Suite (due in 76 hours), 10%
+    of the cruise fare for Suite and Haven (23 hours), final payment 120 days before sailing, and
+    the 2-For-1 Deposits offer in the availability answers. The Aura at 5 guests has only Haven
+    cabins, so its cheapest cabin is a Haven (as on NCL today). Taxes $100 per guest."""
+    CATS = {"INSIDE": [("IX", 380), ("IA", 420)], "BALCONY": [("B4", 600)], "MINISUITE": [("MB", 678)],
+            "SUITE": [("SC", 2000)], "HAVEN": [("H6", 3500)]}
+    TAX = 100
+
+    def __init__(self, fail=(), deposit=None, final=None, offer=True):
+        self.fail = set(fail)               # (ship_short, guests) whose availability call fails
+        self.deposit = deposit or {}        # (ship_short, guests): deposit NCL lists instead of its rule
+        self.final = final or {}            # (ship_short, guests): final payment date instead of the rule
+        self.offer = offer
+        self.calls = []
+        self.ship = {}
+
+    def cfg_for(self, package_id):
+        return next(c for c in fp.SAILINGS if c["ship_short"] == self.ship[str(package_id)])
+
+    def cats(self, ship, guests):
+        only_haven = ship == "Aura" and guests == 5
+        return {t: c for t, c in self.CATS.items() if not only_haven or t == "HAVEN"}
+
+    def __call__(self, url, body=None, raw=False, page=False):
+        self.calls.append(url)
+        for cfg in fp.SAILINGS:
+            if url == fp.CRUISE_PAGE_URL.format(code=cfg["start_pages"][0]):
+                pid = "2422" if cfg["ship_short"] == "Getaway" else "2572"
+                self.ship[pid] = cfg["ship_short"]
+                return cruise_page([{"itineraryCode": cfg["start_pages"][0], "packageId": int(pid),
+                                     "departureDate": ms(cfg["depart"] + "T04:00:00Z")}])
+        if "/itinerary/" in url:
+            cfg = self.cfg_for(url.split("packageId=")[1])
+            return itinerary(url.split("packageId=")[1], cfg["depart"] + "T00:00:00", ship=cfg["ship_code"], nights=cfg["nights"])
+        if "/route-events/" in url:
+            cfg = self.cfg_for(url.rsplit("/", 1)[1])
+            day = dt.date.fromisoformat(cfg["depart"])
+            return [{"date": ms(f"{day + dt.timedelta(days=i)}T00:00:00Z"), "eventType": "port", "title": "Miami",
+                     "arrivalTime": "7:00 AM", "departureTime": "4:00 PM"} for i in range(cfg["nights"] + 1)]
+        if url == fp.AVAILABILITY_URL:
+            f = body["sailingFilters"][0]
+            ship, g = self.ship[f["packageId"]], f["numberOfGuests"]
+            if (ship, g) in self.fail:
+                raise RuntimeError("NCL answered HTTP 500")
+            types = [{"code": t, "title": t.title(), "stateroomsPricing": [{"stateroom": {"title": f"{t.title()} {code}"},
+                      "categoryPricing": [{"isAvailable": True, "standardOption": {"pricedCategoryCode": code, "price": price, "guestCapacity": 5}}]}
+                      for code, price in cats]} for t, cats in self.cats(ship, g).items()]
+            groups = [{"code": "FREE-AT-SEA", "promotionsInGroup": [
+                {"isDefaultInGroup": True, "promotion": {"promotionCodes": ["ALL4CHO"], "stateroomTypes": ["INSIDE", "BALCONY", "MINISUITE"]}},
+                {"isDefaultInGroup": True, "promotion": {"promotionCodes": ["CHOALL4M"], "stateroomTypes": ["SUITE", "HAVEN"]}}]}]
+            if self.offer:
+                groups.append({"code": "MORE-OFFERS", "promotionsInGroup": [{"promotion": {"promotionCodes": [], "stateroomTypes": [], "offers": [
+                    {"code": "2-For-1-Deposits-Offer", "groupingCode": "2-For-1-Deposits-Offer", "title": "2-For-1 Deposits",
+                     "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation."}]}}]})
+            return {"results": [{"result": {"stateroomTypesPricing": types, "offerGroups": groups}}]}
+        if url == fp.PRICE_SUMMARY_URL:
+            f = body["stateroomFilters"][0]
+            ship, g, code, tcode = self.ship[body["packageId"]], f["numberOfGuests"], f["pricedCategoryCode"], f["stateroomTypeCode"]
+            cfg = self.cfg_for(body["packageId"])
+            price = next(p for c, p in self.CATS[tcode] if c == code)
+            fare = price - self.TAX
+            if f["guests"]:   # the age test: 1 adult, a 15 year old, a 7 year old
+                bar, dining = [96, 37.5, 0], [20, 20, 0]
+            else:
+                bar, dining = [96] * g, [20] * g
+            fare_total = fare * g
+            deposit = round(fare_total * 0.1, 2) if tcode in ("SUITE", "HAVEN") else 50 * g
+            deposit = self.deposit.get((ship, g), deposit)
+            final = self.final.get((ship, g), (dt.date.fromisoformat(cfg["depart"]) - dt.timedelta(days=120)).isoformat())
+            options = [{"paymentType": "FULL", "amount": 1, "dueDate": final + "T23:59:59"}, {"paymentType": "MONTHLY", "amount": 1},
+                       {"isDeposit": True, "paymentType": "HOLD", "amount": deposit, "dueHours": 76}]
+            if deposit is not None:
+                options.insert(0, {"paymentType": "DEPOSIT", "amount": deposit, "dueHours": 23 if tcode in ("SUITE", "HAVEN") else 76,
+                                   "dueDate": "2026-10-31T23:59:59"})
+            guests = lambda xs: [{"price": x} for x in xs]
+            return {"staterooms": [{"paymentOptions": options, "pricing": {"priceGroups": [
+                {"code": "STATEROOM", "priceItems": [{"code": "fare", "title": "Fare", "guests": guests([fare] * g)}]},
+                {"code": "FREE-AT-SEA", "priceItems": [
+                    {"code": "unlimited-open-bar-offer", "title": "Unlimited Open Bar", "guests": guests(bar)},
+                    {"code": "specialty-dining-offer-2-4-nights", "title": "Specialty Dining - 1 Meal", "guests": guests(dining)}]},
+                {"code": "TAXES-AND-FEES", "priceItems": [{"code": "taxes-and-fees", "title": "Taxes", "guests": guests([self.TAX] * g)}]}]}}],
+                "total": {"grandTotal": round(price * g) + sum(bar) + sum(dining)}}
+        raise AssertionError(f"unexpected NCL call {url}")
+
+
+RATES_PAGE = ("Prices are Per Person Per Day 1-8 (Adult) $49.99 1-2 (Child) $40 "
+              "2 - 5 Nights $32 USD 6+ Nights $28.50 USD Unlimited Soda Beverage Package is $12.50 USD per person per day "
+              "$25.00 USD per person per day for The Haven and Suites; $20.00 USD per person per day for Club Balcony Suite and below "
+              "All guests 3 years or older")
+
+
+def test_eastern_dates():
+    """Every date-only field fetch_prices.py writes is the Eastern date (5.2.0): the evening run of
+    Oct 28 at 10:14 PM Eastern is Oct 29 by UTC date."""
+    utc = lambda s: dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
+    check("Eastern date: 10:14 PM Eastern on Oct 28 (Oct 29 by UTC date)", fp.eastern_day(utc("2026-10-29T02:14:00Z")), "2026-10-28")
+    check("Eastern date: 10 PM Eastern on Nov 1 (after daylight saving time ends)", fp.eastern_day(utc("2026-11-02T03:00:00Z")), "2026-11-01")
+    check("Eastern date: morning run", fp.eastern_day(utc("2026-10-29T10:20:00Z")), "2026-10-29")
+    cfg = {"id": "getaway-2027-06-11", "ship_short": "Getaway"}
+    keep_log = fp.log
+    fp.log = lambda m: None
+    try:
+        status = {str(g): {"updated": True, "as_of": "2026-10-29T02:14:00Z"} for g in fp.GUEST_COUNTS}
+        summaries = {g: {"type": "BALCONY", "category": "BF", "deposit": 50.0 * g, "deposit_due_hours": 73,
+                         "final_payment_due": "2027-02-11", "fare_total": 1000} for g in fp.GUEST_COUNTS}
+        pay = fp.payment_info(cfg, summaries, status, None, {}, utc("2026-10-29T02:14:00Z"), {"deposits": []}, [])
+        check("deposit checked date: the Eastern date of an evening run", (pay["standard_deposit_per_guest"], pay["standard_deposit_checked_at"]), (50.0, "2026-10-28"))
+        # No standard deposit today: the previous one is kept for 3 Eastern days.
+        kept = {str(g): {"updated": False, "as_of": "2026-10-25T10:20:00Z"} for g in fp.GUEST_COUNTS}
+        prev_s = {"payment": {"standard_deposit_per_guest": 50, "standard_deposit_checked_at": "2026-10-25", "final_payment_due": "2027-02-11"}}
+        pay = fp.payment_info(cfg, {}, kept, prev_s, {}, utc("2026-10-29T02:14:00Z"), {"deposits": []}, [])
+        check("deposit kept 3 Eastern days (4 by UTC date)", pay["standard_deposit_checked_at"], "2026-10-25")
+        pay = fp.payment_info(cfg, {}, kept, prev_s, {}, utc("2026-10-29T10:20:00Z"), {"deposits": []}, [])
+        check("deposit not kept after 4 Eastern days", pay["standard_deposit_per_guest"], None)
+        grat = {"open_bar": {"title": "Unlimited Open Bar", "per_guest": 96, "soda_under_21_position_2": 37.5, "checked_at": "2026-10-13"},
+                "specialty_dining": {"title": "Specialty Dining - 1 Meal", "per_guest": 20, "checked_at": "2026-10-13"}}
+        previous = {"saved_at": "2026-10-13T10:00:00Z", "sailings": [{"id": cfg["id"], "gratuities": grat}],
+                    "checks": {"ages": [{"sailing": cfg["id"], "ok": True, "expected": 1, "ncl_total": 1}]}}
+        g, _ = fp.kept_gratuities(cfg, previous["sailings"][0], previous, utc("2026-10-17T02:00:00Z"), RuntimeError("x"), [])
+        check("gratuities kept 3 Eastern days (Oct 16, 10 PM Eastern; 4 by UTC date)", g is grat, True)
+        rules = fp.deposit_rules({"deposits": [{"rule": fp.PERCENT_RULE, "ok": True, "sailing": "aura-2027-06-14", "category": "H6", "guests": 5}]},
+                                 None, fp.eastern_day(utc("2026-10-29T02:14:00Z")), [])
+        check("Suite and Haven rule confirmed on the Eastern date", rules["confirmed_on"], "2026-10-28")
+    finally:
+        fp.log = keep_log
+
+
+def price_run(ncl, folder, previous=None, name="prices.json"):
+    """One whole fetch_prices.py run (main) against the stand-in for NCL, no network. Returns the
+    data file it wrote and what it printed for the GitHub run page."""
+    import contextlib
+    import io
+    out = os.path.join(folder, name)
+    prev = os.path.join(folder, "previous.json")
+    if previous is not None:
+        with open(prev, "w", encoding="utf-8") as f:
+            json.dump(previous, f)
+    elif os.path.exists(prev):
+        os.remove(prev)
+    keep = (fp.request, fp.page_text, fp.deck_finder_decks, fp.log, fp.PAUSE_SECONDS, sys.argv)
+    fp.request, fp.page_text, fp.deck_finder_decks, fp.log, fp.PAUSE_SECONDS = ncl, (lambda url: RATES_PAGE), (lambda ship: {}), (lambda m: None), 0
+    sys.argv = ["fetch_prices.py", "--out", out, "--previous", prev]
+    printed = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(printed):
+            fp.main()
+    finally:
+        fp.request, fp.page_text, fp.deck_finder_decks, fp.log, fp.PAUSE_SECONDS, sys.argv = keep
+    with open(out, encoding="utf-8") as f:
+        return json.load(f), printed.getvalue()
+
+
+def test_payment():
+    import check_prices
+    folder = tempfile.mkdtemp(prefix="june-payment-")
+
+    # NCL's own answer, saved 2026-10-06 (Getaway B4, 4 guests): DEPOSIT $200 in 74 hours, FULL by
+    # Feb 11, 2027, and the HOLD payment option, which is never used.
+    check("saved NCL price summary: deposit, hours, final payment date", fp.payment_options(saved("price_summary_getaway_B4_4_2026-10-06")),
+          (200.0, 74, "2027-02-11"))
+    check("no DEPOSIT option: only the HOLD option's amount is never used", fp.payment_options(
+        {"staterooms": [{"paymentOptions": [{"isDeposit": True, "paymentType": "HOLD", "amount": 100, "dueHours": 76}]}]}), (None, None, None))
+    check("unreadable payment options: nothing guessed", fp.payment_options(
+        {"staterooms": [{"paymentOptions": [{"paymentType": "DEPOSIT", "amount": "100"}, {"paymentType": "FULL", "dueDate": "soon"}]}]}), (None, None, None))
+    check("no payment options at all", fp.payment_options({"staterooms": [{}]}), (None, None, None))
+
+    # NCL's deposit offer, read like Kids Sail Free, or from the group's own offer list.
+    in_promo = {"offerGroups": [{"code": "MORE-OFFERS", "promotionsInGroup": [{"promotion": {"promotionCodes": ["X1"], "stateroomTypes": ["INSIDE"],
+                "offers": [{"code": "2-For-1-Deposits-Offer", "title": "2-For-1 Deposits", "description": "half off deposits"}]}}]}]}
+    check("deposit offer read from offerGroups", fp.deposit_offer(in_promo),
+          {"title": "2-For-1 Deposits", "short": None, "description": "half off deposits", "codes": ["X1"], "types": ["INSIDE"]})
+    in_group = {"offerGroups": [{"code": "MORE-OFFERS", "offers": [{"groupingCode": "Reduced-Deposit-Offer", "title": "Reduced Deposits"}]}]}
+    check("deposit offer read from a group's own offers", fp.deposit_offer(in_group)["title"], "Reduced Deposits")
+    check("no deposit offer listed: None", fp.deposit_offer(KSF_ANSWER), None)
+
+    # A whole run: the same 26 NCL API calls and pages as before 5.2.0, nothing more.
+    ncl = PaymentNCL()
+    data, printed = price_run(ncl, folder)
+    check("payment run: 24 calls through request() (2 cruise pages, 2 itinerary, 2 route-events, 8 availability, 10 price summaries), "
+          "plus the 2 terms pages = 26 NCL calls, as before 5.2.0", len(ncl.calls), 24)
+    check("payment run: schema 4 file passes the format check", check_prices.check(data), [])
+    g, a = data["sailings"]
+    check("Getaway: $50 per guest, final payment Feb 11, 2027", (g["payment"]["standard_deposit_per_guest"], g["payment"]["final_payment_due"]), (50.0, "2027-02-11"))
+    check("Aura: final payment Feb 14, 2027", a["payment"]["final_payment_due"], "2027-02-14")
+    check("Getaway deposits at 2 to 5 guests from NCL's summaries", [g["payment"]["by_guests"][k]["deposit"] for k in "2345"], [100.0, 150.0, 200.0, 250.0])
+    check("Aura at 5 guests: the Haven's deposit, 10% of its fare", (a["payment"]["by_guests"]["5"]["deposit"], a["payment"]["by_guests"]["5"]["deposit_type"],
+                                                                   a["payment"]["by_guests"]["5"]["due_hours"]), (1700.0, "HAVEN", 23))
+    check("Suite and Haven rule confirmed today on the Aura Haven", (data["deposit_rules"]["percent_of_fare"], data["deposit_rules"]["confirmed_by"]),
+          (10, "aura-2027-06-14 H6 at 5 guests"))
+    check("deposit checks: 7 per guest and 1 percent, all ok", (len(data["checks"]["deposits"]), all(c["ok"] for c in data["checks"]["deposits"])), (8, True))
+    check("deposit offer from the availability answers", g["payment"]["deposit_offer"]["title"], "2-For-1 Deposits")
+    check("no warnings on a clean run", data["warnings"], [])
+    check("run page notice for deposits", "::notice title=Deposits Getaway::$50 per guest up to Club Balcony Suite, Suite and Haven 10% of the fare, final payment 2027-02-11, offer: 2-For-1 Deposits" in printed, True)
+
+    # Next day: the Getaway's 4 guest availability fails; its kept summary carries yesterday's deposit.
+    day2, _ = price_run(PaymentNCL(fail={("Getaway", 4)}), folder, previous=data)
+    g2 = day2["sailings"][0]
+    check("failed party size: kept deposit with the kept prices' time", (g2["payment"]["by_guests"]["4"]["deposit"], g2["payment"]["by_guests"]["4"]["as_of"]),
+          (200.0, g["party_sizes"]["4"]["as_of"]))
+    check("failed party size: file passes the format check", check_prices.check(day2), [])
+
+    # First run after the merge: the kept prices come from a schema 3 file (no deposits in them).
+    old = json.loads(json.dumps(data))
+    old["schema_version"] = 3
+    for k in ("deposit_rules",):
+        old.pop(k)
+    old["checks"].pop("deposits")
+    for s in old["sailings"]:
+        s.pop("payment")
+        for ps in s["price_summaries"]:
+            for k in ("deposit", "deposit_due_hours", "final_payment_due"):
+                ps.pop(k)
+    first, _ = price_run(PaymentNCL(fail={("Getaway", 4)}), folder, previous=old)
+    e = first["sailings"][0]["payment"]["by_guests"]["4"]
+    check("kept schema 3 prices: deposit empty with why", (e["deposit"], e["why"]), (None, "the kept prices are from before deposits were read"))
+    check("kept schema 3 prices: warning names the ship", "Getaway: no deposit for 4 guests (the kept prices are from before deposits were read); left empty" in first["warnings"], True)
+    check("kept schema 3 prices: file passes the format check", check_prices.check(first), [])
+
+    # NCL's Haven deposit is no longer 10%: the rule is left empty with a warning.
+    bad, _ = price_run(PaymentNCL(deposit={("Aura", 5): 500}), folder, previous=data)
+    check("Haven deposit not 10%: rule left empty", bad["deposit_rules"]["percent_of_fare"], None)
+    check("Haven deposit not 10%: warning", any(w.startswith("Deposits: NCL's Suite and Haven deposit is not 10%") for w in bad["warnings"]), True)
+    check("Haven deposit not 10%: file still passes the format check", check_prices.check(bad), [])
+    # The next run has no Suite or Haven summary: the empty rule stays empty, with a warning again.
+    later, _ = price_run(PaymentNCL(fail={("Aura", 5)}), folder, previous=bad)
+    check("no Suite or Haven summary after a failed check: still empty, warned",
+          (later["deposit_rules"]["percent_of_fare"], any(w.startswith("Deposits: no Suite or Haven") for w in later["warnings"])), (None, True))
+    check("no Suite or Haven summary after a failed check: file passes", check_prices.check(later), [])
+    # No Suite or Haven summary and a good previous rule: kept as it was confirmed.
+    kept, _ = price_run(PaymentNCL(fail={("Aura", 5)}), folder, previous=data)
+    check("no Suite or Haven summary: previous rule kept with its date", (kept["deposit_rules"]["percent_of_fare"], kept["deposit_rules"]["confirmed_on"]),
+          (10, data["deposit_rules"]["confirmed_on"]))
+    # The first schema 4 run without a Suite or Haven summary: the research of 2026-10-28.
+    research, _ = price_run(PaymentNCL(fail={("Aura", 5)}), folder, previous=old)
+    check("first run, no Suite or Haven summary: the research rule", (research["deposit_rules"]["percent_of_fare"], research["deposit_rules"]["confirmed_on"]), (10, "2026-10-28"))
+
+    # Standard deposits that differ by party size: left empty with a warning.
+    odd, _ = price_run(PaymentNCL(deposit={("Getaway", 3): 300}), folder, previous=data)
+    check("deposit per guest differs: standard deposit empty", odd["sailings"][0]["payment"]["standard_deposit_per_guest"], None)
+    check("deposit per guest differs: the odd party size fails its check",
+          [c["guests"] for c in odd["checks"]["deposits"] if not c["ok"]], [3])
+    check("deposit per guest differs: file passes the format check", check_prices.check(odd), [])
+    # NCL lists no deposit: empty with a warning, never the HOLD option's amount.
+    none, _ = price_run(PaymentNCL(deposit={("Getaway", 2): None}), folder, previous=data)
+    e = none["sailings"][0]["payment"]["by_guests"]["2"]
+    check("no DEPOSIT option: deposit empty with why", (e["deposit"], e["why"], e["due_hours"]), (None, "NCL's price summary listed no deposit", None))
+    check("no DEPOSIT option: file passes", check_prices.check(none), [])
+    # Final payment dates that disagree: the earliest, with a warning.
+    diff, _ = price_run(PaymentNCL(final={("Getaway", 5): "2027-02-01"}), folder, previous=data)
+    check("final payment dates differ: the earliest", diff["sailings"][0]["payment"]["final_payment_due"], "2027-02-01")
+    check("final payment dates differ: warning", any(w.startswith("Getaway: NCL's final payment dates differ") for w in diff["warnings"]), True)
+    # No deposit offer listed today.
+    plain, _ = price_run(PaymentNCL(offer=False), folder, previous=data)
+    check("no deposit offer listed: null", plain["sailings"][0]["payment"]["deposit_offer"], None)
+    check("no deposit offer listed: file passes", check_prices.check(plain), [])
+
+    # The format check on schema 4 files.
+    def broken(change):
+        d = json.loads(json.dumps(data))
+        change(d)
+        return check_prices.check(d)
+    check("format: a file without payment fails", any("payment must have" in x for x in broken(lambda d: d["sailings"][0].pop("payment"))), True)
+    check("format: a file without deposit_rules fails", any("deposit_rules is missing" in x for x in broken(lambda d: d.pop("deposit_rules"))), True)
+    check("format: an empty deposit without a warning fails",
+          any("empty deposit needs" in x for x in broken(lambda d: d["sailings"][0]["payment"]["by_guests"]["2"].update(deposit=None, why="x", due_hours=None))), True)
+    check("format: an empty final payment date without a warning fails",
+          any("final_payment_due is empty" in x for x in broken(lambda d: d["sailings"][1]["payment"].update(final_payment_due=None))), True)
+    check("format: a final payment date after sailing fails",
+          any("before the sail date" in x for x in broken(lambda d: d["sailings"][1]["payment"].update(final_payment_due="2027-07-01"))), True)
+    check("format: an empty Suite and Haven rule without a warning fails",
+          any("percent_of_fare is empty" in x for x in broken(lambda d: d["deposit_rules"].update(percent_of_fare=None, confirmed_on=None))), True)
+    check("format: a failed Suite and Haven check with the rule still set fails",
+          any("check failed but deposit_rules" in x for x in broken(lambda d: next(c for c in d["checks"]["deposits"] if c["rule"] == fp.PERCENT_RULE).update(ok=False))), True)
+    check("format: a failed per guest check with the deposit still set fails",
+          any("check failed but payment.standard" in x for x in broken(lambda d: d["checks"]["deposits"][0].update(ok=False))), True)
+    check("format: a deposit offer without a title fails",
+          any("deposit_offer must be" in x for x in broken(lambda d: d["sailings"][0]["payment"]["deposit_offer"].update(title=""))), True)
+    check("format: a schema 3 file is refused outside the release check", "schema_version must be 4" in check_prices.check(old), True)
+    check("format: the release check accepts a schema 3 file", check_prices.check(old, allow_schema_3=True), [])
+
+
+def test_family_checks():
+    """Release check (5.2.0): the family alerts Worker's preview address must be off to merge."""
+    import check_release
+    on, off = 'const TEST_ORIGIN = "https://raw.githack.com";', 'const TEST_ORIGIN = "";'
+    page = lambda api, key: f'const FAMILY_API = "{api}"; const TURNSTILE_SITE_KEY = "{key}";'
+    ok = page("https://cruise-family-alerts.example.workers.dev", "0x4AAAAAAA")
+    check("release check: TEST_ORIGIN off and both page settings set", check_release.family_checks(off, ok), [])
+    check("release check: TEST_ORIGIN off and neither set", check_release.family_checks(off, page("", "")), [])
+    check("release check: TEST_ORIGIN on fails", any("TEST_ORIGIN is \"https://raw.githack.com\"" in x for x in check_release.family_checks(on, ok)), True)
+    check("release check: no TEST_ORIGIN line fails", any("is missing" in x for x in check_release.family_checks("", ok)), True)
+    check("release check: only one of the page settings fails", any("both be set" in x for x in check_release.family_checks(off, page("https://a.workers.dev", ""))), True)
+    check("release check: a trailing slash fails", any("trailing slash" in x for x in check_release.family_checks(off, page("https://a.workers.dev/", "k"))), True)
+    check("release check: http fails", any("not an https" in x for x in check_release.family_checks(off, page("http://a.workers.dev", "k"))), True)
+    with open(os.path.join(os.path.dirname(TOOLS), "tools", "family-alerts", "worker.js"), encoding="utf-8") as f:
+        check("release check: the Worker file has the TEST_ORIGIN line", bool(re.search(r'^const TEST_ORIGIN = "[^"]*";$', f.read(), re.M)), True)
+
+
+def test_no_em_dashes():
+    """Owner's rule: no em dashes anywhere (code, docs, page text, steps)."""
+    root = os.path.dirname(TOOLS)
+    files = subprocess.run(["git", "-C", root, "ls-files"], capture_output=True, text=True).stdout.split()
+    found = []
+    for name in files:
+        if name.startswith("data/") or not name.endswith((".py", ".md", ".html", ".yml", ".js", ".mjs", ".gs", ".sql", ".txt", ".json")):
+            continue
+        try:
+            with open(os.path.join(root, name), encoding="utf-8") as f:
+                if EM_DASH in f.read():
+                    found.append(name)
+        except (OSError, UnicodeDecodeError):
+            continue
+    check("No em dashes in any tracked file", found, [])
+
+
 if __name__ == "__main__":
     test_decide()
     test_counts_cadence()
@@ -952,5 +1459,10 @@ if __name__ == "__main__":
     test_florida_plan_and_format()
     test_florida_runs()
     test_florida_clone_guard()
+    test_offers()
+    test_payment()
+    test_eastern_dates()
+    test_family_checks()
+    test_no_em_dashes()
     print(f"\n{'All tests passed' if not FAILED else str(len(FAILED)) + ' FAILED: ' + '; '.join(FAILED)}")
     sys.exit(1 if FAILED else 0)
