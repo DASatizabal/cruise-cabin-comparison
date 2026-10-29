@@ -900,6 +900,7 @@ with sync_playwright() as pw:
         same(f"{where}: the 8 night card keeps its same or different toggle, both ship pickers and Day by day",
              (len(card8.query_selector_all("button[data-mode]")), len(card8.query_selector_all(".cat-list")), len(card8.query_selector_all("details.days")),
               len(card8.query_selector_all("button[data-select]")), len(card8.query_selector_all("input[data-offer]"))), (2, 2, 2, 1, 6))
+        same(f"{where}: no teal border while Option 2 is not selected", page.eval_on_selector_all(".card.featured", "els => els.map(e => e.dataset.option)"), [])
         cardg = page.query_selector('.card[data-option="G"]')
         same(f"{where}: the Getaway card has its switches, cabin list, total, Make Selection and Day by day",
              (len(cardg.query_selector_all("input[data-offer]")) == 3, bool(cardg.query_selector(".cat-list")), bool(cardg.query_selector(".price-total")),
@@ -916,6 +917,10 @@ with sync_playwright() as pw:
         page.click('[data-tile="A"] .tile-dates')
         st = tiles_state(page)
         same(f"{where}: all three selected, in tile order", st["cards"], ["G", "A", "8"])
+        same(f"{where}: the teal border on the Option 2 card only, with no text added",
+             (page.eval_on_selector_all(".card.featured", "els => els.map(e => e.dataset.option)"),
+              page.eval_on_selector('.card[data-option="A"]', "e => getComputedStyle(e).outlineStyle"),
+              page.eval_on_selector('.card[data-option="8"]', "e => getComputedStyle(e).outlineStyle")), (["A"], "solid", "none"))
         cards_y = ys(page, ".card")
         if w == 360:
             check(f"{where}: three cards stacked", cards_y == sorted(cards_y) and len(set(cards_y)) == 3, cards_y)

@@ -1306,7 +1306,7 @@
                 }
             }
             return `
-                <article class="card" data-option="${shipKey(s)}">
+                <article class="card${s === A ? " featured" : ""}" data-option="${shipKey(s)}">
                     <div class="card-head">
                         <span class="option-badge">${label}</span>
                         <h2 class="card-title">${esc(s.ship)}</h2>
@@ -1390,7 +1390,7 @@
                     + ks.map(([s, c]) => ksfNote(s, c, s.ship_short)).join("") + selectButton("8");
             }
             return `
-                <article class="card featured" data-option="8">
+                <article class="card" data-option="8">
                     <div class="card-head">
                         <span class="option-badge">${OPTIONS[2].label}</span>
                         <h2 class="card-title">Getaway, then Aura</h2>
