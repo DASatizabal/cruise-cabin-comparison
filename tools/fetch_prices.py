@@ -46,6 +46,15 @@ Cross checks are logged in the data file under "checks":
     price summary total within $5. A mismatch fails the run (exit 1).
   - ages: the page's age formula for 1 adult + 15 + 7 should match NCL's total for that
     party within $5. A mismatch fails the run (exit 1).
+  - deposits (5.2.0): each of today's price summaries lists NCL's deposit. Inside to Club
+    Balcony Suite: the deposit per guest must be the same in every summary of that ship. Suite
+    and Haven: the deposit must be 10% of the cruise fare (NCL's rule). A mismatch is logged
+    and that number is left empty (null) with a warning, never fatal.
+
+Payment (5.2.0, no extra NCL calls): each price summary's payment options give the deposit
+(DEPOSIT: amount and hours to pay it) and the final payment date (FULL: dueDate). Stored per
+ship in `payment`, with NCL's deposit offer (like "2-For-1 Deposits") from the availability
+answers, and the Suite and Haven rule in `deposit_rules`.
 """
 import argparse
 import datetime as dt
@@ -58,7 +67,7 @@ import time
 import urllib.request
 from zoneinfo import ZoneInfo
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 GUEST_COUNTS = [2, 3, 4, 5]
 PAUSE_SECONDS = 2
 TOLERANCE = 5
@@ -419,6 +428,27 @@ def kids_sail_free(result):
     return None
 
 
+def deposit_offer(result):
+    """NCL's deposit offer when an availability answer lists it (seen 2026-10-28: "2-For-1
+    Deposits", "Lock-in this vacation today with half off deposits for every two guests on your
+    reservation.", code 2-For-1-Deposits-Offer), exactly as NCL words it. None when not listed.
+    Informational only: the deposit amount always comes from NCL's price summaries."""
+    def is_deposit(o):
+        return "deposit" in " ".join(str(o.get(k) or "") for k in ("code", "groupingCode", "title")).lower()
+    for group in result.get("offerGroups", []):
+        for p in group.get("promotionsInGroup", []):
+            promo = p.get("promotion", {})
+            for o in promo.get("offers", []):
+                if is_deposit(o) and o.get("title"):
+                    return {"title": o.get("title"), "short": o.get("shortDescription"), "description": o.get("description"),
+                            "codes": promo.get("promotionCodes") or [], "types": promo.get("stateroomTypes") or []}
+        for o in group.get("offers", []):
+            if is_deposit(o) and o.get("title"):
+                return {"title": o.get("title"), "short": o.get("shortDescription"), "description": o.get("description"),
+                        "codes": [], "types": []}
+    return None
+
+
 def fetch_price_summary(cfg, guests, type_code, cat_code, fare_code, guest_list=None):
     body = {
         "packageId": cfg["package_id"],
@@ -448,6 +478,7 @@ def fetch_price_summary(cfg, guests, type_code, cat_code, fare_code, guest_list=
     taxes = lines.get("taxes-and-fees", {}).get("per_guest") or []
     bar = next((l for c, l in lines.items() if c.startswith("unlimited-open-bar")), None)
     dining = next((l for c, l in lines.items() if c.startswith("specialty-dining")), None)
+    deposit, due_hours, final_due = payment_options(res)
     return {
         "guests": guests,
         "type": type_code,
@@ -459,7 +490,33 @@ def fetch_price_summary(cfg, guests, type_code, cat_code, fare_code, guest_list=
         "open_bar": {"title": bar["title"], "per_guest": bar["per_guest"]} if bar else None,
         "specialty_dining": {"title": dining["title"], "per_guest": dining["per_guest"]} if dining else None,
         "grand_total": res["total"]["grandTotal"],
+        "deposit": deposit,
+        "deposit_due_hours": due_hours,
+        "final_payment_due": final_due,
     }
+
+
+def payment_options(res):
+    """NCL's deposit, the hours to pay it, and the final payment date from a price summary's
+    staterooms[0].paymentOptions: DEPOSIT (amount, dueHours) and FULL (dueDate). The HOLD
+    payment option (the allowed exception in hold_signal) is never used. Anything missing or not
+    a real number is None, never guessed."""
+    try:
+        opts = res["staterooms"][0].get("paymentOptions") or []
+    except (KeyError, IndexError, TypeError, AttributeError):
+        opts = []
+    by_type = {o.get("paymentType"): o for o in opts if isinstance(o, dict)}
+    dep, full = by_type.get("DEPOSIT") or {}, by_type.get("FULL") or {}
+    amount = dep.get("amount")
+    deposit = round(float(amount), 2) if isinstance(amount, (int, float)) and not isinstance(amount, bool) and amount > 0 else None
+    hours = dep.get("dueHours")
+    hours = hours if deposit is not None and isinstance(hours, int) and not isinstance(hours, bool) and hours > 0 else None
+    due = str(full.get("dueDate") or "")[:10]
+    try:
+        dt.date.fromisoformat(due)
+    except ValueError:
+        due = None
+    return deposit, hours, due
 
 
 def deck_text(decks):
@@ -568,6 +625,18 @@ def age_test_guests(depart):
 
 MAX_STALE_DAYS = 3   # kept prices older than this fail the run
 
+# Deposits (5.2.0). Suite and Haven: NCL's rule, a deposit of 10% of the cruise fare (fare without
+# taxes), NCL's terms (payment and deposit timetable) and every Suite and Haven price summary of
+# the 2026-10-28 research run. Checked daily on any Suite or Haven price summary the job makes
+# (the Aura at 5 guests is a Haven today). Inside to Club Balcony Suite: NCL's own deposit per
+# guest, read daily from the price summaries.
+DEPOSIT_PERCENT = 10
+DEPOSIT_PERCENT_TYPES = ["SUITE", "HAVEN"]
+PERCENT_RULE = "10% of the cruise fare"
+PER_GUEST_RULE = "same deposit per guest"
+DEPOSIT_RULE_SOURCE = "https://www.ncl.com/terms#payment-deposit-schedule"
+DEPOSIT_RESEARCH = {"confirmed_on": "2026-10-28", "confirmed_by": "research run: every Suite and Haven price summary on both ships, 2 to 5 guests"}
+
 
 def parse_iso_z(s):
     return dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
@@ -584,6 +653,8 @@ def fetch_party_size(cfg, g, fare_codes, offers):
         fare_codes.setdefault(tcode, code)
     if not offers.get("kids_sail_free"):
         offers["kids_sail_free"] = kids_sail_free(result)
+    if not offers.get("deposit_offer"):
+        offers["deposit_offer"] = deposit_offer(result)
     rows, cheapest = [], None
     for t in result.get("stateroomTypesPricing", []):
         for sp in t.get("stateroomsPricing", []):
@@ -623,6 +694,127 @@ def fetch_party_size(cfg, g, fare_codes, offers):
     if not formula["ok"]:
         raise RuntimeError(f"formula check failed for {ccode} at {g} guests: expected {expected}, NCL total {summary['grand_total']}")
     return rows, summary, formula
+
+
+def payment_info(cfg, summaries, status, prev_s, offers, now, checks, warnings):
+    """Deposits and the final payment date for one ship, from the price summaries in use (today's,
+    or the kept ones for a party size that failed). Never guessed: a number NCL didn't show is
+    null with a warning naming the ship.
+
+      - by_guests[g]: the deposit in the summary for g guests, with its cabin type and category
+      - standard_deposit_per_guest: Inside to Club Balcony Suite deposit per guest, read today
+        (the same in every such summary of this ship), else the previous run's within 3 days
+      - final_payment_due: the FULL payment option's date (the earliest, with a warning, if
+        today's summaries disagree), else the previous run's with a warning
+      - deposit_offer: NCL's deposit offer from today's availability answers, or None
+    """
+    ship = cfg["ship_short"]
+    now_iso = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    today = now.strftime("%Y-%m-%d")
+    prev_pay = (prev_s or {}).get("payment") or {}
+    by_guests, per_guest, dates = {}, {}, {}
+    for g in GUEST_COUNTS:
+        s, st = summaries.get(g), status[str(g)]
+        entry = {"deposit": None, "deposit_type": (s or {}).get("type"), "deposit_category": (s or {}).get("category"),
+                 "due_hours": None, "as_of": st["as_of"], "why": None}
+        if not s or "deposit" not in s:
+            entry["why"] = "the kept prices are from before deposits were read"
+        elif s["deposit"] is None:
+            entry["why"] = "NCL's price summary listed no deposit"
+        else:
+            entry["deposit"], entry["due_hours"] = s["deposit"], s.get("deposit_due_hours")
+        if entry["deposit"] is None:
+            warnings.append(f"{ship}: no deposit for {g} guests ({entry['why']}); left empty")
+            log("Warning: " + warnings[-1])
+        by_guests[str(g)] = entry
+        if not st["updated"]:
+            continue
+        if s.get("final_payment_due"):
+            dates.setdefault(s["final_payment_due"], []).append(g)
+        if entry["deposit"] is None:
+            continue
+        if s["type"] in DEPOSIT_PERCENT_TYPES:
+            expected = round(s["fare_total"] * DEPOSIT_PERCENT / 100, 2)
+            checks["deposits"].append({"sailing": cfg["id"], "guests": g, "type": s["type"], "category": s["category"],
+                                       "rule": PERCENT_RULE, "deposit": entry["deposit"], "expected": expected,
+                                       "ok": abs(entry["deposit"] - expected) <= 0.01})
+        else:
+            per_guest[g] = round(entry["deposit"] / g, 2)
+
+    standard, standard_on = None, None
+    if per_guest:
+        values = list(per_guest.values())
+        common = max(values, key=values.count)
+        for g, v in per_guest.items():
+            checks["deposits"].append({"sailing": cfg["id"], "guests": g, "type": summaries[g]["type"],
+                                       "category": summaries[g]["category"], "rule": PER_GUEST_RULE,
+                                       "deposit": by_guests[str(g)]["deposit"], "expected": round(common * g, 2),
+                                       "ok": abs(v - common) <= 0.01})
+        if all(abs(v - common) <= 0.01 for v in values):
+            standard, standard_on = common, today
+        else:
+            warnings.append(f"{ship}: NCL's deposit per guest differs by party size today "
+                            f"({', '.join(f'{g} guests ${v:g}' for g, v in per_guest.items())}); standard deposit left empty")
+            log("Warning: " + warnings[-1])
+    elif prev_pay.get("standard_deposit_per_guest") and prev_pay.get("standard_deposit_checked_at") \
+            and (now.date() - dt.date.fromisoformat(prev_pay["standard_deposit_checked_at"])).days <= MAX_STALE_DAYS:
+        standard, standard_on = prev_pay["standard_deposit_per_guest"], prev_pay["standard_deposit_checked_at"]
+        log(f"  no standard cabin deposit today; keeping ${standard:g} per guest from {standard_on}")
+    else:
+        warnings.append(f"{ship}: no Inside to Club Balcony Suite deposit in NCL's price summaries today; standard deposit left empty")
+        log("Warning: " + warnings[-1])
+
+    final_due = None
+    if dates:
+        final_due = min(dates)
+        if len(dates) > 1:
+            warnings.append(f"{ship}: NCL's final payment dates differ today ("
+                            + ", ".join(f"{d} at {', '.join(map(str, gs))} guests" for d, gs in sorted(dates.items()))
+                            + f"); using the earliest, {final_due}")
+            log("Warning: " + warnings[-1])
+    elif prev_pay.get("final_payment_due"):
+        final_due = prev_pay["final_payment_due"]
+        warnings.append(f"{ship}: no final payment date in NCL's price summaries today; kept {final_due} from the previous run")
+        log("Warning: " + warnings[-1])
+    else:
+        warnings.append(f"{ship}: no final payment date in NCL's price summaries today; left empty")
+        log("Warning: " + warnings[-1])
+
+    offer = offers.get("deposit_offer")
+    return {
+        "source": "NCL price-summary paymentOptions",
+        "final_payment_due": final_due,
+        "standard_deposit_per_guest": standard,
+        "standard_deposit_checked_at": standard_on,
+        "by_guests": by_guests,
+        "deposit_offer": dict(offer, checked_at=now_iso) if offer else None,
+    }
+
+
+def deposit_rules(checks, previous, today, warnings):
+    """The Suite and Haven deposit rule (10% of the cruise fare), confirmed on today's Suite and
+    Haven price summaries when there are any. A summary that disagrees leaves the rule empty
+    (null) with a warning; the page then says NCL sets the deposit. With no such summary today the
+    previous run's rule is kept, or for the first schema 4 run the 2026-10-28 research."""
+    base = {"suite_haven_types": DEPOSIT_PERCENT_TYPES, "source": DEPOSIT_RULE_SOURCE}
+    pct = [c for c in checks["deposits"] if c["rule"] == PERCENT_RULE]
+    if pct:
+        bad = [c for c in pct if not c["ok"]]
+        if bad:
+            warnings.append("Deposits: NCL's Suite and Haven deposit is not 10% of the cruise fare today ("
+                            + ", ".join(f"{c['sailing']} {c['category']} at {c['guests']} guests: ${c['deposit']:g} instead of ${c['expected']:g}" for c in bad)
+                            + "); Suite and Haven deposit left empty")
+            log("Warning: " + warnings[-1])
+            return dict(base, percent_of_fare=None, confirmed_on=None, confirmed_by=None)
+        by = ", ".join(f"{c['sailing']} {c['category']} at {c['guests']} guests" for c in pct)
+        return dict(base, percent_of_fare=DEPOSIT_PERCENT, confirmed_on=today, confirmed_by=by)
+    prev = (previous or {}).get("deposit_rules")
+    if isinstance(prev, dict):
+        if prev.get("percent_of_fare") is None:
+            warnings.append("Deposits: no Suite or Haven price summary today, and the last check didn't match; Suite and Haven deposit left empty")
+            log("Warning: " + warnings[-1])
+        return dict(prev)
+    return dict(base, percent_of_fare=DEPOSIT_PERCENT, **DEPOSIT_RESEARCH)
 
 
 def kept_gratuities(cfg, prev_s, previous, now, error, warnings):
@@ -799,6 +991,8 @@ def fetch_sailing(cfg, checks, warnings, previous=None):
         gratuities, age_check = kept_gratuities(cfg, prev_s, previous, now, e, warnings)
     checks["ages"].append(age_check)
 
+    payment = payment_info(cfg, summaries, status, prev_s, offers, now, checks, warnings)
+
     describe_categories(cfg, types)
     # A category described only from kept data (its 2-guest call failed today) keeps yesterday's description.
     for t in types.values():
@@ -833,6 +1027,7 @@ def fetch_sailing(cfg, checks, warnings, previous=None):
         "kids_sail_free": dict(offers["kids_sail_free"], checked_at=now_iso) if offers.get("kids_sail_free") else None,
         "terminal": TERMINAL,
         "ports": ports,
+        "payment": payment,
         "price_summaries": [summaries[g] for g in GUEST_COUNTS if g in summaries],
         "types": out_types,
     }
@@ -928,9 +1123,10 @@ def main():
         except Exception:
             previous = None
 
-    checks = {"extra_guest_mismatches": [], "formula": [], "ages": [], "rates": []}
+    checks = {"extra_guest_mismatches": [], "formula": [], "ages": [], "rates": [], "deposits": []}
     warnings = []
     sailings = [fetch_sailing(cfg, checks, warnings, previous) for cfg in SAILINGS]
+    rules = deposit_rules(checks, previous, dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d"), warnings)
     rates, rate_warnings = fetch_rates(previous)
     for w in rate_warnings:
         log("Warning: " + w)
@@ -952,6 +1148,7 @@ def main():
         "rates": rates,
         "rate_warnings": rate_warnings,
         "warnings": warnings,
+        "deposit_rules": rules,
         "checks": checks,
         "sailings": sailings,
     }
@@ -971,12 +1168,23 @@ def main():
         print(f"::notice title=Kids Sail Free {s['ship_short']}::" + (
             f"listed by NCL today: {k['title']}, codes {', '.join(k['codes']) or 'none'}, types {', '.join(k['types']) or 'none'}" if k
             else "not listed by NCL today"))
+    for s in sailings:
+        pay = s["payment"]
+        per = pay["standard_deposit_per_guest"]
+        print(f"::notice title=Deposits {s['ship_short']}::"
+              + (f"${per:g} per guest up to Club Balcony Suite" if per else "standard deposit not found")
+              + (f", Suite and Haven {rules['percent_of_fare']}% of the fare" if rules["percent_of_fare"] else ", Suite and Haven rule not confirmed")
+              + f", final payment {pay['final_payment_due'] or 'not found'}"
+              + (f", offer: {pay['deposit_offer']['title']}" if pay["deposit_offer"] else ", no deposit offer listed"))
     for w in warnings:
         print(f"::warning title=Price refresh::{w}")
 
     for c in checks["rates"]:
         if not c["ok"]:
             log(f"Note: {c['sailing']} {c['item']} gratuity {c['price_summary']} differs from the terms rate x nights {c['terms_rate_x_nights']}")
+    for c in checks["deposits"]:
+        if not c["ok"]:
+            log(f"Note: {c['sailing']} {c['category']} at {c['guests']} guests: deposit {c['deposit']}, expected {c['expected']} ({c['rule']})")
     for m in checks["extra_guest_mismatches"]:
         log(f"Note: extra guest price differs for {m['sailing']} {m['category']}: {m['per_extra_guest']}")
     bad = [c for c in checks["formula"] + checks["ages"] if c["ok"] is False]

@@ -35,7 +35,7 @@ def main():
     import json
     try:
         data = json.loads(read("data/prices.json"))
-        problems += ["data/prices.json: " + e for e in check_prices.check(data, allow_schema_2=True)]
+        problems += ["data/prices.json: " + e for e in check_prices.check(data, allow_schema_3=True)]
     except Exception as e:
         problems.append(f"data/prices.json cannot be read: {e}")
 

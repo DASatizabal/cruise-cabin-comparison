@@ -13,7 +13,17 @@ Built on branch `family-tools-5.2.0` in the order the owner set: the DoubleUp wa
 - Release check workflow: actionlint (pinned Docker image `rhysd/actionlint:1.7.7`, with shellcheck) on every push and pull request.
 - Tests: `tools/test_tools.py` (NCL's real banner markup saved 2026-10-28, every kind of change, one issue per change, retries, unreadable pages and wording, Eastern dates, the format check, and no em dash in any tracked file).
 
-NCL calls: the price job goes from 26 to 27 a day (1 page load). Per week about 918 instead of 911 (940 instead of 933 in a week with the Florida light check). NOTES.md, "DoubleUp watch".
+- Payment data in `data/prices.json` (schema 4), read from the price summaries and availability answers the job already makes (no extra NCL calls), for Make Selection:
+  - per ship, `payment`: the final payment date (NCL's "pay in full" date: Feb 11, 2027 for the Getaway, Feb 14, 2027 for the Aura), the deposit NCL lists at each party size with its cabin type and hours to pay, the Inside to Club Balcony Suite deposit per guest ($50 today), and NCL's deposit offer as NCL words it ("2-For-1 Deposits" today);
+  - `deposit_rules`: Suite and Haven deposits are 10% of the cruise fare (NCL's rule), confirmed daily on any Suite or Haven price summary the job makes (the Aura at 5 guests is a Haven today);
+  - `checks.deposits`: every deposit read today against its rule. A check that fails never stops the run; the number it checks is left empty (null) with a warning, as with other missing numbers.
+  - A notice per ship on the GitHub run page ("Deposits Getaway: $50 per guest up to Club Balcony Suite, ...").
+- Tests: whole runs of `tools/fetch_prices.py` against a stand-in for NCL (same 26 calls as before, failed party sizes, kept prices from before 5.2.0, deposit checks that fail, dates that disagree, no deposit offer) and a saved NCL answer.
+
+### Changed
+- `data/prices.json` is schema 4. `tools/check_prices.py` checks the payment data; the release check still accepts the committed schema 3 file until the first refresh on main after the merge.
+
+NCL calls: the price job goes from 26 to 27 a day (1 page load for the DoubleUp watch; the payment data adds none). Per week about 918 instead of 911 (940 instead of 933 in a week with the Florida light check). NOTES.md, "DoubleUp watch" and "Payment data".
 
 ## [5.1.0] - 2026-10-27
 

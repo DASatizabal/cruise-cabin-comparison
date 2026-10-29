@@ -28,7 +28,7 @@ SHOTS = sys.argv[1] if len(sys.argv) > 1 else None
 sys.stdout.reconfigure(errors="replace")   # the page's minus sign on a Windows console
 sys.path.insert(0, os.path.join(REPO, "tools"))
 import check_florida  # noqa: E402
-import test_tools  # noqa: E402  (null_copy, schema3)
+import test_tools  # noqa: E402  (null_copy, schema4)
 
 from playwright.sync_api import sync_playwright  # noqa: E402
 
@@ -36,14 +36,14 @@ MIAMI = ZoneInfo("America/New_York")
 
 with open(os.path.join(REPO, "data", "prices.json"), encoding="utf-8") as f:
     real = json.load(f)
-sites = {"real": test_tools.schema3(real), "nulls": test_tools.null_copy(real)}
+sites = {"real": test_tools.schema4(real), "nulls": test_tools.null_copy(real)}
 
 
 def ksf_copy(data):
     """Kids Sail Free test copy: NCL lists the offer on both ships (Inside to Club Balcony Suite, as
     on the Joy page). The Getaway's BF prices for 3 and 4 guests are set so each extra guest pays
     only the taxes ("prices agree"); the Aura's prices are today's ("prices charge a fare")."""
-    d = test_tools.schema3(data)
+    d = test_tools.schema4(data)
     offer = {"title": "Kids Sail Free", "short": "3rd & 4th guests sail free", "description": "test", "codes": ["34CHO"],
              "types": ["INSIDE", "OCEANVIEW", "BALCONY", "MINISUITE"], "checked_at": "2026-10-15T10:20:00Z"}
     for sl in d["sailings"]:
@@ -90,7 +90,7 @@ FL_SITES = {"none": fl_copy({}, 0), "higher": fl_copy({("Getaway", "BF"): -20}, 
             "one": fl_copy({("Getaway", "BF"): 60}, 0)}
 FL_SITES_WHEN = {k: v[1] for k, v in FL_SITES.items()}
 for name in FL_SITES:
-    sites[name] = test_tools.schema3(real)
+    sites[name] = test_tools.schema4(real)
 
 
 sites["ksf"] = ksf_copy(real)
