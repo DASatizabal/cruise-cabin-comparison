@@ -688,7 +688,18 @@
         .ms-status.bad { background: var(--red-wash); color: var(--red); border-radius: 8px; padding: 0.6rem 0.75rem; }
         .ms-status.bad ul { padding-left: 1.1rem; margin-top: 0.3rem; }
         .ms-status.info, .ms-status.ok { background: var(--teal-wash); color: var(--gray-800); border-radius: 8px; padding: 0.6rem 0.75rem; }
-        #msTurnstile { margin-top: 0.75rem; min-height: 0; }
+        #msTurnstile, #pwTurnstile { margin-top: 0.75rem; min-height: 0; }
+        /* Price watch (5.2.0) */
+        .pw-open { margin-top: 0.5rem; background: var(--white); color: var(--teal); border: 2px solid var(--teal); }
+        .pw-open:hover { background: var(--teal-wash); }
+        .pw-price { font-size: 1.4rem; font-weight: 800; color: var(--gray-900); }
+        .pw-watch { padding: 0.6rem 0; border-bottom: 1px dashed var(--gray-200); font-size: 0.875rem; }
+        .pw-label { white-space: pre-line; }
+        .pw-stop {
+            margin-top: 0.45rem; padding: 0.35rem 0.9rem; border: 2px solid var(--red); border-radius: 9999px;
+            background: var(--white); color: var(--red); font: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+        }
+        .pw-stop:disabled { border-color: var(--gray-300); color: var(--gray-500); cursor: default; }
     </style>
 </head>
 <body>
@@ -752,6 +763,7 @@
     </main>
 
     <dialog class="ms" id="msDialog" aria-labelledby="msTitle"></dialog>
+    <dialog class="ms" id="pwDialog" aria-labelledby="pwTitle"></dialog>
 
     <footer class="footer">
         <div class="wrap">
@@ -782,10 +794,11 @@
         // CruiseNext credits only while data/offers.json (the DoubleUp watch, at most 3 days old)
         // allows them. Sent through the cruise-family-alerts Worker (tools/family-alerts/, with
         // Cloudflare Turnstile) to the owner's Gmail. Nothing typed in the window is saved.
+        // The same Worker runs the family price watch ("Watch this price", 5.2.0).
         const OFFERS_URL = "data/offers.json";
         const OFFERS_MAX_AGE_DAYS = 3;
-        const FAMILY_API = "";            // the cruise-family-alerts Worker's address (set in 5.2.0 part B)
-        const TURNSTILE_SITE_KEY = "";    // Cloudflare Turnstile site key, public (set in 5.2.0 part B)
+        const FAMILY_API = "";            // the cruise-family-alerts Worker's address
+        const TURNSTILE_SITE_KEY = "";    // Cloudflare Turnstile site key (public)
         const CHANGE_TEXT = "Prices can change until NCL confirms the booking.";
         // NCL's CruiseNext terms (NOTES.md, "Research for 5.2.0"): a $250 credit, which David buys
         // for $125; the full deposit up to a Club Balcony Suite, part of it above that. David's
@@ -1484,12 +1497,13 @@
         // combined totals. Nothing typed here is saved (no browser storage); the window is cleared
         // when it closes. NOTES.md, "Make Selection".
 
-        // The button under a card's total, once a cabin is chosen and every kid's age is set.
-        // Hidden from the sail date on (Eastern).
+        // The buttons under a card's total (Make Selection and Watch this price), once a cabin is
+        // chosen and every kid's age is set. Hidden from the sail date on (Eastern).
         function selectButton(key) {
             const sel = SELECTIONS[key];
             if (!sel || !agesKnown() || sel.items.some(([s]) => todayEastern() >= s.depart)) return "";
-            return `<button type="button" class="ms-open" data-select="${key}">Make Selection</button>`;
+            return `<button type="button" class="ms-open" data-select="${key}">Make Selection</button>
+                    <button type="button" class="ms-open pw-open" data-watch="${key}">Watch this price</button>`;
         }
 
         // NCL's broad types whose deposit is NCL's percentage rule (Suite and Haven).
@@ -1801,7 +1815,7 @@
             renderMsMath();
             dlg.showModal();
             dlg.scrollTop = 0;
-            startTurnstile();
+            startTurnstile(MS, "#msTurnstile");
         }
 
         // Closing the window clears everything typed in it.
@@ -1811,13 +1825,14 @@
             document.getElementById("msDialog").innerHTML = "";
         }
 
-        // Cloudflare Turnstile, loaded only when the window opens and the Worker is set up.
-        function startTurnstile() {
+        // Cloudflare Turnstile, loaded only when a window that sends opens and the Worker is set
+        // up. st: the open window's state (MS or PW), which keeps the widget and its token.
+        function startTurnstile(st, sel) {
             if (!FAMILY_API || !TURNSTILE_SITE_KEY) return;
             const show = () => {
-                if (!MS || !document.getElementById("msTurnstile")) return;
-                MS.widget = window.turnstile.render("#msTurnstile", { sitekey: TURNSTILE_SITE_KEY,
-                    callback: t => { if (MS) MS.token = t; }, "expired-callback": () => { if (MS) MS.token = null; } });
+                if ((st !== MS && st !== PW) || !document.querySelector(sel)) return;
+                st.widget = window.turnstile.render(sel, { sitekey: TURNSTILE_SITE_KEY,
+                    callback: t => { st.token = t; }, "expired-callback": () => { st.token = null; } });
             };
             if (window.turnstile) return show();
             window.onTurnstileReady = show;
@@ -1932,7 +1947,7 @@
             }
             if (!FAMILY_API) {
                 status.className = "ms-status info";
-                status.textContent = "Everything is filled in. Sending isn't switched on yet: the email service is set up in the next part of this update. Nothing was sent.";
+                status.textContent = "Everything is filled in, but sending isn't switched on yet, so nothing was sent.";
                 return;
             }
             MS.sending = true;
@@ -1943,20 +1958,232 @@
                 const body = selectionRequest();
                 const r = await fetch(FAMILY_API + "/booking", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
                 const ans = await r.json().catch(() => ({}));
-                if (!r.ok || !ans.ok) throw new Error(ans.error || "HTTP " + r.status);
+                if (!r.ok || !ans.ok) throw Object.assign(new Error(ans.error || "HTTP " + r.status), { text: ans.message });
                 document.querySelector("#msDialog .ms-body").innerHTML = `
-                    <div class="ms-status ok" style="margin-top:1rem"><strong>Sent.</strong> David will confirm by email. A copy of your selection is on its way to ${esc(body.sender.email)}.</div>
+                    <div class="ms-status ok" style="margin-top:1rem"><strong>Sent.</strong> David will confirm by email. ${ans.copy === false
+                        ? `Your copy couldn't be sent to ${esc(body.sender.email)}, but David has everything.` : `A copy of your selection is on its way to ${esc(body.sender.email)}.`}</div>
                     <p class="ms-warn">${CHANGE_TEXT}</p>
                     <button type="button" class="ms-send" data-ms-close>Close</button>`;
             } catch (err) {
                 if (!MS) return;
                 status.className = "ms-status bad";
-                status.textContent = `Not sent (${err.message}). Please try again in a few minutes.`;
+                status.textContent = err.text || `Not sent (${err.message}). Please try again in a few minutes.`;
                 if (MS.widget !== null && window.turnstile) { try { window.turnstile.reset(MS.widget); } catch (e) {} }
                 MS.token = null;
             } finally {
                 if (MS) MS.sending = false;
                 if (document.getElementById("msSend")) document.getElementById("msSend").disabled = false;
+            }
+        }
+
+
+        // ---------- Price watch (5.2.0; NOTES.md, "Family price watch and booking emails") ----------
+        // "Watch this price" under each card's total opens a window: the cabin and party size, the
+        // Florida question (it only decides which price is watched) and an email address. The
+        // cruise-family-alerts Worker keeps the watch in its own database (never in this repo or
+        // this browser), emails a link to start it, and checks the published prices twice a day.
+        // The links in its emails come back to this page (#confirm=, #unsubscribe=, #manage=): the
+        // page removes the token from the address bar and sends it to the Worker. No NCL calls.
+        let PW = null;
+        const WATCH_LINK = /^#(confirm|unsubscribe|manage)=([A-Za-z0-9_-]{43})$/;
+        const WATCH_TITLES = { form: "Watch this price", confirm: "Start your price watch", unsubscribe: "Stop a price watch", manage: "Your price watches" };
+
+        // The watched price, the Worker's rule: NCL's cabin price for the party minus the cabin's
+        // own Florida discount when the answer is Yes, the same as Make Selection's "Price without
+        // gratuities" (8 nights: both ships added).
+        const watchedPrice = (items, florida) => items.reduce((t, [s, c]) => { const k = cost(s, c, state.offers[shipKey(s)], florida); return t + k.cabin - k.fl.amount; }, 0);
+        const watchHead = mode => `<div class="ms-head"><h2 id="pwTitle">${WATCH_TITLES[mode]}</h2><button type="button" class="ms-close" data-pw-close aria-label="Close">&times;</button></div>`;
+
+        function watchForm() {
+            const n = guests();
+            const review = PW.items.map(([s, c]) => `
+                <div class="ms-item"><strong>${esc(s.ship)}</strong>, ${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)
+                    <div>${esc(c.typeTitle)}: ${catHtml(c)}</div>
+                    ${c.guarantee ? `<div class="cat-meta gty">${GUARANTEE_TEXT}</div>` : ""}
+                </div>`).join("");
+            const gty = PW.items.filter(([, c]) => c.guarantee).length;
+            const few = gty === PW.items.length ? "Guarantee cabins: NCL doesn't show how many are left, so there is no email about that."
+                : `One email when fewer than 10 of these cabins are left for ${plural(n, "guest", "guests")}${gty ? " (not for the Guarantee cabin: NCL doesn't show how many of those are left)" : ""}.`;
+            return `
+                <form id="pwForm" novalidate autocomplete="off">
+                    ${watchHead("form")}
+                    <div class="ms-body">
+                        <section class="ms-sec">
+                            <h3>What you're watching: ${esc(PW.label)}</h3>
+                            ${review}
+                            <div class="ms-list"><div>${plural(n, "guest", "guests")} in the cabin. The price depends on how many guests there are, not their ages.</div></div>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Florida resident</h3>
+                            <fieldset class="ms-q" id="pwFlQ"><legend>Are you a Florida resident?</legend>
+                                <label class="ms-choice"><input type="radio" name="pwFl" value="yes"><span>Yes</span></label>
+                                <label class="ms-choice"><input type="radio" name="pwFl" value="no"><span>No</span></label>
+                            </fieldset>
+                            <p class="hint">It only decides which price is watched: NCL's Florida resident price or the website price.</p>
+                            <div id="pwPrice"></div>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>What you'll get</h3>
+                            <ul class="ms-steps">
+                                <li>An email when this price drops by $1 or more. After each one, the new price is the one watched.</li>
+                                <li>${few}</li>
+                                <li>One email if it is no longer available for ${plural(n, "guest", "guests")}.</li>
+                                <li>Prices are checked twice a day, after they refresh. Every email has a link to stop the watch. Watches end on Jun 11, 2027.</li>
+                            </ul>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Your email</h3>
+                            ${msField("pwEmail", "Email", "email")}
+                            <p class="hint">Your email goes only to David's price watch list, never on this page or in the public repo. It is deleted when you stop watching, and on Jun 11, 2027. Up to 10 watches per email.</p>
+                            <div id="pwTurnstile"></div>
+                            <button type="submit" class="ms-send" id="pwSend">Start watching</button>
+                            <div class="ms-status" id="pwStatus" role="status" aria-live="polite"></div>
+                            <p class="hint">You'll get an email with a link to start the watch. Nothing is watched until you open it, within 48 hours.</p>
+                        </section>
+                    </div>
+                </form>`;
+        }
+
+        function renderPwPrice() {
+            const box = document.getElementById("pwPrice");
+            if (!box) return;
+            if (PW.florida === null) {
+                box.innerHTML = `<p class="ms-wait">Answer the question above to see the price that will be watched.</p>`;
+                return;
+            }
+            const n = guests();
+            const noDiscount = PW.florida && PW.items.every(([s, c]) => !cost(s, c, state.offers[shipKey(s)], true).fl.amount);
+            box.innerHTML = `
+                <div class="ms-note">
+                    <div>Price watched today (${PW.florida ? "Florida resident price" : "website price"}):</div>
+                    <div class="pw-price" id="pwAmount">${money(watchedPrice(PW.items, PW.florida))}</div>
+                    <div>NCL's cruise fare with taxes, fees and port expenses for ${plural(n, "guest", "guests")}${PW.items.length > 1 ? ", both ships added" : ""}, before gratuities and Free at Sea extras.</div>
+                    ${noDiscount ? `<div style="margin-top:0.4rem">NCL isn't offering a Florida resident discount on ${PW.items.length > 1 ? "these cabins" : "this cabin"} right now, so this is the website price. If NCL offers one, the lower price counts as a drop.</div>` : ""}
+                </div>`;
+        }
+
+        function openWatch(key) {
+            const sel = SELECTIONS[key];
+            if (!sel) return;
+            const dlg = document.getElementById("pwDialog");
+            dropTurnstile();
+            PW = { mode: "form", key, label: sel.label, items: sel.items, florida: null, token: null, widget: null, sending: false };
+            dlg.innerHTML = watchForm();
+            renderPwPrice();
+            if (!dlg.open) dlg.showModal();
+            dlg.scrollTop = 0;
+            startTurnstile(PW, "#pwTurnstile");
+        }
+
+        const dropTurnstile = () => { if (PW && PW.widget && window.turnstile) { try { window.turnstile.remove(PW.widget); } catch (e) {} } };
+        // Closing the window clears everything typed in it, and any token from a link. (The close
+        // event comes a moment later: if a link has opened the window again since, keep it.)
+        function closeWatch() {
+            if (document.getElementById("pwDialog").open) return;
+            dropTurnstile();
+            PW = null;
+            document.getElementById("pwDialog").innerHTML = "";
+        }
+
+        async function sendWatch() {
+            if (!PW || PW.mode !== "form" || PW.sending) return;
+            document.querySelectorAll("#pwDialog [aria-invalid]").forEach(el => el.removeAttribute("aria-invalid"));
+            const status = document.getElementById("pwStatus"), button = document.getElementById("pwSend");
+            const errs = [], email = msValue("pwEmail");
+            if (PW.florida === null) errs.push("Answer whether you're a Florida resident.");
+            if (!EMAIL_RE.test(email)) { document.getElementById("pwEmail").setAttribute("aria-invalid", "true"); errs.push("Enter your email."); }
+            if (FAMILY_API && !PW.token) errs.push("Complete the check above the button.");
+            if (errs.length) {
+                status.className = "ms-status bad";
+                status.innerHTML = `<strong>Please fix these first:</strong><ul>${errs.map(e => `<li>${esc(e)}</li>`).join("")}</ul>`;
+                return;
+            }
+            if (!FAMILY_API) {
+                status.className = "ms-status info";
+                status.textContent = "Everything is filled in, but the price watch isn't switched on yet, so nothing was sent.";
+                return;
+            }
+            PW.sending = true;
+            button.disabled = true;
+            status.className = "ms-status info";
+            status.textContent = "Sending...";
+            const st = PW;
+            try {
+                const body = { option: PW.key, guests: guests(), cabins: Object.fromEntries(PW.items.map(([s, c]) => [shipKey(s), c.code])),
+                               florida: PW.florida, email, page: location.origin + location.pathname, turnstile: PW.token };
+                const r = await fetch(FAMILY_API + "/watch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+                const ans = await r.json().catch(() => ({}));
+                if (!r.ok || !ans.ok) throw Object.assign(new Error(ans.error || "HTTP " + r.status), { text: ans.message });
+                if (PW !== st) return;
+                document.querySelector("#pwDialog .ms-body").innerHTML = `
+                    <div class="ms-status ok" style="margin-top:1rem"><strong>Almost done.</strong> Check your email (${esc(email)}) and open the link in it within 48 hours to start the watch. Nothing is watched until then.</div>
+                    <button type="button" class="ms-send" data-pw-close>Close</button>`;
+            } catch (err) {
+                if (PW !== st) return;
+                status.className = "ms-status bad";
+                status.textContent = err.text || `Not sent (${err.message}). Please try again in a few minutes.`;
+                if (PW.widget && window.turnstile) { try { window.turnstile.reset(PW.widget); } catch (e) {} }
+                PW.token = null;
+            } finally {
+                if (PW === st) PW.sending = false;
+                if (document.getElementById("pwSend")) document.getElementById("pwSend").disabled = false;
+            }
+        }
+
+        // A link from a price watch email: the token goes to the Worker, never stays in the address bar.
+        function openLink() {
+            const m = location.hash.match(WATCH_LINK);
+            if (!m) return;
+            history.replaceState(null, "", location.pathname + location.search);
+            const dlg = document.getElementById("pwDialog");
+            dropTurnstile();
+            PW = { mode: m[1], token: m[2], busy: false };
+            dlg.innerHTML = `${watchHead(m[1])}<div class="ms-body"><div class="ms-sec" id="pwResult"><p class="ms-wait">One moment...</p></div></div>`;
+            if (!dlg.open) dlg.showModal();
+            linkCall({});
+        }
+
+        const watchCard = (w, stop) => `
+            <div class="pw-watch">
+                <div class="pw-label">${esc(w.label)}</div>
+                <div>Price watched: <strong>${money(w.watched)}</strong>${w.price !== null && w.price !== w.watched ? ` (latest price ${money(w.price)})` : ""}</div>
+                ${stop ? `<button type="button" class="pw-stop" data-pw-stop="${esc(w.id)}">Stop this watch</button>` : ""}
+            </div>`;
+
+        function linkResult(ans) {
+            if (PW.mode === "confirm") {
+                return `<div class="ms-status ok"><strong>${ans.already ? "You were already watching this price." : "Your price watch has started."}</strong> You'll get an email when the price drops by $1 or more, when fewer than 10 of these cabins are left, or if it is no longer available. Every email has a link to stop the watch.</div>${watchCard(ans.watch, false)}`;
+            }
+            if (PW.mode === "unsubscribe") {
+                return `<div class="ms-status ok"><strong>Stopped.</strong> You won't get emails about this price any more.</div>${watchCard(ans.watch, false)}`;
+            }
+            const waiting = ans.waiting ? `<p class="hint">${plural(ans.waiting, "watch is", "watches are")} waiting for the link in its email (deleted after 48 hours if it isn't opened).</p>` : "";
+            if (!ans.watches.length) return `<div class="ms-status ok">You have no price watches running.</div>${waiting}`;
+            return `<p class="ms-wait">${plural(ans.watches.length, "price watch", "price watches")} running for this email address:</p>
+                ${ans.watches.map(w => watchCard(w, true)).join("")}
+                ${ans.watches.length > 1 ? `<button type="button" class="pw-stop" data-pw-stop="all" style="margin-top:0.9rem">Stop all of them</button>` : ""}
+                ${waiting}`;
+        }
+
+        async function linkCall(extra) {
+            const box = document.getElementById("pwResult"), st = PW;
+            if (!box || !st || st.busy) return;
+            if (!FAMILY_API) {
+                box.innerHTML = `<div class="ms-status info">The price watch isn't switched on yet.</div>`;
+                return;
+            }
+            st.busy = true;
+            box.querySelectorAll("button").forEach(b => { b.disabled = true; });
+            try {
+                const r = await fetch(`${FAMILY_API}/${st.mode}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: st.token, ...extra }) });
+                const ans = await r.json().catch(() => ({}));
+                if (PW !== st) return;
+                box.innerHTML = r.ok && ans.ok ? linkResult(ans)
+                    : `<div class="ms-status bad">${esc(ans.message || "Something went wrong. Please try the link again in a few minutes.")}</div>`;
+            } catch (err) {
+                if (PW === st) box.innerHTML = `<div class="ms-status bad">David's price watch service couldn't be reached. Please try the link again in a few minutes.</div>`;
+            } finally {
+                st.busy = false;
             }
         }
 
@@ -2077,6 +2304,8 @@
             if (!DATA) return;
             const sel = e.target.closest("button[data-select]");
             if (sel) { openSelection(sel.dataset.select); return; }
+            const watch = e.target.closest("button[data-watch]");
+            if (watch) { openWatch(watch.dataset.watch); return; }
             if (e.target.closest("[data-ms-close]")) { document.getElementById("msDialog").close(); return; }
             const tile = e.target.closest("[data-tile]");
             if (tile && !e.target.closest("a")) {
@@ -2115,6 +2344,10 @@
         document.addEventListener("change", e => {
             if (!DATA) return;
             if (e.target.closest("#msDialog")) { msChange(e.target); return; }
+            if (e.target.closest("#pwDialog")) {
+                if (e.target.name === "pwFl" && PW) { PW.florida = e.target.value === "yes"; renderPwPrice(); }
+                return;
+            }
             const offer = e.target.closest("input[data-offer]");
             if (offer) {
                 const o = state.offers[offer.dataset.ship];
@@ -2243,8 +2476,21 @@
             .then(r => r.ok ? r.json() : null)
             .catch(() => null);
         document.getElementById("msDialog").addEventListener("close", closeSelection);
-        document.addEventListener("input", e => { if (e.target.closest("#msDialog")) e.target.removeAttribute("aria-invalid"); });
-        document.addEventListener("submit", e => { if (e.target.id === "msForm") { e.preventDefault(); sendSelection(); } });
+        document.addEventListener("input", e => { if (e.target.closest("#msDialog, #pwDialog")) e.target.removeAttribute("aria-invalid"); });
+        document.addEventListener("submit", e => {
+            if (e.target.id === "msForm") { e.preventDefault(); sendSelection(); }
+            if (e.target.id === "pwForm") { e.preventDefault(); sendWatch(); }
+        });
+        // The price watch window and the links from its emails (these work even if the prices can't load).
+        const pwDialog = document.getElementById("pwDialog");
+        pwDialog.addEventListener("close", closeWatch);
+        pwDialog.addEventListener("click", e => {
+            if (e.target.closest("[data-pw-close]")) { pwDialog.close(); return; }
+            const stop = e.target.closest("button[data-pw-stop]");
+            if (stop && PW && PW.mode === "manage") linkCall({ stop: stop.dataset.pwStop });
+        });
+        window.addEventListener("hashchange", openLink);
+        openLink();
         fetch(DATA_URL, { cache: "no-cache" })
             .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
             .then(d => Promise.all([countsPromise, floridaPromise, offersPromise]).then(([cnt, fl, of]) => [d, cnt, fl, of]))

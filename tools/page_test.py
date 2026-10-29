@@ -20,6 +20,14 @@ every field (a kid's date of birth that doesn't match the age on the page), a sc
 file (deposit not found), and sending to a stand-in for the Worker (the request it gets, nothing
 saved in the browser).
 
+Price watch (5.2.0, NOTES.md "Family price watch and booking emails"): "Watch this price" on every
+card at 360 px, the Florida question and the price watched (the same number as the Worker's own
+rule, tools/family-alerts/worker.js, run with node when it is installed), the request to a
+stand-in Worker, its refusal, nothing saved in the browser, and the links from the emails
+(#confirm=, #unsubscribe=, #manage= with stopping one and all; the token leaves the address bar).
+Every copy of the page gets an empty FAMILY_API except the stand-in one, so Cloudflare's Turnstile
+script is never loaded.
+
 Layout (5.2.0): the option tiles at 360 px and 1280 px (none selected and the prompt on the first
 visit, cards in tile order, side by side on a wide screen and stacked on a phone, remembered on
 return, no sideways scrolling), every cabin list price equal to the card's Total for that cabin in
@@ -33,6 +41,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 import threading
@@ -116,15 +125,15 @@ site_root = tempfile.mkdtemp(prefix="june-page-")
 for name, data in sites.items():
     d = os.path.join(site_root, name)
     os.makedirs(os.path.join(d, "data"))
-    shutil.copy(os.path.join(REPO, "index.html"), d)
-    if name == "ms_api":
-        with open(os.path.join(d, "index.html"), encoding="utf-8") as f:
-            html = f.read()
-        assert 'const FAMILY_API = "";' in html and 'const TURNSTILE_SITE_KEY = "";' in html
-        html = html.replace('const FAMILY_API = "";', f'const FAMILY_API = "{FAMILY_API_TEST}";').replace(
-            'const TURNSTILE_SITE_KEY = "";', 'const TURNSTILE_SITE_KEY = "test-site-key";')
-        with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
-            f.write(html)
+    # The Worker's address and the Turnstile key: the stand-in on "ms_api", empty everywhere else.
+    with open(os.path.join(REPO, "index.html"), encoding="utf-8") as f:
+        html = f.read()
+    api, key = (FAMILY_API_TEST, "test-site-key") if name == "ms_api" else ("", "")
+    html, n1 = re.subn(r'const FAMILY_API = "[^"]*";', f'const FAMILY_API = "{api}";', html)
+    html, n2 = re.subn(r'const TURNSTILE_SITE_KEY = "[^"]*";', f'const TURNSTILE_SITE_KEY = "{key}";', html)
+    assert (n1, n2) == (1, 1)
+    with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
+        f.write(html)
     counts = os.path.join(REPO, "data", "counts.json")
     if os.path.exists(counts):
         shutil.copy(counts, os.path.join(d, "data"))
@@ -814,8 +823,8 @@ with sync_playwright() as pw:
     fill_guests(page, [None, None])
     page.check("#msMe")
     page.click("#msSend")
-    same("Make Selection, no Worker yet: says nothing was sent", page.inner_text("#msStatus"),
-         "Everything is filled in. Sending isn't switched on yet: the email service is set up in the next part of this update. Nothing was sent.")
+    same("Make Selection, no Worker address: says nothing was sent", page.inner_text("#msStatus"),
+         "Everything is filled in, but sending isn't switched on yet, so nothing was sent.")
     page.close()
 
     # 8. A schema 3 price file (no payment data): the deposit is never guessed.
@@ -834,6 +843,213 @@ with sync_playwright() as pw:
     # 9. A kid without an age: no Make Selection button.
     page, errs, _ = ms_open("ms_api", stored={"adults": 2, "kids": [None], "type": "balcony", "mode": "same"}, ready=".card .rows")
     same("Make Selection: no button until every kid's age is chosen", page.eval_on_selector_all("button[data-select]", "els => els.length"), 0)
+    same("Price watch: no button until every kid's age is chosen", page.eval_on_selector_all("button[data-watch]", "els => els.length"), 0)
+    page.close()
+
+    # Price watch (5.2.0): "Watch this price" under each card's total, at 360 px.
+    TOKEN = "Tk" + "x" * 41
+    LABEL = "Option 1: 3 nights\nNorwegian Getaway, Jun 11 to Jun 14, 2027 (3 nights)\nCabin: Balcony, Decks 8 and 9 (BF)\n2 guests, website price"
+
+    def page_money(x):
+        r = round(x * 100) / 100
+        return f"${r:,.0f}" if r == int(r) else f"${r:,.2f}"
+
+    def pw_open(site, stored=None, answers=None, hash_="", ready=".card .price-total"):
+        page = new_page(viewport={"width": 360, "height": 800})
+        errs, sent = [], []
+        page.on("pageerror", lambda e: errs.append(str(e)))
+        page.on("console", lambda m: errs.append(m.text) if console_error(m) else None)
+        page.route("https://challenges.cloudflare.com/**", lambda r: r.abort())
+        page.add_init_script(TURNSTILE_STUB)
+
+        def worker(route):
+            path = route.request.url[len(FAMILY_API_TEST):]
+            body = json.loads(route.request.post_data)
+            sent.append((path, body))
+            status, ans = answers(path, body) if answers else (200, {"ok": True, "price": 1, "hours": 48})
+            route.fulfill(status=status, content_type="application/json", body=json.dumps(ans), headers={"Access-Control-Allow-Origin": "*"})
+        page.route(FAMILY_API_TEST + "/*", worker)
+        page.goto(f"{base}/{site}/index.html")
+        page.evaluate("s => { localStorage.clear(); if (s) localStorage.setItem('cruise-decision-guide-v5', JSON.stringify(s)); }", stored)
+        page.goto(f"{base}/{site}/index.html{hash_}")
+        if ready:
+            page.wait_for_selector(ready)
+        return page, errs, sent
+
+    def pw_fits(page):
+        return page.evaluate("(() => { const d = document.getElementById('pwDialog'); return d.scrollWidth <= d.clientWidth; })()")
+
+    def pw_price(page):
+        return page.inner_text("#pwAmount") if page.query_selector("#pwAmount") else None
+
+    def worker_price(site, option, guests, florida, g, a):
+        """The Worker's own number (tools/family-alerts/worker.js), or None without node."""
+        if not shutil.which("node"):
+            return None
+        d = os.path.join(site_root, site, "data")
+        fl = os.path.join(d, "florida.json")
+        out = subprocess.run(["node", os.path.join(REPO, "tools", "family-alerts", "test", "watched_price.mjs"), os.path.join(d, "prices.json"),
+                              fl if os.path.exists(fl) else "-", option, str(guests), "1" if florida else "0", g or "-", a or "-"],
+                             capture_output=True, text=True, check=True)
+        return json.loads(out.stdout)
+
+    # 1. The Getaway card, 2 adults, Balcony: the window, the checks, the price, the request.
+    page, errs, sent = pw_open("ms_api")
+    same("Price watch: a button on each card, right after Make Selection",
+         page.eval_on_selector_all("button[data-watch]", "els => els.map(e => [e.dataset.watch, e.previousElementSibling.dataset.select, e.textContent])"),
+         [["G", "G", "Watch this price"], ["A", "A", "Watch this price"], ["8", "8", "Watch this price"]])
+    page.click('button[data-watch="G"]')
+    check("Price watch: the window opens", page.is_visible("#pwDialog"))
+    code_g = page.evaluate("SELECTIONS.G.items[0][1].code")
+    text = page.inner_text("#pwDialog")
+    for want in ["Watch this price", "WHAT YOU'RE WATCHING: OPTION 1: 3 NIGHTS", "2 guests in the cabin. The price depends on how many guests there are, not their ages.",
+                 "Are you a Florida resident?", "It only decides which price is watched: NCL's Florida resident price or the website price.",
+                 "Answer the question above to see the price that will be watched.",
+                 "An email when this price drops by $1 or more. After each one, the new price is the one watched.",
+                 "One email when fewer than 10 of these cabins are left for 2 guests.", "One email if it is no longer available for 2 guests.",
+                 "Watches end on Jun 11, 2027.", "Your email goes only to David's price watch list, never on this page or in the public repo.",
+                 "Nothing is watched until you open it, within 48 hours."]:
+        check(f"Price watch window: '{want[:60]}'", want.lower() in text.lower(), text[:300])
+    same("Price watch: nothing chosen on the Florida question", page.eval_on_selector_all("input[name='pwFl']:checked", "els => els.length"), 0)
+    page.click("#pwSend")
+    same("Price watch: the checks before sending", page.inner_text("#pwStatus"),
+         "Please fix these first:\nAnswer whether you're a Florida resident.\nEnter your email.")
+    check("Price watch: nothing sent before the checks pass", not sent)
+    page.check("input[name='pwFl'][value='no']")
+    want_g = cat(gw, code_g)["by_guests"]["2"]["cabin_total"]
+    same("Price watch, No: NCL's cabin price for 2 guests (website price)", (pw_price(page), "website price" in page.inner_text("#pwPrice")), (page_money(want_g), True))
+    same("Price watch, No: the Worker's own rule gives the same number", worker_price("ms_api", "G", 2, False, code_g, None) in (None, want_g), True)
+    page.check("input[name='pwFl'][value='yes']")
+    same("Price watch, Yes without a Florida discount: the same price and the note", (pw_price(page), "NCL isn't offering a Florida resident discount on this cabin right now, so this is the website price. If NCL offers one, the lower price counts as a drop." in page.inner_text("#pwPrice")),
+         (page_money(want_g), True))
+    page.fill("#pwEmail", "watcher@example.com")
+    check("Price watch window: no sideways scrolling at 360 px", pw_fits(page) and wide(page) <= 360, wide(page))
+    if SHOTS:
+        page.screenshot(path=os.path.join(SHOTS, "price_watch.png"))
+    page.click("#pwSend")
+    page.wait_for_selector("#pwDialog .ms-status.ok")
+    same("Price watch: one request to the Worker", [x[0] for x in sent], ["/watch"])
+    same("Price watch: the request", sent[0][1] if sent else None,
+         {"option": "G", "guests": 2, "cabins": {"G": code_g}, "florida": True, "email": "watcher@example.com", "page": f"{base}/ms_api/index.html", "turnstile": "test-token"})
+    check("Price watch: 'check your email'", "Almost done. Check your email (watcher@example.com) and open the link in it within 48 hours" in page.inner_text("#pwDialog"))
+    stored = page.evaluate("JSON.stringify(Object.assign({}, localStorage))")
+    check("Price watch: the email isn't saved in the browser", "watcher@example.com" not in stored, stored[:200])
+    page.click("#pwDialog [data-pw-close]")
+    page.wait_for_function("document.getElementById('pwDialog').innerHTML === ''", timeout=3000)
+    check("Price watch: closing clears the window", not page.is_visible("#pwDialog"))
+    check("Price watch: no script errors", not errs, errs[:3])
+    page.close()
+
+    # 2. 8 nights: both cabins, both prices added; the Worker refuses with its own words.
+    def refuse(path, body):
+        return 400, {"ok": False, "error": "limit", "message": "This email address already has 10 price watches. Stop one first (the link is in every price watch email)."}
+    page, errs, sent = pw_open("ms_api", answers=refuse)
+    page.click('button[data-watch="8"]')
+    codes = page.evaluate("SELECTIONS['8'].items.map(([s, c]) => c.code)")
+    page.check("input[name='pwFl'][value='no']")
+    want_8 = cat(gw, codes[0])["by_guests"]["2"]["cabin_total"] + cat(au, codes[1])["by_guests"]["2"]["cabin_total"]
+    same("Price watch, 8 nights: both ships added", (pw_price(page), "both ships added" in page.inner_text("#pwPrice")), (page_money(want_8), True))
+    check("Price watch, 8 nights: the title", "WHAT YOU'RE WATCHING: OPTION 3: 8 NIGHTS" in page.inner_text("#pwDialog").upper())
+    page.fill("#pwEmail", "watcher@example.com")
+    page.click("#pwSend")
+    page.wait_for_selector("#pwStatus.bad")
+    same("Price watch, 8 nights: both cabins in the request", sent[0][1]["cabins"] if sent else None, {"G": codes[0], "A": codes[1]})
+    same("Price watch: the Worker's refusal is shown as it says", page.inner_text("#pwStatus"),
+         "This email address already has 10 price watches. Stop one first (the link is in every price watch email).")
+    errs = [e for e in errs if "status of 400" not in e]   # the stand-in's refusal itself
+    check("Price watch, 8 nights: no script errors", not errs, errs[:3])
+    page.close()
+
+    # 3. A Florida discount (Getaway BF $60 off per guest, guests 1 and 2), page and Worker agree.
+    page, errs, sent = pw_open("one", stored={"adults": 2, "kids": [10], "type": "balcony", "mode": "same", "pickG": "BF"})
+    page.click('button[data-watch="G"]')
+    page.check("input[name='pwFl'][value='yes']")
+    bf3 = cat(gw, "BF")["by_guests"]["3"]["cabin_total"]
+    same("Price watch, Florida Yes: the cabin's own discount on guests 1 and 2", pw_price(page), page_money(bf3 - 120))
+    same("Price watch, Florida Yes: the Worker's own rule gives the same number", worker_price("one", "G", 3, True, "BF", None) in (None, bf3 - 120), True)
+    check("Price watch, Florida Yes: no 'no discount' note", "isn't offering" not in page.inner_text("#pwPrice"))
+    page.check("input[name='pwFl'][value='no']")
+    same("Price watch, Florida No: the website price", pw_price(page), page_money(bf3))
+    page.fill("#pwEmail", "watcher@example.com")
+    page.click("#pwSend")
+    same("Price watch, no Worker address: says nothing was sent", page.inner_text("#pwStatus"),
+         "Everything is filled in, but the price watch isn't switched on yet, so nothing was sent.")
+    page.close()
+    page, errs, sent = pw_open("both", stored={"adults": 2, "kids": [10], "type": "balcony", "mode": "same", "pickG": "BF", "pickA": "B4"})
+    page.click('button[data-watch="8"]')
+    page.check("input[name='pwFl'][value='yes']")
+    b4a = cat(au, "B4")["by_guests"]["3"]["cabin_total"]
+    same("Price watch, 8 nights with Florida discounts on both ships", pw_price(page), page_money(bf3 - 120 + b4a - 50))
+    same("Price watch, 8 nights with Florida discounts: the Worker agrees", worker_price("both", "8", 3, True, "BF", "B4") in (None, round(bf3 - 120 + b4a - 50, 2)), True)
+    check("Price watch, Florida: no script errors", not errs, errs[:3])
+    page.close()
+
+    # 4. The links in the emails.
+    watches = []
+
+    def link_answers(path, body):
+        if path == "/confirm":
+            return (404, {"ok": False, "error": "gone", "message": "This link has expired or was already used. Start the watch again from the page if you still want it."}) if body["token"] != TOKEN \
+                else (200, {"ok": True, "already": False, "watch": {"id": "w1", "label": LABEL, "price": 878, "watched": 878, "first_price": 878, "confirmed": True}})
+        if path == "/unsubscribe":
+            return 200, {"ok": True, "watch": {"id": "w1", "label": LABEL, "price": 850, "watched": 878, "first_price": 878, "confirmed": True}}
+        if body.get("stop") == "all":
+            watches.clear()
+        elif body.get("stop"):
+            watches[:] = [w for w in watches if w["id"] != body["stop"]]
+        return 200, {"ok": True, "watches": list(watches), "waiting": 1}
+
+    page, errs, sent = pw_open("ms_api", answers=link_answers, hash_=f"#confirm={TOKEN}", ready="#pwResult .ms-status")
+    text = page.inner_text("#pwDialog")
+    check("Link #confirm: 'Start your price watch' and the watch", "Start your price watch" in text and "Your price watch has started." in text
+          and "Norwegian Getaway, Jun 11 to Jun 14, 2027 (3 nights)\nCabin: Balcony, Decks 8 and 9 (BF)" in text and "Price watched: $878" in text, text[:400])
+    same("Link #confirm: the token goes to the Worker once", sent, [("/confirm", {"token": TOKEN})])
+    check("Link #confirm: the token is gone from the address bar", "#" not in page.url and TOKEN not in page.evaluate("location.href + history.state"), page.url)
+    check("Link #confirm: no sideways scrolling at 360 px", pw_fits(page) and wide(page) <= 360, wide(page))
+    if SHOTS:
+        page.screenshot(path=os.path.join(SHOTS, "price_watch_confirm.png"))
+    page.click("#pwDialog [data-pw-close]")
+    # A new link on the open page (hashchange): stop one watch.
+    page.evaluate(f"location.hash = '#unsubscribe={TOKEN}'")
+    page.wait_for_selector("#pwResult .ms-status")
+    text = page.inner_text("#pwDialog")
+    check("Link #unsubscribe: 'Stopped.' and the latest price", "Stop a price watch" in text and "Stopped. You won't get emails about this price any more." in text
+          and "Price watched: $878 (latest price $850)" in text, text[:400])
+    page.click("#pwDialog [data-pw-close]")
+    page.evaluate("location.hash = '#confirm=" + "Bad" + "x" * 40 + "'")
+    page.wait_for_selector("#pwResult .ms-status")
+    same("Link #confirm, used or expired: the Worker's words", page.inner_text("#pwResult"),
+         "This link has expired or was already used. Start the watch again from the page if you still want it.")
+    page.click("#pwDialog [data-pw-close]")
+    page.evaluate("location.hash = '#confirm=short'")
+    page.wait_for_timeout(200)
+    check("Link with a token that isn't one: nothing opens, nothing sent", not page.is_visible("#pwDialog") and len(sent) == 3, sent)
+    # Manage: two watches, stop one, then all.
+    watches[:] = [{"id": "w1", "label": LABEL, "price": 878, "watched": 878, "first_price": 878, "confirmed": True},
+                  {"id": "w2", "label": LABEL.replace("Option 1: 3 nights", "Option 2: 5 nights"), "price": 1500, "watched": 1500, "first_price": 1500, "confirmed": True}]
+    page.evaluate(f"location.hash = '#manage={TOKEN}'")
+    page.wait_for_selector("#pwResult .pw-watch")
+    text = page.inner_text("#pwDialog")
+    check("Link #manage: both watches, a stop button each, 'Stop all of them', one waiting", "Your price watches" in text and "2 price watches running for this email address:" in text
+          and text.count("Stop this watch") == 2 and "Stop all of them" in text and "1 watch is waiting for the link in its email" in text, text[:500])
+    page.click('button[data-pw-stop="w1"]')
+    page.wait_for_function("document.querySelectorAll('#pwResult .pw-watch').length === 1")
+    same("Link #manage: stop one", sent[-1], ("/manage", {"token": TOKEN, "stop": "w1"}))
+    check("Link #manage: one left, no 'Stop all' for one", "1 price watch running" in page.inner_text("#pwResult") and "Stop all" not in page.inner_text("#pwResult"))
+    watches.append({"id": "w3", "label": LABEL, "price": 900, "watched": 900, "first_price": 900, "confirmed": True})
+    page.click("#pwDialog [data-pw-close]")
+    page.evaluate(f"location.hash = '#manage={TOKEN}'")
+    page.wait_for_selector('button[data-pw-stop="all"]')
+    page.click('button[data-pw-stop="all"]')
+    page.wait_for_function("document.getElementById('pwResult').textContent.includes('no price watches running')")
+    same("Link #manage: stop all", sent[-1], ("/manage", {"token": TOKEN, "stop": "all"}))
+    check("Link #manage: no sideways scrolling at 360 px", pw_fits(page) and wide(page) <= 360, wide(page))
+    errs = [e for e in errs if "status of 404" not in e]   # the stand-in's answer to a used link
+    check("Links: no script errors", not errs, errs[:3])
+    page.close()
+    # Without the Worker's address.
+    page, errs, sent = pw_open("real", hash_=f"#manage={TOKEN}", ready="#pwResult .ms-status")
+    same("Link without the Worker's address: says so", page.inner_text("#pwResult"), "The price watch isn't switched on yet.")
     page.close()
 
 

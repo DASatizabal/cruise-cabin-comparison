@@ -40,6 +40,7 @@ before, failed party sizes, kept schema 3 prices, deposit checks that fail), and
 import datetime as dt
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -1411,6 +1412,23 @@ def test_payment():
     check("format: the release check accepts a schema 3 file", check_prices.check(old, allow_schema_3=True), [])
 
 
+def test_family_checks():
+    """Release check (5.2.0): the family alerts Worker's preview address must be off to merge."""
+    import check_release
+    on, off = 'const TEST_ORIGIN = "https://raw.githack.com";', 'const TEST_ORIGIN = "";'
+    page = lambda api, key: f'const FAMILY_API = "{api}"; const TURNSTILE_SITE_KEY = "{key}";'
+    ok = page("https://cruise-family-alerts.example.workers.dev", "0x4AAAAAAA")
+    check("release check: TEST_ORIGIN off and both page settings set", check_release.family_checks(off, ok), [])
+    check("release check: TEST_ORIGIN off and neither set", check_release.family_checks(off, page("", "")), [])
+    check("release check: TEST_ORIGIN on fails", any("TEST_ORIGIN is \"https://raw.githack.com\"" in x for x in check_release.family_checks(on, ok)), True)
+    check("release check: no TEST_ORIGIN line fails", any("is missing" in x for x in check_release.family_checks("", ok)), True)
+    check("release check: only one of the page settings fails", any("both be set" in x for x in check_release.family_checks(off, page("https://a.workers.dev", ""))), True)
+    check("release check: a trailing slash fails", any("trailing slash" in x for x in check_release.family_checks(off, page("https://a.workers.dev/", "k"))), True)
+    check("release check: http fails", any("not an https" in x for x in check_release.family_checks(off, page("http://a.workers.dev", "k"))), True)
+    with open(os.path.join(os.path.dirname(TOOLS), "tools", "family-alerts", "worker.js"), encoding="utf-8") as f:
+        check("release check: the Worker file has the TEST_ORIGIN line", bool(re.search(r'^const TEST_ORIGIN = "[^"]*";$', f.read(), re.M)), True)
+
+
 def test_no_em_dashes():
     """Owner's rule: no em dashes anywhere (code, docs, page text, steps)."""
     root = os.path.dirname(TOOLS)
@@ -1444,6 +1462,7 @@ if __name__ == "__main__":
     test_offers()
     test_payment()
     test_eastern_dates()
+    test_family_checks()
     test_no_em_dashes()
     print(f"\n{'All tests passed' if not FAILED else str(len(FAILED)) + ' FAILED: ' + '; '.join(FAILED)}")
     sys.exit(1 if FAILED else 0)
