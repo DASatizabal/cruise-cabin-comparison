@@ -917,6 +917,14 @@ with sync_playwright() as pw:
         page.click('[data-tile="A"] .tile-dates')
         st = tiles_state(page)
         same(f"{where}: all three selected, in tile order", st["cards"], ["G", "A", "8"])
+        same(f"{where}: Free at Sea first, then the cabin list, its title with a line above it (Option 2 and 8 nights)",
+             [page.eval_on_selector(f'.card[data-option="{k}"] .card-picks', """p => {
+                 const first = p.querySelector(".offers"), title = p.querySelector(".cat-list-title"), toggle = p.querySelector("button[data-mode]");
+                 const after = (a, b) => !!(a && b && (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING));
+                 const line = [...p.querySelectorAll(".cat-list-title")].map(t => getComputedStyle(t).borderTopStyle);
+                 return [p.firstElementChild.classList.contains("offers"), after(first, title), toggle ? after(first, toggle) : null, line];
+             }""") for k in ("A", "8")],
+             [[True, True, None, ["solid"]], [True, True, True, ["none", "solid"]]])
         same(f"{where}: the teal border on the Option 2 card only, with no text added",
              (page.eval_on_selector_all(".card.featured", "els => els.map(e => e.dataset.option)"),
               page.eval_on_selector('.card[data-option="A"]', "e => getComputedStyle(e).outlineStyle"),

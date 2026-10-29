@@ -523,7 +523,10 @@
         .cat-meta { font-size: 0.78rem; color: var(--gray-500); margin-top: 0.1rem; }
         .cat-code { font-size: 0.75rem; color: var(--gray-500); font-weight: 400; white-space: nowrap; }
         .card-picks { padding: 0.9rem 1.25rem 0; }
-        .card-picks .cat-list-title { margin-top: 0; }
+        /* Free at Sea first, then the cabin lists (5.2.0), each list title with a line above it */
+        .card-picks .cat-list-title, .pick-section { margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--gray-200); }
+        .card-picks > :first-child { margin-top: 0; padding-top: 0; border-top: none; }
+        .pick-section .cat-list-note + .cat-list-title { margin-top: 0.6rem; padding-top: 0; border-top: none; }
         .gty { color: #92400e; }
 
         .cat-list { list-style: none; margin-top: 0.9rem; }
@@ -1300,7 +1303,7 @@
                 } else {
                     const full = findCat(s, c.code);
                     const k = cost(s, full);
-                    picks = catPicker(s, tf.t, full, n, 0, listNote("card")) + offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`);
+                    picks = offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`) + catPicker(s, tf.t, full, n, 0, listNote("card"));
                     SELECTIONS[shipKey(s)] = { label, items: [[s, full]] };
                     body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k), onboardRows([[s, k]], false)) + ksfNote(s, full) + selectButton(shipKey(s));
                 }
@@ -1341,7 +1344,7 @@
                     <button type="button" data-mode="same" aria-pressed="${state.mode === "same"}">Same cabin on both ships</button>
                     <button type="button" data-mode="different" aria-pressed="${state.mode === "different"}">Different cabin on each ship</button>
                 </div>`;
-            let body = "", chosen = null, pickers = "";
+            let body = "", chosen = null, pickers = "", offerSets = "";
             if (state.mode === "same") {
                 const tfs = [[G, typeFor(G, state.type)], [A, typeFor(A, state.type)]];
                 const missing = tfs.filter(([, tf]) => tf.missing);
@@ -1380,7 +1383,7 @@
                 const both = { total: sum("total"), now: sum("now"), onboard: sum("onboard"),
                                missing: ks.flatMap(([s, , k]) => k.missing.map(m => `${s.ship_short} ${m}`)),
                                noTaxSplit: ks.flatMap(([, , k]) => k.noTaxSplit) };
-                pickers += ks.map(([s, c]) => offerToggles(s, c, `Free at Sea for the ${s.ship_short} cabin (its own booking)`)).join("");
+                offerSets = ks.map(([s, c]) => offerToggles(s, c, `Free at Sea for the ${s.ship_short} cabin (its own booking)`)).join("");
                 const rows = ks.map(([s, c, k]) => `
                     <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</div>
                     ${lineRows(s, k, true)}
@@ -1396,7 +1399,7 @@
                         <h2 class="card-title">Getaway, then Aura</h2>
                         <div class="card-dates">${fmtDay(G.depart)} to ${fmtDay(A.return)}, 2027 (${nights} nights)</div>
                     </div>
-                    <div class="card-picks">${toggle}${pickers}</div>
+                    <div class="card-picks">${offerSets}<div class="pick-section">${toggle}${pickers}</div></div>
                     <div class="card-body">${body}${daysList(G, "Day by day on the Getaway")}${daysList(A, "Day by day on the Aura")}</div>
                 </article>`;
         }
