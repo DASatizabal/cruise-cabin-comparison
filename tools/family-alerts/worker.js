@@ -27,7 +27,7 @@ const ORIGIN = "https://dasatizabal.github.io";
 // Temporary, for testing from a raw.githack.com preview pinned to a commit. While it is set,
 // tools/check_release.py fails, so it can't be merged: set it to "" and paste this file into the
 // Worker again before merging.
-const TEST_ORIGIN = "https://raw.githack.com";
+const TEST_ORIGIN = "";
 const TEST_PAGE = /^https:\/\/raw\.githack\.com\/DASatizabal\/cruise-cabin-comparison\/[0-9a-f]{7,40}\/index\.html$/;
 const DATA_URL = PAGE + "data/";
 const SITEVERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify";

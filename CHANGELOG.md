@@ -2,9 +2,9 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
-## [5.2.0] - unreleased
+## [5.2.0] - 2026-10-29
 
-Built on branch `family-tools-5.2.0` in the order the owner set: the DoubleUp watch, the payment data, Make Selection, then the price watch. This entry grows as each part is added.
+Built on branch `family-tools-5.2.0` in the order the owner set: the DoubleUp watch, the payment data, Make Selection, the layout changes, then the price watch. Tested by the owner from raw.githack.com previews before the merge; the preview address (`TEST_ORIGIN`) is switched off in the merged Worker.
 
 ### Added
 - DoubleUp watch (alerts to the owner only). The daily price job reads NCL's CruiseNext page (https://www.ncl.com/cruise-deals/cruisenext) once, before the prices, with `tools/fetch_offers.py`: whether the "Limited-Time Offer: DoubleUp!" banner is there, its exact text, and the cabin types and time before sailing read from that text (today: Balcony and above, at least 90 days). Wording it can't read is saved as null with a warning and never guessed. A page that can't be read keeps the previous state with a warning, never fails the price run and never opens an issue.

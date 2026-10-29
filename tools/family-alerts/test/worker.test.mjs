@@ -162,20 +162,24 @@ test("watch: refused requests store and send nothing", async () => {
   assert.equal(db.rows("watches").length + db.rows("tokens").length, 0);
 });
 
-test("watch: the githack preview works while TEST_ORIGIN is set, and not once it is empty", async () => {
+test("watch: a raw.githack.com preview works only while TEST_ORIGIN is set (testing before a merge)", async () => {
   const { env } = fresh();
   files();
-  net.tsHost = "raw.githack.com";
-  const r = await post(worker, env, "/watch", watchBody({ page: GITHACK_PAGE }), GITHACK);
-  assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.ok(lastMail().body.includes(GITHACK_PAGE + "#confirm="));
-  assert.equal((await post(worker, env, "/watch", watchBody({ page: GITHACK_PAGE }))).body.error, "request");
-  const merged = await loadWorker({ testOrigin: "" });
-  assert.equal(merged.__t.TEST_ORIGIN, "");
-  assert.equal((await post(merged, env, "/watch", watchBody({ page: GITHACK_PAGE }), GITHACK)).status, 403);
-  assert.equal((await post(merged, env, "/watch", watchBody())).body.error, "check");
-  net.tsHost = "dasatizabal.github.io";
-  assert.equal((await post(merged, env, "/watch", watchBody())).status, 200);
+  const testing = await loadWorker({ testOrigin: GITHACK });
+  try {
+    net.tsHost = "raw.githack.com";
+    const r = await post(testing, env, "/watch", watchBody({ page: GITHACK_PAGE }), GITHACK);
+    assert.equal(r.status, 200, JSON.stringify(r.body));
+    assert.ok(lastMail().body.includes(GITHACK_PAGE + "#confirm="));
+    assert.equal((await post(testing, env, "/watch", watchBody({ page: GITHACK_PAGE }))).body.error, "request");
+    // The Worker as committed: no preview address.
+    assert.equal(worker.__t.TEST_ORIGIN, "");
+    assert.equal((await post(worker, env, "/watch", watchBody({ page: GITHACK_PAGE }), GITHACK)).status, 403);
+    assert.equal((await post(worker, env, "/watch", watchBody())).body.error, "check", "Turnstile solved on raw.githack.com");
+  } finally {
+    net.tsHost = "dasatizabal.github.io";
+  }
+  assert.equal((await post(worker, env, "/watch", watchBody())).status, 200);
 });
 
 test("watch: 3 unconfirmed a day and 10 watches per email address", async () => {
@@ -516,8 +520,8 @@ test("the Worker's logs hold nothing personal; it calls no other address", async
   assert.ok(net.calls.every(u => !/ncl\.com/i.test(u)));
 });
 
-test("the Worker file: TEST_ORIGIN line and no em dash", () => {
+test("the Worker file: TEST_ORIGIN off and no em dash", () => {
   const src = readFileSync(new URL("tools/family-alerts/worker.js", REPO), "utf-8");
-  assert.match(src, /^const TEST_ORIGIN = "(https:\/\/raw\.githack\.com)?";$/m);
+  assert.match(src, /^const TEST_ORIGIN = "";$/m, "the preview address is switched off in the committed Worker");
   assert.ok(!src.includes(EM_DASH));
 });
