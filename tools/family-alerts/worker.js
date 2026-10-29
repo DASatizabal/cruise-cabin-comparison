@@ -12,6 +12,9 @@
 //   /booking      Make Selection: checks Turnstile, emails David the request and the sender a
 //                 copy. Nothing from a booking request is stored or logged.
 // Cron triggers (UTC): "30 12 * * *" and "30 17 * * *", after the price and count refreshes.
+// A watch is one cabin on one ship at one party size (the 8 night card has one per ship), with
+// the person's choices: the drop per guest that counts, whether to email when only a few cabins
+// are left and when it sells out, and as soon as it happens or at most once a day (mornings).
 //
 // Binding: DB (the D1 database cruise-family-alerts; the tables are created here on first use).
 // Secrets: TURNSTILE_SECRET, APPS_SCRIPT_URL, APPS_SCRIPT_SECRET. Never put them in this repo.
@@ -42,7 +45,7 @@ const MAX_NEW_PER_DAY = 3;     // unconfirmed watches per email address in 24 ho
 const CONFIRM_HOURS = 48;      // an unconfirmed watch is deleted after this
 const FEW_LEFT = 10;           // "only X left" below this (the page's rule)
 const COUNTS_MAX_DAYS = 7, FL_MAX_DAYS = 15, FL_MIN_OFF = 1;   // the page's rules
-const MIN_DROP = 1;            // dollars
+const DROP_MIN = 1, DROP_MAX = 1000;   // dollars per guest the person may choose (the page offers $20)
 const MAX_BODY = 32768;
 const CHANGE_TEXT = "Prices can change until NCL confirms the booking.";
 const PRICE_TEXT = "The price watched is the cruise fare with taxes, fees and port expenses for the guests in the cabin, before gratuities and Free at Sea extras.";
@@ -51,11 +54,12 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS watches (
-     id TEXT PRIMARY KEY, email TEXT NOT NULL, option TEXT NOT NULL, guests INTEGER NOT NULL,
-     florida INTEGER NOT NULL, cabins TEXT NOT NULL, label TEXT NOT NULL, page TEXT NOT NULL,
-     baseline REAL NOT NULL, first_price REAL NOT NULL, last_price REAL, created_at TEXT NOT NULL,
-     confirmed_at TEXT, checked_key TEXT, few_sent INTEGER NOT NULL DEFAULT 0,
-     sold_out_sent INTEGER NOT NULL DEFAULT 0)`,
+     id TEXT PRIMARY KEY, email TEXT NOT NULL, option TEXT NOT NULL, ship TEXT NOT NULL,
+     code TEXT NOT NULL, guests INTEGER NOT NULL, florida INTEGER NOT NULL, drop_pp REAL NOT NULL,
+     few INTEGER NOT NULL, sold_out INTEGER NOT NULL, frequency TEXT NOT NULL, label TEXT NOT NULL,
+     page TEXT NOT NULL, baseline REAL NOT NULL, first_price REAL NOT NULL, last_price REAL,
+     created_at TEXT NOT NULL, confirmed_at TEXT, checked_key TEXT, checked_day TEXT,
+     few_sent INTEGER NOT NULL DEFAULT 0, sold_out_sent INTEGER NOT NULL DEFAULT 0)`,
   "CREATE INDEX IF NOT EXISTS watches_email ON watches (email)",
   // Only the SHA-256 of each token is kept; the token itself is only in the email.
   "CREATE TABLE IF NOT EXISTS tokens (hash TEXT PRIMARY KEY, kind TEXT NOT NULL, watch_id TEXT, email TEXT, created_at TEXT NOT NULL)",
@@ -110,6 +114,10 @@ const refuse = (error, message, status = 400) => [{ ok: false, error, message },
 const schemaReady = new WeakSet();
 async function ensureSchema(env) {
   if (schemaReady.has(env.DB)) return;
+  // The first test version (2026-10-29) kept both 8 night cabins in one watch and had no choices.
+  // Its watches (test watches only) can't be carried over, so its tables are replaced.
+  const old = await env.DB.prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'watches'").first("sql");
+  if (old && old.includes("cabins TEXT")) await env.DB.batch([env.DB.prepare("DROP TABLE watches"), env.DB.prepare("DROP TABLE IF EXISTS tokens")]);
   await env.DB.batch(SCHEMA.map(s => env.DB.prepare(s)));
   schemaReady.add(env.DB);
 }
@@ -185,43 +193,43 @@ function flOff(florida, ship, code, now) {
   return e.off_pp >= FL_MIN_OFF ? e.off_pp : 0;
 }
 
-// The watched price, the same as Make Selection's "Price without gratuities": NCL's cabin price
-// for the party (fare with taxes, fees and port expenses), minus the cabin's own Florida
-// discount on guests 1 and 2 (never more than the fare) when the watch is for the Florida
-// resident price. 8 nights: both ships added.
+// The watched price: NCL's cabin price for the party (fare with taxes, fees and port expenses),
+// minus the cabin's own Florida discount on guests 1 and 2 (never more than the fare) when the
+// watch is for the Florida resident price. One cabin on one ship.
 function priceNow(data, w, now) {
-  const n = w.guests, parts = [];
-  for (const key of OPTIONS[w.option].ships) {
-    const ship = shipOf(data.prices, key);
-    const found = ship && findCategory(ship, w.cabins[key]);
-    const e = found && found.cat.by_guests && found.cat.by_guests[String(n)];
-    const ps = ship && ship.party_sizes && ship.party_sizes[String(n)];
-    const part = { key, ship, cat: found ? found.cat : null, type: found ? found.type : null,
-                   updated: !!ship && !(ps && ps.updated === false),
-                   available: !!(e && e.available && Number.isFinite(e.cabin_total)),
-                   reason: !found ? "no longer on NCL's list" : e && e.reason ? e.reason : "not available" };
-    if (part.available) {
-      const taxes = Number.isFinite(ship.taxes_per_guest) ? ship.taxes_per_guest * n : null;
-      const fare = taxes === null ? e.cabin_total : e.cabin_total - taxes;
-      part.discount = w.florida ? Math.min(flOff(data.florida, ship, found.cat.code, now) * Math.min(n, 2), fare) : 0;
-      part.price = e.cabin_total - part.discount;
-    }
-    parts.push(part);
+  const n = w.guests;
+  const ship = shipOf(data.prices, w.ship);
+  const found = ship && findCategory(ship, w.code);
+  const e = found && found.cat.by_guests && found.cat.by_guests[String(n)];
+  const ps = ship && ship.party_sizes && ship.party_sizes[String(n)];
+  const p = { ship, cat: found ? found.cat : null, type: found ? found.type : null,
+              updated: !!ship && !(ps && ps.updated === false),
+              available: !!(e && e.available && Number.isFinite(e.cabin_total)),
+              reason: !found ? "no longer on NCL's list" : e && e.reason ? e.reason : "not available", price: null };
+  if (p.available) {
+    const taxes = Number.isFinite(ship.taxes_per_guest) ? ship.taxes_per_guest * n : null;
+    const fare = taxes === null ? e.cabin_total : e.cabin_total - taxes;
+    p.price = cents(e.cabin_total - (w.florida ? Math.min(flOff(data.florida, ship, found.cat.code, now) * Math.min(n, 2), fare) : 0));
   }
-  return { parts, price: parts.every(p => p.available) ? cents(parts.reduce((t, p) => t + p.price, 0)) : null };
+  return p;
 }
 
 // What the watch is, for the emails and the page (no personal data).
-function watchLabel(pr, w) {
-  const lines = [OPTIONS[w.option].label];
-  for (const p of pr.parts) {
-    lines.push(`${p.ship.ship}, ${fmtDay(p.ship.depart)} to ${fmtIso(p.ship.return)} (${plural(p.ship.nights, "night", "nights")})`,
-               `Cabin: ${p.cat.description || p.cat.title} (${p.cat.code})${p.cat.guarantee ? `. ${GUARANTEE_TEXT}` : ""}`);
-  }
-  lines.push(`${w.guests} guests, ${w.florida ? "Florida resident price (when NCL offers one on this cabin)" : "website price"}`);
-  return lines.join("\n");
+function watchLabel(p, w) {
+  return [`${OPTIONS[w.option].label}${w.option === "8" ? `, the ${p.ship.ship_short} cabin` : ""}`,
+          `${p.ship.ship}, ${fmtDay(p.ship.depart)} to ${fmtIso(p.ship.return)} (${plural(p.ship.nights, "night", "nights")})`,
+          `Cabin: ${p.cat.description || p.cat.title} (${p.cat.code})${p.cat.guarantee ? `. ${GUARANTEE_TEXT}` : ""}`,
+          `${w.guests} guests, ${w.florida ? "Florida resident price (when NCL offers one on this cabin)" : "website price"}`].join("\n");
 }
-const rowWatch = row => ({ option: row.option, guests: row.guests, florida: !!row.florida, cabins: JSON.parse(row.cabins) });
+// The person's choices, in words (emails and the page's manage list say the same).
+function choicesText(w) {
+  return [`an email when the price drops by at least ${money(w.drop_pp)} per guest (${money(w.drop_pp * w.guests)} for the cabin)`,
+          w.few ? `an email when fewer than ${FEW_LEFT} of these cabins are left` : null,
+          w.sold_out ? `an email if it is no longer available for ${w.guests} guests` : null,
+          w.frequency === "daily" ? "at most one email a day, in the morning" : "emails as soon as a check finds something (prices are checked twice a day)"].filter(Boolean);
+}
+const rowWatch = row => ({ option: row.option, ship: row.ship, code: row.code, guests: row.guests, florida: !!row.florida,
+                           drop_pp: row.drop_pp, few: !!row.few, sold_out: !!row.sold_out, frequency: row.frequency });
 const linkTo = (page, kind, token) => `${page}#${kind}=${token}`;
 
 // ---------- email (the owner's Apps Script) ----------
@@ -270,28 +278,28 @@ async function startWatch(env, body, req) {
   const now = new Date();
   const email = cleanEmail(body.email);
   if (!email) return refuse("email", "Enter a valid email address.");
+  const BAD = ["request", "The request didn't look right, so nothing was done. Please reload the page and try again."];
   const opt = OPTIONS[body.option];
   const n = body.guests;
-  if (!opt || !Number.isInteger(n) || n < 2 || n > 5 || typeof body.florida !== "boolean" || !body.cabins || typeof body.cabins !== "object") {
-    return refuse("request", "The request didn't look right, so nothing was done. Please reload the page and try again.");
-  }
-  const cabins = {};
-  for (const key of opt.ships) {
-    const code = body.cabins[key];
-    if (typeof code !== "string" || !/^[A-Z0-9]{1,4}$/.test(code)) return refuse("request", "The request didn't look right, so nothing was done. Please reload the page and try again.");
-    cabins[key] = code;
+  if (!opt || !opt.ships.includes(body.ship) || typeof body.cabin !== "string" || !/^[A-Z0-9]{1,4}$/.test(body.cabin) ||
+      !Number.isInteger(n) || n < 2 || n > 5 || typeof body.florida !== "boolean" || typeof body.few !== "boolean" ||
+      typeof body.sold_out !== "boolean" || !["now", "daily"].includes(body.frequency)) return refuse(...BAD);
+  if (typeof body.drop_pp !== "number" || !Number.isFinite(body.drop_pp) || body.drop_pp < DROP_MIN || body.drop_pp > DROP_MAX) {
+    return refuse("drop", `Choose a drop from ${money(DROP_MIN)} to ${money(DROP_MAX)} per guest.`);
   }
   const page = pageFor(body.page, req.origin);
-  if (!page) return refuse("request", "The request didn't look right, so nothing was done. Please reload the page and try again.");
+  if (!page) return refuse(...BAD);
   if (!(await turnstileOk(env, body.turnstile, req.ip))) return refuse("check", "The check above the button didn't pass. Please try it again.");
   if (easternDay(now) >= END_DAY) return refuse("ended", "The cruise has started, so prices are no longer watched.");
 
   const data = await loadData(now);
   if (!data.prices) return refuse("data", "The prices couldn't be read right now. Please try again in a few minutes.", 503);
-  const w = { option: body.option, guests: n, florida: body.florida, cabins };
-  const pr = priceNow(data, w, now);
-  if (pr.parts.some(p => !p.cat)) return refuse("cabin", "That cabin isn't on NCL's list today, so there is no price to watch. Please reload the page.");
-  if (pr.price === null) return refuse("unavailable", `That cabin isn't available for ${n} guests today, so there is no price to watch.`);
+  const w = { option: body.option, ship: body.ship, code: body.cabin, guests: n, florida: body.florida, drop_pp: cents(body.drop_pp),
+              few: body.few, sold_out: body.sold_out, frequency: body.frequency };
+  const p = priceNow(data, w, now);
+  if (!p.cat) return refuse("cabin", "That cabin isn't on NCL's list today, so there is no price to watch. Please reload the page.");
+  if (p.price === null) return refuse("unavailable", `That cabin isn't available for ${n} guests today, so there is no price to watch.`);
+  if (p.cat.guarantee) w.few = false;   // NCL doesn't show how many Guarantee cabins are left
 
   const day = new Date(now.getTime() - 86400000).toISOString(), live = new Date(now.getTime() - CONFIRM_HOURS * 3600000).toISOString();
   const active = await env.DB.prepare("SELECT COUNT(*) AS n FROM watches WHERE email = ? AND (confirmed_at IS NOT NULL OR created_at > ?)").bind(email, live).first("n");
@@ -300,20 +308,21 @@ async function startWatch(env, body, req) {
   if (fresh >= MAX_NEW_PER_DAY) return refuse("daily", `This email address has ${MAX_NEW_PER_DAY} watches waiting for their confirmation link today. Open those emails first, or try again tomorrow.`);
 
   const id = newToken();
-  const label = watchLabel(pr, w);
+  const label = watchLabel(p, w);
   const confirm = await tokenRow(env, "confirm", { watchId: id });
   const mng = await tokenRow(env, "manage", { email });
   await env.DB.batch([
-    env.DB.prepare("INSERT INTO watches (id, email, option, guests, florida, cabins, label, page, baseline, first_price, last_price, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-      .bind(id, email, w.option, n, w.florida ? 1 : 0, JSON.stringify(cabins), label, page, pr.price, pr.price, pr.price, now.toISOString()),
+    env.DB.prepare("INSERT INTO watches (id, email, option, ship, code, guests, florida, drop_pp, few, sold_out, frequency, label, page, baseline, first_price, last_price, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+      .bind(id, email, w.option, w.ship, w.code, n, w.florida ? 1 : 0, w.drop_pp, w.few ? 1 : 0, w.sold_out ? 1 : 0, w.frequency, label, page, p.price, p.price, p.price, now.toISOString()),
     confirm.stmt, mng.stmt,
   ]);
   const text = [
     "Hi,", "",
     "Someone (hopefully you) asked to watch this price on David's cruise page:", "",
-    label, `Price today: ${money(pr.price)} (prices as of ${fmtEastern(data.prices.saved_at)})`, "",
+    label, `Price today: ${money(p.price)} for the cabin (${money(p.price / n)} per guest), prices as of ${fmtEastern(data.prices.saved_at)}`, "",
     `To start the watch, open this link within ${CONFIRM_HOURS} hours:`, linkTo(page, "confirm", confirm.token), "",
-    `You'll get an email when this price drops by ${money(MIN_DROP)} or more, once when fewer than ${FEW_LEFT} of these cabins are left, and once if it is no longer available for ${n} guests. Prices are checked twice a day. Watches end on ${fmtIso(END_DAY)}.`,
+    "You asked for:", ...choicesText(w).map(x => `- ${x}`),
+    `After a price drop email, the new price is the one watched. The few left and no longer available emails are sent once. Watches end on ${fmtIso(END_DAY)}.`,
     PRICE_TEXT, "",
     "If you didn't ask for this, ignore this email: nothing is watched unless the link is opened, and your address is deleted after 48 hours.", "",
     `See or stop your price watches: ${linkTo(page, "manage", mng.token)}`,
@@ -326,11 +335,11 @@ async function startWatch(env, body, req) {
     return refuse("mail", "The email couldn't be sent right now, so nothing was saved. Please try again later.", 503);
   }
   console.log("/watch: a watch is waiting for its confirmation link");
-  return [{ ok: true, price: pr.price, hours: CONFIRM_HOURS }];
+  return [{ ok: true, price: p.price, hours: CONFIRM_HOURS }];
 }
 
 const publicWatch = row => ({ id: row.id, label: row.label, price: row.last_price, watched: row.baseline, first_price: row.first_price,
-                              confirmed: !!row.confirmed_at, started: row.confirmed_at });
+                              guests: row.guests, choices: choicesText(rowWatch(row)), confirmed: !!row.confirmed_at, started: row.confirmed_at });
 
 // ---------- /confirm ----------
 async function confirmWatch(env, body) {
@@ -342,13 +351,18 @@ async function confirmWatch(env, body) {
     await env.DB.batch([env.DB.prepare("DELETE FROM tokens WHERE watch_id = ?").bind(row.id), env.DB.prepare("DELETE FROM watches WHERE id = ?").bind(row.id)]);
     return refuse("gone", "This link has expired or was already used. Start the watch again from the page if you still want it.", 404);
   }
-  // The same watch already running for this address: keep that one.
-  const twin = await env.DB.prepare("SELECT * FROM watches WHERE email = ? AND option = ? AND guests = ? AND florida = ? AND cabins = ? AND confirmed_at IS NOT NULL AND id <> ?")
-    .bind(row.email, row.option, row.guests, row.florida, row.cabins, row.id).first();
+  // The same cabin already watched for this address: keep that watch and its price, with the
+  // new choices.
+  const twin = await env.DB.prepare("SELECT * FROM watches WHERE email = ? AND ship = ? AND code = ? AND guests = ? AND florida = ? AND confirmed_at IS NOT NULL AND id <> ?")
+    .bind(row.email, row.ship, row.code, row.guests, row.florida, row.id).first();
   if (twin) {
-    await env.DB.batch([env.DB.prepare("DELETE FROM tokens WHERE watch_id = ?").bind(row.id), env.DB.prepare("DELETE FROM watches WHERE id = ?").bind(row.id)]);
-    console.log("/confirm: already watched");
-    return [{ ok: true, already: true, watch: publicWatch(twin) }];
+    await env.DB.batch([
+      env.DB.prepare("UPDATE watches SET drop_pp = ?, few = ?, sold_out = ?, frequency = ?, option = ?, label = ?, page = ? WHERE id = ?")
+        .bind(row.drop_pp, row.few, row.sold_out, row.frequency, row.option, row.label, row.page, twin.id),
+      env.DB.prepare("DELETE FROM tokens WHERE watch_id = ?").bind(row.id), env.DB.prepare("DELETE FROM watches WHERE id = ?").bind(row.id)]);
+    console.log("/confirm: already watched, choices updated");
+    const { drop_pp, few, sold_out, frequency, option, label, page } = row;
+    return [{ ok: true, already: true, watch: publicWatch({ ...twin, drop_pp, few, sold_out, frequency, option, label, page }) }];
   }
   await env.DB.batch([env.DB.prepare("UPDATE watches SET confirmed_at = ? WHERE id = ?").bind(now.toISOString(), row.id),
                       env.DB.prepare("DELETE FROM tokens WHERE watch_id = ? AND kind = 'confirm'").bind(row.id)]);
@@ -401,30 +415,27 @@ async function cleanUp(env, now) {
 // What changed for one watch. Nothing is decided on a party size NCL didn't update today.
 function evaluate(data, row, now) {
   const w = rowWatch(row), n = w.guests;
-  const pr = priceNow(data, w, now);
-  if (pr.parts.some(p => !p.updated)) return { skip: true };
+  const p = priceNow(data, w, now);
+  if (!p.updated) return { skip: true };
   const items = [], set = {};
-  const gone = pr.parts.filter(p => !p.available);
-  if (gone.length) {
-    if (!row.sold_out_sent) {
-      for (const p of gone) items.push(`No longer available for ${n} guests on the ${p.ship.ship} (NCL: ${p.reason}). You won't get this email again; the watch stays on in case it comes back.`);
+  if (!p.available) {
+    if (w.sold_out && !row.sold_out_sent) {
+      items.push(`No longer available for ${n} guests (NCL: ${p.reason}). You won't get this email again; the watch stays on in case it comes back.`);
       set.sold_out_sent = 1;
     }
-  } else {
-    set.last_price = pr.price;
-    if (pr.price <= row.baseline - MIN_DROP) {
-      items.push(`Price drop: ${money(row.baseline)} to ${money(pr.price)} (${money(row.baseline - pr.price)} less). From now on the watch compares with ${money(pr.price)}.`);
-      set.baseline = pr.price;
-    }
+    return { items, set, drop: false };
   }
-  if (data.counts && !row.few_sent && !gone.length) {
-    for (const p of pr.parts) {
-      const c = !p.cat.guarantee && data.counts.sailings[p.ship.id] && data.counts.sailings[p.ship.id][p.cat.code];
-      const g = c && c.by_guests && c.by_guests[String(n)];
-      if (g && g.reliable && Number.isInteger(g.cabins_left) && g.cabins_left >= 1 && g.cabins_left < FEW_LEFT) {
-        items.push(`Only ${g.cabins_left} of these cabins left on the ${p.ship.ship} for ${n} guests (cabins left as of ${fmtIso(easternDay(new Date(data.counts.saved_at)))}). You won't get this email again.`);
-        set.few_sent = 1;
-      }
+  set.last_price = p.price;
+  if (row.baseline - p.price >= w.drop_pp * n - 0.005) {
+    items.push(`Price drop: ${money(row.baseline)} to ${money(p.price)} for the cabin, ${money(row.baseline - p.price)} less (${money((row.baseline - p.price) / n)} per guest). From now on the watch compares with ${money(p.price)}.`);
+    set.baseline = p.price;
+  }
+  if (data.counts && w.few && !row.few_sent && !p.cat.guarantee) {
+    const c = data.counts.sailings[p.ship.id] && data.counts.sailings[p.ship.id][p.cat.code];
+    const g = c && c.by_guests && c.by_guests[String(n)];
+    if (g && g.reliable && Number.isInteger(g.cabins_left) && g.cabins_left >= 1 && g.cabins_left < FEW_LEFT) {
+      items.push(`Only ${g.cabins_left} of these cabins left for ${n} guests (cabins left as of ${fmtIso(easternDay(new Date(data.counts.saved_at)))}). You won't get this email again.`);
+      set.few_sent = 1;
     }
   }
   return { items, set, drop: set.baseline !== undefined };
@@ -446,7 +457,11 @@ async function runChecks(env, now) {
   // A watch is checked once per new prices file (or counts file). One whose email couldn't be
   // sent keeps its old key, so the next run tries again.
   const key = `${data.prices.saved_at}|${data.counts ? data.counts.saved_at : ""}`;
-  const rows = (await env.DB.prepare("SELECT * FROM watches WHERE confirmed_at IS NOT NULL AND (checked_key IS NULL OR checked_key <> ?)").bind(key).all()).results;
+  // "Once a day" watches are checked once per Eastern day (the morning check), the others on
+  // every check.
+  const today = easternDay(now);
+  const due = (await env.DB.prepare("SELECT * FROM watches WHERE confirmed_at IS NOT NULL AND (checked_key IS NULL OR checked_key <> ?)").bind(key).all()).results;
+  const rows = due.filter(r => r.frequency !== "daily" || r.checked_day !== today);
   const quiet = [], byEmail = new Map();
   let skipped = 0;
   for (const row of rows) {
@@ -457,8 +472,8 @@ async function runChecks(env, now) {
   }
   const update = (row, ev) => {
     const v = { ...row, ...ev.set };
-    return env.DB.prepare("UPDATE watches SET last_price = ?, baseline = ?, few_sent = ?, sold_out_sent = ?, checked_key = ? WHERE id = ?")
-      .bind(v.last_price, v.baseline, v.few_sent, v.sold_out_sent, key, row.id);
+    return env.DB.prepare("UPDATE watches SET last_price = ?, baseline = ?, few_sent = ?, sold_out_sent = ?, checked_key = ?, checked_day = ? WHERE id = ?")
+      .bind(v.last_price, v.baseline, v.few_sent, v.sold_out_sent, key, today, row.id);
   };
   if (quiet.length) await env.DB.batch(quiet.map(([row, ev]) => update(row, ev)));
 
@@ -491,8 +506,8 @@ async function runChecks(env, now) {
       await env.DB.batch(hashes.map(h => env.DB.prepare("DELETE FROM tokens WHERE hash = ?").bind(h)));
     }
   }
-  console.log(`checks: ${rows.length} watches to check, ${skipped} skipped (prices not updated for that party size), ${sent.filter(Boolean).length} emails sent, ${waiting} alerts waiting for the next run`);
-  return { checked: rows.length, skipped, sent: sent.filter(Boolean).length, waiting };
+  console.log(`checks: ${rows.length} watches to check, ${due.length - rows.length} once a day watches already checked today, ${skipped} skipped (prices not updated for that party size), ${sent.filter(Boolean).length} emails sent, ${waiting} alerts waiting for the next run`);
+  return { checked: rows.length, later: due.length - rows.length, skipped, sent: sent.filter(Boolean).length, waiting };
 }
 
 // ---------- /booking (Make Selection) ----------
@@ -508,6 +523,8 @@ function str(v, max, optional = false) {
   return s;
 }
 const num = v => v === null ? null : typeof v === "number" && Number.isFinite(v) && Math.abs(v) < 1e6 ? v : fail();
+// One line of the window's price breakdown, as the page shows it ("Cruise fare", "$3,138").
+const line = x => { obj(x); return { item: str(x.item, 300), value: str(x.value, 60) }; };
 const bool = v => typeof v === "boolean" ? v : fail();
 const int = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi ? v : fail();
 const oneOf = (v, list) => list.includes(v) ? v : fail();
@@ -538,8 +555,7 @@ function readBooking(b) {
       ship: oneOf(k.ship, Object.values(SHIP_NAMES)), depart: isoDate(k.depart), return: isoDate(k.return), nights: int(k.nights, 1, 30),
       cabin_type: str(k.cabin_type, 60), category: str(k.category, 8), description: str(k.description, 300), guarantee: bool(k.guarantee),
       free_at_sea: { bar: bool(fas.bar), dining: bool(fas.dining), plus: bool(fas.plus) },
-      fare: num(k.fare), taxes: num(k.taxes), florida_discount: num(k.florida_discount), price: num(k.price_without_gratuities),
-      not_in_price: list(k.not_in_price, 0, 8).map(x => ({ item: str(obj(x).item, 200), amount: num(x.amount), paid: oneOf(x.paid, ["onboard", "with the balance"]) })),
+      lines: list(k.lines, 1, 12).map(line), price: num(k.total), onboard: list(k.onboard, 0, 1).map(line),
       choice: oneOf(k.deposit_choice, ["ncl", "credit1", "credit2"]),
       deposit: dep && { amount: num(dep.amount), rule: str(dep.rule, 200, true), hours: num(dep.due_hours), offer: dep.offer === null ? null : str(dep.offer, 120) },
       credits: int(k.credits, 0, 2), credit_value: num(k.credit_value), due: num(k.due_at_booking), balance: num(k.balance),
@@ -598,11 +614,8 @@ function bookingText(b, full) {
     out.push("", `${b.bookings.length > 1 ? `Booking ${i + 1}: ` : ""}${k.ship}, ${fmtDay(k.depart)} to ${fmtIso(k.return)} (${plural(k.nights, "night", "nights")})`,
              `Cabin: ${k.cabin_type}: ${k.description} (${k.category})${k.guarantee ? `. ${GUARANTEE_TEXT}` : ""}`,
              `Free at Sea: Unlimited Open Bar ${yes(k.free_at_sea.bar)}, Specialty Dining ${yes(k.free_at_sea.dining)}, Free at Sea Plus ${yes(k.free_at_sea.plus)}`);
-    if (k.taxes === null) out.push(`Cruise fare with taxes, fees and port expenses: ${amount(k.price === null ? null : k.price + (k.florida_discount || 0))}`);
-    else out.push(`Cruise fare: ${amount(k.fare)}`, `Taxes, fees and port expenses: ${amount(k.taxes)}`);
-    if (k.florida_discount) out.push(`Florida resident rate: ${money(k.florida_discount)} off the fare`);
-    out.push(`Price without gratuities: ${amount(k.price)}`);
-    if (k.not_in_price.length) out.push("Not in this price:", ...k.not_in_price.map(x => `  ${x.item}: ${x.amount === null ? "not found on NCL today" : money(x.amount)} (${x.paid})`));
+    out.push(...k.lines.map(x => `${x.item}: ${x.value}`), `Total: ${amount(k.price)}`);
+    if (k.onboard.length) out.push(...k.onboard.map(x => `${x.item}: ${x.value}`), "  Can be removed at Guest Services.");
     out.push(`Deposit: ${depositText(k)}`);
     if (k.credits) out.push(`CruiseNext ${k.credits === 2 ? "credits" : "credit"} toward the cruise: ${amount(k.credit_value)}`);
     out.push(`Paid to NCL at booking: ${amount(k.due)}`, `Balance, ${dueText(k)}: ${amount(k.balance)}`);
@@ -610,7 +623,7 @@ function bookingText(b, full) {
   });
   if (b.bookings.length > 1) {
     const sum = f => b.bookings.some(k => k[f] === null) ? null : b.bookings.reduce((t, k) => t + k[f], 0);
-    out.push("", "Both bookings together", `Price without gratuities: ${amount(sum("price"))}`, `Paid to NCL at booking: ${amount(sum("due"))}`, `Balances: ${amount(sum("balance"))}`);
+    out.push("", "Both bookings together", `Total: ${amount(sum("price"))}`, `Paid to NCL at booking: ${amount(sum("due"))}`, `Balances: ${amount(sum("balance"))}`);
     const david = sum("pay_david");
     if (david) out.push(`Pay David for the credits: ${money(david)}`);
   }

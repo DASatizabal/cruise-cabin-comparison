@@ -2,11 +2,11 @@
 
 `worker.js` is the Cloudflare Worker `cruise-family-alerts`, separate from the Deck Finder Worker and from `cruise-refresh-trigger`. It runs the family price watch ("Watch this price" on the page) and sends the Make Selection booking requests. `apps-script/Code.gs` is the Apps Script that sends its emails from the owner's Gmail. NOTES.md, "Family price watch and booking emails".
 
-- **What is stored:** price watches only, in the Cloudflare D1 database `cruise-family-alerts`: the email address, the option, cabin codes, party size, Florida answer, prices and dates. Links in the emails carry random tokens; only their SHA-256 is stored. Unconfirmed watches are deleted after 48 hours, a stopped watch at once, everything from Jun 11, 2027 (Eastern). Booking requests are never stored or logged: the Worker checks them, builds the two emails and drops them.
+- **What is stored:** price watches only, in the Cloudflare D1 database `cruise-family-alerts`: the email address, the option, ship and cabin code, party size, Florida answer, the person's choices (drop per guest, few left, sold out, how often), prices and dates. Links in the emails carry random tokens; only their SHA-256 is stored. Unconfirmed watches are deleted after 48 hours, a stopped watch at once, everything from Jun 11, 2027 (Eastern). Booking requests are never stored or logged: the Worker checks them, builds the two emails and drops them.
 - **Who can call it:** only the page's address, `https://dasatizabal.github.io` (plus `https://raw.githack.com` while `TEST_ORIGIN` is set for testing). Starting a watch and sending a booking request need Cloudflare Turnstile.
 - **Secrets:** only in Cloudflare (Worker secrets `TURNSTILE_SECRET`, `APPS_SCRIPT_URL`, `APPS_SCRIPT_SECRET`) and in the Apps Script (Script Properties, `SHARED_SECRET`, the same value as `APPS_SCRIPT_SECRET`). Never in this repo, a note, an email or a file. The owner's email address is in no file and no setting: the Apps Script sends "owner" mail to the account it runs as.
 - **Email limits:** a free Gmail account can send 100 emails a day from Apps Script. Price watch emails always leave 20 of them for booking requests; an alert that can't be sent waits for the next check. A booking request is sent whole (David's email and the sender's copy) or not at all.
-- **Checks:** cron triggers `30 12 * * *` and `30 17 * * *` (UTC, after the price and count refreshes) read the published `data/prices.json`, `data/counts.json` and `data/florida.json`. No NCL calls. A price is checked once per new prices file, and never on a party size NCL didn't update that day.
+- **Checks:** cron triggers `30 12 * * *` and `30 17 * * *` (UTC, after the price and count refreshes) read the published `data/prices.json`, `data/counts.json` and `data/florida.json`. No NCL calls. A price is checked once per new prices file, and never on a party size NCL didn't update that day. "At most once a day" watches are checked only on the morning check.
 - **Logs:** counts and fixed words only. Never an email address, a name, a token or anything from a booking request.
 - **Tests:** `node --test "tools/family-alerts/test/*.test.mjs"` (Node 22.13 or later; a stand-in for D1, the data files, Turnstile and the Apps Script; no network). The release check fails while `TEST_ORIGIN` is set.
 
@@ -73,7 +73,7 @@ Claude sets `FAMILY_API` and `TURNSTILE_SITE_KEY` in `index.html`, commits on th
 
 ### 6. Test from the preview
 
-1. Open the preview link on your phone. Pick an option, set the guests, and tap "Watch this price". Answer the Florida question, type your email, wait for the check above the button to show a tick, and tap "Start watching".
+1. Open the preview link on your phone. Pick an option, set the guests, and tap "Watch this price". Answer the Florida question, leave or change the drop amount, the two ticks and how often, type your email, wait for the check above the button to show a tick, and tap "Start watching".
 2. Open the email "Confirm your cruise price watch" and tap the first link. The page opens with "Your price watch has started."
 3. In the same email, tap the last link ("See or stop your price watches"). The page lists the watch with a "Stop this watch" button. Leave it running for the cron test.
 4. Tap "Make Selection" on a card, fill everything in with test names (not real ones) and your own email as the sender, and tap "Send my selection to David". Gmail gets "Booking request: ..." (David's full copy) and "Your cruise selection was sent to David" (no dates of birth, no Latitudes numbers).

@@ -604,6 +604,10 @@ with sync_playwright() as pw:
     def dialog_fits(page):
         return page.evaluate("(() => { const d = document.getElementById('msDialog'); return d.scrollWidth <= d.clientWidth; })()")
 
+    def page_money(x):
+        r = round(x * 100) / 100
+        return f"${r:,.0f}" if r == int(r) else f"${r:,.2f}"
+
     def booking_rows(page, key):
         box = page.query_selector(f"#msMath [data-booking='{key}']")
         return [(r.query_selector(".k").inner_text(), r.query_selector(".v").inner_text()) for r in box.query_selector_all(".row")]
@@ -645,11 +649,19 @@ with sync_playwright() as pw:
     rows = booking_rows(page, "G")
     bf = cat(gw, "BF")["by_guests"]["2"]
     fare, taxes = bf["cabin_total"] - 2 * gw["taxes_per_guest"], 2 * gw["taxes_per_guest"]
-    same("Make Selection: price without gratuities = fare + taxes", [r for r in rows[:3]],
-         [("Cruise fare", f"${fare:,}"), (f"Taxes, fees and port expenses: 2 x ${gw['taxes_per_guest']:g}", f"${taxes:,}"), ("Price without gratuities", f"${bf['cabin_total']:,}")])
-    labels = [k for k, v in rows]
-    check("Make Selection: gratuities listed below the price, not added",
-          any(k.startswith("Unlimited Open Bar") for k in labels) and any(k.startswith("Service charges") for k in labels), labels)
+    card_total = money(page.inner_text('.card[data-option="G"] .price-total'))
+    card_rows = [(r.query_selector(".k").inner_text(), r.query_selector(".v").inner_text()) for r in page.query_selector_all('.card[data-option="G"] .rows .row')
+                 if "Cost per night" not in r.inner_text()]
+    lines = [(r.query_selector(".k").inner_text(), r.query_selector(".v").inner_text()) for r in page.query_selector_all("#msMath [data-booking='G'] .ms-lines .row")]
+    same("Make Selection: the same lines as the card (fare, taxes, Open Bar, Specialty Dining, Total, service charges onboard)", lines, card_rows)
+    same("Make Selection: fare and taxes first", lines[:2], [("Cruise fare", f"${fare:,}"), (f"Taxes, fees and port expenses: 2 x ${gw['taxes_per_guest']:g}", f"${taxes:,}")])
+    same("Make Selection: the Total is the card's Total, the service charges below it", ([k for k, v in lines].index("Total"), money(dict(lines)["Total"]), lines[-1][0].startswith("Service charges (crew gratuities) (paid onboard, not in the total)")),
+         (len(lines) - 2, card_total, True))
+    same("Make Selection: 'Can be removed at Guest Services.' under the service charges", page.inner_text("#msMath [data-booking='G'] .ms-lines .onboard-small"), "Can be removed at Guest Services.")
+    check("Make Selection: no 'Price without gratuities' or 'Not in this price'", "without gratuities" not in page.inner_text("#msMath").lower() and "not in this price" not in page.inner_text("#msMath").lower())
+    same("Make Selection: David's explainer under 'How to pay the deposit', before the choices",
+         page.evaluate("(() => { const f = document.querySelector('#msMath [data-booking=G] fieldset'); return [f.children[0].tagName, f.children[1].className, document.querySelectorAll('#msMath .ms-explain').length]; })()"),
+         ["LEGEND", "ms-explain", 1])
     texts = choice_texts(page, "G")
     same("Make Selection: NCL's deposit with the 2-For-1 line, one credit, two credits (DoubleUp, Balcony)", [t.split("\n")[0] for t in texts],
          ["NCL's deposit: $100 ($50 per guest x 2), due within 76 hours of booking", "One of David's CruiseNext credits: $250 toward the cruise, you pay David $125",
@@ -658,13 +670,13 @@ with sync_playwright() as pw:
     check("Make Selection: CruiseNext steps hidden until a credit is chosen", not page.is_visible("#msCn"))
     page.check("input[name='msDepG'][value='ncl']")
     rows = booking_rows(page, "G")
-    same("Make Selection, NCL deposit: deposit and balance by the final payment date", rows[-2:],
-         [("Deposit to NCL at booking", "$100"), ("Balance, due by Feb 11, 2027", f"${bf['cabin_total'] - 100:,}")])
+    same("Make Selection, NCL deposit: deposit and balance by the final payment date (from the Total)", rows[-2:],
+         [("Deposit to NCL at booking", "$100"), ("Balance, due by Feb 11, 2027", page_money(card_total - 100))])
     page.check("input[name='msDepG'][value='credit1']")
     rows = booking_rows(page, "G")
     same("Make Selection, one credit: $250 off, no deposit due, pay David $125", rows[-4:],
          [("CruiseNext credit toward the cruise: 1 x $250", "−$250"), ("Deposit due at booking (the credit is the deposit)", "$0"),
-          ("Balance, due by Feb 11, 2027", f"${bf['cabin_total'] - 250:,}"), ("Pay David for the credits", "$125")])
+          ("Balance, due by Feb 11, 2027", page_money(card_total - 250)), ("Pay David for the credits", "$125")])
     check("Make Selection, credit: CruiseNext steps shown with NCL's sign-up page",
           page.is_visible("#msCn") and page.get_attribute("#msCn a", "href") == "https://www.ncl.com/account-access/register")
     same("Make Selection, credit: Latitudes number required", page.inner_text("#msLatNeed"), "(required for CruiseNext)")
@@ -714,8 +726,9 @@ with sync_playwright() as pw:
     rows = booking_rows(page, "A")
     rest = round(dep - 250, 2)
     same("Make Selection, Haven, one credit: the rest of NCL's deposit is due at booking", rows[-3][0], "Rest of NCL's deposit, due at booking")
-    check("Make Selection, Haven, one credit: rest = deposit - $250, balance = price - $250 - rest",
-          abs(money(rows[-3][1]) - rest) < 0.01 and abs(money(rows[-2][1]) - (hv["cabin_total"] - 250 - rest)) < 0.01, rows[-3:])
+    hv_total = money(dict(rows)["Total"])
+    check("Make Selection, Haven, one credit: rest = deposit - $250, balance = Total - $250 - rest",
+          abs(money(rows[-3][1]) - rest) < 0.01 and abs(money(rows[-2][1]) - (hv_total - 250 - rest)) < 0.01, rows[-3:])
     check("Make Selection, Haven: no script errors", not errs, errs[:3])
     page.close()
 
@@ -725,12 +738,12 @@ with sync_playwright() as pw:
     page.check("input[name='msFl'][value='no']")
     same("Make Selection, Florida No with the switch on: says so", page.inner_text("#msFlNote"),
          "The Florida resident rate switch on the page is on. Your answer turns the Florida resident rate off for this request.")
-    no_price = money(dict(booking_rows(page, "G"))["Price without gratuities"])
+    no_price = money(dict(booking_rows(page, "G"))["Total"])
     check("Make Selection, Florida No: no address fields", not page.is_visible("#msAddr"))
     page.check("input[name='msFl'][value='yes']")
     rows = dict(booking_rows(page, "G"))
     same("Make Selection, Florida Yes: $60 x 2 off, price $120 lower",
-         (rows.get("Florida resident rate: 2 guests x $60 off the fare"), no_price - money(rows["Price without gratuities"])), ("−$120", 120))
+         (next((v for k, v in rows.items() if k.startswith("Florida resident rate (checked") and k.endswith("2 guests x $60 off the fare")), None), no_price - money(rows["Total"])), ("−$120", 120))
     check("Make Selection, Florida Yes: guest 1's Florida home address asked", page.is_visible("#msAddr") and page.input_value("#msState") == "FL")
     check("Make Selection, Florida Yes with the switch on: no note", not page.is_visible("#msFlNote"))
     page.click("[data-ms-close]")
@@ -739,7 +752,7 @@ with sync_playwright() as pw:
     page.check("input[name='msFl'][value='yes']")
     same("Make Selection, Florida Yes with the switch off: says so", page.inner_text("#msFlNote"),
          "The Florida resident rate switch on the page is off. Your answer turns the Florida resident rate on for this request.")
-    check("Make Selection, Florida Yes with the switch off: discount applied", "Florida resident rate: 2 guests x $60 off the fare" in dict(booking_rows(page, "G")))
+    check("Make Selection, Florida Yes with the switch off: discount applied", any(k.endswith("2 guests x $60 off the fare") for k in dict(booking_rows(page, "G"))))
     check("Make Selection, Florida: no script errors", not errs, errs[:3])
     page.close()
     page, errs, _ = ms_open("none")
@@ -760,8 +773,9 @@ with sync_playwright() as pw:
     same("Make Selection, 8 nights, 4 guests: NCL's deposit $200 on the Aura", a_rows["Deposit to NCL at booking"], "$200")
     tot = page.query_selector_all("#msMath .ms-booking")[-1]
     trows = dict((r.query_selector(".k").inner_text(), r.query_selector(".v").inner_text()) for r in tot.query_selector_all(".row"))
-    same("Make Selection, 8 nights: price = both prices", money(trows["Price without gratuities"]),
-         money(g_rows["Price without gratuities"]) + money(a_rows["Price without gratuities"]))
+    same("Make Selection, 8 nights: Total = both Totals = the 8 night card's Total", (money(trows["Total"]), money(trows["Total"])),
+         (money(g_rows["Total"]) + money(a_rows["Total"]), money(page.inner_text('.card[data-option="8"] .price-total'))))
+    same("Make Selection, 8 nights: the explainer once, under the first booking", page.eval_on_selector_all("#msMath .ms-explain", "els => els.map(e => e.closest('[data-booking]').dataset.booking)"), ["G"])
     same("Make Selection, 8 nights: balances listed with each date and added",
          money(trows["Balances: Getaway due by Feb 11, 2027, Aura due by Feb 14, 2027"]),
          money(g_rows["Balance, due by Feb 11, 2027"]) + money(a_rows["Balance, due by Feb 14, 2027"]))
@@ -802,7 +816,11 @@ with sync_playwright() as pw:
          ("booking", "test-token", "Option 1: 3 nights", "Prices can change until NCL confirms the booking.", {"adults": 2, "kid_ages": [15]}))
     same("Make Selection, send: the booking's numbers", (b0.get("ship"), b0.get("deposit_choice"), b0.get("credits"), b0.get("due_at_booking"), b0.get("pay_david"), b0.get("balance_due")),
          ("Norwegian Getaway", "credit1", 1, 0, 125, "2027-02-11"))
-    same("Make Selection, send: price - credit = balance", b0.get("price_without_gratuities", 0) - 250, b0.get("balance"))
+    same("Make Selection, send: Total - credit = balance", round(b0.get("total", 0) - 250, 2), b0.get("balance"))
+    same("Make Selection, send: the window's lines as shown, the Total and the onboard line",
+         (b0.get("lines", [{}])[0], b0.get("lines", [{}])[-1]["item"], [x["value"].endswith(" onboard") for x in b0.get("onboard", [])]),
+         ({"item": "Cruise fare", "value": b0.get("lines", [{}])[0].get("value")}, "Gratuities paid now (service charges are paid onboard)", [True]))
+    check("Make Selection, send: no old fields", not any(k in b0 for k in ("price_without_gratuities", "not_in_price", "fare", "taxes")), list(b0))
     same("Make Selection, send: guests and the Florida address",
          ([g["first"] for g in req.get("guests", [])], req.get("florida")),
          (["Test1", "Test2", "Test3"], {"residents": True, "address": {"street": "1 Test Street", "city": "Miami", "state": "FL", "zip": "33101"}}))
@@ -850,10 +868,6 @@ with sync_playwright() as pw:
     TOKEN = "Tk" + "x" * 41
     LABEL = "Option 1: 3 nights\nNorwegian Getaway, Jun 11 to Jun 14, 2027 (3 nights)\nCabin: Balcony, Decks 8 and 9 (BF)\n2 guests, website price"
 
-    def page_money(x):
-        r = round(x * 100) / 100
-        return f"${r:,.0f}" if r == int(r) else f"${r:,.2f}"
-
     def pw_open(site, stored=None, answers=None, hash_="", ready=".card .price-total"):
         page = new_page(viewport={"width": 360, "height": 800})
         errs, sent = [], []
@@ -882,22 +896,22 @@ with sync_playwright() as pw:
     def pw_price(page):
         return page.inner_text("#pwAmount") if page.query_selector("#pwAmount") else None
 
-    def worker_price(site, option, guests, florida, g, a):
+    def worker_price(site, ship, code, guests, florida):
         """The Worker's own number (tools/family-alerts/worker.js), or None without node."""
         if not shutil.which("node"):
             return None
         d = os.path.join(site_root, site, "data")
         fl = os.path.join(d, "florida.json")
         out = subprocess.run(["node", os.path.join(REPO, "tools", "family-alerts", "test", "watched_price.mjs"), os.path.join(d, "prices.json"),
-                              fl if os.path.exists(fl) else "-", option, str(guests), "1" if florida else "0", g or "-", a or "-"],
+                              fl if os.path.exists(fl) else "-", ship, code, str(guests), "1" if florida else "0"],
                              capture_output=True, text=True, check=True)
         return json.loads(out.stdout)
 
-    # 1. The Getaway card, 2 adults, Balcony: the window, the checks, the price, the request.
+    # 1. The Getaway card, 2 adults, Balcony: the window, the choices, the checks, the price, the request.
     page, errs, sent = pw_open("ms_api")
-    same("Price watch: a button on each card, right after Make Selection",
-         page.eval_on_selector_all("button[data-watch]", "els => els.map(e => [e.dataset.watch, e.previousElementSibling.dataset.select, e.textContent])"),
-         [["G", "G", "Watch this price"], ["A", "A", "Watch this price"], ["8", "8", "Watch this price"]])
+    same("Price watch: one button per cabin, right after Make Selection (two on the 8 night card)",
+         page.eval_on_selector_all("button[data-watch]", "els => els.map(e => [e.dataset.watch, e.textContent])"),
+         [["G", "Watch this price"], ["A", "Watch this price"], ["8G", "Watch the Getaway cabin price"], ["8A", "Watch the Aura cabin price"]])
     page.click('button[data-watch="G"]')
     check("Price watch: the window opens", page.is_visible("#pwDialog"))
     code_g = page.evaluate("SELECTIONS.G.items[0][1].code")
@@ -905,32 +919,42 @@ with sync_playwright() as pw:
     for want in ["Watch this price", "WHAT YOU'RE WATCHING: OPTION 1: 3 NIGHTS", "2 guests in the cabin. The price depends on how many guests there are, not their ages.",
                  "Are you a Florida resident?", "It only decides which price is watched: NCL's Florida resident price or the website price.",
                  "Answer the question above to see the price that will be watched.",
-                 "An email when this price drops by $1 or more. After each one, the new price is the one watched.",
-                 "One email when fewer than 10 of these cabins are left for 2 guests.", "One email if it is no longer available for 2 guests.",
+                 "Email me when the price drops by at least this much per guest (dollars)", "With 2 guests, that's a drop of $40 or more for the cabin.",
+                 "Tell me when only a few cabins are left (fewer than 10 for 2 guests)", "Tell me if it sells out for 2 guests",
+                 "As soon as it happens (prices are checked twice a day)", "At most once a day, in the morning",
                  "Watches end on Jun 11, 2027.", "Your email goes only to David's price watch list, never on this page or in the public repo.",
                  "Nothing is watched until you open it, within 48 hours."]:
         check(f"Price watch window: '{want[:60]}'", want.lower() in text.lower(), text[:300])
+    same("Price watch: the choices as the window opens ($20, both ticks, as soon as it happens)",
+         page.evaluate("[document.getElementById('pwDrop').value, document.getElementById('pwFew').checked, document.getElementById('pwSold').checked, document.querySelector('input[name=pwFreq]:checked').value]"), ["20", True, True, "now"])
     same("Price watch: nothing chosen on the Florida question", page.eval_on_selector_all("input[name='pwFl']:checked", "els => els.length"), 0)
+    page.fill("#pwDrop", "")
     page.click("#pwSend")
     same("Price watch: the checks before sending", page.inner_text("#pwStatus"),
-         "Please fix these first:\nAnswer whether you're a Florida resident.\nEnter your email.")
+         "Please fix these first:\nAnswer whether you're a Florida resident.\nEnter the drop per guest: a whole number of dollars from $1 to $1,000.\nEnter your email.")
     check("Price watch: nothing sent before the checks pass", not sent)
+    page.fill("#pwDrop", "35")
+    same("Price watch: the drop note follows the amount", page.inner_text("#pwDropNote"), "With 2 guests, that's a drop of $70 or more for the cabin.")
     page.check("input[name='pwFl'][value='no']")
     want_g = cat(gw, code_g)["by_guests"]["2"]["cabin_total"]
-    same("Price watch, No: NCL's cabin price for 2 guests (website price)", (pw_price(page), "website price" in page.inner_text("#pwPrice")), (page_money(want_g), True))
-    same("Price watch, No: the Worker's own rule gives the same number", worker_price("ms_api", "G", 2, False, code_g, None) in (None, want_g), True)
+    same("Price watch, No: NCL's cabin price for 2 guests, and per guest", (pw_price(page), page.inner_text("#pwPerGuest").split(" per guest")[0], "website price" in page.inner_text("#pwPrice")),
+         (page_money(want_g), page_money(want_g / 2), True))
+    same("Price watch, No: the Worker's own rule gives the same number", worker_price("ms_api", "G", code_g, 2, False) in (None, want_g), True)
     page.check("input[name='pwFl'][value='yes']")
     same("Price watch, Yes without a Florida discount: the same price and the note", (pw_price(page), "NCL isn't offering a Florida resident discount on this cabin right now, so this is the website price. If NCL offers one, the lower price counts as a drop." in page.inner_text("#pwPrice")),
          (page_money(want_g), True))
+    page.uncheck("#pwFew")
+    page.check("input[name='pwFreq'][value='daily']")
     page.fill("#pwEmail", "watcher@example.com")
     check("Price watch window: no sideways scrolling at 360 px", pw_fits(page) and wide(page) <= 360, wide(page))
     if SHOTS:
-        page.screenshot(path=os.path.join(SHOTS, "price_watch.png"))
+        page.screenshot(path=os.path.join(SHOTS, "price_watch.png"), full_page=True)
     page.click("#pwSend")
     page.wait_for_selector("#pwDialog .ms-status.ok")
     same("Price watch: one request to the Worker", [x[0] for x in sent], ["/watch"])
     same("Price watch: the request", sent[0][1] if sent else None,
-         {"option": "G", "guests": 2, "cabins": {"G": code_g}, "florida": True, "email": "watcher@example.com", "page": f"{base}/ms_api/index.html", "turnstile": "test-token"})
+         {"option": "G", "ship": "G", "cabin": code_g, "guests": 2, "florida": True, "drop_pp": 35, "few": False, "sold_out": True, "frequency": "daily",
+          "email": "watcher@example.com", "page": f"{base}/ms_api/index.html", "turnstile": "test-token"})
     check("Price watch: 'check your email'", "Almost done. Check your email (watcher@example.com) and open the link in it within 48 hours" in page.inner_text("#pwDialog"))
     stored = page.evaluate("JSON.stringify(Object.assign({}, localStorage))")
     check("Price watch: the email isn't saved in the browser", "watcher@example.com" not in stored, stored[:200])
@@ -940,24 +964,32 @@ with sync_playwright() as pw:
     check("Price watch: no script errors", not errs, errs[:3])
     page.close()
 
-    # 2. 8 nights: both cabins, both prices added; the Worker refuses with its own words.
+    # 2. 8 nights: one ship's cabin per watch; the Worker refuses with its own words.
     def refuse(path, body):
         return 400, {"ok": False, "error": "limit", "message": "This email address already has 10 price watches. Stop one first (the link is in every price watch email)."}
     page, errs, sent = pw_open("ms_api", answers=refuse)
-    page.click('button[data-watch="8"]')
-    codes = page.evaluate("SELECTIONS['8'].items.map(([s, c]) => c.code)")
+    page.click('button[data-watch="8A"]')
+    code_a = page.evaluate("SELECTIONS['8'].items[1][1].code")
     page.check("input[name='pwFl'][value='no']")
-    want_8 = cat(gw, codes[0])["by_guests"]["2"]["cabin_total"] + cat(au, codes[1])["by_guests"]["2"]["cabin_total"]
-    same("Price watch, 8 nights: both ships added", (pw_price(page), "both ships added" in page.inner_text("#pwPrice")), (page_money(want_8), True))
-    check("Price watch, 8 nights: the title", "WHAT YOU'RE WATCHING: OPTION 3: 8 NIGHTS" in page.inner_text("#pwDialog").upper())
+    same("Price watch, 8 nights: the Aura cabin's own price", pw_price(page), page_money(cat(au, code_a)["by_guests"]["2"]["cabin_total"]))
+    text = page.inner_text("#pwDialog")
+    check("Price watch, 8 nights: the title and which cabin", "WHAT YOU'RE WATCHING: OPTION 3: 8 NIGHTS, THE AURA CABIN" in text.upper()
+          and "This watches the Aura cabin of the 8 night trip. The other ship's cabin has its own button." in text and "Norwegian Getaway" not in text, text[:300])
     page.fill("#pwEmail", "watcher@example.com")
     page.click("#pwSend")
     page.wait_for_selector("#pwStatus.bad")
-    same("Price watch, 8 nights: both cabins in the request", sent[0][1]["cabins"] if sent else None, {"G": codes[0], "A": codes[1]})
+    same("Price watch, 8 nights: option 8, the Aura cabin", {k: sent[0][1][k] for k in ("option", "ship", "cabin")} if sent else None, {"option": "8", "ship": "A", "cabin": code_a})
     same("Price watch: the Worker's refusal is shown as it says", page.inner_text("#pwStatus"),
          "This email address already has 10 price watches. Stop one first (the link is in every price watch email).")
     errs = [e for e in errs if "status of 400" not in e]   # the stand-in's refusal itself
     check("Price watch, 8 nights: no script errors", not errs, errs[:3])
+    page.close()
+    # A Guarantee cabin: no few left tick.
+    page, errs, sent = pw_open("ms_api", stored={"adults": 2, "kids": [], "type": "oceanview", "mode": "same", "pickG": "OX"})
+    page.click('button[data-watch="G"]')
+    if page.evaluate("SELECTIONS.G.items[0][1].guarantee"):
+        same("Price watch, Guarantee cabin: few left unticked and off, with the reason",
+             (page.is_checked("#pwFew"), page.is_disabled("#pwFew"), "Not for a Guarantee cabin: NCL doesn't show how many are left." in page.inner_text("#pwDialog")), (False, True, True))
     page.close()
 
     # 3. A Florida discount (Getaway BF $60 off per guest, guests 1 and 2), page and Worker agree.
@@ -966,7 +998,7 @@ with sync_playwright() as pw:
     page.check("input[name='pwFl'][value='yes']")
     bf3 = cat(gw, "BF")["by_guests"]["3"]["cabin_total"]
     same("Price watch, Florida Yes: the cabin's own discount on guests 1 and 2", pw_price(page), page_money(bf3 - 120))
-    same("Price watch, Florida Yes: the Worker's own rule gives the same number", worker_price("one", "G", 3, True, "BF", None) in (None, bf3 - 120), True)
+    same("Price watch, Florida Yes: the Worker's own rule gives the same number", worker_price("one", "G", "BF", 3, True) in (None, bf3 - 120), True)
     check("Price watch, Florida Yes: no 'no discount' note", "isn't offering" not in page.inner_text("#pwPrice"))
     page.check("input[name='pwFl'][value='no']")
     same("Price watch, Florida No: the website price", pw_price(page), page_money(bf3))
@@ -976,11 +1008,13 @@ with sync_playwright() as pw:
          "Everything is filled in, but the price watch isn't switched on yet, so nothing was sent.")
     page.close()
     page, errs, sent = pw_open("both", stored={"adults": 2, "kids": [10], "type": "balcony", "mode": "same", "pickG": "BF", "pickA": "B4"})
-    page.click('button[data-watch="8"]')
-    page.check("input[name='pwFl'][value='yes']")
     b4a = cat(au, "B4")["by_guests"]["3"]["cabin_total"]
-    same("Price watch, 8 nights with Florida discounts on both ships", pw_price(page), page_money(bf3 - 120 + b4a - 50))
-    same("Price watch, 8 nights with Florida discounts: the Worker agrees", worker_price("both", "8", 3, True, "BF", "B4") in (None, round(bf3 - 120 + b4a - 50, 2)), True)
+    for key, want, ship, code in [("8G", bf3 - 120, "G", "BF"), ("8A", b4a - 50, "A", "B4")]:
+        page.click(f'button[data-watch="{key}"]')
+        page.check("input[name='pwFl'][value='yes']")
+        same(f"Price watch, 8 nights, {ship} cabin with its Florida discount", pw_price(page), page_money(want))
+        same(f"Price watch, 8 nights, {ship} cabin: the Worker agrees", worker_price("both", ship, code, 3, True) in (None, round(want, 2)), True)
+        page.click("#pwDialog [data-pw-close]")
     check("Price watch, Florida: no script errors", not errs, errs[:3])
     page.close()
 
@@ -990,7 +1024,8 @@ with sync_playwright() as pw:
     def link_answers(path, body):
         if path == "/confirm":
             return (404, {"ok": False, "error": "gone", "message": "This link has expired or was already used. Start the watch again from the page if you still want it."}) if body["token"] != TOKEN \
-                else (200, {"ok": True, "already": False, "watch": {"id": "w1", "label": LABEL, "price": 878, "watched": 878, "first_price": 878, "confirmed": True}})
+                else (200, {"ok": True, "already": False, "watch": {"id": "w1", "label": LABEL, "price": 878, "watched": 878, "first_price": 878, "confirmed": True,
+                                                                   "choices": ["an email when the price drops by at least $20 per guest ($40 for the cabin)", "at most one email a day, in the morning"]}})
         if path == "/unsubscribe":
             return 200, {"ok": True, "watch": {"id": "w1", "label": LABEL, "price": 850, "watched": 878, "first_price": 878, "confirmed": True}}
         if body.get("stop") == "all":
@@ -1002,7 +1037,8 @@ with sync_playwright() as pw:
     page, errs, sent = pw_open("ms_api", answers=link_answers, hash_=f"#confirm={TOKEN}", ready="#pwResult .ms-status")
     text = page.inner_text("#pwDialog")
     check("Link #confirm: 'Start your price watch' and the watch", "Start your price watch" in text and "Your price watch has started." in text
-          and "Norwegian Getaway, Jun 11 to Jun 14, 2027 (3 nights)\nCabin: Balcony, Decks 8 and 9 (BF)" in text and "Price watched: $878" in text, text[:400])
+          and "Norwegian Getaway, Jun 11 to Jun 14, 2027 (3 nights)\nCabin: Balcony, Decks 8 and 9 (BF)" in text and "Price watched: $878" in text
+          and "An email when the price drops by at least $20 per guest ($40 for the cabin)\nAt most one email a day, in the morning" in text, text[:600])
     same("Link #confirm: the token goes to the Worker once", sent, [("/confirm", {"token": TOKEN})])
     check("Link #confirm: the token is gone from the address bar", "#" not in page.url and TOKEN not in page.evaluate("location.href + history.state"), page.url)
     check("Link #confirm: no sideways scrolling at 360 px", pw_fits(page) and wide(page) <= 360, wide(page))
