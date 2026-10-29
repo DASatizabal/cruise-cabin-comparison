@@ -1,6 +1,6 @@
 {
  "schema_version": 3,
- "saved_at": "2026-10-28T10:21:44Z",
+ "saved_at": "2026-10-29T10:22:38Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -14,14 +14,14 @@
    "child_per_day": 40.0,
    "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; 2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. Includes prepaid service charges.",
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-28"
+   "checked_at": "2026-10-29"
   },
   "open_bar": {
    "per_day_2_to_5_nights": 32.0,
    "per_day_6_plus_nights": 28.5,
    "soda_per_day": 12.5,
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-28"
+   "checked_at": "2026-10-29"
   },
   "service_charge": {
    "suite_haven_per_night": 25.0,
@@ -32,7 +32,7 @@
     "HAVEN"
    ],
    "source": "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge",
-   "checked_at": "2026-10-28"
+   "checked_at": "2026-10-29"
   }
  },
  "rate_warnings": [],
@@ -173,33 +173,33 @@
     ],
     "duration": 3,
     "sail_start": "2027-06-11T00:00:00",
-    "checked_at": "2026-10-28T10:20:27Z"
+    "checked_at": "2026-10-29T10:21:18Z"
    },
    "depart": "2027-06-11",
    "return": "2027-06-14",
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-28",
+   "saved_at": "2026-10-29",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-28T10:20:27Z",
+     "as_of": "2026-10-29T10:21:18Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-28T10:20:27Z",
+     "as_of": "2026-10-29T10:21:18Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-28T10:20:27Z",
+     "as_of": "2026-10-29T10:21:18Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-28T10:20:27Z",
+     "as_of": "2026-10-29T10:21:18Z",
      "why": null
     }
    },
@@ -211,14 +211,14 @@
      "soda_under_21_position_2": 37.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-28"
+     "checked_at": "2026-10-29"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 1 Meal",
      "per_guest": 20,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-28"
+     "checked_at": "2026-10-29"
     }
    },
    "kids_sail_free": null,
@@ -2043,33 +2043,33 @@
     ],
     "duration": 5,
     "sail_start": "2027-06-14T00:00:00",
-    "checked_at": "2026-10-28T10:21:04Z"
+    "checked_at": "2026-10-29T10:21:57Z"
    },
    "depart": "2027-06-14",
    "return": "2027-06-19",
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-28",
+   "saved_at": "2026-10-29",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-28T10:21:04Z",
+     "as_of": "2026-10-29T10:21:57Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-28T10:21:04Z",
+     "as_of": "2026-10-29T10:21:57Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-28T10:21:04Z",
+     "as_of": "2026-10-29T10:21:57Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-28T10:21:04Z",
+     "as_of": "2026-10-29T10:21:57Z",
      "why": null
     }
    },
@@ -2081,14 +2081,14 @@
      "soda_under_21_position_2": 62.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-28"
+     "checked_at": "2026-10-29"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 2 Meals",
      "per_guest": 40,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-28"
+     "checked_at": "2026-10-29"
     }
    },
    "kids_sail_free": null,
