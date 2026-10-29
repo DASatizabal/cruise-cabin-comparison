@@ -596,6 +596,67 @@
 
         .tables { display: grid; gap: 1.25rem; }
         @media (min-width: 900px) { .tables { grid-template-columns: 1fr 1fr; } }
+
+        /* Make Selection (5.2.0) */
+        .ms-open {
+            display: block; width: 100%; margin-top: 0.9rem; padding: 0.75rem 1rem; border: none; border-radius: 9999px;
+            background: var(--teal); color: var(--white); font: inherit; font-size: 1rem; font-weight: 700; cursor: pointer;
+        }
+        .ms-open:hover { background: var(--teal-light); }
+        dialog.ms {
+            width: calc(100% - 1rem); max-width: 40rem; max-height: calc(100dvh - 1rem); margin: auto; padding: 0; overflow-y: auto;
+            border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); color: var(--gray-800); background: var(--white);
+        }
+        dialog.ms::backdrop { background: rgba(10, 37, 64, 0.6); }
+        .ms-head {
+            position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;
+            padding: 0.85rem 1rem; background: var(--deep-ocean); color: var(--white);
+        }
+        .ms-head h2 { font-size: 1.1rem; }
+        .ms-close { width: 2.25rem; height: 2.25rem; flex-shrink: 0; border: none; border-radius: 50%; background: rgba(255, 255, 255, 0.15); color: var(--white); font: inherit; font-size: 1.3rem; cursor: pointer; }
+        .ms-body { padding: 0 1rem 1.25rem; }
+        .ms-sec { margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--gray-200); }
+        .ms-sec:first-child { border-top: none; }
+        .ms-sec h3 { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ocean-blue); margin-bottom: 0.5rem; }
+        .ms-warn { background: var(--gold-wash); border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 0.85rem; font-weight: 600; margin-top: 0.75rem; }
+        .ms-note { background: var(--gray-50); border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 0.85rem; color: var(--gray-700); margin-top: 0.5rem; }
+        .ms-note[hidden], .ms-sec[hidden], .ms-fields[hidden], .hint[hidden] { display: none; }
+        .ms-wait { font-size: 0.875rem; color: var(--gray-600); }
+        .ms-item { font-size: 0.875rem; padding: 0.45rem 0; border-bottom: 1px dashed var(--gray-200); }
+        .ms-list { font-size: 0.875rem; margin-top: 0.4rem; }
+        .ms-list div { padding: 0.15rem 0; }
+        .ms fieldset { border: none; }
+        .ms legend, .ms-sub { font-size: 0.9rem; font-weight: 700; color: var(--gray-900); margin-top: 0.6rem; }
+        .ms-choice {
+            display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.55rem 0.7rem; margin-top: 0.4rem;
+            border: 2px solid var(--gray-200); border-radius: 10px; font-size: 0.875rem; cursor: pointer;
+        }
+        .ms-choice:has(input:checked) { border-color: var(--teal); background: var(--teal-wash); }
+        .ms-choice input, .ms-check input { margin-top: 0.2rem; flex-shrink: 0; width: 1.1rem; height: 1.1rem; accent-color: var(--teal); }
+        .ms-check { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.9rem; font-weight: 600; margin-top: 0.4rem; }
+        .ms-field { margin-top: 0.55rem; }
+        .ms-field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.2rem; }
+        .ms-field input, .ms-field select {
+            width: 100%; padding: 0.5rem 0.6rem; border: 2px solid var(--gray-200); border-radius: 8px;
+            font: inherit; font-size: 1rem; background: var(--white); color: var(--gray-900);
+        }
+        .ms [aria-invalid="true"] { border-color: var(--red); }
+        .ms-guest { margin-top: 0.75rem; padding: 0.25rem 0.75rem 0.75rem; background: var(--gray-50); border-radius: 10px; }
+        .ms-booking { margin-top: 0.9rem; }
+        .ms-booking .ship-head { font-size: 0.9rem; }
+        .ms-math { margin-top: 0.6rem; }
+        .ms-steps { padding-left: 1.2rem; font-size: 0.875rem; }
+        .ms-steps li { margin: 0.35rem 0; }
+        .ms-steps a { color: var(--ocean-blue); font-weight: 600; word-break: break-word; }
+        .ms-explain { font-size: 0.85rem; color: var(--gray-700); margin-top: 0.6rem; }
+        .ms-send { display: block; width: 100%; margin-top: 0.75rem; padding: 0.8rem 1rem; border: none; border-radius: 9999px; background: var(--teal); color: var(--white); font: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; }
+        .ms-send:disabled { background: var(--gray-300); cursor: default; }
+        .ms-status { margin-top: 0.75rem; font-size: 0.875rem; }
+        .ms-status:empty { display: none; }
+        .ms-status.bad { background: var(--red-wash); color: var(--red); border-radius: 8px; padding: 0.6rem 0.75rem; }
+        .ms-status.bad ul { padding-left: 1.1rem; margin-top: 0.3rem; }
+        .ms-status.info, .ms-status.ok { background: var(--teal-wash); color: var(--gray-800); border-radius: 8px; padding: 0.6rem 0.75rem; }
+        #msTurnstile { margin-top: 0.75rem; min-height: 0; }
     </style>
 </head>
 <body>
@@ -664,6 +725,8 @@
         <div id="app"><div class="loading">Loading prices...</div></div>
     </main>
 
+    <dialog class="ms" id="msDialog" aria-labelledby="msTitle"></dialog>
+
     <footer class="footer">
         <div class="wrap">
             <strong>About these prices</strong>
@@ -688,6 +751,21 @@
         const FLORIDA_URL = "data/florida.json";
         const FL_OLD_DAYS = 9, FL_MAX_AGE_DAYS = 15;
         const FL_MIN_OFF = 1;   // dollars off per guest that count as a discount (cents are rounding)
+        // Make Selection (5.2.0): the booking request window. Deposits and the final payment date
+        // come from data/prices.json (schema 4, read daily from NCL's price summaries); two
+        // CruiseNext credits only while data/offers.json (the DoubleUp watch, at most 3 days old)
+        // allows them. Sent through the cruise-family-alerts Worker (tools/family-alerts/, with
+        // Cloudflare Turnstile) to the owner's Gmail. Nothing typed in the window is saved.
+        const OFFERS_URL = "data/offers.json";
+        const OFFERS_MAX_AGE_DAYS = 3;
+        const FAMILY_API = "";            // the cruise-family-alerts Worker's address (set in 5.2.0 part B)
+        const TURNSTILE_SITE_KEY = "";    // Cloudflare Turnstile site key, public (set in 5.2.0 part B)
+        const CHANGE_TEXT = "Prices can change until NCL confirms the booking.";
+        // NCL's CruiseNext terms (NOTES.md, "Research for 5.2.0"): a $250 credit, which David buys
+        // for $125; the full deposit up to a Club Balcony Suite, part of it above that. David's
+        // credits reach his account within 3 days after his sailing ends on Nov 23, 2026.
+        const CRUISENEXT = { credit: 250, cost: 125, signup: "https://www.ncl.com/account-access/register",
+                             readyOn: "2026-11-26", sailingEnds: "Nov 23, 2026" };
         const MIN_GUESTS = 2, MAX_GUESTS = 5;
         const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
         const STORE_KEY = "cruise-decision-guide-v5";
@@ -703,6 +781,9 @@
         let DATA = null, G = null, A = null;   // data file, Getaway sailing, Aura sailing
         let COUNTS = null;                      // data/counts.json when present and at most 7 days old
         let FLORIDA = null, FL_SEEN = null;     // data/florida.json at most 15 days old; any readable one (for its date)
+        let OFFERS = null;                      // data/offers.json when readable (the DoubleUp watch)
+        let SELECTIONS = {};                    // each card's chosen cabins, for its Make Selection button
+        let MS = null;                          // the open Make Selection window (never saved)
         const state = {
             adults: 2, kids: [],            // kids: ages 0 to 20, or null until chosen
             type: "balcony", mode: "same",
@@ -732,6 +813,10 @@
         const fmtDate = t => new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
         const fmtShort = t => new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" });
         const daysSince = t => (Date.now() - Date.parse(t)) / 86400000;
+        // Today's Eastern date as YYYY-MM-DD, and a YYYY-MM-DD date as "Feb 11, 2027".
+        const todayEastern = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+        const fmtIso = iso => { const d = new Date(iso + "T12:00:00Z"); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`; };
+        const isoDays = (a, b) => Math.round((Date.parse(b + "T12:00:00Z") - Date.parse(a + "T12:00:00Z")) / 86400000);
         const guests = () => state.adults + state.kids.length;
         const agesKnown = () => state.kids.every(a => Number.isInteger(a));
 
@@ -842,7 +927,8 @@
         // Any of these that NCL didn't show today (null in the data file) is left out of the
         // total and listed in k.missing; nothing is guessed.
         const shipKey = s => s === G ? "G" : "A";
-        function cost(s, c, off = state.offers[shipKey(s)]) {
+        // flOn: the Florida resident rate (the page switch, or the Make Selection answer).
+        function cost(s, c, off = state.offers[shipKey(s)], flOn = state.flResident) {
             const n = guests();
             const e = entry(c, n);
             const nights = s.nights;
@@ -908,7 +994,7 @@
             // more than the fare). Cabins not checked, and a Florida fare at or above the website
             // fare, get no discount.
             const fare = taxes === null ? null : e.cabin_total - taxes;
-            const fl = { shown: state.flResident && flShipActive(s), entry: null, perGuest: 0, guests: Math.min(n, 2), amount: 0 };
+            const fl = { shown: flOn && flShipActive(s), entry: null, perGuest: 0, guests: Math.min(n, 2), amount: 0 };
             if (fl.shown) {
                 fl.entry = flEntry(s, c.code);
                 fl.perGuest = flOff(fl.entry);
@@ -1149,7 +1235,8 @@
                     const full = findCat(s, c.code);
                     const k = cost(s, full);
                     picks = catPicker(s, tf.t, full, n) + offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`);
-                    body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k)) + ksfNote(s, full);
+                    SELECTIONS[shipKey(s)] = { label, items: [[s, full]] };
+                    body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k)) + ksfNote(s, full) + selectButton(shipKey(s));
                 }
             }
             return `
@@ -1231,7 +1318,8 @@
                     <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</div>
                     ${lineRows(s, k, true)}
                     <div class="row"><span class="k">${esc(s.ship_short)} total${k.onboard ? " to pay now" : ""}</span><span class="v">${agesKnown() ? money(k.now) : ""}</span></div>`).join("");
-                body += staleNote([G, A]) + totalBlock(both, nights, rows) + ks.map(([s, c]) => ksfNote(s, c, s.ship_short)).join("");
+                SELECTIONS["8"] = { label: "Option 3: 8 nights", items: chosen };
+                body += staleNote([G, A]) + totalBlock(both, nights, rows) + ks.map(([s, c]) => ksfNote(s, c, s.ship_short)).join("") + selectButton("8");
             }
             return `
                 <article class="card featured">
@@ -1292,6 +1380,492 @@
                     <p class="hint">Tap an available cabin to choose it. Free at Sea gratuities are added in the option cards above.${state.flResident && flShipActive(s) ? " Prices here are NCL's website prices; Florida resident discounts come off in the option cards above." : ""}</p>
                 </section>`;
         }
+
+        // ---------- Make Selection (5.2.0) ----------
+        // A booking request to David from one option card: the selection, the price without
+        // gratuities (fare plus taxes, fees and port expenses, minus any Florida discount; the
+        // gratuities and Free at Sea Plus are listed below it, not added), the deposit (NCL's, or
+        // David's CruiseNext credits), the balance with NCL's final payment date, and each guest's
+        // details. 8 nights is two bookings, each with its own deposit, credits and balance, plus
+        // combined totals. Nothing typed here is saved (no browser storage); the window is cleared
+        // when it closes. NOTES.md, "Make Selection".
+
+        // The button under a card's total, once a cabin is chosen and every kid's age is set.
+        // Hidden from the sail date on (Eastern).
+        function selectButton(key) {
+            const sel = SELECTIONS[key];
+            if (!sel || !agesKnown() || sel.items.some(([s]) => todayEastern() >= s.depart)) return "";
+            return `<button type="button" class="ms-open" data-select="${key}">Make Selection</button>`;
+        }
+
+        // NCL's broad types whose deposit is NCL's percentage rule (Suite and Haven).
+        const suiteHaven = (s, c) => ((DATA.deposit_rules || {}).suite_haven_types || ["SUITE", "HAVEN"]).includes(typeOfCat(s, c));
+
+        // NCL's deposit for this cabin and party, never guessed (null when not found):
+        //   Inside to Club Balcony Suite: NCL's deposit per guest, read today, x guests (with NCL's
+        //     deposit offer, like 2-For-1 Deposits, as NCL words it)
+        //   Suite and Haven: NCL's rule, 10% of the cruise fare (after any Florida discount),
+        //     confirmed daily on a Suite or Haven price summary (deposit_rules)
+        // The hours to pay it come from today's summary for this party size when it is the same
+        // kind of cabin.
+        function depositFor(s, c, k) {
+            const pay = s.payment, rules = DATA.deposit_rules;
+            if (!pay || !rules) return null;
+            const suite = suiteHaven(s, c);
+            const e = pay.by_guests && pay.by_guests[String(k.n)];
+            const hours = e && e.deposit !== null && rules.suite_haven_types.includes(e.deposit_type) === suite ? e.due_hours : null;
+            if (suite) {
+                if (!rules.percent_of_fare || k.fare === null) return null;
+                return { amount: Math.round((k.fare - k.fl.amount) * rules.percent_of_fare) / 100, hours, partial: true, offer: null,
+                         rule: `${rules.percent_of_fare}% of the cruise fare, NCL's rule for Suites and The Haven` };
+            }
+            const per = pay.standard_deposit_per_guest;
+            if (!per) return null;
+            return { amount: Math.round(per * k.n * 100) / 100, hours, partial: false, offer: pay.deposit_offer, rule: `${money(per)} per guest x ${k.n}` };
+        }
+
+        // Two CruiseNext credits only while NCL's DoubleUp offer is listed (read at most 3 days
+        // ago), covers this cabin's NCL type, and today (Eastern) is early enough before sailing.
+        // Wording the DoubleUp watch couldn't read (null) never allows two.
+        function doubleUp(s, c) {
+            const d = OFFERS && OFFERS.doubleup;
+            if (!d || d.listed !== true || !Array.isArray(d.types) || !d.read_on) return false;
+            if (isoDays(d.read_on, todayEastern()) > OFFERS_MAX_AGE_DAYS || !d.types.includes(typeOfCat(s, c))) return false;
+            const last = new Date(s.depart + "T12:00:00Z");
+            if (Number.isInteger(d.min_days)) last.setUTCDate(last.getUTCDate() - d.min_days);
+            else if (Number.isInteger(d.min_months)) last.setUTCMonth(last.getUTCMonth() - d.min_months);
+            else return false;
+            return todayEastern() <= last.toISOString().slice(0, 10);
+        }
+
+        // What isn't in the price: listed below it, never added. NCL adds them to the booking and
+        // they are paid with the balance, except service charges when not prepaid (onboard).
+        function extrasOf(k) {
+            const out = [];
+            if (k.plus.on) out.push({ label: "Free at Sea Plus (a package, not a gratuity)", amount: k.plus.total, onboard: false });
+            if (k.bar.on) out.push({ label: `${k.bar.title} gratuity`, amount: k.bar.missing ? null : k.bar.total, onboard: false });
+            if (k.dining.on) out.push({ label: `${k.dining.title} gratuity`, amount: k.dining.missing ? null : k.dining.total, onboard: false });
+            out.push({ label: `Service charges (crew gratuities), ${state.prepayGratuities ? "prepaid" : "paid onboard"}`,
+                       amount: k.sc.missing ? null : k.sc.total, onboard: !state.prepayGratuities });
+            return out;
+        }
+
+        // One booking's numbers for the deposit choice ("ncl", "credit1", "credit2" or null).
+        // Credits: $250 each toward the cruise. Up to a Club Balcony Suite a credit is the whole
+        // deposit; for Suites and The Haven the rest of NCL's deposit is still due at booking.
+        // After NCL's final payment date the whole price is due at booking.
+        function bookingMath(s, c, choice) {
+            const cents = x => Math.round(x * 100) / 100;
+            const k = cost(s, c, state.offers[shipKey(s)], MS.florida);
+            const price = cents(k.cabin - k.fl.amount);
+            const final = (s.payment && s.payment.final_payment_due) || null;
+            const past = !!final && todayEastern() > final;
+            const dep = depositFor(s, c, k);
+            const credits = choice === "credit2" ? 2 : choice === "credit1" ? 1 : 0;
+            const creditValue = credits * CRUISENEXT.credit;
+            let dueNow = null;
+            if (choice && past) dueNow = Math.max(0, price - creditValue);
+            else if (choice === "ncl") dueNow = dep ? dep.amount : null;
+            else if (credits) dueNow = !suiteHaven(s, c) ? 0 : dep ? Math.max(0, cents(dep.amount - creditValue)) : null;
+            const balance = dueNow === null ? null : Math.max(0, cents(price - creditValue - dueNow));
+            return { s, c, k, price, dep, choice, credits, creditValue, dueNow, balance, final, past,
+                     payDavid: credits * CRUISENEXT.cost, two: doubleUp(s, c), extras: extrasOf(k) };
+        }
+
+        const msRow = (label, value, cls = "") => `<div class="row ${cls}"><span class="k">${label}</span><span class="v">${value}</span></div>`;
+        const dueText = b => !b.final ? "due by NCL's final payment date (not found on NCL today)" : b.past ? "due when booking" : `due by ${fmtIso(b.final)}`;
+
+        function bookingHtml(b, number) {
+            const { s, c, k } = b, key = shipKey(s);
+            const head = `${number ? `Booking ${number}: ` : ""}${esc(s.ship)}, ${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)`;
+            const fareRows = k.taxes === null
+                ? msRow("Cruise fare with taxes, fees and port expenses", money(k.cabin))
+                : msRow("Cruise fare", money(k.fare)) + msRow(`Taxes, fees and port expenses: ${k.n} x ${money(s.taxes_per_guest)}`, money(k.taxes));
+            const flRow = k.fl.amount ? msRow(`Florida resident rate: ${plural(k.fl.guests, "guest", "guests")} x ${money(k.fl.perGuest)} off the fare`, "&minus;" + money(k.fl.amount)) : "";
+            const withBalance = b.extras.filter(x => !x.onboard && x.amount !== null).reduce((t, x) => t + x.amount, 0);
+            const onboard = b.extras.filter(x => x.onboard && x.amount !== null).reduce((t, x) => t + x.amount, 0);
+            const extras = b.extras.map(x => msRow(esc(x.label), x.amount === null ? NOT_FOUND : money(x.amount), x.amount === null ? "missing" : "muted")).join("");
+            const extrasNote = [withBalance ? `NCL adds ${money(withBalance)} of these to the booking, paid with the balance.` : "",
+                                onboard ? `${money(onboard)} in service charges is charged onboard and can be removed at Guest Services.` : ""].filter(Boolean).join(" ");
+
+            const d = b.dep, name = `msDep${key}`;
+            const opt = (value, html) => `<label class="ms-choice"><input type="radio" name="${name}" value="${value}" data-ms-dep="${key}" ${b.choice === value ? "checked" : ""}><span>${html}</span></label>`;
+            const nclText = b.past ? `Pay NCL in full when booking (NCL's final payment date, ${fmtIso(b.final)}, has passed)`
+                : d ? `NCL's deposit: <strong>${money(d.amount)}</strong> (${esc(d.rule)})${d.hours ? `, due within ${d.hours} hours of booking` : ""}`
+                : `NCL's deposit (${notFound}; David will confirm it)`;
+            const offer = d && d.offer && !b.past ? `<span class="cat-meta" style="display:block">Includes NCL's ${esc(d.offer.title)} offer${d.offer.description ? `: ${esc(d.offer.description)}` : ""}</span>` : "";
+            const partial = suiteHaven(s, c) ? `<span class="cat-meta" style="display:block">On a ${esc(c.typeTitle)} cabin a credit covers part of NCL's deposit, not all of it.</span>` : "";
+            const choices = opt("ncl", nclText + offer)
+                + opt("credit1", `One of David's CruiseNext credits: ${money(CRUISENEXT.credit)} toward the cruise, you pay David ${money(CRUISENEXT.cost)}${partial}`)
+                + (b.two ? opt("credit2", `Two of David's CruiseNext credits (NCL's DoubleUp offer): ${money(2 * CRUISENEXT.credit)} toward the cruise, you pay David ${money(2 * CRUISENEXT.cost)}${partial}`) : "");
+
+            let math = "";
+            if (b.choice) {
+                const confirm = "David will confirm";
+                math = `<div class="rows ms-math">
+                    ${msRow("Price without gratuities", money(b.price))}
+                    ${b.credits ? msRow(`CruiseNext ${b.credits === 2 ? "credits" : "credit"} toward the cruise: ${b.credits} x ${money(CRUISENEXT.credit)}`, "&minus;" + money(b.creditValue)) : ""}
+                    ${msRow(b.past ? "Paid to NCL at booking" : b.credits ? (suiteHaven(s, c) ? "Rest of NCL's deposit, due at booking" : "Deposit due at booking (the credit is the deposit)") : "Deposit to NCL at booking",
+                            b.dueNow === null ? confirm : money(b.dueNow))}
+                    ${msRow(`Balance, ${dueText(b)}`, b.balance === null ? confirm : money(b.balance), "total")}
+                    ${b.credits ? msRow("Pay David for the credits", money(b.payDavid), "subtotal") : ""}
+                </div>`;
+            }
+            return `
+                <div class="ms-booking" data-booking="${key}">
+                    <div class="ship-head">${head}</div>
+                    <div class="cabin-line" style="margin:0.2rem 0 0">${catHtml(c)}</div>
+                    <div class="rows">
+                        ${fareRows}
+                        ${flRow}
+                        ${msRow("Price without gratuities", money(b.price), "total")}
+                    </div>
+                    <div class="ms-sub">Not in this price</div>
+                    <div class="rows">${extras}</div>
+                    ${extrasNote ? `<p class="hint">${esc(extrasNote)}</p>` : ""}
+                    <fieldset class="ms-q"><legend>How to pay the deposit${number ? ` for the ${esc(s.ship_short)}` : ""}</legend>${choices}</fieldset>
+                    ${math}
+                </div>`;
+        }
+
+        // 8 nights: the two bookings added together, once both deposit choices are made.
+        function totalsHtml(books) {
+            if (!books.every(b => b.choice)) return `<p class="ms-wait" style="margin-top:0.9rem">Choose how to pay each deposit to see the totals for both bookings.</p>`;
+            const sum = f => books.some(b => b[f] === null) ? null : books.reduce((t, b) => t + b[f], 0);
+            const show = v => v === null ? "David will confirm" : money(v);
+            const credits = sum("creditValue"), david = sum("payDavid");
+            return `
+                <div class="ms-booking">
+                    <div class="ship-head">Both bookings together</div>
+                    <div class="rows">
+                        ${msRow("Price without gratuities", show(sum("price")))}
+                        ${credits ? msRow("CruiseNext credits toward the cruises", "&minus;" + money(credits)) : ""}
+                        ${msRow("Paid to NCL at booking", show(sum("dueNow")))}
+                        ${msRow(`Balances: ${books.map(b => `${esc(b.s.ship_short)} ${dueText(b)}`).join(", ")}`, show(sum("balance")), "total")}
+                        ${david ? msRow("Pay David for the credits", money(david), "subtotal") : ""}
+                    </div>
+                </div>`;
+        }
+
+        function partyText() {
+            const kids = guestOrder().filter(a => a !== null);
+            return plural(state.adults, "adult", "adults") + (kids.length ? ` and ${plural(kids.length, "kid", "kids")} (${kids.length === 1 ? "age" : "ages"} ${kids.join(" and ")} on ${ageDateText()})` : "");
+        }
+        const offersText = s => { const o = state.offers[shipKey(s)]; return `Unlimited Open Bar ${o.bar ? "yes" : "no"}, Specialty Dining ${o.dining ? "yes" : "no"}, Free at Sea Plus ${o.plus ? "yes" : "no"}`; };
+        const msField = (id, label, type = "text", extra = "") => `<div class="ms-field"><label for="${id}">${label}</label><input type="${type}" id="${id}" name="${id}" ${extra}></div>`;
+
+        function guestFields(a, i) {
+            const p = `g${i}`;
+            return `<fieldset class="ms-guest"><legend>Guest ${i + 1} (${a === null ? "adult" : `age ${a} on ${esc(ageDateText())}`})</legend>
+                ${msField(p + "_first", "First name, as on the passport or ID")}
+                ${msField(p + "_middle", "Middle name (optional)")}
+                ${msField(p + "_last", "Last name, as on the passport or ID")}
+                ${msField(p + "_dob", "Date of birth", "date", `max="${todayEastern()}"`)}
+                <div class="ms-field"><label for="${p}_gender">Gender, as on the passport or ID</label><select id="${p}_gender" name="${p}_gender"><option value="">Choose</option><option>Female</option><option>Male</option></select></div>
+                ${msField(p + "_citizenship", "Citizenship (country)")}
+                ${i === 0 ? msField("g0_email", "Email", "email") + msField("g0_phone", "Mobile phone", "tel") : ""}
+                ${msField(p + "_latitudes", i === 0 ? `Latitudes number <span id="msLatNeed">(if guest 1 has one)</span>` : "Latitudes number (if they have one)", "text", 'inputmode="numeric"')}
+            </fieldset>`;
+        }
+
+        function selectionForm() {
+            const review = MS.items.map(([s, c]) => `
+                <div class="ms-item"><strong>${esc(s.ship)}</strong>, ${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)
+                    <div>${esc(c.typeTitle)}: ${catHtml(c)}</div>
+                    ${c.guarantee ? `<div class="cat-meta gty">${GUARANTEE_TEXT}</div>` : ""}
+                    <div class="cat-meta">Free at Sea: ${esc(offersText(s))}</div>
+                </div>`).join("");
+            const early = todayEastern() < CRUISENEXT.readyOn;
+            return `
+                <form id="msForm" novalidate autocomplete="off">
+                    <div class="ms-head"><h2 id="msTitle">Make Selection</h2><button type="button" class="ms-close" data-ms-close aria-label="Close">&times;</button></div>
+                    <div class="ms-body">
+                        <p class="ms-warn">${CHANGE_TEXT}</p>
+                        <section class="ms-sec">
+                            <h3>Your selection: ${esc(MS.label)}</h3>
+                            ${review}
+                            <div class="ms-list">
+                                <div>Party: ${esc(partyText())}</div>
+                                <div>Prepay gratuities: ${state.prepayGratuities ? "yes" : "no, service charges are paid onboard"}</div>
+                                <div>Florida resident rate switch on the page: ${state.flResident ? "on" : "off"}</div>
+                            </div>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Florida resident rate</h3>
+                            <fieldset class="ms-q" id="msFlQ"><legend>Are guest 1 and guest 2 Florida residents?</legend>
+                                <label class="ms-choice"><input type="radio" name="msFl" value="yes"><span>Yes</span></label>
+                                <label class="ms-choice"><input type="radio" name="msFl" value="no"><span>No</span></label>
+                            </fieldset>
+                            <p class="hint">NCL's Florida resident rate is for guests who live in Florida, and NCL asks for proof of residency. David will confirm with NCL.</p>
+                            <div class="ms-note" id="msFlNote" hidden></div>
+                            <div class="ms-fields" id="msAddr" hidden>
+                                <div class="ms-sub">Guest 1's Florida home address</div>
+                                ${msField("msStreet", "Street address")}
+                                ${msField("msCity", "City")}
+                                ${msField("msState", "State", "text", 'value="FL"')}
+                                ${msField("msZip", "ZIP code", "text", 'inputmode="numeric"')}
+                            </div>
+                        </section>
+                        <section class="ms-sec" id="msMath"></section>
+                        <section class="ms-sec" id="msCn" hidden>
+                            <h3>CruiseNext steps</h3>
+                            ${early ? `<p class="ms-note">David's credits reach his NCL account within 3 days after his cruise ends on ${CRUISENEXT.sailingEnds}, so a CruiseNext request can't be completed before about ${fmtIso(CRUISENEXT.readyOn)}.</p>` : ""}
+                            <ol class="ms-steps">
+                                <li>Guest 1 (21 or older) creates a free NCL account at <a href="${CRUISENEXT.signup}" target="_blank" rel="noopener">${CRUISENEXT.signup.replace("https://www.", "")}</a> to get a Latitudes number.</li>
+                                <li>Enter guest 1's Latitudes number below and send this request to David.</li>
+                                <li>David moves the credit to guest 1's NCL account by emailing cruisenext@ncl.com.</li>
+                                <li>Then the booking is made. Credits only work on a new booking, so the booking waits until the credit is in the account.</li>
+                            </ol>
+                            <p class="hint" id="msTwoNote" hidden>If NCL ends its DoubleUp offer before the booking is made, only one credit can be used.</p>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Guest details</h3>
+                            <p class="hint">Names exactly as on each guest's passport or ID, in NCL's order (adults first, then kids oldest first). No passport or card numbers: those come later, at NCL's online check-in.</p>
+                            ${guestOrder().map(guestFields).join("")}
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Who is sending this</h3>
+                            <label class="ms-check"><input type="checkbox" id="msMe"><span>I'm guest 1</span></label>
+                            <div class="ms-fields" id="msSender">
+                                ${msField("msName", "Your name")}
+                                ${msField("msEmail", "Your email", "email")}
+                            </div>
+                            <p class="hint">David gets the full request. You get a copy by email with your selection and the amounts, without the other guests' dates of birth or Latitudes numbers.</p>
+                        </section>
+                        <section class="ms-sec">
+                            <h3>Send</h3>
+                            <p class="ms-warn">${CHANGE_TEXT}</p>
+                            <div id="msTurnstile"></div>
+                            <button type="submit" class="ms-send" id="msSend">Send my selection to David</button>
+                            <div class="ms-status" id="msStatus" role="status" aria-live="polite"></div>
+                            <p class="hint">Nothing you type here is saved, on this page or anywhere else. It goes only into the two emails.</p>
+                        </section>
+                    </div>
+                </form>`;
+        }
+
+        // The price, deposit and balance part of the window. Shown once the Florida question is
+        // answered (the answer decides the Florida discount in this window).
+        function renderMsMath() {
+            const box = document.getElementById("msMath");
+            if (!box) return;
+            if (MS.florida === null) {
+                box.innerHTML = `<h3>Price, deposit and balance</h3><p class="ms-wait">Answer the Florida question above to see the price, the deposit and the balance.</p>`;
+                MS.books = null;
+            } else {
+                const books = MS.items.map(([s, c]) => bookingMath(s, c, MS.deposit[shipKey(s)] || null));
+                MS.books = books;
+                const many = books.length > 1;
+                box.innerHTML = `<h3>Price, deposit and balance</h3>
+                    ${many ? `<p class="hint">Two separate bookings, one on each ship, each with its own deposit, balance and final payment date.</p>` : ""}
+                    <p class="ms-explain">Use David's CruiseNext credit and save ${money(CRUISENEXT.cost)}. CruiseNext credits are a perk NCL only sells on board, so David will pick some up on his next cruise. He buys a ${money(CRUISENEXT.credit)} credit for ${money(CRUISENEXT.cost)}, it goes toward your deposit, and you just pay him back the ${money(CRUISENEXT.cost)}. On a Balcony or higher cabin, while NCL's DoubleUp offer is running, you can use two: ${money(2 * CRUISENEXT.credit)} toward your cruise for ${money(2 * CRUISENEXT.cost)}. Above a Club Balcony Suite, a credit covers part of the deposit rather than all of it. The credit has to be moved to your NCL account before we book, so this option adds a few days.</p>
+                    ${books.map((b, i) => bookingHtml(b, many ? i + 1 : 0)).join("")}
+                    ${many ? totalsHtml(books) : ""}
+                    <p class="ms-warn">${CHANGE_TEXT}</p>`;
+            }
+            const cn = !!MS.books && MS.books.some(b => b.credits);
+            document.getElementById("msCn").hidden = !cn;
+            document.getElementById("msTwoNote").hidden = !(MS.books && MS.books.some(b => b.credits === 2));
+            document.getElementById("msLatNeed").textContent = cn ? "(required for CruiseNext)" : "(if guest 1 has one)";
+        }
+
+        // The window says when its Florida answer differs from the page's switch, and when NCL
+        // isn't offering a Florida discount on this selection (the answer then changes nothing).
+        function renderFlNote() {
+            const note = document.getElementById("msFlNote");
+            const parts = [];
+            if (MS.florida !== state.flResident) {
+                parts.push(MS.florida ? "The Florida resident rate switch on the page is off. Your answer turns the Florida resident rate on for this request."
+                                      : "The Florida resident rate switch on the page is on. Your answer turns the Florida resident rate off for this request.");
+            }
+            if (!MS.items.some(([s]) => flShipActive(s))) parts.push("NCL isn't offering a Florida resident discount on this selection right now, so the price is the same either way.");
+            note.textContent = parts.join(" ");
+            note.hidden = !parts.length;
+        }
+
+        function msChange(el) {
+            if (!MS) return;
+            if (el.name === "msFl") {
+                MS.florida = el.value === "yes";
+                document.getElementById("msAddr").hidden = !MS.florida;
+                renderFlNote();
+                renderMsMath();
+            } else if (el.dataset.msDep) {
+                MS.deposit[el.dataset.msDep] = el.value;
+                renderMsMath();
+            } else if (el.id === "msMe") {
+                document.getElementById("msSender").hidden = el.checked;
+            }
+        }
+
+        function openSelection(key) {
+            const sel = SELECTIONS[key];
+            if (!sel) return;
+            MS = { key, label: sel.label, items: sel.items, florida: null, deposit: {}, books: null, token: null, widget: null, sending: false };
+            const dlg = document.getElementById("msDialog");
+            dlg.innerHTML = selectionForm();
+            renderMsMath();
+            dlg.showModal();
+            dlg.scrollTop = 0;
+            startTurnstile();
+        }
+
+        // Closing the window clears everything typed in it.
+        function closeSelection() {
+            if (MS && MS.widget !== null && window.turnstile) { try { window.turnstile.remove(MS.widget); } catch (e) {} }
+            MS = null;
+            document.getElementById("msDialog").innerHTML = "";
+        }
+
+        // Cloudflare Turnstile, loaded only when the window opens and the Worker is set up.
+        function startTurnstile() {
+            if (!FAMILY_API || !TURNSTILE_SITE_KEY) return;
+            const show = () => {
+                if (!MS || !document.getElementById("msTurnstile")) return;
+                MS.widget = window.turnstile.render("#msTurnstile", { sitekey: TURNSTILE_SITE_KEY,
+                    callback: t => { if (MS) MS.token = t; }, "expired-callback": () => { if (MS) MS.token = null; } });
+            };
+            if (window.turnstile) return show();
+            window.onTurnstileReady = show;
+            if (!document.getElementById("tsScript")) {
+                const sc = document.createElement("script");
+                sc.id = "tsScript";
+                sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileReady";
+                sc.async = true;
+                document.head.appendChild(sc);
+            }
+        }
+
+        const msValue = id => { const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+        // Age on a date (YYYY-MM-DD) for a date of birth (YYYY-MM-DD).
+        function ageOn(dob, on) {
+            const [y, m, d] = dob.split("-").map(Number), [Y, M, D] = on.split("-").map(Number);
+            return Y - y - (M < m || (M === m && D < d) ? 1 : 0);
+        }
+        const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // Everything the request needs, in the window's order. Returns the problems as text.
+        function validateSelection() {
+            const errs = [];
+            const bad = (id, text) => { const el = document.getElementById(id); if (el) el.setAttribute("aria-invalid", "true"); errs.push(text); };
+            const need = (id, text) => { if (!msValue(id)) bad(id, text); };
+            if (MS.florida === null) errs.push("Answer whether guest 1 and guest 2 are Florida residents.");
+            for (const [s] of MS.items) if (!MS.deposit[shipKey(s)]) errs.push(`Choose how to pay the deposit${MS.items.length > 1 ? ` for the ${s.ship_short} booking` : ""}.`);
+            if (MS.florida) {
+                need("msStreet", "Enter guest 1's street address.");
+                need("msCity", "Enter guest 1's city.");
+                need("msState", "Enter guest 1's state.");
+                if (!/^\d{5}(-\d{4})?$/.test(msValue("msZip"))) bad("msZip", "Enter guest 1's 5 digit ZIP code.");
+            }
+            const today = todayEastern(), sail = G.depart, credit = !!MS.books && MS.books.some(b => b.credits);
+            guestOrder().forEach((a, i) => {
+                const p = `g${i}`, who = `guest ${i + 1}`;
+                need(p + "_first", `Enter ${who}'s first name.`);
+                need(p + "_last", `Enter ${who}'s last name.`);
+                const dob = msValue(p + "_dob");
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(dob) || dob > today) bad(p + "_dob", `Enter ${who}'s date of birth.`);
+                else {
+                    const age = ageOn(dob, sail);
+                    if (a === null && age < 21) bad(p + "_dob", `Guest ${i + 1} is an adult on this page, so they must be 21 or older on ${ageDateText()}.`);
+                    if (a !== null && age !== a) bad(p + "_dob", `Guest ${i + 1}'s date of birth makes them ${age} on ${ageDateText()}, but the page says ${a}. Change the date, or the kid's age on the page.`);
+                    if (i === 0 && credit && ageOn(dob, today) < 21) bad(p + "_dob", "CruiseNext credits can only be used by someone 21 or older, so guest 1 must be 21 today.");
+                }
+                need(p + "_gender", `Choose ${who}'s gender as on the passport or ID.`);
+                need(p + "_citizenship", `Enter ${who}'s citizenship.`);
+                const lat = msValue(p + "_latitudes");
+                if (lat && !/^\d{4,15}$/.test(lat)) bad(p + "_latitudes", `${who[0].toUpperCase() + who.slice(1)}'s Latitudes number should be digits only.`);
+            });
+            if (!EMAIL_RE.test(msValue("g0_email"))) bad("g0_email", "Enter guest 1's email.");
+            if (msValue("g0_phone").replace(/\D/g, "").length < 10) bad("g0_phone", "Enter guest 1's mobile phone number.");
+            if (credit && !msValue("g0_latitudes")) bad("g0_latitudes", "Enter guest 1's Latitudes number. CruiseNext needs it to move the credit.");
+            if (!document.getElementById("msMe").checked) {
+                need("msName", "Enter your name.");
+                if (!EMAIL_RE.test(msValue("msEmail"))) bad("msEmail", "Enter your email.");
+            }
+            if (FAMILY_API && !MS.token) errs.push("Complete the check above the Send button.");
+            return errs;
+        }
+
+        // The request the Worker turns into the two emails (5.2.0 part B). Amounts are the
+        // window's own numbers; the Worker formats them and never stores anything.
+        function selectionRequest() {
+            const order = guestOrder();
+            const v = msValue;
+            const me = document.getElementById("msMe").checked;
+            return {
+                kind: "booking",
+                page_version: APP_VERSION,
+                prices_saved_at: DATA.saved_at,
+                note: CHANGE_TEXT,
+                option: MS.label,
+                party: { adults: state.adults, kid_ages: order.filter(a => a !== null) },
+                page_switches: { prepay_gratuities: state.prepayGratuities, florida_resident_rate: state.flResident },
+                florida: { residents: MS.florida, address: MS.florida ? { street: v("msStreet"), city: v("msCity"), state: v("msState"), zip: v("msZip") } : null },
+                bookings: MS.books.map(b => ({
+                    ship: b.s.ship, depart: b.s.depart, return: b.s.return, nights: b.s.nights,
+                    cabin_type: b.c.typeTitle, category: b.c.code, description: b.c.description, guarantee: b.c.guarantee,
+                    free_at_sea: Object.assign({}, state.offers[shipKey(b.s)]),
+                    fare: b.k.fare, taxes: b.k.taxes, florida_discount: b.k.fl.amount, price_without_gratuities: b.price,
+                    not_in_price: b.extras.map(x => ({ item: x.label, amount: x.amount, paid: x.onboard ? "onboard" : "with the balance" })),
+                    deposit_choice: b.choice,
+                    ncl_deposit: b.dep ? { amount: b.dep.amount, rule: b.dep.rule, due_hours: b.dep.hours, offer: b.dep.offer ? b.dep.offer.title : null } : null,
+                    credits: b.credits, credit_value: b.creditValue, due_at_booking: b.dueNow, balance: b.balance,
+                    balance_due: b.past ? "when booking" : b.final, pay_david: b.payDavid,
+                })),
+                guests: order.map((a, i) => ({
+                    position: i + 1, adult: a === null, age_on_sail_date: a,
+                    first: v(`g${i}_first`), middle: v(`g${i}_middle`), last: v(`g${i}_last`), date_of_birth: v(`g${i}_dob`),
+                    gender: v(`g${i}_gender`), citizenship: v(`g${i}_citizenship`), latitudes: v(`g${i}_latitudes`) || null,
+                })),
+                guest1: { email: v("g0_email"), phone: v("g0_phone") },
+                sender: me ? { is_guest1: true, name: [v("g0_first"), v("g0_last")].join(" "), email: v("g0_email") }
+                           : { is_guest1: false, name: v("msName"), email: v("msEmail") },
+                turnstile: MS.token,
+            };
+        }
+
+        async function sendSelection() {
+            if (!MS || MS.sending) return;
+            document.querySelectorAll("#msDialog [aria-invalid]").forEach(el => el.removeAttribute("aria-invalid"));
+            const status = document.getElementById("msStatus"), button = document.getElementById("msSend");
+            const errs = validateSelection();
+            if (errs.length) {
+                status.className = "ms-status bad";
+                status.innerHTML = `<strong>Please fix these first:</strong><ul>${errs.map(e => `<li>${esc(e)}</li>`).join("")}</ul>`;
+                const first = document.querySelector("#msDialog [aria-invalid='true']");
+                if (first) first.focus();
+                return;
+            }
+            if (!FAMILY_API) {
+                status.className = "ms-status info";
+                status.textContent = "Everything is filled in. Sending isn't switched on yet: the email service is set up in the next part of this update. Nothing was sent.";
+                return;
+            }
+            MS.sending = true;
+            button.disabled = true;
+            status.className = "ms-status info";
+            status.textContent = "Sending...";
+            try {
+                const body = selectionRequest();
+                const r = await fetch(FAMILY_API + "/booking", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+                const ans = await r.json().catch(() => ({}));
+                if (!r.ok || !ans.ok) throw new Error(ans.error || "HTTP " + r.status);
+                document.querySelector("#msDialog .ms-body").innerHTML = `
+                    <div class="ms-status ok" style="margin-top:1rem"><strong>Sent.</strong> David will confirm by email. A copy of your selection is on its way to ${esc(body.sender.email)}.</div>
+                    <p class="ms-warn">${CHANGE_TEXT}</p>
+                    <button type="button" class="ms-send" data-ms-close>Close</button>`;
+            } catch (err) {
+                if (!MS) return;
+                status.className = "ms-status bad";
+                status.textContent = `Not sent (${err.message}). Please try again in a few minutes.`;
+                if (MS.widget !== null && window.turnstile) { try { window.turnstile.reset(MS.widget); } catch (e) {} }
+                MS.token = null;
+            } finally {
+                if (MS) MS.sending = false;
+                if (document.getElementById("msSend")) document.getElementById("msSend").disabled = false;
+            }
+        }
+
 
         // ---------- render ----------
         // Ages are taken on the first sail date (the Getaway, Jun 11, 2027).
@@ -1370,6 +1944,7 @@
         }
 
         function render(msg) {
+            SELECTIONS = {};
             renderPrepay();
             renderFl();
             normalize();
@@ -1405,6 +1980,9 @@
         // ---------- events ----------
         document.addEventListener("click", e => {
             if (!DATA) return;
+            const sel = e.target.closest("button[data-select]");
+            if (sel) { openSelection(sel.dataset.select); return; }
+            if (e.target.closest("[data-ms-close]")) { document.getElementById("msDialog").close(); return; }
             const b = e.target.closest("button[data-count], button[data-type], button[data-mode], button[data-pick], tr.pickable");
             if (!b) return;
             let msg = "";
@@ -1426,6 +2004,7 @@
 
         document.addEventListener("change", e => {
             if (!DATA) return;
+            if (e.target.closest("#msDialog")) { msChange(e.target); return; }
             const offer = e.target.closest("input[data-offer]");
             if (offer) {
                 const o = state.offers[offer.dataset.ship];
@@ -1549,13 +2128,21 @@
         const floridaPromise = fetch(FLORIDA_URL, { cache: "no-cache" })
             .then(r => r.ok ? r.json() : null)
             .catch(() => null);
+        // The DoubleUp watch is optional: without it Make Selection offers one CruiseNext credit.
+        const offersPromise = fetch(OFFERS_URL, { cache: "no-cache" })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null);
+        document.getElementById("msDialog").addEventListener("close", closeSelection);
+        document.addEventListener("input", e => { if (e.target.closest("#msDialog")) e.target.removeAttribute("aria-invalid"); });
+        document.addEventListener("submit", e => { if (e.target.id === "msForm") { e.preventDefault(); sendSelection(); } });
         fetch(DATA_URL, { cache: "no-cache" })
             .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-            .then(d => Promise.all([countsPromise, floridaPromise]).then(([cnt, fl]) => [d, cnt, fl]))
-            .then(([d, cnt, fl]) => {
+            .then(d => Promise.all([countsPromise, floridaPromise, offersPromise]).then(([cnt, fl, of]) => [d, cnt, fl, of]))
+            .then(([d, cnt, fl, of]) => {
                 DATA = d;
                 COUNTS = usableCounts(cnt);
                 loadFlorida(fl);
+                OFFERS = of && of.schema_version === 1 && of.doubleup ? of : null;
                 G = d.sailings.find(s => s.id.startsWith("getaway"));
                 A = d.sailings.find(s => s.id.startsWith("aura"));
                 if (!G || !A) throw new Error("a sailing is missing");

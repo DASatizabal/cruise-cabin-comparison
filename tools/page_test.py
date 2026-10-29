@@ -10,6 +10,15 @@ prepay gratuities switch (NOTES.md, "Prepay gratuities off by default"), and the
 rate switch with test copies of data/florida.json: no discount ("Selected..."), a Florida fare above
 the website, amber after 9 days, not used after 15, a discount on both ships and on one, 4 guests,
 and the switch off (NOTES.md, "Florida resident rates").
+
+Make Selection (5.2.0, NOTES.md "Make Selection"): the window on every card at 360 px, the price
+without gratuities (gratuities listed, not added), NCL's deposit and the 2-For-1 line, one and two
+CruiseNext credits (DoubleUp from a test data/offers.json: on, read too long ago, ended, a cabin
+type it doesn't cover), a Haven deposit (10% of the fare, a credit covering part of it), the
+Florida answer overriding the page switch, 8 nights as two bookings with totals, the checks on
+every field (a kid's date of birth that doesn't match the age on the page), a schema 3 price
+file (deposit not found), and sending to a stand-in for the Worker (the request it gets, nothing
+saved in the browser).
 """
 import datetime as dt
 import functools
@@ -94,11 +103,22 @@ for name in FL_SITES:
 
 
 sites["ksf"] = ksf_copy(real)
+sites["ms_api"] = test_tools.schema4(real)   # Make Selection with a stand-in for the Worker
+sites["schema3"] = real                       # the committed file until the first refresh after 5.2.0
+FAMILY_API_TEST = "https://family-alerts.test"
 site_root = tempfile.mkdtemp(prefix="june-page-")
 for name, data in sites.items():
     d = os.path.join(site_root, name)
     os.makedirs(os.path.join(d, "data"))
     shutil.copy(os.path.join(REPO, "index.html"), d)
+    if name == "ms_api":
+        with open(os.path.join(d, "index.html"), encoding="utf-8") as f:
+            html = f.read()
+        assert 'const FAMILY_API = "";' in html and 'const TURNSTILE_SITE_KEY = "";' in html
+        html = html.replace('const FAMILY_API = "";', f'const FAMILY_API = "{FAMILY_API_TEST}";').replace(
+            'const TURNSTILE_SITE_KEY = "";', 'const TURNSTILE_SITE_KEY = "test-site-key";')
+        with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
+            f.write(html)
     counts = os.path.join(REPO, "data", "counts.json")
     if os.path.exists(counts):
         shutil.copy(counts, os.path.join(d, "data"))
@@ -124,8 +144,9 @@ fails = []
 
 def console_error(m):
     """A console error, except the 404 of an optional file the page does without (florida.json:
-    until the AI PC's first check, the page shows website prices)."""
-    return m.type == "error" and not (m.location or {}).get("url", "").endswith("/data/florida.json")
+    until the AI PC's first check, the page shows website prices; offers.json: until the first
+    refresh after 5.2.0, Make Selection offers one CruiseNext credit)."""
+    return m.type == "error" and not (m.location or {}).get("url", "").endswith(("/data/florida.json", "/data/offers.json"))
 
 
 def check(name, ok, detail=""):
@@ -483,6 +504,291 @@ with sync_playwright() as pw:
         if SHOTS and name in ("none", "old"):
             page.screenshot(path=os.path.join(SHOTS, f"florida_{name}_360.png"))
         page.close()
+
+    # Make Selection (5.2.0): the booking request window.
+    today_e = dt.datetime.now(MIAMI).date()
+
+    def offers_file(listed=True, read_days_ago=0, types=("BALCONY", "MINISUITE", "SUITE", "HAVEN"), min_days=90):
+        on = (today_e - dt.timedelta(days=read_days_ago)).isoformat()
+        return {"schema_version": 1, "saved_at": f"{on}T12:00:00Z", "checked_on": on, "source": "https://www.ncl.com/cruise-deals/cruisenext",
+                "read_ok": True, "warnings": [],
+                "doubleup": {"listed": listed, "title": "Limited-Time Offer: DoubleUp!" if listed else None,
+                             "text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply TWO CruiseNext credits." if listed else None,
+                             "types": list(types) if listed else None, "min_days": min_days if listed else None, "min_months": None,
+                             "read_on": on, "since": on},
+                "last_change": None}
+
+    # A stand-in for Cloudflare Turnstile: Cloudflare's own script is never loaded in the test.
+    TURNSTILE_STUB = ("window.turnstile = { render: (el, o) => { setTimeout(() => o.callback('test-token'), 0); return 'w1'; },"
+                      " remove() {}, reset() {} };")
+
+    def ms_open(site, stored=None, offers=None, ready=".card .price-total"):
+        page = browser.new_page(viewport={"width": 360, "height": 800})
+        errs, sent = [], []
+        page.on("pageerror", lambda e: errs.append(str(e)))
+        page.on("console", lambda m: errs.append(m.text) if console_error(m) else None)
+        if offers is not None:
+            page.route("**/data/offers.json", lambda r: r.fulfill(status=200, content_type="application/json", body=json.dumps(offers)))
+        page.route("https://challenges.cloudflare.com/**", lambda r: r.abort())
+        page.add_init_script(TURNSTILE_STUB)
+
+        def worker(route):
+            sent.append(json.loads(route.request.post_data))
+            route.fulfill(status=200, content_type="application/json", body='{"ok": true}', headers={"Access-Control-Allow-Origin": "*"})
+        page.route(FAMILY_API_TEST + "/booking", worker)
+        page.goto(f"{base}/{site}/index.html")
+        page.evaluate("s => { localStorage.clear(); if (s) localStorage.setItem('cruise-decision-guide-v5', JSON.stringify(s)); }", stored)
+        page.reload()
+        page.wait_for_selector(ready)
+        return page, errs, sent
+
+    def wide(page):
+        return page.evaluate("Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)")
+
+    def dialog_fits(page):
+        return page.evaluate("(() => { const d = document.getElementById('msDialog'); return d.scrollWidth <= d.clientWidth; })()")
+
+    def booking_rows(page, key):
+        box = page.query_selector(f"#msMath [data-booking='{key}']")
+        return [(r.query_selector(".k").inner_text(), r.query_selector(".v").inner_text()) for r in box.query_selector_all(".row")]
+
+    def choice_texts(page, key):
+        return [l.inner_text() for l in page.query_selector_all(f"#msMath [data-booking='{key}'] .ms-choice")]
+
+    def sail_dob(age, adult=False):
+        """A date of birth that makes the guest `age` on Jun 11, 2027 (30 days past the birthday)."""
+        return (dt.date(2027 - age, 6, 11) - dt.timedelta(days=30)).isoformat()
+
+    def fill_guests(page, ages):
+        for i, a in enumerate(ages):
+            page.fill(f"#g{i}_first", f"Test{i + 1}")
+            page.fill(f"#g{i}_last", "Guest")
+            page.fill(f"#g{i}_dob", sail_dob(40) if a is None else sail_dob(a))
+            page.select_option(f"#g{i}_gender", "Female")
+            page.fill(f"#g{i}_citizenship", "United States")
+        page.fill("#g0_email", "guest1@example.com")
+        page.fill("#g0_phone", "305 555 0100")
+
+    gw = next(x for x in sites["ms_api"]["sailings"] if x["id"].startswith("getaway"))
+    au = next(x for x in sites["ms_api"]["sailings"] if x["id"].startswith("aura"))
+    cat = lambda sl, code: next(c for t in sl["types"] for c in t["categories"] if c["code"] == code)
+    doubleup_on = offers_file()
+
+    # 1. Getaway card, 2 adults, Balcony (default BF). DoubleUp on today.
+    page, errs, _ = ms_open("ms_api", offers=doubleup_on)
+    same("Make Selection: a button on each card", page.eval_on_selector_all("button[data-select]", "els => els.map(e => e.dataset.select)"), ["G", "A", "8"])
+    page.click('button[data-select="G"]')
+    check("Make Selection: the window opens", page.is_visible("#msDialog"))
+    same("Make Selection: 'Prices can change until NCL confirms the booking' in the window",
+         page.inner_text("#msDialog").count("Prices can change until NCL confirms the booking."), 2)
+    same("Make Selection: no price until the Florida question is answered",
+         page.inner_text("#msMath").splitlines()[-1], "Answer the Florida question above to see the price, the deposit and the balance.")
+    same("Make Selection: Florida question starts with nothing selected",
+         page.eval_on_selector_all("input[name='msFl']", "els => els.filter(e => e.checked).length"), 0)
+    page.check("input[name='msFl'][value='no']")
+    rows = booking_rows(page, "G")
+    bf = cat(gw, "BF")["by_guests"]["2"]
+    fare, taxes = bf["cabin_total"] - 2 * gw["taxes_per_guest"], 2 * gw["taxes_per_guest"]
+    same("Make Selection: price without gratuities = fare + taxes", [r for r in rows[:3]],
+         [("Cruise fare", f"${fare:,}"), (f"Taxes, fees and port expenses: 2 x ${gw['taxes_per_guest']:g}", f"${taxes:,}"), ("Price without gratuities", f"${bf['cabin_total']:,}")])
+    labels = [k for k, v in rows]
+    check("Make Selection: gratuities listed below the price, not added",
+          any(k.startswith("Unlimited Open Bar") for k in labels) and any(k.startswith("Service charges") for k in labels), labels)
+    texts = choice_texts(page, "G")
+    same("Make Selection: NCL's deposit with the 2-For-1 line, one credit, two credits (DoubleUp, Balcony)", [t.split("\n")[0] for t in texts],
+         ["NCL's deposit: $100 ($50 per guest x 2), due within 76 hours of booking", "One of David's CruiseNext credits: $250 toward the cruise, you pay David $125",
+          "Two of David's CruiseNext credits (NCL's DoubleUp offer): $500 toward the cruise, you pay David $250"])
+    check("Make Selection: NCL's deposit offer in NCL's words", "Includes NCL's 2-For-1 Deposits offer: Lock-in this vacation today" in texts[0], texts[0])
+    check("Make Selection: CruiseNext steps hidden until a credit is chosen", not page.is_visible("#msCn"))
+    page.check("input[name='msDepG'][value='ncl']")
+    rows = booking_rows(page, "G")
+    same("Make Selection, NCL deposit: deposit and balance by the final payment date", rows[-2:],
+         [("Deposit to NCL at booking", "$100"), ("Balance, due by Feb 11, 2027", f"${bf['cabin_total'] - 100:,}")])
+    page.check("input[name='msDepG'][value='credit1']")
+    rows = booking_rows(page, "G")
+    same("Make Selection, one credit: $250 off, no deposit due, pay David $125", rows[-4:],
+         [("CruiseNext credit toward the cruise: 1 x $250", "−$250"), ("Deposit due at booking (the credit is the deposit)", "$0"),
+          ("Balance, due by Feb 11, 2027", f"${bf['cabin_total'] - 250:,}"), ("Pay David for the credits", "$125")])
+    check("Make Selection, credit: CruiseNext steps shown with NCL's sign-up page",
+          page.is_visible("#msCn") and page.get_attribute("#msCn a", "href") == "https://www.ncl.com/account-access/register")
+    same("Make Selection, credit: Latitudes number required", page.inner_text("#msLatNeed"), "(required for CruiseNext)")
+    early = today_e < dt.date(2026, 11, 26)
+    same("Make Selection, credit: 'can't be completed before about Nov 26, 2026' only before that date",
+         "can't be completed before about Nov 26, 2026" in page.inner_text("#msCn"), early)
+    page.check("input[name='msDepG'][value='credit2']")
+    rows = booking_rows(page, "G")
+    same("Make Selection, two credits: $500 off, pay David $250", [rows[-4], rows[-1]], [("CruiseNext credits toward the cruise: 2 x $250", "−$500"), ("Pay David for the credits", "$250")])
+    check("Make Selection, two credits: note about DoubleUp ending", page.is_visible("#msTwoNote"))
+    page.click("#msSend")
+    st = page.inner_text("#msStatus")
+    check("Make Selection: sending an empty form lists what's missing", "Enter guest 1's first name." in st and "Enter guest 1's Latitudes number" in st, st[:200])
+    check("Make Selection: no sideways scrolling at 360 px", wide(page) <= 360 and dialog_fits(page), wide(page))
+    page.click("[data-ms-close]")
+    page.wait_for_function("document.getElementById('msDialog').innerHTML === ''", timeout=3000)
+    check("Make Selection: closing clears the window", not page.is_visible("#msDialog") and page.inner_html("#msDialog") == "")
+    check("Make Selection: no script errors", not errs, errs[:3])
+    page.close()
+
+    # 2. DoubleUp: read too long ago, ended, or not covering the cabin: one credit only.
+    for name, offers, stored in [("read 4 days ago", offers_file(read_days_ago=4), None), ("ended", offers_file(listed=False), None),
+                                 ("Inside cabin", doubleup_on, {"adults": 2, "kids": [], "type": "inside", "mode": "same"}),
+                                 ("no offers file", None, None)]:
+        page, errs, _ = ms_open("ms_api" if offers is not None else "real", stored=stored, offers=offers)
+        page.click('button[data-select="G"]')
+        page.check("input[name='msFl'][value='no']")
+        same(f"Make Selection, DoubleUp {name}: one credit only", len(choice_texts(page, "G")), 2)
+        check(f"Make Selection, DoubleUp {name}: no script errors", not errs, errs[:3])
+        page.close()
+
+    # 3. Haven on the Aura: NCL's 10% rule, a credit covers part of the deposit.
+    page, errs, _ = ms_open("ms_api", stored={"adults": 2, "kids": [], "type": "haven", "mode": "same"}, offers=doubleup_on)
+    page.click('button[data-select="A"]')
+    page.check("input[name='msFl'][value='no']")
+    head = page.inner_text("#msMath [data-booking='A'] .cabin-line")
+    code = head.rsplit("(", 1)[1].rstrip(")")
+    hv = cat(au, code)["by_guests"]["2"]
+    dep = round((hv["cabin_total"] - 2 * au["taxes_per_guest"]) * 0.10, 2)
+    dep_text = f"${dep:,.2f}".replace(".00", "")
+    texts = choice_texts(page, "A")
+    check(f"Make Selection, Haven {code}: NCL's deposit is 10% of the cruise fare ({dep_text})",
+          texts[0].startswith(f"NCL's deposit: {dep_text} (10% of the cruise fare, NCL's rule for Suites and The Haven)"), texts[0])
+    check("Make Selection, Haven: no 2-For-1 line", "2-For-1" not in texts[0], texts[0])
+    check("Make Selection, Haven: says a credit covers part of the deposit", "covers part of NCL's deposit" in texts[1], texts[1])
+    page.check("input[name='msDepA'][value='credit1']")
+    rows = booking_rows(page, "A")
+    rest = round(dep - 250, 2)
+    same("Make Selection, Haven, one credit: the rest of NCL's deposit is due at booking", rows[-3][0], "Rest of NCL's deposit, due at booking")
+    check("Make Selection, Haven, one credit: rest = deposit - $250, balance = price - $250 - rest",
+          abs(money(rows[-3][1]) - rest) < 0.01 and abs(money(rows[-2][1]) - (hv["cabin_total"] - 250 - rest)) < 0.01, rows[-3:])
+    check("Make Selection, Haven: no script errors", not errs, errs[:3])
+    page.close()
+
+    # 4. Florida answer overrides the page switch (Getaway BF $60 off per guest in the "both" file).
+    page, errs, _ = ms_open("both")
+    page.click('button[data-select="G"]')
+    page.check("input[name='msFl'][value='no']")
+    same("Make Selection, Florida No with the switch on: says so", page.inner_text("#msFlNote"),
+         "The Florida resident rate switch on the page is on. Your answer turns the Florida resident rate off for this request.")
+    no_price = money(dict(booking_rows(page, "G"))["Price without gratuities"])
+    check("Make Selection, Florida No: no address fields", not page.is_visible("#msAddr"))
+    page.check("input[name='msFl'][value='yes']")
+    rows = dict(booking_rows(page, "G"))
+    same("Make Selection, Florida Yes: $60 x 2 off, price $120 lower",
+         (rows.get("Florida resident rate: 2 guests x $60 off the fare"), no_price - money(rows["Price without gratuities"])), ("−$120", 120))
+    check("Make Selection, Florida Yes: guest 1's Florida home address asked", page.is_visible("#msAddr") and page.input_value("#msState") == "FL")
+    check("Make Selection, Florida Yes with the switch on: no note", not page.is_visible("#msFlNote"))
+    page.click("[data-ms-close]")
+    page.click("#flToggle")
+    page.click('button[data-select="G"]')
+    page.check("input[name='msFl'][value='yes']")
+    same("Make Selection, Florida Yes with the switch off: says so", page.inner_text("#msFlNote"),
+         "The Florida resident rate switch on the page is off. Your answer turns the Florida resident rate on for this request.")
+    check("Make Selection, Florida Yes with the switch off: discount applied", "Florida resident rate: 2 guests x $60 off the fare" in dict(booking_rows(page, "G")))
+    check("Make Selection, Florida: no script errors", not errs, errs[:3])
+    page.close()
+    page, errs, _ = ms_open("none")
+    page.click('button[data-select="G"]')
+    page.check("input[name='msFl'][value='yes']")
+    same("Make Selection, Florida Yes with no discount offered: says the price is the same", page.inner_text("#msFlNote"),
+         "NCL isn't offering a Florida resident discount on this selection right now, so the price is the same either way.")
+    page.close()
+
+    # 5. 8 nights: two bookings and the totals, 4 guests (2 adults, kids 15 and 7).
+    page, errs, _ = ms_open("ms_api", stored={"adults": 2, "kids": [15, 7], "type": "balcony", "mode": "same"}, offers=doubleup_on)
+    page.click('button[data-select="8"]')
+    page.check("input[name='msFl'][value='no']")
+    check("Make Selection, 8 nights: totals wait for both deposit choices", "Choose how to pay each deposit" in page.inner_text("#msMath"))
+    page.check("input[name='msDepG'][value='credit1']")
+    page.check("input[name='msDepA'][value='ncl']")
+    g_rows, a_rows = dict(booking_rows(page, "G")), dict(booking_rows(page, "A"))
+    same("Make Selection, 8 nights, 4 guests: NCL's deposit $200 on the Aura", a_rows["Deposit to NCL at booking"], "$200")
+    tot = page.query_selector_all("#msMath .ms-booking")[-1]
+    trows = dict((r.query_selector(".k").inner_text(), r.query_selector(".v").inner_text()) for r in tot.query_selector_all(".row"))
+    same("Make Selection, 8 nights: price = both prices", money(trows["Price without gratuities"]),
+         money(g_rows["Price without gratuities"]) + money(a_rows["Price without gratuities"]))
+    same("Make Selection, 8 nights: balances listed with each date and added",
+         money(trows["Balances: Getaway due by Feb 11, 2027, Aura due by Feb 14, 2027"]),
+         money(g_rows["Balance, due by Feb 11, 2027"]) + money(a_rows["Balance, due by Feb 14, 2027"]))
+    same("Make Selection, 8 nights: pay David $125, at booking $200", (trows["Pay David for the credits"], trows["Paid to NCL at booking"]), ("$125", "$200"))
+    same("Make Selection, 4 guests: guest details in NCL's order",
+         [l.inner_text() for l in page.query_selector_all(".ms-guest legend")], ["Guest 1 (adult)", "Guest 2 (adult)", "Guest 3 (age 15 on Jun 11, 2027)", "Guest 4 (age 7 on Jun 11, 2027)"])
+    fill_guests(page, [None, None, 15, 7])
+    page.fill("#g3_dob", sail_dob(8))
+    page.check("#msMe")
+    page.fill("#g0_latitudes", "123456789")
+    page.click("#msSend")
+    st = page.inner_text("#msStatus")
+    same("Make Selection: a kid's date of birth must match the age on the page", "Guest 4's date of birth makes them 8 on Jun 11, 2027, but the page says 7." in st, True)
+    page.fill("#g3_dob", sail_dob(7))
+    page.click("#msSend")
+    page.wait_for_selector(".ms-status.ok")
+    check("Make Selection, 8 nights: no sideways scrolling at 360 px", wide(page) <= 360, wide(page))
+    page.close()
+
+    # 6. Sending to the stand-in Worker: the request, Turnstile's token, nothing saved in the browser.
+    page, errs, sent = ms_open("ms_api", stored={"adults": 2, "kids": [15], "type": "balcony", "mode": "same"}, offers=doubleup_on)
+    page.click('button[data-select="G"]')
+    page.check("input[name='msFl'][value='yes']")
+    page.check("input[name='msDepG'][value='credit1']")
+    fill_guests(page, [None, None, 15])
+    page.fill("#g0_latitudes", "123456789")
+    page.fill("#msStreet", "1 Test Street")
+    page.fill("#msCity", "Miami")
+    page.fill("#msZip", "33101")
+    page.fill("#msName", "Test Sender")
+    page.fill("#msEmail", "sender@example.com")
+    page.click("#msSend")
+    page.wait_for_selector(".ms-status.ok")
+    same("Make Selection, send: one request to the Worker", len(sent), 1)
+    req = sent[0] if sent else {}
+    b0 = (req.get("bookings") or [{}])[0]
+    same("Make Selection, send: the request", (req.get("kind"), req.get("turnstile"), req.get("option"), req.get("note"), req.get("party")),
+         ("booking", "test-token", "Option 1: 3 nights", "Prices can change until NCL confirms the booking.", {"adults": 2, "kid_ages": [15]}))
+    same("Make Selection, send: the booking's numbers", (b0.get("ship"), b0.get("deposit_choice"), b0.get("credits"), b0.get("due_at_booking"), b0.get("pay_david"), b0.get("balance_due")),
+         ("Norwegian Getaway", "credit1", 1, 0, 125, "2027-02-11"))
+    same("Make Selection, send: price - credit = balance", b0.get("price_without_gratuities", 0) - 250, b0.get("balance"))
+    same("Make Selection, send: guests and the Florida address",
+         ([g["first"] for g in req.get("guests", [])], req.get("florida")),
+         (["Test1", "Test2", "Test3"], {"residents": True, "address": {"street": "1 Test Street", "city": "Miami", "state": "FL", "zip": "33101"}}))
+    same("Make Selection, send: sender", req.get("sender"), {"is_guest1": False, "name": "Test Sender", "email": "sender@example.com"})
+    stored = page.evaluate("JSON.stringify(Object.assign({}, localStorage))")
+    check("Make Selection, send: nothing typed is saved in the browser", not any(x in stored for x in ("Test1", "Test Street", "123456789", "sender@example.com")), stored[:200])
+    check("Make Selection, send: no sideways scrolling at 360 px", wide(page) <= 360, wide(page))
+    check("Make Selection, send: no script errors", not errs, errs[:3])
+    if SHOTS:
+        page.screenshot(path=os.path.join(SHOTS, "make_selection_sent.png"))
+    page.close()
+
+    # 7. Without the Worker's address (until part B): checks run, nothing is sent.
+    page, errs, _ = ms_open("real")
+    page.click('button[data-select="A"]')
+    page.check("input[name='msFl'][value='no']")
+    page.check("input[name='msDepA'][value='ncl']")
+    fill_guests(page, [None, None])
+    page.check("#msMe")
+    page.click("#msSend")
+    same("Make Selection, no Worker yet: says nothing was sent", page.inner_text("#msStatus"),
+         "Everything is filled in. Sending isn't switched on yet: the email service is set up in the next part of this update. Nothing was sent.")
+    page.close()
+
+    # 8. A schema 3 price file (no payment data): the deposit is never guessed.
+    page, errs, _ = ms_open("schema3")
+    page.click('button[data-select="G"]')
+    page.check("input[name='msFl'][value='no']")
+    same("Make Selection, schema 3 file: NCL's deposit not found, David will confirm", choice_texts(page, "G")[0],
+         "NCL's deposit (not found on NCL today; David will confirm it)")
+    page.check("input[name='msDepG'][value='ncl']")
+    same("Make Selection, schema 3 file: balance left to David", booking_rows(page, "G")[-1], ("Balance, due by NCL's final payment date (not found on NCL today)", "David will confirm"))
+    check("Make Selection, schema 3 file: no script errors", not errs, errs[:3])
+    if SHOTS:
+        page.screenshot(path=os.path.join(SHOTS, "make_selection_schema3.png"))
+    page.close()
+
+    # 9. A kid without an age: no Make Selection button.
+    page, errs, _ = ms_open("ms_api", stored={"adults": 2, "kids": [None], "type": "balcony", "mode": "same"}, ready=".card .rows")
+    same("Make Selection: no button until every kid's age is chosen", page.eval_on_selector_all("button[data-select]", "els => els.length"), 0)
+    page.close()
+
     browser.close()
 srv.shutdown()
 shutil.rmtree(site_root, ignore_errors=True)
