@@ -526,7 +526,10 @@
         /* Free at Sea first, then the cabin lists (5.2.0), each list title with a line above it */
         .card-picks .cat-list-title, .pick-section { margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--gray-200); }
         .card-picks > :first-child { margin-top: 0; padding-top: 0; border-top: none; }
-        .pick-section .cat-list-note + .cat-list-title { margin-top: 0.6rem; padding-top: 0; border-top: none; }
+        .pick-section .cat-list-note + .cat-list-title, .pick-section .type-pick + .cat-list-title { margin-top: 0.9rem; padding-top: 0; border-top: none; }
+        .type-pick-title { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ocean-blue); margin-bottom: 0.4rem; }
+        .seg + .type-pick { margin-top: 0.9rem; }
+        .type-pick + .cat-list-note { margin-top: 0.75rem; }
         .gty { color: #92400e; }
 
         .cat-list { list-style: none; margin-top: 0.9rem; }
@@ -534,7 +537,7 @@
         .cat-list-note + .cat-list { margin-top: 0.5rem; }
 
         .cat-list-title {
-            font-size: 0.75rem;
+            font-size: 0.9rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.04em;
@@ -724,12 +727,6 @@
             </div>
             <div class="guest-msg" id="guestMsg" role="status" aria-live="polite"></div>
             <div class="guest-summary" id="guestSummary"></div>
-        </section>
-
-        <section class="panel" aria-label="Cabin type">
-            <div class="panel-title">Cabin type</div>
-            <div class="seg small" id="typeButtons" role="group" aria-label="Cabin type"></div>
-            <p class="hint">Prices are for one cabin with everyone above in it.</p>
         </section>
 
         <section class="panel" aria-label="Florida resident rate and gratuities">
@@ -1292,7 +1289,7 @@
         function singleCard(s, label) {
             const n = guests();
             const tf = typeFor(s, state.type);
-            let body = "", picks = "";
+            let body = "", offersHtml = "", listHtml = "";
             if (tf.missing) {
                 body = `<div class="notice bad">${esc(typeName(state.type))}: not offered on the ${esc(s.ship_short)}</div>`;
             } else {
@@ -1303,7 +1300,8 @@
                 } else {
                     const full = findCat(s, c.code);
                     const k = cost(s, full);
-                    picks = offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`) + catPicker(s, tf.t, full, n, 0, listNote("card"));
+                    offersHtml = offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`);
+                    listHtml = catPicker(s, tf.t, full, n, 0, listNote("card"));
                     SELECTIONS[shipKey(s)] = { label, items: [[s, full]] };
                     body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k), onboardRows([[s, k]], false)) + ksfNote(s, full) + selectButton(shipKey(s));
                 }
@@ -1315,7 +1313,7 @@
                         <h2 class="card-title">${esc(s.ship)}</h2>
                         <div class="card-dates">${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)</div>
                     </div>
-                    ${picks ? `<div class="card-picks">${picks}</div>` : ""}
+                    <div class="card-picks">${offersHtml}<div class="pick-section">${typeButtons()}${listHtml}</div></div>
                     <div class="card-body">${body}${daysList(s)}</div>
                     <a class="ncl-link" href="${esc(s.url)}" target="_blank" rel="noopener">See this sailing on NCL &rarr;</a>
                 </article>`;
@@ -1399,7 +1397,7 @@
                         <h2 class="card-title">Getaway, then Aura</h2>
                         <div class="card-dates">${fmtDay(G.depart)} to ${fmtDay(A.return)}, 2027 (${nights} nights)</div>
                     </div>
-                    <div class="card-picks">${offerSets}<div class="pick-section">${toggle}${pickers}</div></div>
+                    <div class="card-picks">${offerSets}<div class="pick-section">${toggle}${state.mode === "same" ? typeButtons() : ""}${pickers}</div></div>
                     <div class="card-body">${body}${daysList(G, "Day by day on the Getaway")}${daysList(A, "Day by day on the Aura")}</div>
                 </article>`;
         }
@@ -1981,9 +1979,11 @@
             document.getElementById("guestSummary").textContent = parts.join(". ") + ".";
         }
 
-        function renderTypes() {
-            document.getElementById("typeButtons").innerHTML = allTypes().map(k =>
-                `<button type="button" data-type="${k}" aria-pressed="${state.type === k}">${esc(typeName(k))}</button>`).join("");
+        // The cabin type buttons, in each card after Free at Sea and above the cabin list (5.2.0).
+        // One choice for the whole page: a tap in any card changes every card.
+        function typeButtons() {
+            return `<div class="type-pick"><div class="type-pick-title">Cabin type</div><div class="seg small" role="group" aria-label="Cabin type">${allTypes().map(k =>
+                `<button type="button" data-type="${k}" aria-pressed="${state.type === k}">${esc(typeName(k))}</button>`).join("")}</div></div>`;
         }
 
         // Keep every saved pick valid for the current party.
@@ -2045,7 +2045,6 @@
             renderFl();
             normalize();
             renderGuests(msg);
-            renderTypes();
             // The tiles, then the full card of each selected option, in tile order.
             const cards = { G: () => singleCard(G, OPTIONS[0].label), A: () => singleCard(A, OPTIONS[1].label), "8": eightCard };
             const picked = OPTIONS.filter(o => state.compare.includes(o.key));
@@ -2093,6 +2092,8 @@
             const b = e.target.closest("button[data-count], button[data-type], button[data-mode], button[data-pick], tr.pickable");
             if (!b) return;
             let msg = "";
+            const card = b.closest(".card[data-option]");
+            const anchor = card && b.matches("button") ? { sel: `.card[data-option="${card.dataset.option}"] button${["type", "mode", "pick", "code"].filter(a => b.dataset[a]).map(a => `[data-${a}="${b.dataset[a]}"]`).join("")}`, top: b.getBoundingClientRect().top } : null;
             if (b.dataset.count) msg = changeCount(b.dataset.count, Number(b.dataset.step));
             else if (b.dataset.mode) state.mode = b.dataset.mode;
             else if (b.dataset.pick) state[b.dataset.pick] = b.dataset.code;
@@ -2107,6 +2108,8 @@
                 }
             }
             render(msg);
+            const again = anchor && document.querySelector(anchor.sel);
+            if (again) window.scrollBy(0, again.getBoundingClientRect().top - anchor.top);
         });
 
         document.addEventListener("change", e => {

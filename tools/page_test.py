@@ -879,9 +879,10 @@ with sync_playwright() as pw:
             check(f"{where}: tiles stacked", tops[0] < tops[1] < tops[2] and len(set(xs(page, ".tile"))) == 1, tops)
         else:
             check(f"{where}: tiles in one row", len(set(tops)) == 1, tops)
-        order = [ys(page, s)[0] for s in ("section[aria-label='Who is in the cabin']", "section[aria-label='Cabin type']",
+        order = [ys(page, s)[0] for s in ("section[aria-label='Who is in the cabin']",
                                           "section[aria-label='Florida resident rate and gratuities']", ".tiles-wrap")]
-        check(f"{where}: page order: who, cabin type, Florida and gratuities, then the tiles", order == sorted(order), order)
+        check(f"{where}: page order: who, Florida and gratuities, then the tiles", order == sorted(order), order)
+        same(f"{where}: no cabin type panel at the top (the buttons are in the cards)", page.query_selector("section[aria-label='Cabin type']"), None)
 
         page.click('[data-tile="8"] .tile-title')
         page.click('[data-tile="G"] .tile-btn')
@@ -917,14 +918,32 @@ with sync_playwright() as pw:
         page.click('[data-tile="A"] .tile-dates')
         st = tiles_state(page)
         same(f"{where}: all three selected, in tile order", st["cards"], ["G", "A", "8"])
-        same(f"{where}: Free at Sea first, then the cabin list, its title with a line above it (Option 2 and 8 nights)",
+        same(f"{where}: Free at Sea first, then the cabin type buttons, then the cabin list with a larger title (8 nights: the toggle before the buttons, a line above the Aura list)",
              [page.eval_on_selector(f'.card[data-option="{k}"] .card-picks', """p => {
                  const first = p.querySelector(".offers"), title = p.querySelector(".cat-list-title"), toggle = p.querySelector("button[data-mode]");
+                 const types = p.querySelector(".type-pick");
                  const after = (a, b) => !!(a && b && (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING));
                  const line = [...p.querySelectorAll(".cat-list-title")].map(t => getComputedStyle(t).borderTopStyle);
-                 return [p.firstElementChild.classList.contains("offers"), after(first, title), toggle ? after(first, toggle) : null, line];
-             }""") for k in ("A", "8")],
-             [[True, True, None, ["solid"]], [True, True, True, ["none", "solid"]]])
+                 return [p.firstElementChild.classList.contains("offers"), after(first, types), after(types, title), toggle ? after(toggle, types) : null,
+                         p.querySelectorAll("button[data-type]").length > 3, line, getComputedStyle(title).fontSize];
+             }""") for k in ("G", "A", "8")],
+             [[True, True, True, None, True, ["none"], "14.4px"], [True, True, True, None, True, ["none"], "14.4px"],
+              [True, True, True, True, True, ["none", "solid"], "14.4px"]])
+        # A cabin type tapped in one card changes every card, and on a phone the tapped button
+        # stays where it was on screen while the cards above it change height.
+        page.eval_on_selector('.card[data-option="A"] button[data-type="suite"]', "b => b.scrollIntoView({ block: 'center' })")
+        before = page.eval_on_selector('.card[data-option="A"] button[data-type="suite"]', "b => b.getBoundingClientRect().top")
+        page.click('.card[data-option="A"] button[data-type="suite"]')
+        after_top = page.eval_on_selector('.card[data-option="A"] button[data-type="suite"]', "b => b.getBoundingClientRect().top")
+        same(f"{where}: a cabin type tapped in one card is chosen in every card",
+             page.eval_on_selector_all('button[data-type][aria-pressed="true"]', "els => els.map(e => e.closest('.card').dataset.option + ' ' + e.dataset.type)"),
+             ["G suite", "A suite", "8 suite"])
+        check(f"{where}: the tapped cabin type button stays in place on screen", abs(after_top - before) <= 1, (before, after_top))
+        page.click('.card[data-option="8"] button[data-mode="different"]')
+        same(f"{where}: different cabins on the 8 night card: no cabin type buttons there",
+             page.eval_on_selector_all('.card[data-option="8"] button[data-type]', "els => els.length"), 0)
+        page.click('.card[data-option="8"] button[data-mode="same"]')
+        page.click('.card[data-option="G"] button[data-type="balcony"]')
         same(f"{where}: the teal border on the Option 2 card only, with no text added",
              (page.eval_on_selector_all(".card.featured", "els => els.map(e => e.dataset.option)"),
               page.eval_on_selector('.card[data-option="A"]', "e => getComputedStyle(e).outlineStyle"),
