@@ -25,6 +25,12 @@ Florida resident rates (5.1.0): tools/fetch_florida.py's weekly cadence (light, 
 to light, Eastern dates), its runs against a stand-in for NCL (call counts, the light cabins, each
 cabin's own amount, the hold guard on signed-in answers, the sail-date stop), the --push guard
 (noreply email, main only) and tools/check_florida.py.
+
+DoubleUp watch (5.2.0): tools/fetch_offers.py on NCL's real banner markup (tools/test_data/
+cruisenext_doubleup.html, saved 2026-10-28) and on stand-in pages: started, ended, appeared and
+changed, one issue per change with its own marker, retries of an unreported change, pages that
+can't be read, wording that can't be read, Eastern dates, and tools/check_offers.py. Also: no
+em dash in any tracked file.
 """
 import datetime as dt
 import json
@@ -40,6 +46,7 @@ import fetch_counts  # noqa: E402
 import fetch_prices as fp  # noqa: E402
 
 TEST_DATA = os.path.join(TOOLS, "test_data")
+EM_DASH = chr(0x2014)
 
 FAILED = []
 
@@ -939,6 +946,172 @@ def test_florida_clone_guard():
         ff.ROOT, ff.log = old
 
 
+def offers_page(banner_text=None, title="Limited-Time Offer: DoubleUp!", terms=True):
+    """A small stand-in for NCL's CruiseNext page."""
+    parts = ['<h2 class="cmp-title__text">How It works</h2><div class="cmp-text"><p>Buy credits on board.</p></div>']
+    if banner_text is not None:
+        parts.append(f'<h3 class="cmp-title__text">{title}</h3><div class="cmp-text"><div><p>{banner_text}</p></div></div>')
+    if terms:
+        parts.append("<p><sub>*CruiseNext Credits can only be applied to new reservations. Only one CNC or CNHC "
+                     "can be applied per stateroom.</sub></p>")
+    return "<html><body>" + "".join(parts) + "</body></html>"
+
+
+def test_offers():
+    """DoubleUp watch (5.2.0): tools/fetch_offers.py reads the banner, one issue per change, and
+    tools/check_offers.py. A stand-in for NCL's page; no NCL calls."""
+    import check_offers as co
+    import fetch_offers as fo
+    day = lambda d, h=10: dt.datetime(2026, 10, d, h, 21, tzinfo=dt.timezone.utc)
+    with open(os.path.join(TEST_DATA, "cruisenext_doubleup.html"), encoding="utf-8") as f:
+        real = f.read()
+    now_text = ("Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply TWO "
+                "CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*")
+
+    # First run on NCL's real markup (saved 2026-10-28): the "watch started" issue.
+    first = fo.build(real, None, day(29))
+    du = first["doubleup"]
+    check("DoubleUp: banner read from NCL's real markup", (du["listed"], du["title"], du["text"]),
+          (True, "Limited-Time Offer: DoubleUp!", now_text))
+    check("DoubleUp: Balcony and above", du["types"], ["BALCONY", "MINISUITE", "SUITE", "HAVEN"])
+    check("DoubleUp: 90 days before sailing", (du["min_days"], du["min_months"]), (90, None))
+    check("DoubleUp: first run is a started change, not yet reported",
+          (first["last_change"]["kind"], first["last_change"]["reported"], first["last_change"]["old_listed"]),
+          ("started", False, None))
+    check("DoubleUp: first file passes the format check", co.check(first), [])
+    title, body, marker = fo.issue(first)
+    check("DoubleUp: started issue title", title, "DoubleUp watch started (Oct 29, 2026)")
+    check("DoubleUp: issue mentions the owner, the link and the new text",
+          ["@DASatizabal" in body, fo.CRUISENEXT_URL in body, now_text in body, marker in body], [True] * 4)
+    check("DoubleUp: issue text has no em dash", EM_DASH in title + body, False)
+
+    # Not reported yet (the issue couldn't be opened): the next day tries again with the same marker.
+    retry = fo.build(real, first, day(30))
+    check("DoubleUp: an unreported change is tried again with the same marker",
+          (fo.issue(retry) or (None, None, None))[2], marker)
+    check("DoubleUp: state date kept while nothing changes", retry["doubleup"]["since"], "2026-10-29")
+
+    # Reported: the next days open nothing.
+    first["last_change"]["reported"] = True
+    same = fo.build(real, first, day(30))
+    check("DoubleUp: same text the next day opens no issue", fo.issue(same), None)
+    check("DoubleUp: same text keeps the last change as it was", same["last_change"], first["last_change"])
+    check("DoubleUp: read_on moves to today", same["doubleup"]["read_on"], "2026-10-30")
+    check("DoubleUp: same-day file passes", co.check(same), [])
+
+    # The banner ends, changes, comes back: one issue each, each with its own marker.
+    ended = fo.build(offers_page(None), same, day(31))
+    check("DoubleUp: banner gone is an ended change", (ended["last_change"]["kind"], ended["doubleup"]["listed"]), ("ended", False))
+    check("DoubleUp: ended file passes", co.check(ended), [])
+    e_title, e_body, e_marker = fo.issue(ended)
+    check("DoubleUp: ended issue title and texts", (e_title, "(no DoubleUp banner on the page)" in e_body, now_text in e_body),
+          ("DoubleUp offer ended (Oct 31, 2026)", True, True))
+    ended["last_change"]["reported"] = True
+    back = fo.build(offers_page(now_text), ended, day(31, 20))
+    check("DoubleUp: banner back is an appeared change", back["last_change"]["kind"], "appeared")
+    check("DoubleUp: every change has its own marker",
+          len({marker, e_marker, back["last_change"]["marker"]}), 3)
+    back["last_change"]["reported"] = True
+    new_text = "Book ANY stateroom on any sailing booked at least 6 months in advance and apply TWO CruiseNext credits."
+    changed = fo.build(offers_page(new_text), back, dt.datetime(2026, 11, 2, 14, tzinfo=dt.timezone.utc))
+    check("DoubleUp: new text is a changed change", changed["last_change"]["kind"], "changed")
+    check("DoubleUp: any stateroom, 6 months", (changed["doubleup"]["types"], changed["doubleup"]["min_days"], changed["doubleup"]["min_months"]),
+          (fo.TYPE_ORDER, None, 6))
+    check("DoubleUp: changed file passes", co.check(changed), [])
+    c_body = fo.issue(changed)[1]
+    check("DoubleUp: changed issue shows old and new text", (f'Old text: "{now_text}"' in c_body, f'New text: "{new_text}"' in c_body), (True, True))
+    check("DoubleUp: Eastern date, not UTC (Nov 2 at 3:30 AM UTC is Nov 1, 10:30 PM in Miami)",
+          fo.build(offers_page(None), back, dt.datetime(2026, 11, 2, 3, 30, tzinfo=dt.timezone.utc))["checked_on"], "2026-11-01")
+    check("DoubleUp: evening run belongs to the Eastern day",
+          fo.build(offers_page(None), back, dt.datetime(2026, 11, 3, 2, 0, tzinfo=dt.timezone.utc))["checked_on"], "2026-11-02")
+
+    # Pages that can't be read keep the previous state, warn, and open nothing.
+    for name, page, error in [("a page without CruiseNext terms", offers_page(now_text, terms=False), None),
+                              ("an error loading the page", None, "RuntimeError: NCL answered HTTP 403"),
+                              ("a DoubleUp heading with no text", offers_page("").replace("<p></p>", ""), None),
+                              ("offer text far from the heading", offers_page(now_text).replace(
+                                  "</h3>", "</h3><div>" + " " * (fo.NEAR + 10) + "</div>"), None)]:
+        kept = fo.build(page, same, day(31), page_error=error)
+        check(f"DoubleUp: {name} keeps the state", (kept["read_ok"], kept["doubleup"], kept["last_change"]),
+              (False, same["doubleup"], same["last_change"]))
+        check(f"DoubleUp: {name} opens no issue and warns", (fo.issue(kept), len(kept["warnings"])), (None, 1))
+        check(f"DoubleUp: {name} passes the format check", co.check(kept), [])
+    none_yet = fo.build(None, None, day(29), page_error="URLError: timed out")
+    check("DoubleUp: no previous file and no page: nothing read yet, no issue", (none_yet["doubleup"], fo.issue(none_yet)), (None, None))
+    check("DoubleUp: nothing read yet passes", co.check(none_yet), [])
+
+    # Wording that can't be read: saved as null with a warning, never guessed.
+    odd = fo.build(offers_page("Book something special stateroom and apply TWO credits."), same, day(31))
+    check("DoubleUp: unknown wording gives null types and lead time",
+          (odd["doubleup"]["types"], odd["doubleup"]["min_days"], odd["doubleup"]["min_months"], len(odd["warnings"])), (None, None, None, 2))
+    check("DoubleUp: unknown wording passes the format check", co.check(odd), [])
+    check("DoubleUp: unknown wording means one credit", "one CruiseNext credit" in fo.issue(odd)[1], True)
+    for text, want in [("Book a Club Balcony Suite and above stateroom", ["MINISUITE", "SUITE", "HAVEN"]),
+                       ("Book a Balcony, Club Balcony Suite or Suite stateroom", ["BALCONY", "MINISUITE", "SUITE"]),
+                       ("Book a Suite or The Haven stateroom", ["SUITE", "HAVEN"]),
+                       ("Book a ANY stateroom", fo.TYPE_ORDER),
+                       ("Apply two credits", None)]:
+        check(f"DoubleUp types: {text}", fo.read_types(text), want)
+    check("DoubleUp: 120 days before sailing", fo.read_lead_time("at least 120 days before sailing"), (120, None))
+
+    # The format check refuses anything outside its lists.
+    bad_cases = {
+        "an extra key": dict(same, guest_email="x"),
+        "read_ok true with nothing read": dict(same, doubleup=None),
+        "a banner with a new line": dict(same, doubleup=dict(same["doubleup"], text="two\nlines")),
+        "unknown cabin type": dict(same, doubleup=dict(same["doubleup"], types=["YACHT"])),
+        "no banner but text": dict(ended, doubleup=dict(ended["doubleup"], text="x")),
+        "bad marker": dict(same, last_change=dict(same["last_change"], marker="x")),
+        "read_ok false without a warning": dict(same, read_ok=False, warnings=[]),
+        "types null without a warning": dict(same, doubleup=dict(same["doubleup"], types=None)),
+    }
+    for name, data in bad_cases.items():
+        check(f"DoubleUp format check refuses {name}", bool(co.check(data)), True)
+
+    # main(): exactly 1 NCL page load at the CruiseNext address, the issue files, --mark-reported.
+    folder = tempfile.mkdtemp(prefix="june-offers-")
+    calls = []
+    old_request = fo.fp.request
+
+    def fake_request(url, body=None, raw=False, page=False):
+        calls.append((url, page))
+        return real
+    fo.fp.request = fake_request
+    try:
+        out, issue_dir = os.path.join(folder, "offers.new.json"), os.path.join(folder, "issue")
+        fo.main(["--out", out, "--issue-dir", issue_dir])
+        check("DoubleUp main: 1 NCL page load at the CruiseNext address", calls, [(fo.CRUISENEXT_URL, True)])
+        check("DoubleUp main: issue files written", sorted(os.listdir(issue_dir)), ["body.md", "marker.txt", "title.txt"])
+        fo.main(["--mark-reported", out])
+        with open(out, encoding="utf-8") as f:
+            saved_file = json.load(f)
+        check("DoubleUp main: --mark-reported marks the change", saved_file["last_change"]["reported"], True)
+        check("DoubleUp main: the written file passes", co.check(saved_file), [])
+        issue_dir2 = os.path.join(folder, "issue2")
+        fo.main(["--previous", out, "--out", os.path.join(folder, "next.json"), "--issue-dir", issue_dir2])
+        check("DoubleUp main: next run with the same banner writes no issue", os.path.exists(issue_dir2), False)
+    finally:
+        fo.fp.request = old_request
+    check("DoubleUp: the CruiseNext address passes the address guard", bool(fo.fp.FORBIDDEN.search(fo.CRUISENEXT_URL)), False)
+
+
+def test_no_em_dashes():
+    """Owner's rule: no em dashes anywhere (code, docs, page text, steps)."""
+    root = os.path.dirname(TOOLS)
+    files = subprocess.run(["git", "-C", root, "ls-files"], capture_output=True, text=True).stdout.split()
+    found = []
+    for name in files:
+        if name.startswith("data/") or not name.endswith((".py", ".md", ".html", ".yml", ".js", ".mjs", ".gs", ".sql", ".txt", ".json")):
+            continue
+        try:
+            with open(os.path.join(root, name), encoding="utf-8") as f:
+                if EM_DASH in f.read():
+                    found.append(name)
+        except (OSError, UnicodeDecodeError):
+            continue
+    check("No em dashes in any tracked file", found, [])
+
+
 if __name__ == "__main__":
     test_decide()
     test_counts_cadence()
@@ -952,5 +1125,7 @@ if __name__ == "__main__":
     test_florida_plan_and_format()
     test_florida_runs()
     test_florida_clone_guard()
+    test_offers()
+    test_no_em_dashes()
     print(f"\n{'All tests passed' if not FAILED else str(len(FAILED)) + ' FAILED: ' + '; '.join(FAILED)}")
     sys.exit(1 if FAILED else 0)

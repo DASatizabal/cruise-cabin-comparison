@@ -2,6 +2,19 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [5.2.0] - unreleased
+
+Built on branch `family-tools-5.2.0` in the order the owner set: the DoubleUp watch, the payment data, Make Selection, then the price watch. This entry grows as each part is added.
+
+### Added
+- DoubleUp watch (alerts to the owner only). The daily price job reads NCL's CruiseNext page (https://www.ncl.com/cruise-deals/cruisenext) once, before the prices, with `tools/fetch_offers.py`: whether the "Limited-Time Offer: DoubleUp!" banner is there, its exact text, and the cabin types and time before sailing read from that text (today: Balcony and above, at least 90 days). Wording it can't read is saved as null with a warning and never guessed. A page that can't be read keeps the previous state with a warning, never fails the price run and never opens an issue.
+- `data/offers.json` (schema 1, public NCL text, dates and codes only), committed with the prices, checked by the new `tools/check_offers.py` before it replaces the old file and in the release check, and published by "Deploy site".
+- One GitHub issue per change (main only): "DoubleUp watch started" on the first run (to test that the alert reaches the owner's email and phone), then "appeared", "ended" or "text changed", with the old and new text, the Eastern date and the link. Each change has its own marker, so a retry never opens a second issue, and a change whose issue couldn't be opened is tried again on the next run. The issue mentions the owner, so GitHub notifies by email and on the phone.
+- Release check workflow: actionlint (pinned Docker image `rhysd/actionlint:1.7.7`, with shellcheck) on every push and pull request.
+- Tests: `tools/test_tools.py` (NCL's real banner markup saved 2026-10-28, every kind of change, one issue per change, retries, unreadable pages and wording, Eastern dates, the format check, and no em dash in any tracked file).
+
+NCL calls: the price job goes from 26 to 27 a day (1 page load). Per week about 918 instead of 911 (940 instead of 933 in a week with the Florida light check). NOTES.md, "DoubleUp watch".
+
 ## [5.1.0] - 2026-10-27
 
 ### Added

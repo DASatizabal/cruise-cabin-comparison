@@ -643,3 +643,43 @@ Retries add 2 calls per failed cabin plus 1 availability call per ship. The proo
 ## "Prices moved" warning (item 10): not built
 
 The Joy page's amber "NCL prices have moved since the last refresh" line compares the website fares its Florida runner reads (in `data/florida.json`, last 24 hours) with `data/prices.json`. June's `data/florida.json` is weekly (5.1.0), so it is not a same-day comparison. Not built (owner's decision 2026-10-15).
+
+## Research for 5.2.0 (2026-10-28)
+
+Owner's plan for 5.2.0: a DoubleUp watch (alerts to the owner), a family price watch (emails through a new Cloudflare Worker and the owner's Gmail), and a "Make Selection" booking request. Research run by Claude Code on the owner's PC, nothing held, nothing committed: one read-only run through `fetch_prices.request()` (2 cruise pages, 2 itinerary calls, 8 availability calls, 41 price summaries: 53 NCL calls, 2 seconds apart, only the allowed HOLD payment option note), plus public page loads (CruiseNext page, terms, promotion terms, payment schedule, the sign-up address, the Florida resident pages). From then on the owner's rule: say the number of NCL calls before any research or test run that makes them, and wait for the owner's OK above 10.
+
+Final payment: NCL's terms ("Payment / Deposit Timetable for Sailings Departing August 15, 2022 and beyond", at https://www.ncl.com/terms#payment-deposit-schedule): 1 to 6 day sailings, deposit $100 per person (3rd to 8th guests too), final payment 120 days before sailing; The Haven and Suites, 1 to 6 days: deposit 10% of the voyage fare, final payment 120 days. Every one of the 41 price summaries agrees: the `FULL` payment option's `dueDate` was 2027-02-11 for the Getaway and 2027-02-14 for the Aura, every cabin type and party size.
+
+Deposits in the price summary (`staterooms[0].paymentOptions`: `DEPOSIT` with `amount`, `dueHours` and `dueDate`; `FULL`; `MONTHLY`; the allowed `HOLD` option with `isDeposit` true and the deposit amount):
+
+| Cabin type | Deposit NCL showed, both ships, 2 to 5 guests |
+|---|---|
+| Inside, Oceanview, Balcony, Club Balcony Suite | $50 per guest ($100, $150, $200, $250) on all 13 categories tested (IX, OX, BX, MX, M1, M2, M4, MB, O4, O5, OA, BB, BF, B4). NCL's $100 with its "2-For-1 Deposits" offer ("Lock-in this vacation today with half off deposits for every two guests on your reservation.", listed in the availability answers' `offerGroups`). Due within 74 to 76 hours. |
+| Suite and Haven | Exactly 10% of the cruise fare (fare without taxes) on all 9 categories tested: Getaway HI $329.80 (fare $3,298), H2 $753.80, HG $394.70 (3 guests), HA $453.60 (4), H6 $528.50 (5); Aura SL $419.80, SJ $569.80, HE $659.80, H2 $2,289.80, H5 $1,007.60 (4), H6 $1,343.50 (5). No 2-For-1 halving. Due within 23 hours. |
+
+Owner's decision (2026-10-28): standard cabins use NCL's daily per guest deposit from the price summaries the job already makes; Suite and Haven cabins use 10% of that cabin's cruise fare, labelled as NCL's rule (reading each category directly would add dozens of price summaries a day).
+
+CruiseNext (https://www.ncl.com/cruise-deals/promotion-terms#cruisenext-credit, the terms page the price job already reads): a $250 credit is the full deposit for a stateroom up to a Club Balcony Suite, a partial deposit above that; sailings of 3 days or longer; one credit per stateroom, two when the booking qualifies for DoubleUp ("DoubleUp! promotion eligibility is based on redemption date and not on Credit purchase date"); 21 or older to buy and to use; transferable to another guest at no charge; new reservations only; not usable in partial values; added to the buyer's Latitudes account within 3 days after the sailing ends. NCL account sign-up: https://www.ncl.com/account-access/register (ncl.com/register redirects there).
+
+Guest details: NCL's terms ask for the "full name as it appears on your passport as well as your date of birth", and a reservation can't be held without names. NCL's own guest form comes after `cabin/manage-cabin` (which holds a cabin), so it was not opened. List approved by the owner: every guest's first, middle (optional) and last name as on the passport or ID, date of birth, gender as on the ID, citizenship, Latitudes number if any; guest 1's email and mobile phone, and the Latitudes number when CruiseNext is chosen; the sender's name and email. Never card or passport numbers.
+
+Florida resident rule (who must live in Florida): NCL doesn't publish it. Its US resident rate page (https://www.ncl.com/cruise-deals/residential-rates-florida) now redirects to the home page, and neither the terms nor the promotion terms mention resident rates. NCL's resident rate FAQ (seen on https://www.ncl.com/in/en/residents-florida, dated by its "opens on 1/7/2025") says: "The residency of the guests prompts the promotion. Proof of residency is required." and "If the spouse lives in a different state, the Resident Discount will not be applicable." It also says to "Verify your address on MyNCL". What this project has seen: the Florida price follows the address on the NCL account that is signed in (the owner's runner), and the discount comes off the fare of guests 1 and 2 (5.1.0). So the windows ask about the guests the discount applies to and leave the final word to NCL (see the 5.2.0 Make Selection notes).
+
+## DoubleUp watch (5.2.0, 2026-10-28)
+
+- `tools/fetch_offers.py`, in the "refresh" job before the prices: 1 page load (GET https://www.ncl.com/cruise-deals/cruisenext through `fetch_prices.request(page=True)`: the address guard, tried once, no cookies). It finds the heading with "DoubleUp" and the offer paragraph right after it (NCL's text component next to its title component; never a footnote, never a paragraph more than 4,000 characters on or after the next heading). The page only counts as read if it carries NCL's CruiseNext credit terms ("per stateroom").
+- Read on 2026-10-28: "Limited-Time Offer: DoubleUp!", "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply TWO CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*" (NCL changed the component on 2026-10-22). Types: Balcony, Club Balcony Suite, Suite, Haven. 90 days before sailing: Mar 13, 2027 (Getaway), Mar 16, 2027 (Aura). Older wordings it also reads: "ANY stateroom" and "at least 6 months in advance" (`min_months`). Wording it can't read: null with a warning, and the page offers one credit.
+- `data/offers.json` (schema 1, `tools/check_offers.py`): `saved_at`, `checked_on` (Eastern), `source`, `read_ok`, `warnings`, `doubleup` (`listed`, `title`, `text`, `types`, `min_days`, `min_months`, `read_on`, `since`), `last_change` (`kind` started, appeared, ended or changed, `on`, old and new state, `marker`, `reported`). A page that can't be read keeps the previous `doubleup` with `read_ok` false and a warning; it never decides a change.
+- Issues (main only, `issues: write` on the refresh job): when the state (listed and exact text) differs from the committed file's, or on the first run ("DoubleUp watch started", owner's choice, to test the alert on the owner's email and phone). The marker is a hash of the old state, the new state and the date the old state began: the same on every retry of one change, different for every change. The workflow searches all issues (open and closed) for the marker, opens one if none has it, then marks the change reported. If the search or the issue fails, the step only warns and the next run tries again. The issue starts with @DASatizabal so GitHub notifies the owner. Issue text: public NCL text and dates only.
+- The issue opens before the files are committed. If the price fetch then fails, the offers file isn't committed; the next run sees the same change, finds the issue by its marker and only marks it reported.
+- Branch runs fetch and check the file but never commit it or open issues. Timed runs that skip the price job skip this too, so it runs once a day.
+- Tested 2026-10-28 with 1 live NCL page load (output to the scratchpad, nothing committed): read as above, Eastern date Oct 28 at 8:02 PM (UTC already Oct 29).
+
+NCL calls per day, before and after 5.2.0 (counts from Oct 21 to 27: full sweeps of 141, light days of 76 or 77; Florida weekly):
+
+| | Prices job | Counts | Florida (weekly) | Price watch and Make Selection |
+|---|---|---|---|---|
+| Before 5.2.0 | 26 | 141 or 76 to 77 | 22 on its day (122 while a discount lasts) | none |
+| After 5.2.0 | 27 (26 + 1 CruiseNext page load) | unchanged | unchanged | 0 (they read the published data files) |
+
+Per week: about 918 instead of 911, or 940 instead of 933 with the Florida light check.

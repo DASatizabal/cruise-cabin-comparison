@@ -6,6 +6,7 @@
 Fails when:
   - data/prices.json does not pass the format check (tools/check_prices.py)
   - data/florida.json, when present, does not pass its format check (tools/check_florida.py)
+  - data/offers.json, when present, does not pass its format check (tools/check_offers.py)
   - the version in index.html (APP_VERSION) is not Semantic Versioning, or
     does not match the newest entry in CHANGELOG.md
   - index.html no longer reads data/prices.json
@@ -17,6 +18,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import check_florida  # noqa: E402
+import check_offers  # noqa: E402
 import check_prices  # noqa: E402
 
 SEMVER = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
@@ -45,6 +47,15 @@ def main():
             problems += ["data/florida.json: " + e for e in check_florida.check(florida)]
         except Exception as e:
             problems.append(f"data/florida.json cannot be read: {e}")
+
+    # Written daily by the price job (tools/fetch_offers.py); optional, the page offers one
+    # CruiseNext credit without it.
+    if os.path.exists(os.path.join(ROOT, "data", "offers.json")):
+        try:
+            offers = json.loads(read("data/offers.json"))
+            problems += ["data/offers.json: " + e for e in check_offers.check(offers)]
+        except Exception as e:
+            problems.append(f"data/offers.json cannot be read: {e}")
 
     page = read("index.html")
     m = re.search(r'const APP_VERSION = "([^"]+)"', page)

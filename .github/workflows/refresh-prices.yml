@@ -3,14 +3,16 @@ name: Refresh prices
 # Daily, two parts in one run:
 # 1. Prices (job "refresh"): finds each sailing's NCL ids (cruise page, itinerary call), then
 #    NCL's vacation-builder API for both sailings at 2, 3, 4 and 5 guests, plus one age test per
-#    ship (26 calls with NCL's terms pages, 2 seconds apart, nothing held). Commits
-#    data/prices.json, then publishes the site (job "publish"). Never depends on counts.
+#    ship (26 calls with NCL's terms pages, 2 seconds apart, nothing held). First it reads the
+#    DoubleUp banner on NCL's CruiseNext page (1 page load, tools/fetch_offers.py) and opens
+#    one GitHub issue per change (main only). Commits data/prices.json and data/offers.json,
+#    then publishes the site (job "publish"). Never depends on counts.
 # 2. Cabin counts (job "counts"): runs after the price job, even if it failed. A full sweep
 #    every 3 days, a light re-check on the other days, 3 seconds between calls. Commits
 #    data/counts.json, then publishes again (job "publish-counts"). If it fails, the published
 #    prices stay and the page keeps the last good counts.
 # Scheduled runs only happen on the default branch (main). The push trigger below lets the
-# development branch test the price part on GitHub's runners before it is merged (about 26
+# development branch test the price part on GitHub's runners before it is merged (27
 # NCL calls; counts are skipped on pushes and run on a branch only from a manual run with a
 # chosen count mode). Only main commits data files and publishes.
 # GitHub's schedules are best effort and have been unreliable here (NOTES.md), so the main
@@ -49,6 +51,8 @@ on:
       - tools/fetch_counts.py
       - tools/check_counts.py
       - tools/decide_run.py
+      - tools/fetch_offers.py
+      - tools/check_offers.py
       - .github/workflows/refresh-prices.yml
 
 permissions:
@@ -84,10 +88,49 @@ jobs:
     if: needs.decide.outputs.prices == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    permissions:
+      contents: write
+      issues: write   # the DoubleUp watch opens one issue per change
     outputs:
       sha: ${{ steps.commit.outputs.sha }}
     steps:
       - uses: actions/checkout@v7
+
+      # DoubleUp watch: 1 NCL page load. NCL problems never fail this step; a page that can't
+      # be read keeps the previous state with a warning and opens no issue.
+      - name: Read the DoubleUp banner on NCL's CruiseNext page
+        run: python3 tools/fetch_offers.py --previous data/offers.json --out data/offers.new.json --issue-dir "$RUNNER_TEMP/doubleup"
+
+      - name: Format check of the DoubleUp file
+        run: python3 tools/check_offers.py data/offers.new.json
+
+      # One issue per change, never one per day: the marker (old state, new state, the date the
+      # old state began) is the same on every retry of one change. If the search or the issue
+      # fails, the change stays unreported and the next run tries again.
+      - name: Open the DoubleUp issue (main only, one per change)
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          DIR="$RUNNER_TEMP/doubleup"
+          if [ ! -f "$DIR/marker.txt" ]; then
+            echo "No DoubleUp change to report."
+            exit 0
+          fi
+          MARKER=$(cat "$DIR/marker.txt")
+          if ! FOUND=$(gh issue list --repo "$GITHUB_REPOSITORY" --state all --search "$MARKER in:body" --json number --jq length); then
+            echo "::warning title=DoubleUp watch::Could not search the issues; trying again on the next run."
+            exit 0
+          fi
+          if [ "$FOUND" = "0" ]; then
+            if ! gh issue create --repo "$GITHUB_REPOSITORY" --title "$(cat "$DIR/title.txt")" --body-file "$DIR/body.md"; then
+              echo "::warning title=DoubleUp watch::Could not open the issue; trying again on the next run."
+              exit 0
+            fi
+          else
+            echo "An issue with $MARKER is already open or closed; not opening another."
+          fi
+          python3 tools/fetch_offers.py --mark-reported data/offers.new.json
 
       - name: Fetch prices from NCL into a new file
         run: python3 tools/fetch_prices.py --out data/prices.new.json --previous data/prices.json
@@ -99,16 +142,17 @@ jobs:
       # branch never carries its own data/prices.json that would conflict with main's.
       - name: Branch test (fetched and checked; not committed)
         if: github.ref != 'refs/heads/main'
-        run: echo "Branch run, so data/prices.new.json is checked but not committed."
+        run: echo "Branch run, so data/prices.new.json and data/offers.new.json are checked but not committed."
 
-      - name: Replace the price file and commit
+      - name: Replace the price and DoubleUp files and commit
         id: commit
         if: github.ref == 'refs/heads/main'
         run: |
           mv data/prices.new.json data/prices.json
+          mv data/offers.new.json data/offers.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/prices.json
+          git add data/prices.json data/offers.json
           if git diff --cached --quiet; then
             echo "No change to commit."
             echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"

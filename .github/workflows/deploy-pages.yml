@@ -57,6 +57,8 @@ jobs:
           # Florida rates are optional too (written weekly by the owner's AI PC): without the
           # file the page shows NCL's website prices.
           if [ -f data/florida.json ]; then cp data/florida.json _site/data/florida.json; fi
+          # DoubleUp watch (daily, with the prices): without it the page offers one CruiseNext credit.
+          if [ -f data/offers.json ]; then cp data/offers.json _site/data/offers.json; fi
 
       - name: Name the artifact for this run attempt
         id: name
