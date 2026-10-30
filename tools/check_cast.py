@@ -7,7 +7,13 @@ The splash page (splash/index.html) is a stage: a still deck picture with one ac
 top. splash/cast.json (schema 1) lists the cast:
 
   schema_version  1
-  deck            the deck picture in splash/ (deck.svg, or deck.webp for your own art), 3:5 portrait
+  deck            the deck picture in splash/: deck.webp (or deck.svg), at most 300 KB
+  stage           where things are on that picture, every spot {"x", "y"} in % of it:
+                  width, height   the picture's size in pixels (the page keeps its shape)
+                  actor_width     an actor's width on a lounger, % of the picture's width
+                  dock_actor_width  the same at the dock
+                  gangway         {"bottom", "top"}: the jump goes dock, bottom, top, lounger
+                  dock            the dock spots, one per person at least, used in cast order
   cast[]          id         a short lowercase id (letters, digits and single dashes), stored by the
                              cruise-family-alerts Worker for who is aboard; never change it
                   name       first name only, shown under the actor ("Zin", "Kid 1", "David Jr.",
@@ -31,7 +37,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SPLASH = os.path.join(ROOT, "splash")
 
-MAX_CAST = 21               # the dock has 21 spots (3 rows of 7)
+MAX_CAST = 40
 ACTOR_MAX_BYTES = 150_000
 HERO_MAX_BYTES = 400_000
 DECK_MAX_BYTES = 300_000
@@ -42,9 +48,7 @@ NAME_RE = re.compile(r"[A-Z][A-Za-z'\-]{0,19}( (Jr\.|Sr\.|[0-9]{1,2}|guest))?")
 ACTOR_RE = re.compile(r"actors/[a-z0-9]+(-[a-z0-9]+)*\.webp")
 DECK_NAMES = {"deck.svg", "deck.webp"}
 FIXED = {"index.html", "cast.json", "hero-family.webp", "hero-ship.webp", "actors/placeholder.webp"}
-LOUNGER_X = (3, 97)
-LOUNGER_Y = (8, 60)         # the deck part of the picture (the dock is below)
-MIN_APART = 8               # percent points between two loungers
+MIN_APART = 4               # percent points between two loungers (or two dock spots)
 
 
 def webp_info(data):
@@ -63,6 +67,53 @@ def webp_info(data):
     if kind == b"VP8 " and len(body) >= 10:
         return int.from_bytes(body[6:8], "little") & 0x3FFF, int.from_bytes(body[8:10], "little") & 0x3FFF, False, False
     return None
+
+
+def spot_ok(s):
+    return (isinstance(s, dict) and set(s) == {"x", "y"} and
+            all(isinstance(s[k], (int, float)) and not isinstance(s[k], bool) and 2 <= s[k] <= 98 for k in ("x", "y")))
+
+
+def too_close(a, b):
+    return abs(a["x"] - b["x"]) < MIN_APART and abs(a["y"] - b["y"]) < MIN_APART
+
+
+def deck_size(folder, deck):
+    """(width, height) of the deck picture: a WebP's size, or an SVG's viewBox."""
+    with open(os.path.join(folder, deck), "rb") as f:
+        data = f.read()
+    if deck.endswith(".webp"):
+        info = webp_info(data)
+        return info[:2] if info else None
+    m = re.search(rb'viewBox="0 0 ([0-9.]+) ([0-9.]+)"', data)
+    return (float(m.group(1)), float(m.group(2))) if m else None
+
+
+def stage_problems(stage, size, people):
+    errors = []
+    if not isinstance(stage, dict) or set(stage) != {"width", "height", "actor_width", "dock_actor_width", "gangway", "dock"}:
+        return ["stage must have width, height, actor_width, dock_actor_width, gangway and dock"]
+    w, h = stage["width"], stage["height"]
+    if not all(isinstance(v, int) and not isinstance(v, bool) and v > 0 for v in (w, h)):
+        errors.append("stage: width and height must be the deck picture's size in pixels")
+    elif size and abs(w / h - size[0] / size[1]) > 0.01:
+        errors.append(f"stage: {w} x {h} is not the deck picture's shape ({size[0]:g} x {size[1]:g})")
+    for k in ("actor_width", "dock_actor_width"):
+        v = stage[k]
+        if not isinstance(v, (int, float)) or isinstance(v, bool) or not 3 <= v <= 20:
+            errors.append(f"stage: {k} must be 3 to 20 (% of the picture's width)")
+    g = stage["gangway"]
+    if not isinstance(g, dict) or set(g) != {"bottom", "top"} or not all(spot_ok(g[k]) for k in ("bottom", "top")):
+        errors.append('stage: gangway must be {"bottom": {"x", "y"}, "top": {"x", "y"}}')
+    dock = stage["dock"]
+    if not isinstance(dock, list) or not all(spot_ok(s) for s in dock):
+        return errors + ["stage: dock must be a list of {\"x\", \"y\"} spots, 2 to 98"]
+    if isinstance(people, list) and len(dock) < len(people):
+        errors.append(f"stage: {len(dock)} dock spots for {len(people)} people (one each)")
+    for i, s in enumerate(dock):
+        if any(too_close(s, o) for o in dock[:i]):
+            errors.append(f"stage: dock spot {i + 1} is on top of another")
+    return errors
 
 
 def actor_problems(folder, path, label):
@@ -92,7 +143,7 @@ def check(cast, folder=SPLASH):
     err = errors.append
     if not isinstance(cast, dict):
         return ["cast.json is not a JSON object"]
-    extra = set(cast) - {"schema_version", "deck", "cast"}
+    extra = set(cast) - {"schema_version", "deck", "stage", "cast"}
     if extra:
         err(f"unexpected keys {sorted(extra)}")
     if cast.get("schema_version") != 1:
@@ -104,7 +155,11 @@ def check(cast, folder=SPLASH):
         err(f"deck: {deck} is missing")
     elif os.path.getsize(os.path.join(folder, deck)) > DECK_MAX_BYTES:
         err(f"deck: {deck} is more than {DECK_MAX_BYTES:,} bytes")
+    size = deck_size(folder, deck) if deck in DECK_NAMES and os.path.isfile(os.path.join(folder, deck)) else None
+    if deck in DECK_NAMES and os.path.isfile(os.path.join(folder, deck)) and not size:
+        err(f"deck: {deck} is not a WebP (or an SVG with a viewBox)")
     people = cast.get("cast")
+    errors += stage_problems(cast.get("stage"), size, people)
     if not isinstance(people, list) or not 1 <= len(people) <= MAX_CAST:
         return errors + [f"cast must be a list of 1 to {MAX_CAST} people"]
     ids, names, spots, files = set(), set(), [], set()
@@ -143,17 +198,13 @@ def check(cast, folder=SPLASH):
             files.add(path)
             errors += actor_problems(folder, path, label)
         spot = p.get("lounger")
-        if (not isinstance(spot, dict) or set(spot) != {"x", "y"} or
-                not all(isinstance(spot[k], (int, float)) and not isinstance(spot[k], bool) for k in ("x", "y"))):
-            err(f"{label}: lounger must be {{\"x\": number, \"y\": number}}")
+        if not spot_ok(spot):
+            err(f"{label}: lounger must be {{\"x\": number, \"y\": number}}, each 2 to 98 (% of the deck picture)")
             continue
-        x, y = spot["x"], spot["y"]
-        if not (LOUNGER_X[0] <= x <= LOUNGER_X[1] and LOUNGER_Y[0] <= y <= LOUNGER_Y[1]):
-            err(f"{label}: lounger x must be {LOUNGER_X[0]} to {LOUNGER_X[1]} and y {LOUNGER_Y[0]} to {LOUNGER_Y[1]} (the deck)")
-        for other, (ox, oy) in spots:
-            if abs(x - ox) < MIN_APART and abs(y - oy) < MIN_APART:
+        for other, o in spots:
+            if too_close(spot, o):
                 err(f"{label}: lounger is on top of {other}'s")
-        spots.append((label, (x, y)))
+        spots.append((label, spot))
 
     # Only the expected files are published.
     allowed = FIXED | files | ({deck} if isinstance(deck, str) else set())

@@ -1456,7 +1456,11 @@ with sync_playwright() as pw:
     def actor_state(page):
         return page.evaluate("""() => Object.fromEntries([...document.querySelectorAll('.actor')].map(a => [a.dataset.id,
             { dock: a.classList.contains('dock'), x: +a.style.getPropertyValue('--x'), y: +a.style.getPropertyValue('--y'),
-              shown: getComputedStyle(a).display !== 'none', src: a.querySelector('img').getAttribute('src'), name: a.querySelector('.name').textContent }]))""")
+              shown: getComputedStyle(a).display !== 'none', src: a.querySelector('img').getAttribute('src'),
+              name: document.querySelector(`#names .who[data-id="${a.dataset.id}"]`).textContent }]))""")
+
+    # The jump's animations (the names' fade in and out is a CSS transition, not counted).
+    ACTOR_ANIMS = "document.getAnimations().filter(a => a.effect && a.effect.target && a.effect.target.classList.contains('actor')).length"
 
     def to_deck(page, wait=0):
         page.locator("#stage").scroll_into_view_if_needed()
@@ -1489,7 +1493,7 @@ with sync_playwright() as pw:
                 got[(card.get_attribute("data-option"), row.get_attribute("data-level"))] = (name, money(row.query_selector(".tier-price strong").inner_text()))
         same(f"{tag}: low, middle and high 'from' prices per person (9 prices)", got, TIERS)
         same(f"{tag}: the maiden voyage badge on Options 2 and 3", [len(c.query_selector_all(".maiden-badge")) for c in page.query_selector_all(".option")], [0, 1, 1])
-        early = [u for u in log["urls"] if "/actors/" in u or "youtube" in u or "deck.svg" in u]
+        early = [u for u in log["urls"] if "/actors/" in u or "youtube" in u or "/splash/deck." in u]
         same(f"{tag}: the video player, the deck and the actors don't load with the page", early, [])
         # The video: loads near, plays muted in view, pauses out of view.
         page.locator("#videoBox").scroll_into_view_if_needed()
@@ -1503,24 +1507,35 @@ with sync_playwright() as pw:
         # The deck: the jump plays when it comes into view, then everyone is in place.
         to_deck(page)
         page.wait_for_timeout(200)
-        jumping = page.evaluate("document.getAnimations().length")
+        jumping = page.evaluate(ACTOR_ANIMS)
         check(f"{tag}: the people aboard jump aboard when the deck comes into view", jumping == 3, f"{jumping} animations")
         page.wait_for_timeout(1600 + 2 * 180 + 400)
         same(f"{tag}: aboard on their loungers, everyone else at the dock", in_place(page, {"zin", "tony", "david"}), [])
         same(f"{tag}: the score", page.inner_text("#score"), "3 of 20 aboard")
         st = actor_state(page)
-        same(f"{tag}: one actor per cast member, first names under them", [st[p["id"]]["name"] for p in CAST], [p["name"] for p in CAST])
-        inside = page.evaluate("""() => { const s = document.getElementById('stage').getBoundingClientRect();
-            return [...document.querySelectorAll('.actor .name')].filter(n => { const r = n.getBoundingClientRect(); return r.left < s.left - 0.5 || r.right > s.right + 0.5; }).map(n => n.textContent); }""")
-        same(f"{tag}: every name inside the deck picture", inside, [])
+        same(f"{tag}: one actor per cast member, each with a first name", [st[p["id"]]["name"] for p in CAST], [p["name"] for p in CAST])
+        same(f"{tag}: the list under the deck", page.inner_text("#castText"),
+             "On deck: Zin, Tony, David. At the dock: " + ", ".join(p["name"] for p in CAST if p["id"] not in ("zin", "tony", "david")) + ".")
+        shown_names = """() => [...document.querySelectorAll('#names .who')].filter(n => getComputedStyle(n).opacity === '1').map(n => n.textContent)"""
+        if w == 360:
+            # A small deck: names would cover each other, so a tap shows one.
+            same(f"{tag}: names hidden on the small deck, with the tap hint", (page.evaluate(shown_names), page.is_visible("#tapHint")), ([], True))
+            page.click('.actor[data-id="tony"]', force=True)
+            page.wait_for_timeout(300)
+            same(f"{tag}: a tap shows that person's name", page.evaluate(shown_names), ["Tony"])
+        else:
+            same(f"{tag}: every name shown on the big deck, no tap hint", (len(page.evaluate(shown_names)), page.is_visible("#tapHint")), (len(CAST), False))
+            inside = page.evaluate("""() => { const s = document.getElementById('stage').getBoundingClientRect();
+                return [...document.querySelectorAll('#names .who')].filter(n => { const r = n.getBoundingClientRect(); return r.left < s.left - 0.5 || r.right > s.right + 0.5 || r.bottom > s.bottom + 0.5; }).map(n => n.textContent); }""")
+            same(f"{tag}: every name inside the deck picture", inside, [])
         check(f"{tag}: no script errors", not log["errors"], log["errors"][:3])
         if w == 360:
             page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
             page.wait_for_timeout(300)
             weight = sum(log["bytes"].values())
-            parts = {k: sum(v for u, v in log["bytes"].items() if k in u) for k in ("/splash/index.html", "prices.json", "cast.json", "deck.svg", "hero-", "/actors/")}
+            parts = {k: sum(v for u, v in log["bytes"].items() if k in u) for k in ("/splash/index.html", "prices.json", "cast.json", "deck.webp", "hero-", "/actors/")}
             print(f"      page weight (everything from the site, scrolled to the bottom, without fonts and YouTube): {weight:,} bytes {parts}")
-            check("splash: the page weight before the owner's photos and actors is under 300 KB", weight < 300_000, weight)
+            check("splash: the page weight with the deck picture, before the owner's photos and actors, is under 600 KB", weight < 600_000, weight)
         if SHOTS:
             page.locator("#deck").screenshot(path=os.path.join(SHOTS, f"splash_deck_{w}.png"))
             page.locator("#options").screenshot(path=os.path.join(SHOTS, f"splash_options_{w}.png"))
@@ -1535,7 +1550,7 @@ with sync_playwright() as pw:
     page.wait_for_timeout(300)
     same("splash less motion: the video doesn't play by itself", page.evaluate("window.__yt.filter(x => x === 'play')"), [])
     to_deck(page, 100)
-    same("splash less motion: no jump", page.evaluate("document.getAnimations().length"), 0)
+    same("splash less motion: no jump", page.evaluate(ACTOR_ANIMS), 0)
     same("splash less motion: everyone in place at once", in_place(page, {"zin", "tony", "david"}), [])
     check("splash less motion: no script errors", not log["errors"], log["errors"][:3])
     ctx.close()
@@ -1556,7 +1571,7 @@ with sync_playwright() as pw:
         to_deck(page, 200)
         st = actor_state(page)
         shown = sorted(k for k, v in st.items() if v["shown"])
-        same(f"splash {title}: the scene", (page.inner_text("#deckTitle"), page.inner_text("#stage .banner"), shown, page.evaluate("document.getAnimations().length")),
+        same(f"splash {title}: the scene", (page.inner_text("#deckTitle"), page.inner_text("#stage .banner"), shown, page.evaluate(ACTOR_ANIMS)),
              (title, title, ["tony", "zin"] if title == "Bon voyage!" else [], 0))
         ctx.close()
     ctx, page, log = splash_open({"width": 360, "height": 800}, clock="2027-06-11T03:59:00Z")

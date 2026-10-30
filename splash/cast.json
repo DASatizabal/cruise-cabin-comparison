@@ -1,26 +1,35 @@
 {
   "schema_version": 1,
-  "deck": "deck.svg",
+  "deck": "deck.webp",
+  "stage": {
+    "width": 1086, "height": 1448, "actor_width": 7, "dock_actor_width": 5.5,
+    "gangway": {"bottom": {"x": 48.8, "y": 92.2}, "top": {"x": 50.2, "y": 71.5}},
+    "dock": [
+      {"x": 13, "y": 83}, {"x": 24.5, "y": 83}, {"x": 36, "y": 83}, {"x": 61, "y": 83}, {"x": 70.5, "y": 83}, {"x": 80, "y": 83}, {"x": 89.5, "y": 83},
+      {"x": 13, "y": 90.5}, {"x": 24.5, "y": 90.5}, {"x": 36, "y": 90.5}, {"x": 61, "y": 90.5}, {"x": 70.5, "y": 90.5}, {"x": 80, "y": 90.5}, {"x": 89.5, "y": 90.5},
+      {"x": 13, "y": 98}, {"x": 24.5, "y": 98}, {"x": 36, "y": 98}, {"x": 61, "y": 98}, {"x": 70.5, "y": 98}, {"x": 80, "y": 98}, {"x": 89.5, "y": 98}
+    ]
+  },
   "cast": [
-    {"id": "zin", "name": "Zin", "actor": "actors/zin.webp", "lounger": {"x": 12, "y": 17.5}},
-    {"id": "tony", "name": "Tony", "actor": "actors/tony.webp", "lounger": {"x": 31, "y": 17.5}},
-    {"id": "kid-1", "name": "Kid 1", "actor": "actors/kid-1.webp", "lounger": {"x": 50, "y": 17.5}},
-    {"id": "kid-2", "name": "Kid 2", "actor": "actors/kid-2.webp", "lounger": {"x": 69, "y": 17.5}},
-    {"id": "lochis", "name": "Lochis", "actor": "actors/lochis.webp", "lounger": {"x": 88, "y": 17.5}},
-    {"id": "ephraim", "name": "Ephraim", "actor": "actors/ephraim.webp", "lounger": {"x": 12, "y": 30.5}},
-    {"id": "rosie", "name": "Rosie", "actor": "actors/rosie.webp", "lounger": {"x": 31, "y": 30.5}},
-    {"id": "ralph", "name": "Ralph", "actor": "actors/ralph.webp", "lounger": {"x": 50, "y": 30.5}},
-    {"id": "jared", "name": "Jared", "actor": "actors/jared.webp", "lounger": {"x": 69, "y": 30.5}},
-    {"id": "stephanie", "name": "Stephanie", "actor": "actors/stephanie.webp", "lounger": {"x": 88, "y": 30.5}},
-    {"id": "claire", "name": "Claire", "actor": "actors/claire.webp", "lounger": {"x": 12, "y": 43.5}},
-    {"id": "kathy", "name": "Kathy", "actor": "actors/kathy.webp", "lounger": {"x": 31, "y": 43.5}},
-    {"id": "umberto", "name": "Umberto", "actor": "actors/umberto.webp", "lounger": {"x": 50, "y": 43.5}},
-    {"id": "daniel", "name": "Daniel", "actor": "actors/daniel.webp", "lounger": {"x": 69, "y": 43.5}},
-    {"id": "daniels-guest", "name": "Daniel's guest", "actor": "actors/daniels-guest.webp", "lounger": {"x": 88, "y": 43.5}},
-    {"id": "david", "name": "David", "actor": "actors/david.webp", "lounger": {"x": 12, "y": 56.5}},
-    {"id": "lisa", "name": "Lisa", "actor": "actors/lisa.webp", "lounger": {"x": 31, "y": 56.5}},
-    {"id": "david-jr", "name": "David Jr.", "actor": "actors/david-jr.webp", "lounger": {"x": 50, "y": 56.5}},
-    {"id": "dante", "name": "Dante", "actor": "actors/dante.webp", "lounger": {"x": 69, "y": 56.5}},
-    {"id": "alex", "name": "Alex", "actor": "actors/alex.webp", "lounger": {"x": 88, "y": 56.5}}
+    {"id": "zin", "name": "Zin", "actor": "actors/zin.webp", "lounger": {"x": 30.1, "y": 30.5}},
+    {"id": "tony", "name": "Tony", "actor": "actors/tony.webp", "lounger": {"x": 40.2, "y": 30.5}},
+    {"id": "kid-1", "name": "Kid 1", "actor": "actors/kid-1.webp", "lounger": {"x": 50.0, "y": 30.5}},
+    {"id": "kid-2", "name": "Kid 2", "actor": "actors/kid-2.webp", "lounger": {"x": 60.0, "y": 30.5}},
+    {"id": "lochis", "name": "Lochis", "actor": "actors/lochis.webp", "lounger": {"x": 70.0, "y": 30.5}},
+    {"id": "ephraim", "name": "Ephraim", "actor": "actors/ephraim.webp", "lounger": {"x": 26.9, "y": 36.8}},
+    {"id": "rosie", "name": "Rosie", "actor": "actors/rosie.webp", "lounger": {"x": 38.5, "y": 36.8}},
+    {"id": "ralph", "name": "Ralph", "actor": "actors/ralph.webp", "lounger": {"x": 50.0, "y": 36.8}},
+    {"id": "jared", "name": "Jared", "actor": "actors/jared.webp", "lounger": {"x": 61.6, "y": 36.8}},
+    {"id": "stephanie", "name": "Stephanie", "actor": "actors/stephanie.webp", "lounger": {"x": 73.0, "y": 36.8}},
+    {"id": "claire", "name": "Claire", "actor": "actors/claire.webp", "lounger": {"x": 23.3, "y": 44.3}},
+    {"id": "kathy", "name": "Kathy", "actor": "actors/kathy.webp", "lounger": {"x": 36.6, "y": 44.3}},
+    {"id": "umberto", "name": "Umberto", "actor": "actors/umberto.webp", "lounger": {"x": 50.0, "y": 44.3}},
+    {"id": "daniel", "name": "Daniel", "actor": "actors/daniel.webp", "lounger": {"x": 63.5, "y": 44.3}},
+    {"id": "daniels-guest", "name": "Daniel's guest", "actor": "actors/daniels-guest.webp", "lounger": {"x": 76.7, "y": 44.3}},
+    {"id": "david", "name": "David", "actor": "actors/david.webp", "lounger": {"x": 20.6, "y": 51.8}},
+    {"id": "lisa", "name": "Lisa", "actor": "actors/lisa.webp", "lounger": {"x": 35.1, "y": 51.8}},
+    {"id": "david-jr", "name": "David Jr.", "actor": "actors/david-jr.webp", "lounger": {"x": 50.1, "y": 51.8}},
+    {"id": "dante", "name": "Dante", "actor": "actors/dante.webp", "lounger": {"x": 64.7, "y": 51.8}},
+    {"id": "alex", "name": "Alex", "actor": "actors/alex.webp", "lounger": {"x": 79.5, "y": 51.8}}
   ]
 }
