@@ -1,6 +1,6 @@
 {
- "schema_version": 3,
- "saved_at": "2026-10-29T10:22:38Z",
+ "schema_version": 4,
+ "saved_at": "2026-10-30T10:22:15Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -14,14 +14,14 @@
    "child_per_day": 40.0,
    "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; 2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. Includes prepaid service charges.",
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-29"
+   "checked_at": "2026-10-30"
   },
   "open_bar": {
    "per_day_2_to_5_nights": 32.0,
    "per_day_6_plus_nights": 28.5,
    "soda_per_day": 12.5,
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-10-29"
+   "checked_at": "2026-10-30"
   },
   "service_charge": {
    "suite_haven_per_night": 25.0,
@@ -32,11 +32,21 @@
     "HAVEN"
    ],
    "source": "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge",
-   "checked_at": "2026-10-29"
+   "checked_at": "2026-10-30"
   }
  },
  "rate_warnings": [],
  "warnings": [],
+ "deposit_rules": {
+  "suite_haven_types": [
+   "SUITE",
+   "HAVEN"
+  ],
+  "source": "https://www.ncl.com/terms#payment-deposit-schedule",
+  "percent_of_fare": 10,
+  "confirmed_on": "2026-10-30",
+  "confirmed_by": "aura-2027-06-14 H6 at 5 guests"
+ },
  "checks": {
   "extra_guest_mismatches": [],
   "formula": [
@@ -152,6 +162,88 @@
     "terms_rate_x_nights": 62.5,
     "ok": true
    }
+  ],
+  "deposits": [
+   {
+    "sailing": "getaway-2027-06-11",
+    "guests": 2,
+    "type": "INSIDE",
+    "category": "IX",
+    "rule": "same deposit per guest",
+    "deposit": 100.0,
+    "expected": 100.0,
+    "ok": true
+   },
+   {
+    "sailing": "getaway-2027-06-11",
+    "guests": 3,
+    "type": "INSIDE",
+    "category": "IX",
+    "rule": "same deposit per guest",
+    "deposit": 150.0,
+    "expected": 150.0,
+    "ok": true
+   },
+   {
+    "sailing": "getaway-2027-06-11",
+    "guests": 4,
+    "type": "INSIDE",
+    "category": "IX",
+    "rule": "same deposit per guest",
+    "deposit": 200.0,
+    "expected": 200.0,
+    "ok": true
+   },
+   {
+    "sailing": "getaway-2027-06-11",
+    "guests": 5,
+    "type": "OCEANVIEW",
+    "category": "O5",
+    "rule": "same deposit per guest",
+    "deposit": 250.0,
+    "expected": 250.0,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 5,
+    "type": "HAVEN",
+    "category": "H6",
+    "rule": "10% of the cruise fare",
+    "deposit": 1343.5,
+    "expected": 1343.5,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 2,
+    "type": "INSIDE",
+    "category": "IX",
+    "rule": "same deposit per guest",
+    "deposit": 100.0,
+    "expected": 100.0,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 3,
+    "type": "INSIDE",
+    "category": "IX",
+    "rule": "same deposit per guest",
+    "deposit": 150.0,
+    "expected": 150.0,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 4,
+    "type": "INSIDE",
+    "category": "IX",
+    "rule": "same deposit per guest",
+    "deposit": 200.0,
+    "expected": 200.0,
+    "ok": true
+   }
   ]
  },
  "sailings": [
@@ -173,33 +265,33 @@
     ],
     "duration": 3,
     "sail_start": "2027-06-11T00:00:00",
-    "checked_at": "2026-10-29T10:21:18Z"
+    "checked_at": "2026-10-30T10:20:55Z"
    },
    "depart": "2027-06-11",
    "return": "2027-06-14",
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-29",
+   "saved_at": "2026-10-30",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-29T10:21:18Z",
+     "as_of": "2026-10-30T10:20:55Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-29T10:21:18Z",
+     "as_of": "2026-10-30T10:20:55Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-29T10:21:18Z",
+     "as_of": "2026-10-30T10:20:55Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-29T10:21:18Z",
+     "as_of": "2026-10-30T10:20:55Z",
      "why": null
     }
    },
@@ -211,14 +303,14 @@
      "soda_under_21_position_2": 37.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-29"
+     "checked_at": "2026-10-30"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 1 Meal",
      "per_guest": 20,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-29"
+     "checked_at": "2026-10-30"
     }
    },
    "kids_sail_free": null,
@@ -252,6 +344,54 @@
      "depart": null
     }
    ],
+   "payment": {
+    "source": "NCL price-summary paymentOptions",
+    "final_payment_due": "2027-02-11",
+    "standard_deposit_per_guest": 50.0,
+    "standard_deposit_checked_at": "2026-10-30",
+    "by_guests": {
+     "2": {
+      "deposit": 100.0,
+      "deposit_type": "INSIDE",
+      "deposit_category": "IX",
+      "due_hours": 89,
+      "as_of": "2026-10-30T10:20:55Z",
+      "why": null
+     },
+     "3": {
+      "deposit": 150.0,
+      "deposit_type": "INSIDE",
+      "deposit_category": "IX",
+      "due_hours": 89,
+      "as_of": "2026-10-30T10:20:55Z",
+      "why": null
+     },
+     "4": {
+      "deposit": 200.0,
+      "deposit_type": "INSIDE",
+      "deposit_category": "IX",
+      "due_hours": 89,
+      "as_of": "2026-10-30T10:20:55Z",
+      "why": null
+     },
+     "5": {
+      "deposit": 250.0,
+      "deposit_type": "OCEANVIEW",
+      "deposit_category": "O5",
+      "due_hours": 89,
+      "as_of": "2026-10-30T10:20:55Z",
+      "why": null
+     }
+    },
+    "deposit_offer": {
+     "title": "2-For-1 Deposits",
+     "short": null,
+     "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
+     "codes": [],
+     "types": [],
+     "checked_at": "2026-10-30T10:20:55Z"
+    }
+   },
    "price_summaries": [
     {
      "guests": 2,
@@ -281,7 +421,10 @@
        20
       ]
      },
-     "grand_total": 890
+     "grand_total": 890,
+     "deposit": 100.0,
+     "deposit_due_hours": 89,
+     "final_payment_due": "2027-02-11"
     },
     {
      "guests": 3,
@@ -315,7 +458,10 @@
        20
       ]
      },
-     "grand_total": 1305
+     "grand_total": 1305,
+     "deposit": 150.0,
+     "deposit_due_hours": 89,
+     "final_payment_due": "2027-02-11"
     },
     {
      "guests": 4,
@@ -353,7 +499,10 @@
        20
       ]
      },
-     "grand_total": 1720
+     "grand_total": 1720,
+     "deposit": 200.0,
+     "deposit_due_hours": 89,
+     "final_payment_due": "2027-02-11"
     },
     {
      "guests": 5,
@@ -395,7 +544,10 @@
        20
       ]
      },
-     "grand_total": 2465
+     "grand_total": 2465,
+     "deposit": 250.0,
+     "deposit_due_hours": 89,
+     "final_payment_due": "2027-02-11"
     }
    ],
    "types": [
@@ -2043,33 +2195,33 @@
     ],
     "duration": 5,
     "sail_start": "2027-06-14T00:00:00",
-    "checked_at": "2026-10-29T10:21:57Z"
+    "checked_at": "2026-10-30T10:21:35Z"
    },
    "depart": "2027-06-14",
    "return": "2027-06-19",
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-10-29",
+   "saved_at": "2026-10-30",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-10-29T10:21:57Z",
+     "as_of": "2026-10-30T10:21:35Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-10-29T10:21:57Z",
+     "as_of": "2026-10-30T10:21:35Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-10-29T10:21:57Z",
+     "as_of": "2026-10-30T10:21:35Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-10-29T10:21:57Z",
+     "as_of": "2026-10-30T10:21:35Z",
      "why": null
     }
    },
@@ -2081,14 +2233,14 @@
      "soda_under_21_position_2": 62.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-29"
+     "checked_at": "2026-10-30"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 2 Meals",
      "per_guest": 40,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-10-29"
+     "checked_at": "2026-10-30"
     }
    },
    "kids_sail_free": null,
@@ -2130,6 +2282,54 @@
      "depart": null
     }
    ],
+   "payment": {
+    "source": "NCL price-summary paymentOptions",
+    "final_payment_due": "2027-02-14",
+    "standard_deposit_per_guest": 50.0,
+    "standard_deposit_checked_at": "2026-10-30",
+    "by_guests": {
+     "2": {
+      "deposit": 100.0,
+      "deposit_type": "INSIDE",
+      "deposit_category": "IX",
+      "due_hours": 89,
+      "as_of": "2026-10-30T10:21:35Z",
+      "why": null
+     },
+     "3": {
+      "deposit": 150.0,
+      "deposit_type": "INSIDE",
+      "deposit_category": "IX",
+      "due_hours": 89,
+      "as_of": "2026-10-30T10:21:35Z",
+      "why": null
+     },
+     "4": {
+      "deposit": 200.0,
+      "deposit_type": "INSIDE",
+      "deposit_category": "IX",
+      "due_hours": 89,
+      "as_of": "2026-10-30T10:21:35Z",
+      "why": null
+     },
+     "5": {
+      "deposit": 1343.5,
+      "deposit_type": "HAVEN",
+      "deposit_category": "H6",
+      "due_hours": 23,
+      "as_of": "2026-10-30T10:21:35Z",
+      "why": null
+     }
+    },
+    "deposit_offer": {
+     "title": "2-For-1 Deposits",
+     "short": null,
+     "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
+     "codes": [],
+     "types": [],
+     "checked_at": "2026-10-30T10:21:35Z"
+    }
+   },
    "price_summaries": [
     {
      "guests": 2,
@@ -2159,7 +2359,10 @@
        40
       ]
      },
-     "grand_total": 2658
+     "grand_total": 2658,
+     "deposit": 100.0,
+     "deposit_due_hours": 89,
+     "final_payment_due": "2027-02-14"
     },
     {
      "guests": 3,
@@ -2193,7 +2396,10 @@
        40
       ]
      },
-     "grand_total": 3597
+     "grand_total": 3597,
+     "deposit": 150.0,
+     "deposit_due_hours": 89,
+     "final_payment_due": "2027-02-14"
     },
     {
      "guests": 4,
@@ -2231,7 +2437,10 @@
        40
       ]
      },
-     "grand_total": 4536
+     "grand_total": 4536,
+     "deposit": 200.0,
+     "deposit_due_hours": 89,
+     "final_payment_due": "2027-02-14"
     },
     {
      "guests": 5,
@@ -2273,7 +2482,10 @@
        40
       ]
      },
-     "grand_total": 15235
+     "grand_total": 15235,
+     "deposit": 1343.5,
+     "deposit_due_hours": 23,
+     "final_payment_due": "2027-02-14"
     }
    ],
    "types": [

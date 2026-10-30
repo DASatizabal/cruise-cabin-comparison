@@ -1,0 +1,33 @@
+{
+ "schema_version": 1,
+ "saved_at": "2026-10-30T10:20:54Z",
+ "checked_on": "2026-10-30",
+ "source": "https://www.ncl.com/cruise-deals/cruisenext",
+ "read_ok": true,
+ "warnings": [],
+ "doubleup": {
+  "listed": true,
+  "title": "Limited-Time Offer: DoubleUp!",
+  "text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply TWO CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
+  "types": [
+   "BALCONY",
+   "MINISUITE",
+   "SUITE",
+   "HAVEN"
+  ],
+  "min_days": 90,
+  "min_months": null,
+  "read_on": "2026-10-30",
+  "since": "2026-10-30"
+ },
+ "last_change": {
+  "kind": "started",
+  "on": "2026-10-30",
+  "old_listed": null,
+  "old_text": null,
+  "new_listed": true,
+  "new_text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply TWO CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
+  "marker": "doubleup-fee5989d4c0d",
+  "reported": true
+ }
+}
