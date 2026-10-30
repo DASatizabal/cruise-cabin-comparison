@@ -33,6 +33,15 @@ visit, cards in tile order, side by side on a wide screen and stacked on a phone
 return, no sideways scrolling), every cabin list price equal to the card's Total for that cabin in
 every switch combination, and the service charge line below the Total when not prepaid. Every
 other check starts with all three tiles selected (new_page).
+
+Splash page (5.3.0, NOTES.md "Splash page"), at 360 px and 1280 px: no sideways scrolling, the
+low, middle and high "from" prices against the same rules worked out here from data/prices.json,
+nothing loaded early (the video player and the actors wait until they get close), the video
+playing in view and pausing out of view, the deck with a stand-in Worker (who is on a lounger,
+who is at the dock, the jump), less motion (no fade, no autoplay, no jump), the "Bon voyage" and
+"Welcome home" scenes, the owner's "Confirm aboard" checklist and "Email me a private aboard
+link" (the token leaves the address bar, nothing saved in the browser), a missing actor picture,
+and the page weight. The links between the two pages.
 """
 import datetime as dt
 import functools
@@ -142,6 +151,23 @@ for name, data in sites.items():
     if name in FL_SITES:
         with open(os.path.join(d, "data", "florida.json"), "w", encoding="utf-8") as f:
             json.dump(FL_SITES[name][0], f)
+
+# The splash page next to a copy of the comparison page, as published (splash/ and data/), with
+# the Worker's address set to the stand-in.
+SPLASH_SITE = os.path.join(site_root, "splash_site")
+shutil.copytree(os.path.join(REPO, "splash"), os.path.join(SPLASH_SITE, "splash"))
+os.makedirs(os.path.join(SPLASH_SITE, "data"))
+with open(os.path.join(SPLASH_SITE, "data", "prices.json"), "w", encoding="utf-8") as f:
+    json.dump(sites["real"], f)
+shutil.copy(os.path.join(site_root, "real", "index.html"), os.path.join(SPLASH_SITE, "index.html"))
+with open(os.path.join(SPLASH_SITE, "splash", "index.html"), encoding="utf-8") as f:
+    html = f.read()
+html, n1 = re.subn(r'const FAMILY_API = "[^"]*";', f'const FAMILY_API = "{FAMILY_API_TEST}";', html)
+html, n2 = re.subn(r'const TURNSTILE_SITE_KEY = "[^"]*";', 'const TURNSTILE_SITE_KEY = "test-site-key";', html)
+assert (n1, n2) == (1, 1)
+with open(os.path.join(SPLASH_SITE, "splash", "index.html"), "w", encoding="utf-8") as f:
+    f.write(html)
+
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a):
@@ -1331,6 +1357,266 @@ with sync_playwright() as pw:
         page.evaluate("() => { Object.assign(state, { kids: [] }); render(); }")
         page.query_selector('.card[data-option="G"]').screenshot(path=os.path.join(SHOTS, "list_prices_getaway.png"))
     page.close()
+
+    # ---------- Splash page (5.3.0) ----------
+    with open(os.path.join(REPO, "splash", "cast.json"), encoding="utf-8") as f:
+        CAST = json.load(f)["cast"]
+    SPLASH_URL = f"{base}/splash_site/splash/index.html"
+
+    def tiers_expected(data):
+        """The splash page's rules, worked out here: per person for 2 adults, NCL's fare with taxes
+        plus the Open Bar and Specialty Dining gratuities; low = cheapest type default, middle =
+        Balcony, high = Haven else Suite; each type's default is the cheapest available
+        non-Guarantee category (Guarantee only when that's all)."""
+        ships = {s["id"].split("-")[0]: s for s in data["sailings"]}
+
+        def default(t):
+            ok = sorted([c for c in t["categories"] if not c.get("solo") and c["code"] not in ("T1", "IT", "OT", "BT") and c["by_guests"]["2"]["available"]],
+                        key=lambda c: c["by_guests"]["2"]["cabin_total"])
+            return next((c for c in ok if not c["guarantee"]), ok[0] if ok else None)
+
+        def pick(s, level):
+            types = [t for t in s["types"] if t["match"] != "studio"]
+            if level == "low":
+                cs = [(t, default(t)) for t in types if default(t)]
+                return min(cs, key=lambda x: x[1]["by_guests"]["2"]["cabin_total"])
+            for code in (["BALCONY"] if level == "middle" else ["HAVEN", "SUITE"]):
+                t = next((t for t in types if t["code"] == code), None)
+                if t and default(t):
+                    return t, default(t)
+
+        def pp(s, c):
+            g = s["gratuities"]
+            return (c["by_guests"]["2"]["cabin_total"] + 2 * (g["open_bar"]["per_guest"] + g["specialty_dining"]["per_guest"])) / 2
+        out = {}
+        for opt, keys in (("1", ["getaway"]), ("2", ["aura"]), ("3", ["getaway", "aura"])):
+            for level in ("low", "middle", "high"):
+                picks = [pick(ships[k], level) for k in keys]
+                titles = [t["title"] for t, _ in picks]
+                name = titles[0] if len(set(titles)) == 1 else ", ".join(f"{t['title']} on the {ships[k]['ship_short']}" for (t, _), k in zip(picks, keys))
+                out[(opt, level)] = (name, round(sum(pp(ships[k], c) for (_, c), k in zip(picks, keys)), 2))
+        return out
+
+    TIERS = tiers_expected(sites["real"])
+    YT_STUB = """window.__yt = []; window.YT = { Player: function (id, o) {
+        window.__ytOpts = o; const p = { mute() { __yt.push("mute"); }, playVideo() { __yt.push("play"); }, pauseVideo() { __yt.push("pause"); } };
+        document.getElementById(id).outerHTML = '<iframe id="' + id + '" title="video" src="about:blank"></iframe>';
+        setTimeout(() => o.events.onReady({ target: p }), 0); return p; } };
+        setTimeout(() => window.onYouTubeIframeAPIReady && onYouTubeIframeAPIReady(), 0);"""
+    TS_STUB = """window.turnstile = { render(sel, o) { setTimeout(() => o.callback("ts-ok"), 0); return 7; }, reset() {}, remove() {} };
+        setTimeout(() => window.onTurnstileReady && onTurnstileReady(), 0);"""
+
+    def splash_open(viewport, aboard=("zin", "tony", "david"), reduced=False, clock=None, hash_="", answers=None, aboard_status=200, missing_actor=None):
+        """The splash page with stand-ins for YouTube, Turnstile and the Worker. Returns the page,
+        its script errors, the address log and the Worker requests."""
+        ctx = browser.new_context(viewport=viewport, reduced_motion="reduce" if reduced else "no-preference")
+        page = ctx.new_page()
+        if clock:
+            page.clock.set_fixed_time(clock)
+        log = {"errors": [], "urls": [], "worker": [], "bytes": {}}
+        page.on("pageerror", lambda e: log["errors"].append(str(e)))
+        page.on("console", lambda m: log["errors"].append(m.text) if m.type == "error" and "fonts.g" not in (m.location or {}).get("url", "") else None)
+        page.on("request", lambda r: log["urls"].append(r.url))
+
+        def sized(resp):
+            try:
+                if resp.url.startswith(base):
+                    log["bytes"][resp.url] = len(resp.body())
+            except Exception:
+                pass
+        page.on("response", sized)
+        page.route("https://fonts.googleapis.com/**", lambda r: r.abort())
+        page.route("https://www.youtube.com/iframe_api", lambda r: r.fulfill(status=200, content_type="text/javascript", body=YT_STUB))
+        page.route("https://challenges.cloudflare.com/**", lambda r: r.fulfill(status=200, content_type="text/javascript", body=TS_STUB))
+        if missing_actor:
+            page.route(f"**/splash/actors/{missing_actor}.webp", lambda r: r.fulfill(status=404, body="no"))
+        state = {"aboard": list(aboard)}
+        replies = answers or {}
+
+        def worker(route):
+            req = route.request
+            path = req.url[len(FAMILY_API_TEST):]
+            if req.method == "OPTIONS":
+                return route.fulfill(status=204, headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type", "Access-Control-Allow-Methods": "POST"})
+            body = json.loads(req.post_data) if req.post_data else None
+            log["worker"].append((req.method, path, body))
+            if path == "/aboard":
+                ans = {"ok": True, "aboard": state["aboard"], "updated_at": "2026-10-29T12:00:00Z"} if aboard_status == 200 else {"ok": False}
+                return route.fulfill(status=aboard_status, content_type="application/json", headers={"Access-Control-Allow-Origin": "*"}, body=json.dumps(ans))
+            status, ans = replies.get(path, (200, {"ok": True}))
+            if path == "/aboard/save" and status == 200:
+                state["aboard"] = body["aboard"]
+                ans = {"ok": True, "aboard": [p["id"] for p in CAST if p["id"] in body["aboard"]]}
+            return route.fulfill(status=status, content_type="application/json", headers={"Access-Control-Allow-Origin": "*"}, body=json.dumps(ans))
+        page.route(FAMILY_API_TEST + "/**", worker)
+        page.goto(SPLASH_URL + hash_)
+        page.wait_for_selector(".tier")
+        return ctx, page, log
+
+    def actor_state(page):
+        return page.evaluate("""() => Object.fromEntries([...document.querySelectorAll('.actor')].map(a => [a.dataset.id,
+            { dock: a.classList.contains('dock'), x: +a.style.getPropertyValue('--x'), y: +a.style.getPropertyValue('--y'),
+              shown: getComputedStyle(a).display !== 'none', src: a.querySelector('img').getAttribute('src'), name: a.querySelector('.name').textContent }]))""")
+
+    def to_deck(page, wait=0):
+        page.locator("#stage").scroll_into_view_if_needed()
+        page.wait_for_function("document.querySelectorAll('.actor').length > 0")
+        if wait:
+            page.wait_for_timeout(wait)
+
+    def in_place(page, aboard):
+        st = actor_state(page)
+        bad = []
+        for p in CAST:
+            a = st[p["id"]]
+            want = (False, p["lounger"]["x"], p["lounger"]["y"]) if p["id"] in aboard else (True,)
+            got = (a["dock"], a["x"], a["y"]) if p["id"] in aboard else (a["dock"],)
+            if got != want:
+                bad.append((p["id"], got, want))
+        return bad
+
+    for w, h in ((360, 800), (1280, 900)):
+        tag = f"splash {w} px"
+        ctx, page, log = splash_open({"width": w, "height": h})
+        width = page.evaluate("Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)")
+        check(f"{tag}: no sideways scrolling", width <= w, f"page width {width}")
+        same(f"{tag}: 'Prices as of' in Eastern time", page.inner_text("#asOf").replace("\u202f", " "),
+             page.evaluate("t => fmtEastern(t)", real["saved_at"]).replace("\u202f", " "))
+        got = {}
+        for card in page.query_selector_all(".option"):
+            for row in card.query_selector_all(".tier"):
+                name = row.query_selector(".tier-name").evaluate("e => e.firstChild.textContent.trim()")
+                got[(card.get_attribute("data-option"), row.get_attribute("data-level"))] = (name, money(row.query_selector(".tier-price strong").inner_text()))
+        same(f"{tag}: low, middle and high 'from' prices per person (9 prices)", got, TIERS)
+        same(f"{tag}: the maiden voyage badge on Options 2 and 3", [len(c.query_selector_all(".maiden-badge")) for c in page.query_selector_all(".option")], [0, 1, 1])
+        early = [u for u in log["urls"] if "/actors/" in u or "youtube" in u or "deck.svg" in u]
+        same(f"{tag}: the video player, the deck and the actors don't load with the page", early, [])
+        # The video: loads near, plays muted in view, pauses out of view.
+        page.locator("#videoBox").scroll_into_view_if_needed()
+        page.wait_for_function("window.__yt && window.__yt.includes('play')", timeout=5000)
+        opts = page.evaluate("window.__ytOpts")
+        same(f"{tag}: the video is NCL's, muted, inline, from youtube-nocookie.com", (opts["videoId"], opts["playerVars"]["mute"], opts["playerVars"]["playsinline"], opts["host"]),
+             ("WSWIpQhOoE4", 1, 1, "https://www.youtube-nocookie.com"))
+        page.evaluate("window.scrollTo(0, 0)")
+        page.wait_for_function("window.__yt[window.__yt.length - 1] === 'pause'", timeout=5000)
+        check(f"{tag}: the video pauses when it leaves the screen", True)
+        # The deck: the jump plays when it comes into view, then everyone is in place.
+        to_deck(page)
+        page.wait_for_timeout(200)
+        jumping = page.evaluate("document.getAnimations().length")
+        check(f"{tag}: the people aboard jump aboard when the deck comes into view", jumping == 3, f"{jumping} animations")
+        page.wait_for_timeout(1600 + 2 * 180 + 400)
+        same(f"{tag}: aboard on their loungers, everyone else at the dock", in_place(page, {"zin", "tony", "david"}), [])
+        same(f"{tag}: the score", page.inner_text("#score"), "3 of 20 aboard")
+        st = actor_state(page)
+        same(f"{tag}: one actor per cast member, first names under them", [st[p["id"]]["name"] for p in CAST], [p["name"] for p in CAST])
+        inside = page.evaluate("""() => { const s = document.getElementById('stage').getBoundingClientRect();
+            return [...document.querySelectorAll('.actor .name')].filter(n => { const r = n.getBoundingClientRect(); return r.left < s.left - 0.5 || r.right > s.right + 0.5; }).map(n => n.textContent); }""")
+        same(f"{tag}: every name inside the deck picture", inside, [])
+        check(f"{tag}: no script errors", not log["errors"], log["errors"][:3])
+        if w == 360:
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            page.wait_for_timeout(300)
+            weight = sum(log["bytes"].values())
+            parts = {k: sum(v for u, v in log["bytes"].items() if k in u) for k in ("/splash/index.html", "prices.json", "cast.json", "deck.svg", "hero-", "/actors/")}
+            print(f"      page weight (everything from the site, scrolled to the bottom, without fonts and YouTube): {weight:,} bytes {parts}")
+            check("splash: the page weight before the owner's photos and actors is under 300 KB", weight < 300_000, weight)
+        if SHOTS:
+            page.locator("#deck").screenshot(path=os.path.join(SHOTS, f"splash_deck_{w}.png"))
+            page.locator("#options").screenshot(path=os.path.join(SHOTS, f"splash_options_{w}.png"))
+        ctx.close()
+
+    # Less motion: no fade, no autoplay, no jump; everyone in place.
+    ctx, page, log = splash_open({"width": 360, "height": 800}, reduced=True)
+    same("splash less motion: the opening pictures one after the other, no fade", (page.evaluate("document.documentElement.classList.contains('still')"),
+         page.evaluate("getComputedStyle(document.querySelector('.hero-img.ship')).opacity"), page.evaluate("getComputedStyle(document.querySelector('.hero-sticky')).position")), (True, "1", "relative"))
+    page.locator("#videoBox").scroll_into_view_if_needed()
+    page.wait_for_function("window.__ytOpts !== undefined", timeout=5000)
+    page.wait_for_timeout(300)
+    same("splash less motion: the video doesn't play by itself", page.evaluate("window.__yt.filter(x => x === 'play')"), [])
+    to_deck(page, 100)
+    same("splash less motion: no jump", page.evaluate("document.getAnimations().length"), 0)
+    same("splash less motion: everyone in place at once", in_place(page, {"zin", "tony", "david"}), [])
+    check("splash less motion: no script errors", not log["errors"], log["errors"][:3])
+    ctx.close()
+
+    # Who's aboard can't be read: everyone at the dock, said so. A missing actor picture: the placeholder.
+    ctx, page, log = splash_open({"width": 360, "height": 800}, aboard_status=500, missing_actor="lisa")
+    to_deck(page, 300)
+    same("splash Worker down: everyone at the dock, with a note", (in_place(page, set()), page.inner_text("#deckNote")),
+         ([], "Who's aboard couldn't be checked right now, so everyone is shown at the dock."))
+    page.wait_for_function("document.querySelector('.actor[data-id=lisa] img').getAttribute('src') === 'actors/placeholder.webp'", timeout=5000)
+    check("splash: a missing actor picture shows the placeholder", True)
+    check("splash Worker down: no script errors", not [e for e in log["errors"] if "500" not in e and "404" not in e], log["errors"][:3])
+    ctx.close()
+
+    # Bon voyage (from Jun 11, 2027 Eastern) and welcome home (from Jun 20).
+    for when, title in (("2027-06-11T04:00:00Z", "Bon voyage!"), ("2027-06-20T04:30:00Z", "Welcome home!")):
+        ctx, page, log = splash_open({"width": 360, "height": 800}, clock=when, aboard=("zin", "tony") if title == "Bon voyage!" else ())
+        to_deck(page, 200)
+        st = actor_state(page)
+        shown = sorted(k for k, v in st.items() if v["shown"])
+        same(f"splash {title}: the scene", (page.inner_text("#deckTitle"), page.inner_text("#stage .banner"), shown, page.evaluate("document.getAnimations().length")),
+             (title, title, ["tony", "zin"] if title == "Bon voyage!" else [], 0))
+        ctx.close()
+    ctx, page, log = splash_open({"width": 360, "height": 800}, clock="2027-06-11T03:59:00Z")
+    same("splash: Jun 10, 2027 at 11:59 PM Eastern is still before the trip", page.inner_text("#deckTitle"), "Who's coming?")
+    ctx.close()
+
+    # The owner's private link: the checklist, saved once.
+    token = "A" * 43
+    ctx, page, log = splash_open({"width": 360, "height": 800}, hash_=f"#aboard={token}", aboard=("zin",),
+                                 answers={"/aboard/open": (200, {"ok": True, "aboard": ["zin"], "preticks": ["zin", "tony"]})})
+    page.wait_for_selector("#aboardDialog .check-row")
+    same("splash checklist: the token leaves the address bar", page.evaluate("location.hash"), "")
+    same("splash checklist: the Worker gets the token and the page", [(m, p, b) for m, p, b in log["worker"] if p == "/aboard/open"],
+         [("POST", "/aboard/open", {"token": token, "page": SPLASH_URL})])
+    rows = page.eval_on_selector_all("#aboardDialog .check-row", "rs => rs.map(r => [r.querySelector('input').value, r.querySelector('input').checked, (r.querySelector('.tag') || {}).textContent || ''])")
+    same("splash checklist: everyone, aboard and this request's matches ticked", [r for r in rows if r[1] or r[2]], [["zin", True, "aboard now"], ["tony", True, "from this request"]])
+    same("splash checklist: 20 people", len(rows), 20)
+    check("splash checklist: fits at 360 px", page.evaluate("document.getElementById('aboardDialog').getBoundingClientRect().right <= 360"))
+    page.uncheck("#aboardDialog input[value=tony]")
+    page.check("#aboardDialog input[value=alex]")
+    page.click("#aboardSave")
+    page.wait_for_selector("#aboardDialog [data-close].primary")
+    saved = [b for m, p, b in log["worker"] if p == "/aboard/save"]
+    same("splash checklist: Save sends the ticked cast ids", saved, [{"token": token, "aboard": ["zin", "alex"], "page": SPLASH_URL}])
+    page.click("#aboardDialog [data-close]")
+    page.wait_for_timeout(600 + 1600 + 400)
+    same("splash checklist: the deck shows the new list (Alex jumped aboard)", (page.inner_text("#score"), in_place(page, {"zin", "alex"})), ("2 of 20 aboard", []))
+    same("splash checklist: nothing saved in the browser", page.evaluate("[localStorage.length, sessionStorage.length]"), [0, 0])
+    ctx.close()
+    ctx, page, log = splash_open({"width": 360, "height": 800}, hash_=f"#aboard={token}",
+                                 answers={"/aboard/open": (404, {"ok": False, "error": "gone", "message": "This link has expired or was already used."})})
+    page.wait_for_selector("#aboardDialog .status.bad")
+    same("splash checklist: a used link says so", page.inner_text("#aboardDialog .status.bad"), "This link has expired or was already used.")
+    ctx.close()
+
+    # "Email me a private aboard link".
+    ctx, page, log = splash_open({"width": 360, "height": 800})
+    page.click("#ownerOpen")
+    page.wait_for_timeout(100)
+    page.click("#ownerSend")
+    page.wait_for_function("document.getElementById('ownerStatus').textContent.startsWith('Sent')")
+    same("splash owner link: Turnstile and the page go to the Worker", [b for m, p, b in log["worker"] if p == "/aboard/link"], [{"turnstile": "ts-ok", "page": SPLASH_URL}])
+    ctx.close()
+    ctx, page, log = splash_open({"width": 360, "height": 800}, answers={"/aboard/link": (400, {"ok": False, "error": "daily", "message": "3 links were already emailed in the last 24 hours."})})
+    page.click("#ownerOpen")
+    page.wait_for_timeout(100)
+    page.click("#ownerSend")
+    page.wait_for_function("document.getElementById('ownerStatus').classList.contains('bad')")
+    same("splash owner link: the Worker's refusal is shown", page.inner_text("#ownerStatus"), "3 links were already emailed in the last 24 hours.")
+    ctx.close()
+
+    # The links between the two pages.
+    ctx, page, log = splash_open({"width": 360, "height": 800})
+    page.click(".big-button")
+    page.wait_for_selector(".card .price-total, .tile")
+    same("splash: Pick your cabin opens the comparison page", page.url, f"{base}/splash_site/")
+    page.click(".splash-link")
+    page.wait_for_selector(".tier")
+    same("comparison page: the splash link opens the splash page", page.url, f"{base}/splash_site/splash/")
+    ctx.close()
 
     browser.close()
 srv.shutdown()

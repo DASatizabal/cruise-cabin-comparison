@@ -25,7 +25,7 @@ export async function loadWorker({ testOrigin } = {}) {
     if (!line.test(src)) throw new Error("TEST_ORIGIN line not found");
     src = src.replace(line, `const TEST_ORIGIN = ${JSON.stringify(testOrigin)};`);
   }
-  src += `\n// load ${++loads}\nexport const __t = { priceNow, evaluate, runChecks, readBooking, bookingText, easternDay, TEST_ORIGIN, END_DAY };\n`;
+  src += `\n// load ${++loads}\nexport const __t = { priceNow, evaluate, runChecks, readBooking, bookingText, easternDay, TEST_ORIGIN, END_DAY, aboardNow, aboardCleanUp, matchCast, splashFor, splashNextTo, TRIP_OVER_DAY };\n`;
   return import("data:text/javascript;base64," + Buffer.from(src).toString("base64"));
 }
 
@@ -56,13 +56,19 @@ export class FakeD1 {
 // The network as the Worker sees it. Anything else fails the test (so no NCL address, ever).
 export function fakeNet() {
   const net = {
-    files: {}, mailMode: "ok", tsHost: "dasatizabal.github.io", mails: [], verifies: 0, calls: [],
+    // files: the published data files by name; site: any other published file by its full address
+    // (the splash page's cast.json, on the site or on a raw.githack.com preview).
+    files: {}, site: {}, mailMode: "ok", tsHost: "dasatizabal.github.io", mails: [], verifies: 0, calls: [],
     async fetch(url, init = {}) {
       url = String(url);
       net.calls.push(url);
       if (url.startsWith(PAGE + "data/")) {
         const name = url.slice((PAGE + "data/").length).split("?")[0];
         const body = net.files[name];
+        return body === undefined || body === null ? new Response("Not found", { status: 404 }) : Response.json(structuredClone(body));
+      }
+      if (url.startsWith(PAGE + "splash/") || url.startsWith(GITHACK + "/DASatizabal/cruise-cabin-comparison/")) {
+        const body = net.site[url.split("?")[0]];
         return body === undefined || body === null ? new Response("Not found", { status: 404 }) : Response.json(structuredClone(body));
       }
       if (url === "https://challenges.cloudflare.com/turnstile/v0/siteverify") {

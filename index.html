@@ -50,6 +50,8 @@
             overflow: hidden;
         }
 
+        .splash-link { display: inline-block; margin: -0.5rem 0 1rem; color: #fde68a; font-size: 0.85rem; font-weight: 600; }
+
         .hero-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -712,6 +714,7 @@
             <span class="version-badge" id="versionBadge"></span>
             <h1 class="hero-title">Our June 2027 Family Cruise</h1>
             <p class="hero-subtitle">Three choices, all Norwegian Cruise Line, all round trip from Miami: 3 nights, 5 nights, or both back to back for 8 nights.</p>
+            <a class="splash-link" href="splash/">See the trip: the ships, a video and who's coming &rarr;</a>
             <div class="as-of-row">
                 <span class="as-of">Prices as of <strong id="asOf">loading...</strong></span>
                 <span class="as-of" id="countsAsOf" hidden>Cabins left as of <strong id="countsAsOfDate"></strong></span>
@@ -780,7 +783,7 @@
     </footer>
 
     <script>
-        const APP_VERSION = "5.2.0";
+        const APP_VERSION = "5.3.0";
         const DATA_URL = "data/prices.json";
         const COUNTS_URL = "data/counts.json";
         const COUNTS_MAX_AGE_DAYS = 7;
@@ -1895,6 +1898,7 @@
             const me = document.getElementById("msMe").checked;
             return {
                 kind: "booking",
+                page: location.origin + location.pathname,   // the Worker puts the splash page next to it in David's "Confirm aboard" link
                 page_version: APP_VERSION,
                 prices_saved_at: DATA.saved_at,
                 note: CHANGE_TEXT,

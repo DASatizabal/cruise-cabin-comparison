@@ -1,8 +1,8 @@
-# Family alerts (Cloudflare Worker and Apps Script, 5.2.0)
+# Family alerts (Cloudflare Worker and Apps Script, 5.2.0; aboard list 5.3.0)
 
 `worker.js` is the Cloudflare Worker `cruise-family-alerts`, separate from the Deck Finder Worker and from `cruise-refresh-trigger`. It runs the family price watch ("Watch this price" on the page) and sends the Make Selection booking requests. `apps-script/Code.gs` is the Apps Script that sends its emails from the owner's Gmail. NOTES.md, "Family price watch and booking emails".
 
-- **What is stored:** price watches only, in the Cloudflare D1 database `cruise-family-alerts`: the email address, the option, ship and cabin code, party size, Florida answer, the person's choices (drop per guest, few left, sold out, how often), prices and dates. Links in the emails carry random tokens; only their SHA-256 is stored. Unconfirmed watches are deleted after 48 hours, a stopped watch at once, everything from Jun 11, 2027 (Eastern). Booking requests are never stored or logged: the Worker checks them, builds the two emails and drops them.
+- **What is stored:** price watches only, in the Cloudflare D1 database `cruise-family-alerts`: the email address, the option, ship and cabin code, party size, Florida answer, the person's choices (drop per guest, few left, sold out, how often), prices and dates. Links in the emails carry random tokens; only their SHA-256 is stored. Unconfirmed watches are deleted after 48 hours, a stopped watch at once, everything from Jun 11, 2027 (Eastern). Booking requests are never stored or logged: the Worker checks them, builds the two emails and drops them (5.3.0: except the cast ids their guests' first names match, kept with the hash of David's "Confirm aboard" link). The splash page's aboard list: cast ids only, kept through the trip and deleted from Jun 20, 2027 (Eastern).
 - **Who can call it:** only the page's address, `https://dasatizabal.github.io` (plus `https://raw.githack.com` while `TEST_ORIGIN` is set for testing). Starting a watch and sending a booking request need Cloudflare Turnstile.
 - **Secrets:** only in Cloudflare (Worker secrets `TURNSTILE_SECRET`, `APPS_SCRIPT_URL`, `APPS_SCRIPT_SECRET`) and in the Apps Script (Script Properties, `SHARED_SECRET`, the same value as `APPS_SCRIPT_SECRET`). Never in this repo, a note, an email or a file. The owner's email address is in no file and no setting: the Apps Script sends "owner" mail to the account it runs as.
 - **Email limits:** a free Gmail account can send 100 emails a day from Apps Script. Price watch emails always leave 20 of them for booking requests; an alert that can't be sent waits for the next check. A booking request is sent whole (David's email and the sender's copy) or not at all.
@@ -86,3 +86,13 @@ Claude sets `FAMILY_API` and `TURNSTILE_SITE_KEY` in `index.html`, commits on th
 1. Claude sets `TEST_ORIGIN` to `""` in `worker.js` and commits (until then the release check fails on purpose).
 2. Paste the new `worker.js` into the Worker again (part 4, steps 1 and 5, from the same branch address, after Claude's commit). The preview stops working for the price watch and booking requests; that is expected.
 3. In Turnstile, open the `cruise family` widget's settings, remove the hostname `raw.githack.com` and save.
+
+## Splash page update (5.3.0)
+
+The Worker also keeps who is aboard for the splash page (NOTES.md, "Splash page"): new routes `GET /aboard`, `/aboard/open`, `/aboard/save` and `/aboard/link`, and two new tables it creates itself (`aboard`, `aboard_links`: cast ids and token hashes only). The Apps Script gets one new email kind (`aboard`, to the owner only). No new secrets, bindings or cron triggers. Claude gives the steps one at a time; they are:
+
+1. Update the Apps Script (paste the new `Code.gs`, save, and deploy a new version of the same web app, so its address stays the same).
+2. Add `raw.githack.com` to the Turnstile widget's hostnames again (for testing from the preview).
+3. Claude sets `TEST_ORIGIN` to `"https://raw.githack.com"` and commits; paste that `worker.js` into the Worker.
+4. Test from the preview: the deck, a Make Selection request with the "Confirm aboard" link, the checklist, and "Email me a private aboard link".
+5. Before merging: Claude sets `TEST_ORIGIN` to `""` and commits; paste `worker.js` into the Worker again; remove `raw.githack.com` from the Turnstile widget; move the test people back to the dock with a fresh private link.

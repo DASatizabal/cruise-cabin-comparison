@@ -1,4 +1,4 @@
-// Apps Script "Cruise family mail" (5.2.0): sends the emails of the Cloudflare Worker
+// Apps Script "Cruise family mail" (5.2.0; "aboard" 5.3.0): sends the emails of the Cloudflare Worker
 // cruise-family-alerts (tools/family-alerts/worker.js) from the owner's Gmail.
 // Setup: tools/family-alerts/README.md, part 1. Deployed as a web app that runs as the owner.
 //
@@ -7,7 +7,8 @@
 // - "owner" as a recipient means the owner's own address (the account this script runs as), so
 //   the address is in no file and no Worker setting.
 // - Respects Gmail's daily limit (MailApp.getRemainingDailyQuota(), 100 a day on a free Gmail
-//   account): price watch emails ("watch", "alert") always leave RESERVED_FOR_BOOKINGS sends for
+//   account): price watch emails ("watch", "alert") and the splash page's private aboard link
+//   ("aboard", to the owner only) always leave RESERVED_FOR_BOOKINGS sends for
 //   booking requests. A message not sent is answered false; the Worker tries an alert again on
 //   its next run.
 // - Logs nothing: no Logger or console calls, so no address, name or text is ever written down.
@@ -15,7 +16,7 @@
 var RESERVED_FOR_BOOKINGS = 20;
 var MAX_MESSAGES = 50;
 var SENDER_NAME = "David's cruise page";
-var KINDS = { watch: true, alert: true, booking: true };
+var KINDS = { watch: true, alert: true, booking: true, aboard: true };
 
 function doPost(e) {
   var answer;

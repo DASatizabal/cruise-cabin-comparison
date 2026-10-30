@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Our June 2027 Family Cruise</title>
+    <meta name="description" content="Our June 2027 family cruise from Miami: three ways to go, prices from NCL, and who's coming.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" as="image" href="hero-family.webp" fetchpriority="high">
+    <style>
+        :root {
+            --deep-ocean: #0a2540;
+            --ocean-blue: #1e3a5f;
+            --teal: #0d9488;
+            --teal-light: #14b8a6;
+            --teal-wash: rgba(13, 148, 136, 0.1);
+            --gold: #f59e0b;
+            --gold-wash: #fef3c7;
+            --red: #b91c1c;
+            --white: #ffffff;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --vh: 100vh;
+        }
+        @supports (height: 100svh) { :root { --vh: 100svh; } }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-100); color: var(--gray-800); line-height: 1.5; overflow-x: hidden;
+        }
+        img { display: block; max-width: 100%; }
+        a { color: var(--ocean-blue); }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+        /* 1. Opening: the family photo, pinned while you scroll, fades into the ship. */
+        .hero { position: relative; height: calc(var(--vh) * 2.2); background: var(--deep-ocean); }
+        .hero-sticky { position: sticky; top: 0; height: var(--vh); overflow: hidden; }
+        .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .hero-img.ship { opacity: 0; will-change: opacity; }
+        .hero-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10, 37, 64, 0) 45%, rgba(10, 37, 64, 0.82) 100%); }
+        .hero-text {
+            position: absolute; left: 0; right: 0; bottom: 0; padding: 0 1rem 4.5rem; color: var(--white);
+            text-align: center; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+        }
+        .kicker { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #fde68a; }
+        .hero h1 { font-size: clamp(2rem, 9vw, 3.6rem); font-weight: 800; line-height: 1.08; margin: 0.35rem 0 0.5rem; }
+        .hero-sub { font-size: clamp(1rem, 4.2vw, 1.3rem); max-width: 34rem; margin: 0 auto; }
+        .hero-link { display: inline-block; margin-top: 0.9rem; color: var(--white); font-size: 0.9rem; font-weight: 600; }
+        .scroll-cue {
+            position: absolute; left: 50%; bottom: 1.1rem; transform: translateX(-50%); color: var(--white);
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85;
+        }
+        .scroll-cue::after { content: ""; display: block; width: 10px; height: 10px; margin: 0.3rem auto 0; border-right: 2px solid; border-bottom: 2px solid; transform: rotate(45deg); }
+
+        /* Sections */
+        .block { max-width: 1100px; margin: 0 auto; padding: 3rem 1rem; }
+        .block > h2, .cta h2 { font-size: clamp(1.5rem, 6vw, 2.1rem); font-weight: 800; color: var(--deep-ocean); line-height: 1.15; text-align: center; }
+        .lead { text-align: center; color: var(--gray-600); max-width: 36rem; margin: 0.5rem auto 0; }
+        .fine { font-size: 0.78rem; color: var(--gray-500); text-align: center; margin-top: 0.75rem; }
+
+        /* 2. Video */
+        .video-box {
+            position: relative; width: 100%; max-width: 860px; margin: 1.25rem auto 0; aspect-ratio: 16 / 9;
+            border-radius: 14px; overflow: hidden; background: linear-gradient(135deg, var(--deep-ocean), var(--ocean-blue));
+            box-shadow: 0 12px 30px rgba(10, 37, 64, 0.25);
+        }
+        .video-box iframe, .video-box #ytPlayer { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+        .video-poster { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; color: var(--white); font-weight: 600; }
+        .video-poster .play { width: 64px; height: 64px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); display: flex; align-items: center; justify-content: center; }
+        .video-poster .play::before { content: ""; border-left: 20px solid var(--white); border-top: 12px solid transparent; border-bottom: 12px solid transparent; margin-left: 5px; }
+
+        /* 3. The three options */
+        .options { display: grid; gap: 1rem; margin-top: 1.5rem; }
+        @media (min-width: 760px) { .options { grid-template-columns: repeat(3, 1fr); } }
+        .option { background: var(--white); border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 18px rgba(10, 37, 64, 0.08); display: flex; flex-direction: column; }
+        .option-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); }
+        .option h3 { font-size: 1.25rem; font-weight: 800; color: var(--deep-ocean); line-height: 1.2; margin-top: 0.15rem; }
+        .option-dates { font-size: 0.9rem; color: var(--gray-600); margin-top: 0.2rem; }
+        .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
+        .chip { font-size: 0.75rem; padding: 0.15rem 0.6rem; border-radius: 9999px; background: var(--teal-wash); color: var(--ocean-blue); font-weight: 600; }
+        .maiden-badge {
+            display: inline-block; margin-top: 0.6rem; padding: 0.25rem 0.7rem; border-radius: 9999px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid var(--gold);
+            color: #78350f; font-size: 0.8rem; font-weight: 700; align-self: flex-start;
+        }
+        .tiers { list-style: none; margin-top: 0.9rem; border-top: 1px solid var(--gray-200); }
+        .tier { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid var(--gray-200); }
+        .tier-name { font-weight: 600; font-size: 0.92rem; }
+        .tier-level { display: block; font-size: 0.72rem; color: var(--gray-500); font-weight: 400; }
+        .tier-price { text-align: right; white-space: nowrap; font-size: 0.8rem; color: var(--gray-600); }
+        .tier-price strong { font-size: 1.2rem; color: var(--deep-ocean); font-weight: 800; }
+        .tier.none .tier-price { font-size: 0.8rem; white-space: normal; }
+        .option-note { font-size: 0.75rem; color: #92400e; margin-top: 0.5rem; }
+        .as-of { text-align: center; font-size: 0.85rem; color: var(--gray-600); margin-top: 0.4rem; }
+
+        /* 4. The deck: a still picture with one actor per person on top. */
+        .score { text-align: center; font-size: 1.05rem; font-weight: 700; color: var(--teal); margin-top: 0.35rem; }
+        .stage {
+            position: relative; width: 100%; max-width: 520px; margin: 1.25rem auto 0; aspect-ratio: 3 / 5;
+            border-radius: 16px; overflow: hidden; box-shadow: 0 12px 30px rgba(10, 37, 64, 0.25); background: #0b5f86;
+        }
+        .deck-img { position: absolute; inset: 0; width: 100%; height: 100%; }
+        /* An actor's box is the picture (3:4); its bottom center sits on the spot (x, y in %). */
+        .actor {
+            position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); width: 12%; aspect-ratio: 3 / 4;
+            translate: -50% -100%; transform-origin: 50% 100%;
+        }
+        .actor.dock { width: 8.6%; }
+        .actor img { width: 100%; height: 100%; object-fit: contain; }
+        .actor .name {
+            position: absolute; top: 100%; left: 50%; translate: -50% 0; margin-top: 1px; padding: 0 0.3em;
+            font-size: clamp(9px, 2.7vw, 12px); font-weight: 700; line-height: 1.3; white-space: nowrap;
+            color: var(--deep-ocean); background: rgba(255, 255, 255, 0.85); border-radius: 4px;
+        }
+        .actor.dock .name { font-size: clamp(8px, 2.4vw, 11px); }
+        /* Names at the dock's left and right edges stay inside the picture. */
+        .actor.edge-left .name { left: 0; translate: 0 0; }
+        .actor.edge-right .name { left: auto; right: 0; translate: 0 0; }
+        .stage.bon-voyage .actor.dock { display: none; }
+        .banner {
+            position: absolute; left: 50%; top: 84%; translate: -50% -50%; padding: 0.5rem 1.2rem; border-radius: 9999px;
+            background: var(--white); color: var(--deep-ocean); font-weight: 800; font-size: clamp(1rem, 5vw, 1.5rem);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); white-space: nowrap;
+        }
+
+        /* 5. Call to action */
+        .cta { text-align: center; padding: 3rem 1rem 3.5rem; background: linear-gradient(135deg, var(--deep-ocean) 0%, var(--ocean-blue) 100%); color: var(--white); }
+        .cta h2 { color: var(--white); }
+        .cta p { max-width: 30rem; margin: 0.5rem auto 0; opacity: 0.9; }
+        .big-button {
+            display: inline-block; margin-top: 1.5rem; padding: 1rem 2.6rem; border-radius: 9999px; background: var(--gold);
+            color: var(--deep-ocean); font-size: 1.2rem; font-weight: 800; text-decoration: none; box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+        }
+        .big-button:focus-visible, .owner-btn:focus-visible { outline: 3px solid var(--white); outline-offset: 3px; }
+
+        footer { text-align: center; padding: 1.5rem 1rem 2.5rem; font-size: 0.78rem; color: var(--gray-500); }
+        footer p + p { margin-top: 0.35rem; }
+        .owner { margin-top: 1rem; }
+        .owner-btn, .dlg-btn {
+            padding: 0.45rem 1rem; border-radius: 9999px; border: 2px solid var(--gray-300); background: var(--white);
+            color: var(--gray-700); font: inherit; font-weight: 600; cursor: pointer;
+        }
+        .owner-panel { max-width: 22rem; margin: 0.75rem auto 0; }
+        .owner-panel p { margin: 0.5rem 0; }
+        .ts { display: flex; justify-content: center; min-height: 0; }
+        .status { min-height: 1.2em; font-weight: 600; color: var(--gray-700); }
+        .status.bad { color: var(--red); }
+
+        /* The owner's checklist (from the private "Confirm aboard" link) */
+        dialog.aboard { width: min(28rem, calc(100vw - 1.5rem)); max-height: calc(var(--vh) - 2rem); margin: auto; border: 0; border-radius: 16px; padding: 0; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35); }
+        dialog.aboard::backdrop { background: rgba(10, 37, 64, 0.55); }
+        .dlg-head { position: sticky; top: 0; background: var(--white); padding: 1rem 1rem 0.5rem; border-bottom: 1px solid var(--gray-200); }
+        .dlg-head h2 { font-size: 1.15rem; color: var(--deep-ocean); }
+        .dlg-head p { font-size: 0.8rem; color: var(--gray-600); margin-top: 0.2rem; }
+        .dlg-body { padding: 0.5rem 1rem; }
+        .check-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0; border-bottom: 1px solid var(--gray-100); font-weight: 600; }
+        .check-row input { width: 1.3rem; height: 1.3rem; accent-color: var(--teal); flex-shrink: 0; }
+        .check-row .tag { margin-left: auto; font-size: 0.72rem; font-weight: 600; color: var(--teal); white-space: nowrap; }
+        .dlg-foot { position: sticky; bottom: 0; background: var(--white); padding: 0.75rem 1rem 1rem; border-top: 1px solid var(--gray-200); display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+        .dlg-btn.primary { background: var(--teal); border-color: var(--teal); color: var(--white); }
+        .dlg-btn:disabled { opacity: 0.6; cursor: default; }
+        .dlg-foot .status { flex-basis: 100%; font-size: 0.85rem; }
+
+        /* Less motion: no fade, no autoplay, no jump. The two opening pictures are shown one after the other. */
+        .still .hero { height: auto; }
+        .still .hero-sticky { position: relative; height: auto; display: grid; }
+        .still .hero-img.family, .still .hero-shade, .still .hero-text { grid-area: 1 / 1; position: relative; }
+        .still .hero-img.family { height: var(--vh); }
+        .still .hero-text { align-self: end; padding-bottom: 2rem; }
+        .still .hero-img.ship { grid-area: 2 / 1; position: relative; height: calc(var(--vh) * 0.6); opacity: 1; }
+        .still .scroll-cue { display: none; }
+    </style>
+</head>
+<body>
+    <section class="hero" id="hero" aria-label="Our June 2027 family cruise">
+        <div class="hero-sticky">
+            <img class="hero-img family" src="hero-family.webp" alt="Our family" fetchpriority="high">
+            <img class="hero-img ship" src="hero-ship.webp" alt="Our ship" decoding="async">
+            <div class="hero-shade"></div>
+            <div class="hero-text">
+                <p class="kicker">June 2027 &middot; Round trip from Miami</p>
+                <h1>Our Family Cruise</h1>
+                <p class="hero-sub" id="heroSub">Two ships, up to 8 nights, all of us together on Norwegian Cruise Line.</p>
+                <a class="hero-link" href="../">Compare cabins and prices &rarr;</a>
+            </div>
+            <div class="scroll-cue" aria-hidden="true">Scroll</div>
+        </div>
+    </section>
+
+    <section class="block" id="video" aria-labelledby="videoTitle">
+        <h2 id="videoTitle">Meet Norwegian Aura</h2>
+        <p class="lead">NCL's newest ship. Our 5 night sailing on Jun 14, 2027 is her maiden voyage from Miami.</p>
+        <div class="video-box" id="videoBox">
+            <div class="video-poster" id="videoPoster"><span class="play"></span><span>Meet Norwegian Aura</span></div>
+            <div id="ytPlayer"></div>
+        </div>
+        <p class="fine">Norwegian Cruise Line's video, played from YouTube. <a href="https://www.youtube.com/watch?v=WSWIpQhOoE4" target="_blank" rel="noopener">Watch on YouTube</a></p>
+    </section>
+
+    <section class="block" id="options" aria-labelledby="optionsTitle">
+        <h2 id="optionsTitle">Three ways to go</h2>
+        <p class="lead">Every option fits every budget. Prices come from NCL every day.</p>
+        <p class="as-of">Prices as of <strong id="asOf">loading...</strong></p>
+        <div class="options" id="optionCards"><p class="lead">Loading prices...</p></div>
+        <p class="fine" id="priceNote">Each "from" price is per person for 2 adults sharing one cabin: NCL's cruise fare with taxes, fees and port expenses, plus the Free at Sea gratuities for Unlimited Open Bar and Specialty Dining (the comparison page's starting choices). Service charges (crew gratuities) are paid onboard. Kids, Florida resident rates and every other cabin are on the comparison page.</p>
+    </section>
+
+    <section class="block" id="deck" aria-labelledby="deckTitle">
+        <h2 id="deckTitle">Who's coming?</h2>
+        <p class="score" id="score" aria-live="polite"></p>
+        <p class="lead" id="deckLead">Everyone David has confirmed is on deck on their lounger. Everyone else is waiting at the dock.</p>
+        <div class="stage" id="stage">
+            <img class="deck-img" id="deckImg" alt="" decoding="async">
+            <div id="actors"></div>
+        </div>
+        <p class="sr-only" id="castText"></p>
+        <p class="fine" id="deckNote"></p>
+    </section>
+
+    <section class="cta" aria-labelledby="ctaTitle">
+        <h2 id="ctaTitle">Ready to come aboard?</h2>
+        <p>See every cabin, your party's total with your choices, and send your pick to David.</p>
+        <a class="big-button" href="../">Pick your cabin</a>
+    </section>
+
+    <footer>
+        <p>First names only. Nothing about you is kept on this page.</p>
+        <p id="footerVersion"></p>
+        <div class="owner">
+            <button type="button" class="owner-btn" id="ownerOpen" aria-expanded="false" aria-controls="ownerPanel">Email me a private aboard link</button>
+            <div class="owner-panel" id="ownerPanel" hidden>
+                <p>For David: the link goes only to David's email. It opens the aboard checklist once.</p>
+                <div class="ts" id="ownerTs"></div>
+                <p><button type="button" class="dlg-btn primary" id="ownerSend">Send the link</button></p>
+                <p class="status" id="ownerStatus" role="status" aria-live="polite"></p>
+            </div>
+        </div>
+    </footer>
+
+    <dialog class="aboard" id="aboardDialog" aria-labelledby="aboardTitle"></dialog>
+
+    <script>
+        const APP_VERSION = "5.3.0";
+        const FAMILY_API = "https://cruise-family-alerts.dasatizabal.workers.dev";  // the cruise-family-alerts Worker (same as ../index.html)
+        const TURNSTILE_SITE_KEY = "0x4AAAAAAFraPQ22zRVXxf0b";                      // Cloudflare Turnstile site key (public, same as ../index.html)
+        // Splash page (5.3.0, NOTES.md "Splash page"). It reads only files the daily refresh
+        // already publishes (no NCL calls), its own cast list, and who is aboard from the
+        // cruise-family-alerts Worker (public, read only: cast ids only).
+        const PRICES_URL = "../data/prices.json";
+        const CAST_URL = "cast.json";
+        const VIDEO_ID = "WSWIpQhOoE4";            // NCL's "Meet Norwegian Aura" on YouTube, never downloaded
+        const SAIL_DAY = "2027-06-11";             // from this Eastern date: the "Bon voyage" scene
+        const HOME_DAY = "2027-06-20";             // the trip is over (the Worker deletes the aboard list)
+        const HIDDEN_CODES = new Set(["T1", "IT", "OT", "BT"]);   // solo cabins, hidden as on the comparison page
+        const DOCK = { cols: 7, rows: [81, 89, 97] };              // dock spots in % of the deck picture
+        const GANGWAY = { bottom: [85, 74], top: [85, 60] };       // in % of the deck picture (splash/deck.svg)
+        const JUMP_MS = 1600, JUMP_GAP_MS = 180;
+        const ABOARD_LINK = /^#aboard=([A-Za-z0-9_-]{43})$/;
+
+        const $ = id => document.getElementById(id);
+        const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const money = n => { const r = Math.round(n * 100) / 100; return "$" + r.toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(r) ? 0 : 2, maximumFractionDigits: 2 }); };
+        const fmtEastern = t => new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
+        const fmtShort = t => new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" });
+        const easternDay = d => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+        const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const fmtDay = iso => { const [, m, d] = iso.split("-").map(Number); return `${MONTHS[m - 1]} ${d}`; };
+        const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+        // The page address the Worker's links come back to (the published page, or a preview).
+        const pageAddress = () => location.origin + location.pathname;
+
+        const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const still = () => motion.matches;
+        if (still()) document.documentElement.classList.add("still");
+        const today = easternDay(new Date());
+        const sailed = today >= SAIL_DAY;
+        $("footerVersion").textContent = `Version ${APP_VERSION}`;
+
+        // ---------- 1. Opening: the family photo fades into the ship as you scroll ----------
+        (function opening() {
+            const hero = $("hero"), ship = document.querySelector(".hero-img.ship"), cue = document.querySelector(".scroll-cue");
+            let queued = false;
+            const update = () => {
+                queued = false;
+                if (still()) { ship.style.opacity = ""; return; }
+                const r = hero.getBoundingClientRect(), span = r.height - window.innerHeight;
+                const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+                ship.style.opacity = p.toFixed(3);
+                cue.style.opacity = String(Math.max(0, 0.85 - p * 3));
+            };
+            const ask = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+            window.addEventListener("scroll", ask, { passive: true });
+            window.addEventListener("resize", ask);
+            motion.addEventListener && motion.addEventListener("change", () => { document.documentElement.classList.toggle("still", still()); ask(); });
+            update();
+            if (sailed) $("heroSub").textContent = today >= HOME_DAY ? "We sailed together in June 2027. Welcome home!" : "Bon voyage! We're sailing together on Norwegian Cruise Line.";
+        })();
+
+        // ---------- 2. Video: plays muted while in view, pauses when it leaves ----------
+        // YouTube's player loads only when the video gets close. With less motion it never plays
+        // by itself: tap play.
+        const video = { player: null, ready: false, visible: false, ours: false };
+        function loadVideo() {
+            if (video.loading) return;
+            video.loading = true;
+            const make = () => {
+                video.player = new YT.Player("ytPlayer", {
+                    host: "https://www.youtube-nocookie.com", videoId: VIDEO_ID, width: "100%", height: "100%",
+                    playerVars: { mute: 1, playsinline: 1, rel: 0, controls: 1, autoplay: 0 },
+                    events: {
+                        onReady: () => { video.ready = true; $("videoPoster").hidden = true; video.player.mute(); syncVideo(); },
+                    },
+                });
+            };
+            if (window.YT && window.YT.Player) return make();
+            window.onYouTubeIframeAPIReady = make;
+            const s = document.createElement("script");
+            s.src = "https://www.youtube.com/iframe_api";
+            s.async = true;
+            document.head.appendChild(s);
+        }
+        function syncVideo() {
+            if (!video.ready || still()) return;
+            if (video.visible) video.player.playVideo();
+            else video.player.pauseVideo();
+        }
+        (function watchVideo() {
+            const box = $("videoBox");
+            if (!("IntersectionObserver" in window)) { loadVideo(); return; }
+            new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) loadVideo(); }, { rootMargin: "600px 0px" }).observe(box);
+            new IntersectionObserver(es => {
+                for (const e of es) {
+                    const v = e.intersectionRatio >= 0.5;
+                    if (v !== video.visible) { video.visible = v; syncVideo(); }
+                }
+            }, { threshold: [0, 0.5, 1] }).observe(box);
+        })();
+
+        // ---------- 3. The three options, low, middle and high, from data/prices.json ----------
+        // The comparison page's own rules: Studio and solo cabins hidden; in a cabin type, the
+        // cheapest available non-Guarantee category (the cheapest Guarantee one when that is all
+        // the type has). Low: the cheapest of those. Middle: Balcony. High: The Haven, else Suite.
+        // Per person for 2 adults with the page's starting choices: NCL's fare with taxes plus the
+        // Open Bar and Specialty Dining gratuities, service charges onboard, no Florida discount.
+        // That is the same as the comparison card's Total (to pay now) / 2 with the Florida switch off.
+        const shipOf = (d, key) => d.sailings.find(s => typeof s.id === "string" && s.id.startsWith(key));
+        function pickIn(t) {
+            const list = (t ? t.categories : []).filter(c => !c.solo && !HIDDEN_CODES.has(c.code) && c.by_guests && c.by_guests["2"] &&
+                c.by_guests["2"].available && Number.isFinite(c.by_guests["2"].cabin_total)).sort((a, b) => a.by_guests["2"].cabin_total - b.by_guests["2"].cabin_total);
+            return list.find(c => !c.guarantee) || list[0] || null;
+        }
+        function tierPick(s, level) {
+            const types = s.types.filter(t => t.match !== "studio");
+            const typeIs = code => types.find(t => t.code === code);
+            const one = t => { const c = pickIn(t); return c ? { t, c } : null; };
+            if (level === "low") return types.map(one).filter(Boolean).sort((a, b) => a.c.by_guests["2"].cabin_total - b.c.by_guests["2"].cabin_total)[0] || null;
+            if (level === "middle") return one(typeIs("BALCONY"));
+            return one(typeIs("HAVEN")) || one(typeIs("SUITE"));
+        }
+        function perPerson(s, c) {
+            const g = s.gratuities;
+            const extras = g ? (g.open_bar.per_guest + g.specialty_dining.per_guest) * 2 : 0;
+            return { pp: (c.by_guests["2"].cabin_total + extras) / 2, noGratuities: !g };
+        }
+        const LEVELS = [["low", "Lowest price"], ["middle", "Middle"], ["high", "Top of the line"]];
+        function tierRows(ships) {
+            return LEVELS.map(([level, levelName]) => {
+                const picks = ships.map(s => tierPick(s, level));
+                if (picks.some(p => !p)) {
+                    const missing = ships.filter((s, i) => !picks[i]).map(s => s.ship_short).join(" and ");
+                    const what = level === "middle" ? "Balcony" : level === "high" ? "Haven or Suite" : "cabin";
+                    return `<li class="tier none"><span class="tier-name">${esc(levelName)}</span><span class="tier-price">No ${what} available for 2 on the ${esc(missing)} today</span></li>`;
+                }
+                const titles = picks.map(p => p.t.title);
+                const name = titles.every(x => x === titles[0]) ? titles[0] : picks.map((p, i) => `${p.t.title} on the ${ships[i].ship_short}`).join(", ");
+                const total = picks.reduce((sum, p, i) => sum + perPerson(ships[i], p.c).pp, 0);
+                return `<li class="tier" data-level="${level}"><span class="tier-name">${esc(name)}<span class="tier-level">${esc(levelName)}</span></span>
+                        <span class="tier-price">from <strong>${money(total)}</strong> per person</span></li>`;
+            }).join("");
+        }
+        function portChips(ships) {
+            const names = [], seaDays = ships.reduce((n, s) => n + (s.ports || []).filter(p => p.sea).length, 0);
+            for (const s of ships) for (const p of s.ports || []) {
+                const name = p.port && p.port.split(",")[0];
+                if (name && !/^Miami$/i.test(name) && !names.includes(name)) names.push(name);
+            }
+            if (seaDays) names.push(plural(seaDays, "sea day", "sea days"));
+            return `<div class="chips">${names.map(n => `<span class="chip">${esc(n)}</span>`).join("")}</div>`;
+        }
+        function notes(ships) {
+            const out = [];
+            for (const s of ships) {
+                const ps = s.party_sizes && s.party_sizes["2"];
+                if (ps && ps.updated === false) out.push(`${s.ship_short} prices not updated today: from ${fmtShort(ps.as_of)}.`);
+                if (!s.gratuities) out.push(`The ${s.ship_short}'s Free at Sea gratuities weren't found on NCL today, so they aren't included.`);
+            }
+            return out.map(x => `<p class="option-note">${esc(x)}</p>`).join("");
+        }
+        function renderOptions(d) {
+            const G = shipOf(d, "getaway"), A = shipOf(d, "aura");
+            if (!G || !A) throw new Error("ships");
+            const card = (label, title, dates, ships, extra) => `
+                <article class="option" data-option="${label.slice(-1)}">
+                    <span class="option-label">${esc(label)}</span>
+                    <h3>${esc(title)}</h3>
+                    <p class="option-dates">${esc(dates)}</p>
+                    ${portChips(ships)}${extra}
+                    <ul class="tiers">${tierRows(ships)}</ul>
+                    ${notes(ships)}
+                </article>`;
+            const badge = `<span class="maiden-badge">🍾 Maiden Voyage from Miami 🎆</span>`;
+            const span = s => `${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027`;
+            $("optionCards").innerHTML =
+                card("Option 1", `${G.nights} nights on ${G.ship}`, span(G), [G], "") +
+                card("Option 2", `${A.nights} nights on ${A.ship}`, span(A), [A], badge) +
+                card("Option 3", `${G.nights + A.nights} nights: both, back to back`, `${fmtDay(G.depart)} to ${fmtDay(A.return)}, 2027. Change ships in Miami on ${fmtDay(A.depart)}.`, [G, A], badge);
+            $("asOf").textContent = fmtEastern(d.saved_at);
+        }
+        fetch(PRICES_URL, { cache: "no-cache" }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(renderOptions).catch(() => {
+            $("asOf").textContent = "not available";
+            $("optionCards").innerHTML = `<p class="lead">Today's prices couldn't be loaded. They are on the <a href="../">comparison page</a>.</p>`;
+        });
+
+        // ---------- 4. The deck: who's aboard ----------
+        // The deck is a still picture; each person is an actor (splash/actors/<id>.webp) placed
+        // by the page. Aboard: on their lounger. Not yet: at the dock (3 rows of 7 spots, by cast
+        // order). When the deck first scrolls into view, the people aboard jump from the dock,
+        // up the gangway, onto their loungers. With less motion (or once the trip has started)
+        // everyone is shown in place.
+        const scene = { cast: null, aboard: null, aboardOk: true, built: false, played: false, seen: false, near: false };
+        const dockSpot = i => [((i % DOCK.cols) + 0.5) / DOCK.cols * 100, DOCK.rows[Math.floor(i / DOCK.cols)] ?? DOCK.rows[DOCK.rows.length - 1]];
+        function place(el, [x, y], dock) {
+            el.style.setProperty("--x", x);
+            el.style.setProperty("--y", y);
+            el.classList.toggle("dock", dock);
+            el.classList.toggle("edge-left", dock && x < 10);
+            el.classList.toggle("edge-right", dock && x > 90);
+            el.style.zIndex = String(Math.round(y * 10));
+        }
+        function buildScene() {
+            if (scene.built || !scene.cast || !scene.near) return;
+            scene.built = true;
+            $("deckImg").src = scene.cast.deck;
+            $("actors").innerHTML = scene.cast.cast.map(p => `
+                <div class="actor" data-id="${esc(p.id)}"><img src="${esc(still() && p.still ? p.still : p.actor)}" alt="" width="180" height="240" decoding="async"><span class="name">${esc(p.name)}</span></div>`).join("");
+            for (const img of document.querySelectorAll("#actors img")) img.addEventListener("error", () => { if (!img.dataset.fallback) { img.dataset.fallback = "1"; img.src = "actors/placeholder.webp"; } });
+            showAboard(false);
+        }
+        const actorEl = id => document.querySelector(`.actor[data-id="${CSS.escape(id)}"]`);
+        // Places everyone: aboard on the lounger (before the jump has played, still at the dock).
+        function showAboard() {
+            if (!scene.built) return;
+            const aboard = new Set(scene.aboard || []);
+            const settled = scene.played || still() || sailed;
+            scene.cast.cast.forEach((p, i) => {
+                if (aboard.has(p.id) && settled) place(actorEl(p.id), [p.lounger.x, p.lounger.y], false);
+                else place(actorEl(p.id), dockSpot(i), true);
+            });
+            $("stage").classList.toggle("bon-voyage", sailed);
+            const old = document.querySelector("#stage .banner");
+            if (old) old.remove();
+            if (sailed) $("stage").insertAdjacentHTML("beforeend", `<div class="banner">${today >= HOME_DAY ? "Welcome home!" : "Bon voyage!"}</div>`);
+            const names = ids => scene.cast.cast.filter(p => ids(p.id)).map(p => p.name);
+            const on = names(id => aboard.has(id)), off = names(id => !aboard.has(id));
+            const n = scene.cast.cast.length;
+            if (sailed) {
+                $("deckTitle").textContent = today >= HOME_DAY ? "Welcome home!" : "Bon voyage!";
+                $("score").textContent = on.length ? `${plural(on.length, "of us is", "of us are")} sailing` : "";
+                $("deckLead").textContent = on.length ? "Everyone aboard is on deck." : "";
+            } else {
+                $("score").textContent = scene.aboard ? `${on.length} of ${n} aboard` : "";
+            }
+            $("castText").textContent = scene.aboard ? `Aboard: ${on.join(", ") || "nobody yet"}.${sailed ? "" : ` At the dock: ${off.join(", ") || "nobody"}.`}` : "";
+            $("deckNote").textContent = scene.aboardOk ? "" : "Who's aboard couldn't be checked right now, so everyone is shown at the dock.";
+            if (scene.seen) playJump();
+        }
+        // FLIP: measure each jumper at the dock, move them to the lounger, then animate from the
+        // dock up the gangway to the lounger. Works the same for a placeholder and a real actor,
+        // because the page moves the picture, not what is in it.
+        // only: the people to jump (after the owner saves); otherwise everyone aboard, once.
+        function playJump(only) {
+            if (!scene.built || scene.aboard === null || (scene.played && !only)) return;
+            scene.played = true;
+            const aboard = new Set(scene.aboard);
+            const jumpers = scene.cast.cast.filter(p => aboard.has(p.id) && (!only || only.has(p.id)));
+            if (still() || sailed || !jumpers.length || !Element.prototype.animate) { showAboard(); return; }
+            const stage = $("stage").getBoundingClientRect();
+            const at = ([x, y]) => [stage.left + x / 100 * stage.width, stage.top + y / 100 * stage.height];
+            jumpers.forEach((p, k) => {
+                const el = actorEl(p.id);
+                place(el, dockSpot(scene.cast.cast.indexOf(p)), true);
+                const first = el.getBoundingClientRect();
+                place(el, [p.lounger.x, p.lounger.y], false);
+                const last = el.getBoundingClientRect();
+                const lx = last.left + last.width / 2, ly = last.bottom, s = first.width / last.width;
+                const rel = ([x, y]) => [x - lx, y - ly];
+                const [dx, dy] = rel([first.left + first.width / 2, first.bottom]);
+                const [bx, by] = rel(at(GANGWAY.bottom)), [tx, ty] = rel(at(GANGWAY.top));
+                const hop = stage.height * 0.03, arc = stage.height * 0.09;
+                const T = (x, y, sx, sy = sx) => `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+                const mid = (a, b) => (a + b) / 2;
+                el.animate([
+                    { offset: 0, transform: T(dx, dy, s) },
+                    { offset: 0.12, transform: T(mid(dx, bx), Math.min(dy, by) - hop, s) },
+                    { offset: 0.25, transform: T(bx, by, s) },
+                    { offset: 0.5, transform: T(tx, ty, mid(s, 1)) },
+                    { offset: 0.75, transform: T(tx / 2, ty / 2 - arc, 1) },
+                    { offset: 0.9, transform: T(0, 0, 1.08, 0.86) },
+                    { offset: 1, transform: T(0, 0, 1) },
+                ], { duration: JUMP_MS, delay: k * JUMP_GAP_MS, easing: "ease-in-out", fill: "backwards" });
+            });
+        }
+        (function watchDeck() {
+            const stage = $("stage");
+            if (!("IntersectionObserver" in window)) { scene.near = scene.seen = true; return; }
+            new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { scene.near = true; buildScene(); } }, { rootMargin: "800px 0px" }).observe(stage);
+            new IntersectionObserver(es => { if (es.some(e => e.intersectionRatio >= 0.35)) { scene.seen = true; playJump(); } }, { threshold: [0, 0.35] }).observe(stage);
+        })();
+        async function loadAboard() {
+            if (!FAMILY_API) { scene.aboard = []; return; }
+            try {
+                const r = await fetch(FAMILY_API + "/aboard", { cache: "no-cache" });
+                const a = await r.json();
+                if (!r.ok || !a.ok || !Array.isArray(a.aboard)) throw new Error();
+                scene.aboard = a.aboard.filter(x => typeof x === "string");
+            } catch (e) {
+                scene.aboard = [];
+                scene.aboardOk = false;
+            }
+        }
+        const castReady = fetch(CAST_URL, { cache: "no-cache" }).then(r => r.json()).then(c => { scene.cast = c; buildScene(); });
+        Promise.all([castReady, loadAboard()]).then(() => {
+            const ids = new Set(scene.cast.cast.map(p => p.id));
+            scene.aboard = scene.aboard.filter(id => ids.has(id));
+            buildScene();
+            showAboard();
+        }).catch(() => { $("deckNote").textContent = "The cast list couldn't be loaded right now."; });
+
+        // ---------- The owner's private link ----------
+        // The "Confirm aboard" link in David's copy of a Make Selection email (or the one the
+        // button below emails to David) is #aboard=TOKEN: the page removes it from the address
+        // bar, asks the Worker for the checklist, and saves it once. Nothing is kept here.
+        const owner = { token: null, widget: null, tsToken: null, busy: false };
+        async function call(path, body) {
+            const r = await fetch(FAMILY_API + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, page: pageAddress() }) });
+            const a = await r.json().catch(() => null);
+            if (!a) throw new Error("Something went wrong on David's side. Please try again in a few minutes.");
+            if (!r.ok || !a.ok) throw new Error(a.message || "That didn't work. Please try again.");
+            return a;
+        }
+        function dialogHtml(body, foot) {
+            return `<div class="dlg-head"><h2 id="aboardTitle">Who's aboard?</h2><p>Tick everyone who is booked. Unticked people wait at the dock. Saving uses up this link.</p></div>
+                    <div class="dlg-body">${body}</div><div class="dlg-foot">${foot}</div>`;
+        }
+        async function openChecklist(token) {
+            const dlg = $("aboardDialog");
+            owner.token = token;
+            dlg.innerHTML = dialogHtml(`<p class="status">One moment...</p>`, `<button type="button" class="dlg-btn" data-close>Close</button>`);
+            if (!dlg.open) dlg.showModal();
+            try {
+                const [a] = await Promise.all([call("/aboard/open", { token }), castReady]);
+                const now = new Set(a.aboard), pre = new Set(a.preticks || []);
+                const rows = scene.cast.cast.map(p => `
+                    <label class="check-row"><input type="checkbox" value="${esc(p.id)}" ${now.has(p.id) || pre.has(p.id) ? "checked" : ""}>
+                        <span>${esc(p.name)}</span>${now.has(p.id) ? `<span class="tag">aboard now</span>` : pre.has(p.id) ? `<span class="tag">from this request</span>` : ""}</label>`).join("");
+                dlg.innerHTML = dialogHtml(rows, `<button type="button" class="dlg-btn primary" id="aboardSave">Save</button><button type="button" class="dlg-btn" data-close>Cancel</button><p class="status" id="aboardStatus" role="status" aria-live="polite"></p>`);
+            } catch (e) {
+                owner.token = null;
+                dlg.innerHTML = dialogHtml(`<p class="status bad">${esc(e.message)}</p>`, `<button type="button" class="dlg-btn" data-close>Close</button>`);
+            }
+        }
+        async function saveChecklist() {
+            if (owner.busy || !owner.token) return;
+            owner.busy = true;
+            const btn = $("aboardSave"), status = $("aboardStatus");
+            btn.disabled = true;
+            status.className = "status";
+            status.textContent = "Saving...";
+            const ids = [...document.querySelectorAll("#aboardDialog input[type=checkbox]:checked")].map(i => i.value);
+            try {
+                const a = await call("/aboard/save", { token: owner.token, aboard: ids });
+                owner.token = null;
+                const before = new Set(scene.aboard || []);
+                scene.aboard = a.aboard;
+                const fresh = new Set(a.aboard.filter(id => !before.has(id)));
+                $("aboardDialog").innerHTML = dialogHtml(`<p class="status">Saved: ${plural(a.aboard.length, "person", "people")} aboard. This link is used up. For more changes, use "Email me a private aboard link" at the bottom of the page.</p>`,
+                    `<button type="button" class="dlg-btn primary" data-close>See the deck</button>`);
+                $("aboardDialog").addEventListener("close", () => {
+                    scene.near = true;
+                    buildScene();
+                    $("deck").scrollIntoView({ behavior: still() ? "auto" : "smooth" });
+                    scene.played = true;
+                    showAboard(false);
+                    if (fresh.size) setTimeout(() => playJump(fresh), still() ? 0 : 600);
+                }, { once: true });
+            } catch (e) {
+                status.className = "status bad";
+                status.textContent = e.message;
+                btn.disabled = false;
+            } finally {
+                owner.busy = false;
+            }
+        }
+        $("aboardDialog").addEventListener("click", e => {
+            if (e.target.closest("[data-close]")) $("aboardDialog").close();
+            if (e.target.id === "aboardSave") saveChecklist();
+        });
+        $("aboardDialog").addEventListener("close", () => { owner.token = null; });
+        (function aboardLink() {
+            const m = location.hash.match(ABOARD_LINK);
+            if (!m) return;
+            history.replaceState(null, "", location.pathname + location.search);
+            if (!FAMILY_API) return;
+            openChecklist(m[1]);
+        })();
+
+        // "Email me a private aboard link": Turnstile, then the Worker emails a fresh single use
+        // link to David only (at most 3 a day).
+        function startTurnstile() {
+            if (!FAMILY_API || !TURNSTILE_SITE_KEY || owner.widget !== null) return;
+            const show = () => {
+                if (owner.widget !== null || $("ownerPanel").hidden) return;
+                owner.widget = window.turnstile.render("#ownerTs", { sitekey: TURNSTILE_SITE_KEY,
+                    callback: t => { owner.tsToken = t; }, "expired-callback": () => { owner.tsToken = null; } });
+            };
+            if (window.turnstile) return show();
+            window.onTurnstileReady = show;
+            if (!document.getElementById("tsScript")) {
+                const sc = document.createElement("script");
+                sc.id = "tsScript";
+                sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileReady";
+                sc.async = true;
+                document.head.appendChild(sc);
+            }
+        }
+        $("ownerOpen").addEventListener("click", () => {
+            const panel = $("ownerPanel");
+            panel.hidden = !panel.hidden;
+            $("ownerOpen").setAttribute("aria-expanded", String(!panel.hidden));
+            if (!panel.hidden) startTurnstile();
+        });
+        $("ownerSend").addEventListener("click", async () => {
+            const status = $("ownerStatus"), btn = $("ownerSend");
+            if (owner.busy) return;
+            status.className = "status";
+            if (!FAMILY_API) { status.textContent = "The email service isn't set up on this copy of the page."; return; }
+            if (!owner.tsToken) { status.className = "status bad"; status.textContent = "Complete the check above the button first."; return; }
+            owner.busy = true;
+            btn.disabled = true;
+            status.textContent = "Sending...";
+            try {
+                await call("/aboard/link", { turnstile: owner.tsToken });
+                status.textContent = "Sent. If you're David, check your email for the link.";
+            } catch (e) {
+                status.className = "status bad";
+                status.textContent = e.message;
+                btn.disabled = false;
+            } finally {
+                owner.busy = false;
+                owner.tsToken = null;
+                if (owner.widget !== null && window.turnstile) { try { window.turnstile.reset(owner.widget); } catch (e) {} }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "deck": "deck.svg",
+  "cast": [
+    {"id": "zin", "name": "Zin", "actor": "actors/zin.webp", "lounger": {"x": 12, "y": 17.5}},
+    {"id": "tony", "name": "Tony", "actor": "actors/tony.webp", "lounger": {"x": 31, "y": 17.5}},
+    {"id": "kid-1", "name": "Kid 1", "actor": "actors/kid-1.webp", "lounger": {"x": 50, "y": 17.5}},
+    {"id": "kid-2", "name": "Kid 2", "actor": "actors/kid-2.webp", "lounger": {"x": 69, "y": 17.5}},
+    {"id": "lochis", "name": "Lochis", "actor": "actors/lochis.webp", "lounger": {"x": 88, "y": 17.5}},
+    {"id": "ephraim", "name": "Ephraim", "actor": "actors/ephraim.webp", "lounger": {"x": 12, "y": 30.5}},
+    {"id": "rosie", "name": "Rosie", "actor": "actors/rosie.webp", "lounger": {"x": 31, "y": 30.5}},
+    {"id": "ralph", "name": "Ralph", "actor": "actors/ralph.webp", "lounger": {"x": 50, "y": 30.5}},
+    {"id": "jared", "name": "Jared", "actor": "actors/jared.webp", "lounger": {"x": 69, "y": 30.5}},
+    {"id": "stephanie", "name": "Stephanie", "actor": "actors/stephanie.webp", "lounger": {"x": 88, "y": 30.5}},
+    {"id": "claire", "name": "Claire", "actor": "actors/claire.webp", "lounger": {"x": 12, "y": 43.5}},
+    {"id": "kathy", "name": "Kathy", "actor": "actors/kathy.webp", "lounger": {"x": 31, "y": 43.5}},
+    {"id": "umberto", "name": "Umberto", "actor": "actors/umberto.webp", "lounger": {"x": 50, "y": 43.5}},
+    {"id": "daniel", "name": "Daniel", "actor": "actors/daniel.webp", "lounger": {"x": 69, "y": 43.5}},
+    {"id": "daniels-guest", "name": "Daniel's guest", "actor": "actors/daniels-guest.webp", "lounger": {"x": 88, "y": 43.5}},
+    {"id": "david", "name": "David", "actor": "actors/david.webp", "lounger": {"x": 12, "y": 56.5}},
+    {"id": "lisa", "name": "Lisa", "actor": "actors/lisa.webp", "lounger": {"x": 31, "y": 56.5}},
+    {"id": "david-jr", "name": "David Jr.", "actor": "actors/david-jr.webp", "lounger": {"x": 50, "y": 56.5}},
+    {"id": "dante", "name": "Dante", "actor": "actors/dante.webp", "lounger": {"x": 69, "y": 56.5}},
+    {"id": "alex", "name": "Alex", "actor": "actors/alex.webp", "lounger": {"x": 88, "y": 56.5}}
+  ]
+}

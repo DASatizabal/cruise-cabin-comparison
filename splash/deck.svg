@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 1000" width="600" height="1000">
+  <!-- Splash page deck scene (5.3.0): the pool deck with 20 loungers (4 rows of 5), the hull, the
+       water, the gangway and the dock. Drawn for this page; replace with your own art of the same
+       shape (3:5, portrait). Lounger centers (x, y in % of the scene) are in splash/cast.json:
+       x 12, 31, 50, 69, 88 and y 17.5, 30.5, 43.5, 56.5. The gangway top is at x 85, y 60. -->
+  <defs>
+    <pattern id="planks" width="600" height="26" patternUnits="userSpaceOnUse">
+      <rect width="600" height="26" fill="#d9a066"/>
+      <rect y="24" width="600" height="2" fill="#b9844f"/>
+      <rect x="140" width="2" height="24" fill="#c38d57"/>
+      <rect x="430" width="2" height="24" fill="#c38d57"/>
+    </pattern>
+    <pattern id="dockPlanks" width="40" height="300" patternUnits="userSpaceOnUse">
+      <rect width="40" height="300" fill="#9a6a3c"/>
+      <rect x="38" width="2" height="300" fill="#7a5230"/>
+      <rect x="0" y="120" width="38" height="2" fill="#86592f"/>
+    </pattern>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1fa3c4"/>
+      <stop offset="1" stop-color="#0b5f86"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cfeefb" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#9fd8ef" stop-opacity="0.7"/>
+    </linearGradient>
+    <g id="lounger">
+      <rect x="-42" y="-40" width="84" height="22" rx="8" fill="#0d9488"/>
+      <rect x="-42" y="-22" width="84" height="30" rx="6" fill="#14b8a6"/>
+      <rect x="-36" y="-14" width="72" height="3" rx="1.5" fill="#ffffff" opacity="0.7"/>
+      <rect x="-36" y="-2" width="72" height="3" rx="1.5" fill="#ffffff" opacity="0.7"/>
+      <rect x="-40" y="8" width="5" height="6" fill="#6b7280"/>
+      <rect x="35" y="8" width="5" height="6" fill="#6b7280"/>
+    </g>
+    <g id="towel">
+      <rect x="-9" y="-36" width="18" height="12" rx="3" fill="#fde68a"/>
+    </g>
+  </defs>
+
+  <!-- Deck -->
+  <rect width="600" height="612" fill="url(#planks)"/>
+  <!-- Far railing and the sea beyond it -->
+  <rect width="600" height="44" fill="url(#sea)"/>
+  <rect y="44" width="600" height="18" fill="url(#glass)"/>
+  <rect y="40" width="600" height="5" fill="#ffffff"/>
+  <!-- Pool strip down the middle, behind the loungers -->
+  <rect x="246" y="78" width="108" height="36" rx="12" fill="#38bdf8"/>
+  <rect x="252" y="84" width="96" height="24" rx="9" fill="#7dd3fc"/>
+  <path d="M262 96 q10 -6 20 0 t20 0 t20 0 t20 0" stroke="#e0f2fe" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Umbrellas between the lounger columns -->
+  <g fill="#f59e0b" stroke="#ffffff" stroke-width="3">
+    <circle cx="129" cy="104" r="20"/><circle cx="471" cy="104" r="20"/>
+    <circle cx="243" cy="370" r="18"/><circle cx="357" cy="370" r="18"/>
+  </g>
+  <g fill="#ffffff"><circle cx="129" cy="104" r="4"/><circle cx="471" cy="104" r="4"/><circle cx="243" cy="370" r="3.5"/><circle cx="357" cy="370" r="3.5"/></g>
+
+  <!-- Loungers: 4 rows of 5 -->
+  <use href="#lounger" x="72" y="175"/>
+  <use href="#lounger" x="186" y="175"/>
+  <use href="#lounger" x="300" y="175"/>
+  <use href="#lounger" x="414" y="175"/>
+  <use href="#lounger" x="528" y="175"/>
+  <use href="#lounger" x="72" y="305"/>
+  <use href="#lounger" x="186" y="305"/>
+  <use href="#lounger" x="300" y="305"/>
+  <use href="#lounger" x="414" y="305"/>
+  <use href="#lounger" x="528" y="305"/>
+  <use href="#lounger" x="72" y="435"/>
+  <use href="#lounger" x="186" y="435"/>
+  <use href="#lounger" x="300" y="435"/>
+  <use href="#lounger" x="414" y="435"/>
+  <use href="#lounger" x="528" y="435"/>
+  <use href="#lounger" x="72" y="565"/>
+  <use href="#lounger" x="186" y="565"/>
+  <use href="#lounger" x="300" y="565"/>
+  <use href="#lounger" x="414" y="565"/>
+  <use href="#lounger" x="528" y="565"/>
+
+  <!-- Near railing -->
+  <rect y="586" width="600" height="26" fill="url(#glass)"/>
+  <rect y="584" width="600" height="5" fill="#ffffff"/>
+  <!-- Hull -->
+  <rect y="612" width="600" height="30" fill="#ffffff"/>
+  <rect y="642" width="600" height="52" fill="#1e3a5f"/>
+  <rect y="642" width="600" height="6" fill="#0d9488"/>
+  <g fill="#cfeefb">
+    <circle cx="40" cy="626" r="6"/><circle cx="90" cy="626" r="6"/><circle cx="140" cy="626" r="6"/><circle cx="190" cy="626" r="6"/>
+    <circle cx="240" cy="626" r="6"/><circle cx="290" cy="626" r="6"/><circle cx="340" cy="626" r="6"/><circle cx="390" cy="626" r="6"/>
+    <circle cx="440" cy="626" r="6"/>
+  </g>
+  <!-- Water -->
+  <rect y="694" width="600" height="306" fill="url(#sea)"/>
+  <g stroke="#bae6fd" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8">
+    <path d="M20 712 q12 -7 24 0 t24 0"/><path d="M200 716 q12 -7 24 0 t24 0"/><path d="M360 710 q12 -7 24 0 t24 0"/>
+  </g>
+  <!-- Dock -->
+  <rect y="730" width="600" height="270" fill="url(#dockPlanks)"/>
+  <rect y="726" width="600" height="8" fill="#6b4423"/>
+  <g fill="#5b3a1e"><rect x="14" y="716" width="14" height="22" rx="3"/><rect x="290" y="716" width="14" height="22" rx="3"/><rect x="572" y="716" width="14" height="22" rx="3"/></g>
+  <!-- Gangway from the dock up to the deck -->
+  <path d="M478 600 L542 600 L556 742 L464 742 Z" fill="#e5e7eb"/>
+  <path d="M478 600 L464 742" stroke="#9ca3af" stroke-width="5"/>
+  <path d="M542 600 L556 742" stroke="#9ca3af" stroke-width="5"/>
+  <g stroke="#d1d5db" stroke-width="3">
+    <path d="M476 620 L544 620"/><path d="M474 645 L546 645"/><path d="M471 670 L549 670"/><path d="M469 695 L551 695"/><path d="M466 720 L554 720"/>
+  </g>
+</svg>

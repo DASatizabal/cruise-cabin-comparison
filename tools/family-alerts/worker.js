@@ -1,5 +1,5 @@
-// Cloudflare Worker "cruise-family-alerts" (5.2.0): the family price watch and the Make
-// Selection emails for the June 2027 cruise page. Separate from the Deck Finder Worker and from
+// Cloudflare Worker "cruise-family-alerts" (5.2.0, aboard list 5.3.0): the family price watch,
+// the Make Selection emails and the splash page's aboard list for the June 2027 cruise page. Separate from the Deck Finder Worker and from
 // cruise-refresh-trigger. Setup: tools/family-alerts/README.md. NOTES.md, "Family price watch
 // and booking emails".
 //
@@ -10,7 +10,14 @@
 //   /unsubscribe  stops one watch (the link in every alert email)
 //   /manage       lists the watches of one email address, or stops some of them
 //   /booking      Make Selection: checks Turnstile, emails David the request and the sender a
-//                 copy. Nothing from a booking request is stored or logged.
+//                 copy. Nothing from a booking request is stored or logged, except the cast ids
+//                 its guests' first names match (for David's "Confirm aboard" link).
+//   /aboard/open  the splash page's checklist for a "Confirm aboard" link (#aboard=TOKEN): who
+//                 is aboard now and who the request matched
+//   /aboard/save  saves the checklist (cast ids only) and uses up the link
+//   /aboard/link  "Email me a private aboard link": checks Turnstile, emails David a fresh link
+//                 (at most 3 a day)
+// GET /aboard (public, read only, any origin): the cast ids aboard, for the splash page.
 // Cron triggers (UTC): "30 12 * * *" and "30 17 * * *", after the price and count refreshes.
 // A watch is one cabin on one ship at one party size (the 8 night card has one per ship), with
 // the person's choices: the drop per guest that counts, whether to email when only a few cabins
@@ -29,11 +36,19 @@ const ORIGIN = "https://dasatizabal.github.io";
 // Worker again before merging.
 const TEST_ORIGIN = "";
 const TEST_PAGE = /^https:\/\/raw\.githack\.com\/DASatizabal\/cruise-cabin-comparison\/[0-9a-f]{7,40}\/index\.html$/;
+const TEST_SPLASH = /^https:\/\/raw\.githack\.com\/DASatizabal\/cruise-cabin-comparison\/[0-9a-f]{7,40}\/splash\/index\.html$/;
+const SPLASH = PAGE + "splash/";
 const DATA_URL = PAGE + "data/";
 const SITEVERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 // From the first sail date (Eastern) nothing is watched and everything stored is deleted.
 const END_DAY = "2027-06-11";
 const AGE_DAY = "2027-06-11";   // kids' ages on the page are on the first sail date
+// The aboard list and its links are kept through the end of the trip (the splash page shows
+// "Bon voyage" from Jun 11) and deleted from this Eastern date, the day after the last return.
+const TRIP_OVER_DAY = "2027-06-20";
+const ABOARD_LINK_DAYS = 30;   // a "Confirm aboard" link works once, within this many days
+const ABOARD_LINKS_PER_DAY = 3;   // "Email me a private aboard link" emails in 24 hours
+const CAST_MAX = 40;
 const OPTIONS = {
   G: { label: "Option 1: 3 nights", ships: ["G"] },
   A: { label: "Option 2: 5 nights", ships: ["A"] },
@@ -64,6 +79,11 @@ const SCHEMA = [
   // Only the SHA-256 of each token is kept; the token itself is only in the email.
   "CREATE TABLE IF NOT EXISTS tokens (hash TEXT PRIMARY KEY, kind TEXT NOT NULL, watch_id TEXT, email TEXT, created_at TEXT NOT NULL)",
   "CREATE INDEX IF NOT EXISTS tokens_watch ON tokens (watch_id)",
+  // The splash page (5.3.0): who is aboard, by cast id (splash/cast.json) only.
+  "CREATE TABLE IF NOT EXISTS aboard (id TEXT PRIMARY KEY, updated_at TEXT NOT NULL)",
+  // "Confirm aboard" links: the SHA-256 of the token, the cast ids pre-ticked (from a booking
+  // request's guest first names; empty for a link from the button) and where it came from.
+  "CREATE TABLE IF NOT EXISTS aboard_links (hash TEXT PRIMARY KEY, preticks TEXT NOT NULL, source TEXT NOT NULL, created_at TEXT NOT NULL)",
 ];
 
 export default {
@@ -71,6 +91,17 @@ export default {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/") {
       return new Response("Cruise family alerts. Nothing to see here.\n", { headers: { "content-type": "text/plain; charset=utf-8" } });
+    }
+    // Public and read only: cast ids, nothing else.
+    if (request.method === "GET" && url.pathname === "/aboard") {
+      try {
+        await ensureSchema(env);
+        return new Response(JSON.stringify({ ok: true, ...(await aboardNow(env, new Date())) }),
+          { headers: { "content-type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*", "Cache-Control": "public, max-age=60" } });
+      } catch (e) {
+        console.log("/aboard: failed");
+        return new Response(JSON.stringify({ ok: false }), { status: 500, headers: { "content-type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" } });
+      }
     }
     const origin = request.headers.get("Origin") || "";
     if (!origins().includes(origin)) return new Response("Not allowed.\n", { status: 403, headers: { "content-type": "text/plain; charset=utf-8" } });
@@ -104,7 +135,8 @@ export default {
   },
 };
 
-const ROUTES = { "/watch": startWatch, "/confirm": confirmWatch, "/unsubscribe": unsubscribe, "/manage": manage, "/booking": booking };
+const ROUTES = { "/watch": startWatch, "/confirm": confirmWatch, "/unsubscribe": unsubscribe, "/manage": manage, "/booking": booking,
+                 "/aboard/open": aboardOpen, "/aboard/save": aboardSave, "/aboard/link": aboardLink };
 
 const origins = () => [ORIGIN, TEST_ORIGIN].filter(Boolean);
 const cors = origin => ({ "Access-Control-Allow-Origin": origin, Vary: "Origin" });
@@ -443,6 +475,7 @@ function evaluate(data, row, now) {
 
 async function runChecks(env, now) {
   await ensureSchema(env);
+  await aboardCleanUp(env, now);
   if (easternDay(now) >= END_DAY) {
     await env.DB.batch([env.DB.prepare("DELETE FROM tokens"), env.DB.prepare("DELETE FROM watches")]);
     console.log("checks: the cruise has started, every watch and token deleted");
@@ -647,14 +680,174 @@ async function booking(env, body, req) {
     return refuse("request", "The request didn't look right, so nothing was sent. Please reload the page and try again.");
   }
   if (!(await turnstileOk(env, body.turnstile, req.ip))) return refuse("check", "The check above the Send button didn't pass. Please try it again.");
+  // David's "Confirm aboard" link (5.3.0): only in David's email, never in the sender's copy.
+  const aboard = await bookingAboardLink(env, b, body.page, req.origin);
+  if (aboard) await aboard.stmt.run();
   const sent = await mail(env, "booking", [
-    { to: "owner", subject: `Booking request: ${b.option} (${b.sender.name})`, body: bookingText(b, true), replyTo: b.sender.email },
+    { to: "owner", subject: `Booking request: ${b.option} (${b.sender.name})`, body: bookingText(b, true) + (aboard ? "\n\n" + aboard.text : ""), replyTo: b.sender.email },
     { to: b.sender.email, subject: "Your cruise selection was sent to David", body: bookingText(b, false) },
   ]);
   if (!sent[0]) {
+    if (aboard) await env.DB.prepare("DELETE FROM aboard_links WHERE hash = ?").bind(aboard.hash).run();
     console.log("/booking: not sent");
     return refuse("mail", "David's email service couldn't send it right now. Nothing was sent or saved. Please try again later.", 503);
   }
   console.log(`/booking: sent${sent[1] ? " with the copy" : ", the copy failed"}`);
   return [{ ok: true, copy: sent[1] }];
+}
+
+// ---------- the splash page's aboard list (5.3.0) ----------
+// Stored: the cast ids aboard (splash/cast.json) and, per "Confirm aboard" link, the SHA-256 of
+// its token and the cast ids it pre-ticks. No names, no emails, nothing else from a request.
+// Kept through the end of the trip, deleted from TRIP_OVER_DAY (Eastern).
+const CAST_ID = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const tripOver = now => easternDay(now) >= TRIP_OVER_DAY;
+async function aboardNow(env, now) {
+  if (tripOver(now)) return { aboard: [], updated_at: null };
+  const rows = (await env.DB.prepare("SELECT id, updated_at FROM aboard ORDER BY id").all()).results;
+  return { aboard: rows.map(r => r.id), updated_at: rows.reduce((m, r) => (r.updated_at > m ? r.updated_at : m), "") || null };
+}
+async function aboardCleanUp(env, now) {
+  if (tripOver(now)) {
+    await env.DB.batch([env.DB.prepare("DELETE FROM aboard"), env.DB.prepare("DELETE FROM aboard_links")]);
+    return;
+  }
+  const old = new Date(now.getTime() - ABOARD_LINK_DAYS * 86400000).toISOString();
+  await env.DB.prepare("DELETE FROM aboard_links WHERE created_at < ?").bind(old).run();
+}
+
+// The splash page a link goes to, from the address a request came from: the published splash
+// page, or while TEST_ORIGIN is set a raw.githack.com preview of it. From a booking request the
+// address is the comparison page's, so its splash page is next to it.
+function splashFor(page, origin) {
+  if (typeof page !== "string" || !page.startsWith(origin + "/")) return null;
+  if (page === SPLASH || page === SPLASH + "index.html") return SPLASH;
+  if (TEST_ORIGIN && TEST_SPLASH.test(page)) return page;
+  return null;
+}
+function splashNextTo(page, origin) {
+  const p = pageFor(page, origin);
+  if (p && TEST_ORIGIN && TEST_PAGE.test(p)) return p.replace(/index\.html$/, "splash/index.html");
+  return SPLASH;
+}
+const castUrl = splash => splash.replace(/index\.html$/, "") + "cast.json";
+// The cast list (ids and first names), read from the splash page's own folder.
+async function loadCast(splash) {
+  try {
+    const r = await fetch(`${castUrl(splash)}?t=${Date.now()}`, { headers: { "Cache-Control": "no-cache" } });
+    const c = r.ok ? await r.json() : null;
+    const list = c && Array.isArray(c.cast) ? c.cast : null;
+    if (!list || !list.length || list.length > CAST_MAX) return null;
+    if (!list.every(p => p && typeof p.id === "string" && CAST_ID.test(p.id) && typeof p.name === "string" && p.name.length <= 40)) return null;
+    return list.map(p => ({ id: p.id, name: p.name }));
+  } catch (e) {
+    return null;
+  }
+}
+const plainName = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+// Guest first names to cast ids: the same first name (capitals and accents ignored), nothing
+// cleverer. Anything else David ticks by hand.
+function matchCast(cast, firsts) {
+  const byName = new Map(cast.map(p => [plainName(p.name), p]));
+  const matched = [], unmatched = [];
+  for (const f of firsts) {
+    const p = byName.get(plainName(f));
+    if (p) { if (!matched.includes(p)) matched.push(p); } else if (!unmatched.includes(f)) unmatched.push(f);
+  }
+  return { matched, unmatched };
+}
+async function newAboardLink(env, preticks, source) {
+  const token = newToken(), hash = await sha256(token);
+  return { token, hash, stmt: env.DB.prepare("INSERT INTO aboard_links (hash, preticks, source, created_at) VALUES (?, ?, ?, ?)")
+    .bind(hash, preticks.join(","), source, new Date().toISOString()) };
+}
+const aboardLinkText = (splash, token) => [
+  "Confirm aboard (for you only: it opens the splash page's checklist and works once, within " + ABOARD_LINK_DAYS + " days):",
+  `${splash}#aboard=${token}`];
+
+async function bookingAboardLink(env, b, page, origin) {
+  const now = new Date();
+  if (tripOver(now)) return null;
+  const splash = splashNextTo(page, origin);
+  const cast = await loadCast(splash);
+  const firsts = b.guests.map(g => g.first);
+  const m = cast ? matchCast(cast, firsts) : { matched: [], unmatched: [] };
+  const link = await newAboardLink(env, m.matched.map(p => p.id), "booking");
+  const lines = ["Splash page", ...aboardLinkText(splash, link.token)];
+  if (!cast) lines.push("The cast list couldn't be read, so nobody is pre-ticked. Tick everyone by hand.");
+  else {
+    lines.push(m.matched.length ? `Pre-ticked from this request: ${m.matched.map(p => p.name).join(", ")}.` : "Nobody in this request matched a first name in the cast list.");
+    if (m.unmatched.length) lines.push(`Not matched to the cast: ${m.unmatched.join(", ")}. Tick the right person by hand.`);
+  }
+  return { ...link, text: lines.join("\n") };
+}
+
+async function findAboardLink(env, token, now) {
+  if (typeof token !== "string" || !TOKEN_RE.test(token)) return null;
+  const row = await env.DB.prepare("SELECT * FROM aboard_links WHERE hash = ?").bind(await sha256(token)).first();
+  if (!row || now.getTime() - Date.parse(row.created_at) > ABOARD_LINK_DAYS * 86400000) return null;
+  return row;
+}
+const GONE = ["gone", "This link has expired or was already used. Use \"Email me a private aboard link\" at the bottom of the splash page for a new one.", 404];
+const OVER = ["over", "The trip is over, so the aboard list was deleted.", 410];
+
+// ---------- /aboard/open ----------
+async function aboardOpen(env, body) {
+  const now = new Date();
+  if (tripOver(now)) return refuse(...OVER);
+  const row = await findAboardLink(env, body.token, now);
+  if (!row) return refuse(...GONE);
+  const { aboard } = await aboardNow(env, now);
+  console.log("/aboard/open: a checklist opened");
+  return [{ ok: true, aboard, preticks: row.preticks ? row.preticks.split(",") : [] }];
+}
+
+// ---------- /aboard/save ----------
+async function aboardSave(env, body, req) {
+  const now = new Date();
+  if (tripOver(now)) return refuse(...OVER);
+  const ids = body.aboard;
+  const splash = splashFor(body.page, req.origin);
+  if (!splash || !Array.isArray(ids) || ids.length > CAST_MAX || !ids.every(x => typeof x === "string" && CAST_ID.test(x)) || new Set(ids).size !== ids.length) {
+    return refuse("request", "The request didn't look right, so nothing was saved. Please reload the page and try again.");
+  }
+  const row = await findAboardLink(env, body.token, now);
+  if (!row) return refuse(...GONE);
+  const cast = await loadCast(splash);
+  if (!cast) return refuse("cast", "The cast list couldn't be read right now, so nothing was saved. Please try again in a few minutes.", 503);
+  const known = new Set(cast.map(p => p.id));
+  if (!ids.every(x => known.has(x))) return refuse("cast", "Someone ticked isn't in the cast list any more. Please reload the page and try again.");
+  const at = now.toISOString();
+  await env.DB.batch([
+    env.DB.prepare("DELETE FROM aboard"),
+    ...ids.map(id => env.DB.prepare("INSERT INTO aboard (id, updated_at) VALUES (?, ?)").bind(id, at)),
+    env.DB.prepare("DELETE FROM aboard_links WHERE hash = ?").bind(row.hash),
+  ]);
+  console.log(`/aboard/save: ${ids.length} aboard`);
+  return [{ ok: true, aboard: cast.map(p => p.id).filter(id => ids.includes(id)) }];
+}
+
+// ---------- /aboard/link ----------
+async function aboardLink(env, body, req) {
+  const now = new Date();
+  const splash = splashFor(body.page, req.origin);
+  if (!splash) return refuse("request", "The request didn't look right, so nothing was sent. Please reload the page and try again.");
+  if (!(await turnstileOk(env, body.turnstile, req.ip))) return refuse("check", "The check above the button didn't pass. Please try it again.");
+  if (tripOver(now)) return refuse(...OVER);
+  const day = new Date(now.getTime() - 86400000).toISOString();
+  const sentToday = await env.DB.prepare("SELECT COUNT(*) AS n FROM aboard_links WHERE source = 'button' AND created_at > ?").bind(day).first("n");
+  if (sentToday >= ABOARD_LINKS_PER_DAY) return refuse("daily", `${ABOARD_LINKS_PER_DAY} links were already emailed in the last 24 hours. Use the newest one, or try again tomorrow.`);
+  const link = await newAboardLink(env, [], "button");
+  await link.stmt.run();
+  const text = ["Hi David,", "", "Someone (hopefully you) asked for a private aboard link on the splash page.", "",
+                ...aboardLinkText(splash, link.token), "",
+                "If you didn't ask for it, ignore this email: the link only opens the checklist, and only for whoever has this email."].join("\n");
+  const [sent] = await mail(env, "aboard", [{ to: "owner", subject: "Your private aboard link", body: text }]);
+  if (!sent) {
+    await env.DB.prepare("DELETE FROM aboard_links WHERE hash = ?").bind(link.hash).run();
+    console.log("/aboard/link: not sent");
+    return refuse("mail", "The email couldn't be sent right now. Please try again later.", 503);
+  }
+  console.log("/aboard/link: sent");
+  return [{ ok: true }];
 }

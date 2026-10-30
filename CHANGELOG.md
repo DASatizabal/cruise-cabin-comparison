@@ -2,6 +2,32 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [5.3.0] - 2026-10-29
+
+Built on branch `claude/clever-volta-xdoare` on the plan the owner approved on 2026-10-29.
+
+### Added
+- Splash page for the family, published at https://dasatizabal.github.io/cruise-cabin-comparison/splash/ (`splash/index.html`, one file like the comparison page). In order:
+  - the opening: a family photo, pinned while you scroll, that fades into the ship (placeholders `splash/hero-family.webp` and `splash/hero-ship.webp` until the owner's photos replace them);
+  - "Meet Norwegian Aura": NCL's YouTube video (embedded from youtube-nocookie.com, never downloaded), loaded only when you get close, playing muted while at least half of it is on screen and pausing when it leaves;
+  - "Three ways to go": the 3 night Getaway, the 5 night Aura (with the maiden voyage badge) and 8 nights on both, each with a low, middle and high "from" price per person for 2 adults (the cheapest cabin, the cheapest Balcony, the cheapest Haven or else Suite; the comparison page's own default cabin rule), read from `data/prices.json` on every load with its "Prices as of" time. Each is NCL's fare with taxes plus the Open Bar and Specialty Dining gratuities, the comparison card's Total for 2 adults with the Florida switch off;
+  - "Who's coming?": a deck with one lounger per person. Everyone David has confirmed is on their lounger, everyone else waits at the dock, with "N of 20 aboard". When the deck first scrolls into view, the people aboard jump from the dock, up the gangway and onto their loungers. From Jun 11, 2027 (Eastern) the scene is "Bon voyage!" with only the people aboard; from Jun 20 "Welcome home!";
+  - "Pick your cabin": a big button to the comparison page.
+- A theater stage: the deck is a still picture (`splash/deck.svg`, drawn for the page) and each person is an actor, `splash/actors/<id>.webp`, a WebP with transparency (animated or still, 3:4, at most 150 KB), placed by the page. Today every actor is a placeholder silhouette with the first name under it; a real actor replaces one file. `splash/cast.json` (schema 1) lists the cast: id, first name, actor and lounger position. Starting cast of 20, everyone at the dock.
+- `tools/check_cast.py`: the cast list's format check (first names only, unique ids and names, the actor files' format, transparency, shape and size, loungers on the deck, and no file in `splash/` the page doesn't use). Run by the release check.
+- The comparison page links to the splash page under its title ("See the trip: the ships, a video and who's coming").
+- Who's aboard, from Make Selection: David's email of a booking request now ends with a private "Confirm aboard" link to the splash page (never in the sender's copy). It opens a checklist of the cast, pre-ticked by matching the request's guest first names to the cast's (capitals and accents ignored); David fixes mismatches by hand and taps Save. The link works once, within 30 days. "Email me a private aboard link" at the bottom of the splash page (Turnstile, at most 3 a day) emails David a fresh link for changes by hand, like moving someone back to the dock.
+- The `cruise-family-alerts` Worker: `GET /aboard` (public, read only: the cast ids aboard), `POST /aboard/open`, `/aboard/save` and `/aboard/link`. Stored: only cast ids aboard, and per link the SHA-256 of its token and the cast ids it pre-ticks. Nothing else from a booking request. The aboard list and its links are kept through the trip and deleted from Jun 20, 2027 (Eastern); everything else keeps its Jun 11 rule.
+- The Apps Script sends the new "aboard" email kind (to the owner only; it leaves the 20 sends kept for booking requests).
+- Less motion: when the phone asks for it, no fade (the two opening pictures one after the other), no autoplay and no jump; everyone is shown in place.
+- Tests: 9 more Node tests (the public list, the link in David's email only, matching, saving once, refused saves, the button's limit, the preview, the trip's end, the logs) and the Apps Script's new kind; `tools/test_tools.py` covers `tools/check_cast.py` and the release check's splash rules; `tools/page_test.py` covers the splash page at 360 px and 1280 px (the prices against the same rules worked out in Python, lazy loading, the video, the deck and the jump, less motion, Bon voyage and Welcome home, the owner's checklist and link, a missing actor picture, the links between the pages, the page weight).
+
+### Changed
+- "Deploy site" also publishes `splash/` (after the release check, which allows only the files the splash page uses). The release check also requires the splash page's version, Worker address and Turnstile key to match the comparison page's, and the links between the two pages.
+- Make Selection sends the page's address, so the "Confirm aboard" link goes to the splash page next to it (the published one; a raw.githack.com preview only while the Worker's `TEST_ORIGIN` is set).
+
+NCL calls: none added. The splash page reads only `data/prices.json` (already published by the daily refresh), its own files and the Worker's public aboard list.
+
 ## [5.2.0] - 2026-10-29
 
 Built on branch `family-tools-5.2.0` in the order the owner set: the DoubleUp watch, the payment data, Make Selection, the layout changes, then the price watch. Tested by the owner from raw.githack.com previews before the merge; the preview address (`TEST_ORIGIN`) is switched off in the merged Worker.

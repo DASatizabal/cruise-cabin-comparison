@@ -113,7 +113,7 @@ test("watch: stored unconfirmed with the person's choices, a confirmation email,
   const dump = db.dump();
   assert.ok(!dump.includes(confirm) && !dump.includes(manage), "a token is stored as it is");
   assert.deepEqual(db.rows("tokens").map(t => t.hash).sort(), [sha256(confirm), sha256(manage)].sort());
-  assert.deepEqual(db.tables(), ["tokens", "watches"]);
+  assert.deepEqual(db.tables(), ["aboard", "aboard_links", "tokens", "watches"]);
 });
 
 test("watch: the 8 night card watches one ship's cabin; other choices; a Guarantee cabin has no few left email", async () => {
@@ -454,7 +454,10 @@ test("booking: David gets everything, the sender a copy without dates of birth o
   assert.equal(me.status, 200);
   const mine = lastMail();
   assert.ok(mine.body.includes("1 Test Street") && mine.body.includes("ann@example.com") && !mine.body.includes("1980") && !mine.body.includes("123456789"));
-  assert.deepEqual([before, db.tables(), db.rows("watches"), db.rows("tokens")], ["[]", ["tokens", "watches"], [], []], "nothing stored");
+  // Nothing stored but the "Confirm aboard" link's hash and the cast ids it pre-ticks (none here).
+  assert.deepEqual([before, db.tables(), db.rows("watches"), db.rows("tokens"), db.rows("aboard")], ["[]", ["aboard", "aboard_links", "tokens", "watches"], [], [], []], "nothing stored");
+  assert.ok(db.rows("aboard_links").every(r => r.preticks === "" && r.source === "booking"));
+  assert.ok(!db.dump().includes("Tester") && !db.dump().includes("ann@example.com"));
   for (const m of net.mails.slice(sends)) assert.ok(!(m.body + m.subject).includes(EM_DASH));
   // Prepaid: no onboard line.
   const pre = bookingBody();

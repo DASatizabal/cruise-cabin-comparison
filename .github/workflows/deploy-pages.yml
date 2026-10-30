@@ -1,6 +1,7 @@
 name: Deploy site
 
-# Publishes the family page to GitHub Pages (Settings, Pages, Source: GitHub Actions).
+# Publishes the family page and its splash page (splash/) to GitHub Pages (Settings, Pages,
+# Source: GitHub Actions).
 # Runs on every push to main, on demand, and from the daily refresh right after its commit
 # (commits made with GITHUB_TOKEN don't start a Pages build by themselves).
 # Only main is ever published; runs for any other branch skip both jobs.
@@ -59,6 +60,9 @@ jobs:
           if [ -f data/florida.json ]; then cp data/florida.json _site/data/florida.json; fi
           # DoubleUp watch (daily, with the prices): without it the page offers one CruiseNext credit.
           if [ -f data/offers.json ]; then cp data/offers.json _site/data/offers.json; fi
+          # The splash page (5.3.0): its page, cast list, deck, opening pictures and actors. The
+          # release check above (tools/check_cast.py) allows no other file in splash/.
+          cp -R splash _site/splash
 
       - name: Name the artifact for this run attempt
         id: name

@@ -61,6 +61,12 @@ test("price watch emails leave 20 sends a day for booking requests", () => {
   assert.equal(s.quota(), 18);
 });
 
+test("the splash page's private aboard link (\"aboard\") also leaves 20 sends for booking requests", () => {
+  const s = script({ quota: 21 });
+  assert.deepEqual(s.call({ secret: SECRET, kind: "aboard", messages: [msg("owner"), msg("owner")] }).sent, [true, false]);
+  assert.equal(s.sent[0].to, "owner@example.com");
+});
+
 test("a booking request is sent whole or not at all", () => {
   const s = script({ quota: 1 });
   const a = s.call({ secret: SECRET, kind: "booking", messages: [msg("owner"), msg()] });

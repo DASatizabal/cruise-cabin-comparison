@@ -1429,13 +1429,72 @@ def test_family_checks():
         check("release check: the Worker file has the TEST_ORIGIN line", bool(re.search(r'^const TEST_ORIGIN = "[^"]*";$', f.read(), re.M)), True)
 
 
+def test_cast():
+    """Splash page (5.3.0): tools/check_cast.py on the committed cast list and on broken copies."""
+    import shutil
+    import check_cast
+    import check_release
+    root = os.path.dirname(TOOLS)
+    splash = os.path.join(root, "splash")
+    with open(os.path.join(splash, "cast.json"), encoding="utf-8") as f:
+        cast = json.load(f)
+    check("cast: the committed cast list and splash files pass", check_cast.check(cast), [])
+    check("cast: 20 people, everyone a first name only", (len(cast["cast"]), all(" " not in p["name"] or p["name"].split(" ")[1] in ("1", "2", "Jr.", "guest") for p in cast["cast"])), (20, True))
+    with tempfile.TemporaryDirectory() as tmp:
+        work = os.path.join(tmp, "splash")
+        shutil.copytree(splash, work)
+        has = lambda c, words: any(words in e for e in check_cast.check(c, work))
+
+        def copy(fn):
+            c = json.loads(json.dumps(cast))
+            fn(c)
+            return c
+        check("cast: a last name is refused", has(copy(lambda c: c["cast"][0].update(name="Zin Smith")), "first name only"), True)
+        check("cast: lowercase or long names are refused", has(copy(lambda c: c["cast"][0].update(name="zin")), "first name only"), True)
+        check("cast: a name used twice is refused", has(copy(lambda c: c["cast"][1].update(name="ZIN")), "used twice"), True)
+        check("cast: an id used twice is refused", has(copy(lambda c: c["cast"][1].update(id="zin", actor="actors/zin.webp")), "id zin is used twice"), True)
+        check("cast: a bad id is refused", has(copy(lambda c: c["cast"][0].update(id="Zin_1")), "lowercase letters"), True)
+        check("cast: the actor must be named by the id", has(copy(lambda c: c["cast"][0].update(actor="actors/tony.webp")), "must be actors/zin.webp"), True)
+        check("cast: a missing actor file is refused", has(copy(lambda c: c["cast"].append({"id": "newbie", "name": "Newbie", "actor": "actors/newbie.webp", "lounger": {"x": 50, "y": 10}})), "actors/newbie.webp is missing"), True)
+        check("cast: loungers on top of each other are refused", has(copy(lambda c: c["cast"][1].update(lounger={"x": 14, "y": 18})), "on top of"), True)
+        check("cast: a lounger off the deck is refused", has(copy(lambda c: c["cast"][0].update(lounger={"x": 50, "y": 80})), "the deck"), True)
+        check("cast: extra keys (like an email) are refused", has(copy(lambda c: c["cast"][0].update(email="x@example.com")), "unexpected keys"), True)
+        check("cast: more than 21 people is refused", has(copy(lambda c: c.update(cast=c["cast"] + c["cast"][:2])), "1 to 21"), True)
+        check("cast: a deck that isn't deck.svg or deck.webp is refused", has(copy(lambda c: c.update(deck="deck.png")), "deck must be"), True)
+        # Actor files: transparency, size, shape. A real actor is one file replaced. Test files
+        # in tools/test_data (made with Pillow, so the check itself needs no image library).
+        zin = os.path.join(work, "actors", "zin.webp")
+        use = lambda name: shutil.copy(os.path.join(TEST_DATA, name), zin)
+        use("actor_no_alpha.webp")
+        check("cast: an actor without transparency is refused", has(cast, "zin.webp has no transparency"), True)
+        use("actor_square.webp")
+        check("cast: an actor that isn't 3:4 is refused", has(cast, "not 3:4"), True)
+        use("actor_animated.webp")
+        info = check_cast.webp_info(open(zin, "rb").read())
+        check("cast: an animated WebP with transparency is accepted (a real actor)", (info[2], info[3], check_cast.check(cast, work)), (True, True, []))
+        with open(zin, "wb") as f:
+            f.write(b"RIFF" + b"\0" * 200_000)
+        check("cast: an actor over 150 KB is refused", has(cast, "at most 150,000"), True)
+        shutil.copy(os.path.join(splash, "actors", "zin.webp"), zin)
+        with open(os.path.join(work, "notes.txt"), "w") as f:
+            f.write("x")
+        check("cast: a file the page doesn't use is refused (it would be published)", has(cast, "notes.txt: not used"), True)
+    page = '<a href="splash/">x</a> const APP_VERSION = "5.3.0"; const FAMILY_API = "https://a.workers.dev"; const TURNSTILE_SITE_KEY = "k";'
+    good = 'const APP_VERSION = "5.3.0"; const FAMILY_API = "https://a.workers.dev"; const TURNSTILE_SITE_KEY = "k"; <a class="big-button" href="../">Pick your cabin</a> ../data/prices.json'
+    check("release check: the splash page matches index.html", check_release.splash_checks(good, page), [])
+    check("release check: a different version on the splash page fails", any("APP_VERSION" in x for x in check_release.splash_checks(good.replace("5.3.0", "5.2.9"), page)), True)
+    check("release check: a different Worker address on the splash page fails", any("FAMILY_API" in x for x in check_release.splash_checks(good.replace("a.workers", "b.workers"), page)), True)
+    check("release check: the Pick your cabin button is required", any("Pick your cabin" in x for x in check_release.splash_checks(good.replace("big-button", "button"), page)), True)
+    check("release check: the link from index.html is required", any("splash/" in x for x in check_release.splash_checks(good, page.replace("splash/", "x/"))), True)
+
+
 def test_no_em_dashes():
     """Owner's rule: no em dashes anywhere (code, docs, page text, steps)."""
     root = os.path.dirname(TOOLS)
     files = subprocess.run(["git", "-C", root, "ls-files"], capture_output=True, text=True).stdout.split()
     found = []
     for name in files:
-        if name.startswith("data/") or not name.endswith((".py", ".md", ".html", ".yml", ".js", ".mjs", ".gs", ".sql", ".txt", ".json")):
+        if name.startswith("data/") or not name.endswith((".py", ".md", ".html", ".yml", ".js", ".mjs", ".gs", ".sql", ".txt", ".json", ".svg")):
             continue
         try:
             with open(os.path.join(root, name), encoding="utf-8") as f:
@@ -1463,6 +1522,7 @@ if __name__ == "__main__":
     test_payment()
     test_eastern_dates()
     test_family_checks()
+    test_cast()
     test_no_em_dashes()
     print(f"\n{'All tests passed' if not FAILED else str(len(FAILED)) + ' FAILED: ' + '; '.join(FAILED)}")
     sys.exit(1 if FAILED else 0)
