@@ -11,13 +11,13 @@ The DoubleUp watch misread a real change: on 2026-11-06 NCL replaced DoubleUp wi
 - `data/offers.json` schema 2: `doubleup` is now `multi_credit`, with `name` (like "TripleUp!") and `credits` (2 to 4); the last change records the old and new name and credits. Schema 1 files are still read. `tools/check_offers.py` checks schema 2 (and schema 1 in the release check until the first refresh on main).
 - Issues: a change of name or credits is a "changed" issue, like "CruiseNext offer changed: DoubleUp to TripleUp (Nov 7, 2026)", with the old and new text and credits. Other titles: "CruiseNext offer appeared: ...", "... ended: ...", "CruiseNext offer text changed: ...".
 - One-time fix (owner's rule): the first run after the merge that reads a multi-credit offer, with main's schema 1 file saying DoubleUp ended on 2026-11-06, reports it as "CruiseNext offer changed: DoubleUp to TripleUp". No other schema 1 state is changed. To be removed once main has a schema 2 file.
-- Make Selection: one up to N CruiseNext credits on qualifying cabins, N from `data/offers.json` (same cabin type, time before sailing and 3 day rules). David's explainer, the choices and the note use the offer's name and number ("you can use up to three: $750 toward your cruise for $375"); the offer sentence is left out when there is no offer.
+- Make Selection: one up to N CruiseNext credits on qualifying cabins, N from `data/offers.json` (same cabin type, time before sailing and 3 day rules). David's explainer, the choices and the note use the offer's name and number ("you can use up to three: $750 toward your cruise for $375"); the offer sentence is left out when there is no offer. NCL's credit terms footnote still says two credits ("Two Credits ... DoubleUp!"), so the 3 and 4 credit choices carry one line: "NCL's fine print still mentions two credits. David will confirm the third with NCL before booking." ("the third and fourth" on the 4 credit choice; owner's wording).
 - Family alerts Worker: booking requests with up to 4 credits, the offer's name in David's email ("Three of David's CruiseNext credits, NCL's TripleUp offer ($750 toward the cruise, pay David $375)"), and credits must match the choice. Redeploy it before merging.
 - The wrong "DoubleUp offer ended (Nov 6, 2026)" issue was commented on and closed.
 
 ### Tests
 - `tools/test_tools.py`: NCL's real TripleUp markup (saved 2026-11-07), every heading form, a heading and text that disagree, no number, unknown headings, schema 1 files, the one-time fix and the cases where it must not apply, and the schema 2 format check.
-- `tools/page_test.py` (360 px): one, two and three credits, a schema 1 file, TripleUp on an Inside cabin, credits not read, and the request to a stand-in Worker with three credits.
+- `tools/page_test.py` (360 px): one, two, three and four credits (the fine print line only under the 3 and 4 credit choices), a schema 1 file, TripleUp on an Inside cabin, credits not read, and the request to a stand-in Worker with three credits.
 - Worker tests: three credits with TripleUp, and credits that don't match the choice.
 
 ## [5.2.0] - 2026-10-29

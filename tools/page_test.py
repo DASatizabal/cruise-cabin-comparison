@@ -723,25 +723,32 @@ with sync_playwright() as pw:
     # choices, the math and the note, at 360 px. Schema 1 files (5.2.0) still give DoubleUp's two.
     tripleup_on = offers_file(name="TripleUp!", credits=3)
     for name, offers, n in [("no offer", offers_file(listed=False), 1), ("DoubleUp", doubleup_on, 2),
-                            ("DoubleUp, schema 1 file", offers_file(schema=1), 2), ("TripleUp", tripleup_on, 3)]:
+                            ("DoubleUp, schema 1 file", offers_file(schema=1), 2), ("TripleUp", tripleup_on, 3),
+                            ("QuadUp", offers_file(name="QuadUp!", credits=4), 4)]:
         page, errs, sent = ms_open("ms_api", stored={"adults": 2, "kids": [], "type": "balcony", "mode": "same"}, offers=offers)
         page.click('button[data-select="G"]')
         page.check("input[name='msFl'][value='no']")
         texts = [t.split("\n")[0] for t in choice_texts(page, "G")]
-        words = {2: "Two", 3: "Three"}
-        offer = {2: "DoubleUp", 3: "TripleUp"}.get(n)
+        words = {2: "Two", 3: "Three", 4: "Four"}
+        offer = {2: "DoubleUp", 3: "TripleUp", 4: "QuadUp"}.get(n)
         want = ["One of David's CruiseNext credits: $250 toward the cruise, you pay David $125"]
-        want += [f"{words[k]} of David's CruiseNext credits (NCL's {offer} offer): ${250 * k} toward the cruise, you pay David ${125 * k}" for k in range(2, n + 1)]
+        want += [f"{words[k]} of David's CruiseNext credits (NCL's {offer} offer): ${250 * k:,} toward the cruise, you pay David ${125 * k:,}" for k in range(2, n + 1)]
         same(f"Make Selection, {name}: NCL's deposit and one to {n} credits", texts[1:], want)
+        fine = page.eval_on_selector_all("#msMath [data-booking='G'] .ms-choice",
+                                         "els => els.map(e => [e.querySelector('input').value, (e.querySelector('.ms-fine') || {}).innerText || null])")
+        same(f"Make Selection, {name}: the fine print line only under the 3 and 4 credit choices", fine,
+             [["ncl", None]] + [[f"credit{k}", {3: "NCL's fine print still mentions two credits. David will confirm the third with NCL before booking.",
+                                                4: "NCL's fine print still mentions two credits. David will confirm the third and fourth with NCL before booking."}.get(k)]
+                                for k in range(1, n + 1)])
         explain = page.inner_text("#msMath .ms-explain")
         sentence = (None if n == 1 else f"On a Balcony or higher cabin, while NCL's {offer} offer is running, you can use "
-                    f"{'two' if n == 2 else 'up to three'}: ${250 * n} toward your cruise for ${125 * n}.")
+                    f"{'two' if n == 2 else 'up to ' + words[n].lower()}: ${250 * n:,} toward your cruise for ${125 * n:,}.")
         same(f"Make Selection, {name}: the explainer's offer sentence", sentence in explain if sentence else "offer is running" in explain, bool(sentence))
         check(f"Make Selection, {name}: no hard-coded DoubleUp or two", n == 2 or ("DoubleUp" not in page.inner_text("#msDialog")), explain)
         page.check(f"input[name='msDepG'][value='credit{n}']")
         rows = booking_rows(page, "G")
-        same(f"Make Selection, {name}: {n} x $250 off, pay David ${125 * n}", [rows[-4], rows[-1]],
-             [(f"CruiseNext {'credits' if n > 1 else 'credit'} toward the cruise: {n} x $250", f"−${250 * n}"), ("Pay David for the credits", f"${125 * n}")])
+        same(f"Make Selection, {name}: {n} x $250 off, pay David ${125 * n:,}", [rows[-4], rows[-1]],
+             [(f"CruiseNext {'credits' if n > 1 else 'credit'} toward the cruise: {n} x $250", f"−${250 * n:,}"), ("Pay David for the credits", f"${125 * n:,}")])
         same(f"Make Selection, {name}: the note about the offer ending", (page.is_visible("#msTwoNote"), page.inner_text("#msTwoNote") if n > 1 else ""),
              (n > 1, f"If NCL ends its {offer} offer before the booking is made, only one credit can be used." if n > 1 else ""))
         if n > 1:   # back to fewer credits: the math follows

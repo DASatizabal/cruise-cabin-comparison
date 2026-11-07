@@ -1621,6 +1621,11 @@
         const msRow = (label, value, cls = "") => `<div class="row ${cls}"><span class="k">${label}</span><span class="v">${value}</span></div>`;
         const dueText = b => !b.final ? "due by NCL's final payment date (not found on NCL today)" : b.past ? "due when booking" : `due by ${fmtIso(b.final)}`;
 
+        // NCL's CruiseNext terms footnote still said "Two Credits ... DoubleUp!" when TripleUp
+        // started (2026-11-06), so the 3 and 4 credit choices say David confirms with NCL
+        // (owner's wording, 2026-11-07).
+        const finePrint = n => `<span class="cat-meta ms-fine" style="display:block">NCL's fine print still mentions two credits. David will confirm the ${n === 3 ? "third" : "third and fourth"} with NCL before booking.</span>`;
+
         // explain: the CruiseNext explainer goes under the first booking's "How to pay the deposit".
         function bookingHtml(b, number, explain) {
             const { s, c, k } = b, key = shipKey(s);
@@ -1637,7 +1642,7 @@
             let choices = opt("ncl", nclText + offer)
                 + opt("credit1", `One of David's CruiseNext credits: ${money(CRUISENEXT.credit)} toward the cruise, you pay David ${money(CRUISENEXT.cost)}${partial}`);
             for (let n = 2; n <= b.most; n++)
-                choices += opt(`credit${n}`, `${capital(NUMBER_WORDS[n])} of David's CruiseNext credits (NCL's ${esc(OFFER.short)} offer): ${money(n * CRUISENEXT.credit)} toward the cruise, you pay David ${money(n * CRUISENEXT.cost)}${partial}`);
+                choices += opt(`credit${n}`, `${capital(NUMBER_WORDS[n])} of David's CruiseNext credits (NCL's ${esc(OFFER.short)} offer): ${money(n * CRUISENEXT.credit)} toward the cruise, you pay David ${money(n * CRUISENEXT.cost)}${partial}${n > 2 ? finePrint(n) : ""}`);
 
             let math = "";
             if (b.choice) {
