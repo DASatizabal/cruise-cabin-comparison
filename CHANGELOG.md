@@ -2,6 +2,24 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [5.3.0] - 2026-11-07
+
+The DoubleUp watch misread a real change: on 2026-11-06 NCL replaced DoubleUp with TripleUp (three credits), the watch only knew DoubleUp headings, so it recorded "ended" and Make Selection offered one credit. Still 1 NCL page load a day; no new NCL calls.
+
+### Changed
+- The DoubleUp watch is now the CruiseNext offer watch: it reads any multi-credit offer heading (DoubleUp, TripleUp, QuadUp, with or without "!", spaces or hyphens) and the number of credits from the offer text ("apply THREE ... credits", or digits). When the heading and the text disagree, or the number can't be read, it warns and the page offers one credit. An "apply TWO (or more) ... CruiseNext" sentence under a heading it doesn't know keeps the previous state with a warning, so a new offer name is never read as the offer ending.
+- `data/offers.json` schema 2: `doubleup` is now `multi_credit`, with `name` (like "TripleUp!") and `credits` (2 to 4); the last change records the old and new name and credits. Schema 1 files are still read. `tools/check_offers.py` checks schema 2 (and schema 1 in the release check until the first refresh on main).
+- Issues: a change of name or credits is a "changed" issue, like "CruiseNext offer changed: DoubleUp to TripleUp (Nov 7, 2026)", with the old and new text and credits. Other titles: "CruiseNext offer appeared: ...", "... ended: ...", "CruiseNext offer text changed: ...".
+- One-time fix (owner's rule): the first run after the merge that reads a multi-credit offer, with main's schema 1 file saying DoubleUp ended on 2026-11-06, reports it as "CruiseNext offer changed: DoubleUp to TripleUp". No other schema 1 state is changed. To be removed once main has a schema 2 file.
+- Make Selection: one up to N CruiseNext credits on qualifying cabins, N from `data/offers.json` (same cabin type, time before sailing and 3 day rules). David's explainer, the choices and the note use the offer's name and number ("you can use up to three: $750 toward your cruise for $375"); the offer sentence is left out when there is no offer.
+- Family alerts Worker: booking requests with up to 4 credits, the offer's name in David's email ("Three of David's CruiseNext credits, NCL's TripleUp offer ($750 toward the cruise, pay David $375)"), and credits must match the choice. Redeploy it before merging.
+- The wrong "DoubleUp offer ended (Nov 6, 2026)" issue was commented on and closed.
+
+### Tests
+- `tools/test_tools.py`: NCL's real TripleUp markup (saved 2026-11-07), every heading form, a heading and text that disagree, no number, unknown headings, schema 1 files, the one-time fix and the cases where it must not apply, and the schema 2 format check.
+- `tools/page_test.py` (360 px): one, two and three credits, a schema 1 file, TripleUp on an Inside cabin, credits not read, and the request to a stand-in Worker with three credits.
+- Worker tests: three credits with TripleUp, and credits that don't match the choice.
+
 ## [5.2.0] - 2026-10-29
 
 Built on branch `family-tools-5.2.0` in the order the owner set: the DoubleUp watch, the payment data, Make Selection, the layout changes, then the price watch. Tested by the owner from raw.githack.com previews before the merge; the preview address (`TEST_ORIGIN`) is switched off in the merged Worker.

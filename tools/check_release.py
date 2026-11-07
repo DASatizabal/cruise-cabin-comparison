@@ -73,7 +73,8 @@ def main():
             problems.append(f"data/florida.json cannot be read: {e}")
 
     # Written daily by the price job (tools/fetch_offers.py); optional, the page offers one
-    # CruiseNext credit without it.
+    # CruiseNext credit without it. Schema 1 (5.2.0) is accepted until the first refresh on main
+    # after 5.3.0; every new file must be schema 2 (the workflow checks it without --any-schema).
     if os.path.exists(os.path.join(ROOT, "data", "offers.json")):
         try:
             offers = json.loads(read("data/offers.json"))

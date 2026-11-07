@@ -525,3 +525,23 @@ test("the Worker file: TEST_ORIGIN off and no em dash", () => {
   assert.match(src, /^const TEST_ORIGIN = "";$/m, "the preview address is switched off in the committed Worker");
   assert.ok(!src.includes(EM_DASH));
 });
+
+test("booking: three credits with NCL's TripleUp offer (5.3.0); credits must match the choice", async () => {
+  const { env } = fresh();
+  files();
+  const three = bookingBody({ page_version: "5.3.0" });
+  three.bookings[0] = { ...three.bookings[0], deposit_choice: "credit3", credits: 3, credit_offer: "TripleUp!", credit_value: 750, balance: 1339.5, pay_david: 375 };
+  const r = await post(worker, env, "/booking", three);
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  const body = net.mails[net.mails.length - 2].body;
+  for (const x of ["Deposit: Three of David's CruiseNext credits, NCL's TripleUp offer ($750 toward the cruise, pay David $375)",
+                   "CruiseNext credits toward the cruise: $750", "Pay David for the credits: $375"]) {
+    assert.ok(body.includes(x), x);
+  }
+  assert.ok(!body.includes("DoubleUp"));
+  const bad = (k) => { const b = bookingBody(); b.bookings[0] = { ...b.bookings[0], ...k }; return b; };
+  for (const k of [{ deposit_choice: "credit3", credits: 2 }, { deposit_choice: "credit5", credits: 5 }, { deposit_choice: "ncl", credits: 1 },
+                   { deposit_choice: "credit2", credits: 2, credit_offer: "x".repeat(41) }]) {
+    assert.equal((await post(worker, env, "/booking", bad(k))).status, 400, JSON.stringify(k));
+  }
+});

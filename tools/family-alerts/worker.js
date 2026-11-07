@@ -48,6 +48,7 @@ const COUNTS_MAX_DAYS = 7, FL_MAX_DAYS = 15, FL_MIN_OFF = 1;   // the page's rul
 const DROP_MIN = 1, DROP_MAX = 1000;   // dollars per guest the person may choose (the page offers $20)
 const MAX_BODY = 32768;
 const CHANGE_TEXT = "Prices can change until NCL confirms the booking.";
+const CREDITS_MAX = 4;         // CruiseNext credits per booking (QuadUp; the page offers up to the offer's number)
 const PRICE_TEXT = "The price watched is the cruise fare with taxes, fees and port expenses for the guests in the cabin, before gratuities and Free at Sea extras.";
 const GUARANTEE_TEXT = "Guarantee: NCL picks your cabin location";
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -556,12 +557,16 @@ function readBooking(b) {
       cabin_type: str(k.cabin_type, 60), category: str(k.category, 8), description: str(k.description, 300), guarantee: bool(k.guarantee),
       free_at_sea: { bar: bool(fas.bar), dining: bool(fas.dining), plus: bool(fas.plus) },
       lines: list(k.lines, 1, 12).map(line), price: num(k.total), onboard: list(k.onboard, 0, 1).map(line),
-      choice: oneOf(k.deposit_choice, ["ncl", "credit1", "credit2"]),
+      choice: oneOf(k.deposit_choice, ["ncl", ...Array.from({ length: CREDITS_MAX }, (_, i) => `credit${i + 1}`)]),
       deposit: dep && { amount: num(dep.amount), rule: str(dep.rule, 200, true), hours: num(dep.due_hours), offer: dep.offer === null ? null : str(dep.offer, 120) },
-      credits: int(k.credits, 0, 2), credit_value: num(k.credit_value), due: num(k.due_at_booking), balance: num(k.balance),
+      credits: int(k.credits, 0, CREDITS_MAX), credit_value: num(k.credit_value), due: num(k.due_at_booking), balance: num(k.balance),
+      // The multi-credit offer's name, like "TripleUp!" (5.3.0). Pages before 5.3.0 send none:
+      // their only multi-credit offer was DoubleUp.
+      credit_offer: k.credit_offer === undefined || k.credit_offer === null ? null : str(k.credit_offer, 40),
       balance_due: k.balance_due === null ? null : k.balance_due === "when booking" ? "when booking" : isoDate(k.balance_due), pay_david: num(k.pay_david),
     };
   });
+  for (const k of bookings) if (k.credits !== (k.choice === "ncl" ? 0 : Number(k.choice.slice(6)))) fail();
   if (bookings.length !== OPTIONS[Object.keys(OPTIONS).find(x => OPTIONS[x].label === option)].ships.length) fail();
   const guests = list(b.guests, total, total).map((g, i) => {
     obj(g);
@@ -584,14 +589,20 @@ function readBooking(b) {
 }
 
 const yes = v => v ? "yes" : "no";
+// CruiseNext credits: $250 toward the cruise, $125 to David each; up to 4 with NCL's QuadUp offer.
+const CREDIT = { value: 250, cost: 125 };
+const NUMBER_WORDS = ["Zero", "One", "Two", "Three", "Four"];
 const amount = v => v === null ? "David will confirm" : money(v);
 function partyText(p) {
   const kids = p.kids.length ? ` and ${plural(p.kids.length, "kid", "kids")} (${p.kids.length === 1 ? "age" : "ages"} ${p.kids.join(" and ")} on ${fmtIso(AGE_DAY)})` : "";
   return plural(p.adults, "adult", "adults") + kids;
 }
 function depositText(k) {
-  if (k.choice === "credit1") return "One of David's CruiseNext credits ($250 toward the cruise, pay David $125)";
-  if (k.choice === "credit2") return "Two of David's CruiseNext credits, NCL's DoubleUp offer ($500 toward the cruise, pay David $250)";
+  if (k.choice === "credit1") return `One of David's CruiseNext credits (${money(CREDIT.value)} toward the cruise, pay David ${money(CREDIT.cost)})`;
+  if (k.credits > 1) {
+    const offer = (k.credit_offer || "DoubleUp!").replace(/!+$/, "").trim();
+    return `${NUMBER_WORDS[k.credits]} of David's CruiseNext credits, NCL's ${offer} offer (${money(k.credits * CREDIT.value)} toward the cruise, pay David ${money(k.credits * CREDIT.cost)})`;
+  }
   const d = k.deposit;
   if (!d || d.amount === null) return "NCL's deposit (not found on NCL today; David will confirm it)";
   return `NCL's deposit: ${money(d.amount)}${d.rule ? ` (${d.rule})` : ""}${d.hours ? `, due within ${d.hours} hours of booking` : ""}${d.offer ? `, with NCL's ${d.offer} offer` : ""}`;
@@ -617,7 +628,7 @@ function bookingText(b, full) {
     out.push(...k.lines.map(x => `${x.item}: ${x.value}`), `Total: ${amount(k.price)}`);
     if (k.onboard.length) out.push(...k.onboard.map(x => `${x.item}: ${x.value}`), "  Can be removed at Guest Services.");
     out.push(`Deposit: ${depositText(k)}`);
-    if (k.credits) out.push(`CruiseNext ${k.credits === 2 ? "credits" : "credit"} toward the cruise: ${amount(k.credit_value)}`);
+    if (k.credits) out.push(`CruiseNext ${k.credits > 1 ? "credits" : "credit"} toward the cruise: ${amount(k.credit_value)}`);
     out.push(`Paid to NCL at booking: ${amount(k.due)}`, `Balance, ${dueText(k)}: ${amount(k.balance)}`);
     if (k.credits) out.push(`Pay David for the credits: ${amount(k.pay_david)}`);
   });

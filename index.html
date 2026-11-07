@@ -780,7 +780,7 @@
     </footer>
 
     <script>
-        const APP_VERSION = "5.2.0";
+        const APP_VERSION = "5.3.0";
         const DATA_URL = "data/prices.json";
         const COUNTS_URL = "data/counts.json";
         const COUNTS_MAX_AGE_DAYS = 7;
@@ -794,9 +794,9 @@
         const FL_OLD_DAYS = 9, FL_MAX_AGE_DAYS = 15;
         const FL_MIN_OFF = 1;   // dollars off per guest that count as a discount (cents are rounding)
         // Make Selection (5.2.0): the booking request window. Deposits and the final payment date
-        // come from data/prices.json (schema 4, read daily from NCL's price summaries); two
-        // CruiseNext credits only while data/offers.json (the DoubleUp watch, at most 3 days old)
-        // allows them. Sent through the cruise-family-alerts Worker (tools/family-alerts/, with
+        // come from data/prices.json (schema 4, read daily from NCL's price summaries); more than
+        // one CruiseNext credit only while data/offers.json (the CruiseNext offer watch: DoubleUp,
+        // TripleUp or QuadUp, read at most 3 days ago) allows them, up to the offer's number. Sent through the cruise-family-alerts Worker (tools/family-alerts/, with
         // Cloudflare Turnstile) to the owner's Gmail. Nothing typed in the window is saved.
         // The same Worker runs the family price watch ("Watch this price", 5.2.0).
         const OFFERS_URL = "data/offers.json";
@@ -827,7 +827,7 @@
         let DATA = null, G = null, A = null;   // data file, Getaway sailing, Aura sailing
         let COUNTS = null;                      // data/counts.json when present and at most 7 days old
         let FLORIDA = null, FL_SEEN = null;     // data/florida.json at most 15 days old; any readable one (for its date)
-        let OFFERS = null;                      // data/offers.json when readable (the DoubleUp watch)
+        let OFFER = null;                       // the multi-credit offer from data/offers.json (readOffer), or null
         let SELECTIONS = {};                    // each card's chosen cabins, for its Make Selection button
         let MS = null;                          // the open Make Selection window (never saved)
         const state = {
@@ -1538,21 +1538,50 @@
             return { amount: Math.round(per * k.n * 100) / 100, hours, partial: false, offer: pay.deposit_offer, rule: `${money(per)} per guest x ${k.n}` };
         }
 
-        // Two CruiseNext credits only while NCL's DoubleUp offer is listed (read at most 3 days
-        // ago), covers this cabin's NCL type, and today (Eastern) is early enough before sailing.
-        // Wording the DoubleUp watch couldn't read (null) never allows two.
-        function doubleUp(s, c) {
-            const d = OFFERS && OFFERS.doubleup;
-            if (!d || d.listed !== true || !Array.isArray(d.types) || !d.read_on) return false;
-            if (isoDays(d.read_on, todayEastern()) > OFFERS_MAX_AGE_DAYS || !d.types.includes(typeOfCat(s, c))) return false;
+        // NCL's multi-credit offer (DoubleUp, TripleUp, QuadUp) from data/offers.json: schema 2
+        // ("multi_credit", 5.3.0) or schema 1 ("doubleup", 5.2.0, always two credits). Null when
+        // not listed, read more than 3 days ago, or the number of credits, the cabin types or the
+        // time before sailing couldn't be read (null in the file): then one credit is offered.
+        function readOffer(of) {
+            if (!of || typeof of !== "object") return null;
+            const d = of.schema_version === 2 ? of.multi_credit : of.schema_version === 1 ? of.doubleup : null;
+            if (!d || d.listed !== true || !Array.isArray(d.types) || !d.types.length || !d.read_on) return null;
+            const credits = of.schema_version === 1 ? 2 : d.credits;
+            const name = of.schema_version === 1 ? "DoubleUp!" : d.name;
+            if (!Number.isInteger(credits) || credits < 2 || credits > CREDITS_MAX || typeof name !== "string" || !name) return null;
+            if (!Number.isInteger(d.min_days) && !Number.isInteger(d.min_months)) return null;
+            return { name, short: name.replace(/!+$/, "").trim(), credits, types: d.types, min_days: d.min_days, min_months: d.min_months, read_on: d.read_on };
+        }
+        const CREDITS_MAX = 4;   // QuadUp; data/offers.json never holds more (tools/check_offers.py)
+        const NUMBER_WORDS = ["zero", "one", "two", "three", "four"];
+        const capital = w => w.charAt(0).toUpperCase() + w.slice(1);
+        const offerFresh = () => !!OFFER && isoDays(OFFER.read_on, todayEastern()) <= OFFERS_MAX_AGE_DAYS;
+
+        // How many CruiseNext credits this cabin may use: the offer's number while it is listed
+        // (read at most 3 days ago), covers this cabin's NCL type, and today (Eastern) is early
+        // enough before sailing; otherwise one.
+        function maxCredits(s, c) {
+            if (!offerFresh() || !OFFER.types.includes(typeOfCat(s, c))) return 1;
             const last = new Date(s.depart + "T12:00:00Z");
-            if (Number.isInteger(d.min_days)) last.setUTCDate(last.getUTCDate() - d.min_days);
-            else if (Number.isInteger(d.min_months)) last.setUTCMonth(last.getUTCMonth() - d.min_months);
-            else return false;
-            return todayEastern() <= last.toISOString().slice(0, 10);
+            if (Number.isInteger(OFFER.min_days)) last.setUTCDate(last.getUTCDate() - OFFER.min_days);
+            else last.setUTCMonth(last.getUTCMonth() - OFFER.min_months);
+            return todayEastern() <= last.toISOString().slice(0, 10) ? OFFER.credits : 1;
         }
 
-        // One booking's numbers for the deposit choice ("ncl", "credit1", "credit2" or null). The
+        // "Balcony or higher", "any", or the types one by one, from the offer's NCL types.
+        function offerTypesText(types) {
+            const order = ["INSIDE", "OCEANVIEW", "BALCONY", "MINISUITE", "SUITE", "HAVEN"];
+            const names = { INSIDE: "Inside", OCEANVIEW: "Oceanview", BALCONY: "Balcony", MINISUITE: "Club Balcony Suite", SUITE: "Suite", HAVEN: "Haven" };
+            const mine = order.filter(t => types.includes(t));
+            if (!mine.length) return null;
+            const first = order.indexOf(mine[0]);
+            if (mine.length === order.length) return "On any cabin";
+            const tail = order.slice(first).every(t => mine.includes(t));
+            const art = /^[AEIOU]/.test(names[mine[0]]) ? "an" : "a";
+            return tail ? `On ${art} ${names[mine[0]]} or higher cabin` : `On ${art} ${mine.map(t => names[t]).join(" or ")} cabin`;
+        }
+
+        // One booking's numbers for the deposit choice ("ncl", "credit1" up to "credit4", or null). The
         // price is the card's Total with the window's Florida answer (owner's change 2026-10-29): the
         // Free at Sea gratuities and Plus are in it (NCL adds them to the booking, paid with the
         // balance), service charges only when prepaid. Credits: $250 each toward the cruise. Up to a Club Balcony Suite a credit is the whole
@@ -1565,7 +1594,10 @@
             const final = (s.payment && s.payment.final_payment_due) || null;
             const past = !!final && todayEastern() > final;
             const dep = depositFor(s, c, k);
-            const credits = choice === "credit2" ? 2 : choice === "credit1" ? 1 : 0;
+            const most = maxCredits(s, c);
+            const picked = /^credit(\d)$/.exec(choice || "");
+            const credits = picked ? Math.min(Number(picked[1]), most) : 0;
+            if (picked) choice = "credit" + credits;
             const creditValue = credits * CRUISENEXT.credit;
             let dueNow = null;
             if (choice && past) dueNow = Math.max(0, price - creditValue);
@@ -1573,11 +1605,19 @@
             else if (credits) dueNow = !suiteHaven(s, c) ? 0 : dep ? Math.max(0, cents(dep.amount - creditValue)) : null;
             const balance = dueNow === null ? null : Math.max(0, cents(price - creditValue - dueNow));
             return { s, c, k, price, dep, choice, credits, creditValue, dueNow, balance, final, past,
-                     payDavid: credits * CRUISENEXT.cost, two: doubleUp(s, c) };
+                     payDavid: credits * CRUISENEXT.cost, most };
         }
 
         // David's CruiseNext explainer (his words), under "How to pay the deposit".
-        const cnExplain = () => `<p class="ms-explain">Use David's CruiseNext credit and save ${money(CRUISENEXT.cost)}. CruiseNext credits are a perk NCL only sells on board, so David will pick some up on his next cruise. He buys a ${money(CRUISENEXT.credit)} credit for ${money(CRUISENEXT.cost)}, it goes toward your deposit, and you just pay him back the ${money(CRUISENEXT.cost)}. On a Balcony or higher cabin, while NCL's DoubleUp offer is running, you can use two: ${money(2 * CRUISENEXT.credit)} toward your cruise for ${money(2 * CRUISENEXT.cost)}. Above a Club Balcony Suite, a credit covers part of the deposit rather than all of it. The credit has to be moved to your NCL account before we book, so this option adds a few days.</p>`;
+        const cnExplain = () => `<p class="ms-explain">Use David's CruiseNext credit and save ${money(CRUISENEXT.cost)}. CruiseNext credits are a perk NCL only sells on board, so David will pick some up on his next cruise. He buys a ${money(CRUISENEXT.credit)} credit for ${money(CRUISENEXT.cost)}, it goes toward your deposit, and you just pay him back the ${money(CRUISENEXT.cost)}. ${offerSentence()}Above a Club Balcony Suite, a credit covers part of the deposit rather than all of it. The credit has to be moved to your NCL account before we book, so this option adds a few days.</p>`;
+        // The multi-credit sentence in David's explainer, with NCL's offer name and number. Left
+        // out while no offer is listed (or it was read more than 3 days ago).
+        function offerSentence() {
+            const where = offerFresh() && offerTypesText(OFFER.types);
+            if (!where) return "";
+            const n = OFFER.credits, count = n === 2 ? "two" : `up to ${NUMBER_WORDS[n]}`;
+            return `${where}, while NCL's ${esc(OFFER.short)} offer is running, you can use ${count}: ${money(n * CRUISENEXT.credit)} toward your cruise for ${money(n * CRUISENEXT.cost)}. `;
+        }
         const msRow = (label, value, cls = "") => `<div class="row ${cls}"><span class="k">${label}</span><span class="v">${value}</span></div>`;
         const dueText = b => !b.final ? "due by NCL's final payment date (not found on NCL today)" : b.past ? "due when booking" : `due by ${fmtIso(b.final)}`;
 
@@ -1594,16 +1634,17 @@
                 : `NCL's deposit (${notFound}; David will confirm it)`;
             const offer = d && d.offer && !b.past ? `<span class="cat-meta" style="display:block">Includes NCL's ${esc(d.offer.title)} offer${d.offer.description ? `: ${esc(d.offer.description)}` : ""}</span>` : "";
             const partial = suiteHaven(s, c) ? `<span class="cat-meta" style="display:block">On a ${esc(c.typeTitle)} cabin a credit covers part of NCL's deposit, not all of it.</span>` : "";
-            const choices = opt("ncl", nclText + offer)
-                + opt("credit1", `One of David's CruiseNext credits: ${money(CRUISENEXT.credit)} toward the cruise, you pay David ${money(CRUISENEXT.cost)}${partial}`)
-                + (b.two ? opt("credit2", `Two of David's CruiseNext credits (NCL's DoubleUp offer): ${money(2 * CRUISENEXT.credit)} toward the cruise, you pay David ${money(2 * CRUISENEXT.cost)}${partial}`) : "");
+            let choices = opt("ncl", nclText + offer)
+                + opt("credit1", `One of David's CruiseNext credits: ${money(CRUISENEXT.credit)} toward the cruise, you pay David ${money(CRUISENEXT.cost)}${partial}`);
+            for (let n = 2; n <= b.most; n++)
+                choices += opt(`credit${n}`, `${capital(NUMBER_WORDS[n])} of David's CruiseNext credits (NCL's ${esc(OFFER.short)} offer): ${money(n * CRUISENEXT.credit)} toward the cruise, you pay David ${money(n * CRUISENEXT.cost)}${partial}`);
 
             let math = "";
             if (b.choice) {
                 const confirm = "David will confirm";
                 math = `<div class="rows ms-math">
                     ${msRow("Total", money(b.price))}
-                    ${b.credits ? msRow(`CruiseNext ${b.credits === 2 ? "credits" : "credit"} toward the cruise: ${b.credits} x ${money(CRUISENEXT.credit)}`, "&minus;" + money(b.creditValue)) : ""}
+                    ${b.credits ? msRow(`CruiseNext ${b.credits > 1 ? "credits" : "credit"} toward the cruise: ${b.credits} x ${money(CRUISENEXT.credit)}`, "&minus;" + money(b.creditValue)) : ""}
                     ${msRow(b.past ? "Paid to NCL at booking" : b.credits ? (suiteHaven(s, c) ? "Rest of NCL's deposit, due at booking" : "Deposit due at booking (the credit is the deposit)") : "Deposit to NCL at booking",
                             b.dueNow === null ? confirm : money(b.dueNow))}
                     ${msRow(`Balance, ${dueText(b)}`, b.balance === null ? confirm : money(b.balance), "total")}
@@ -1713,7 +1754,7 @@
                                 <li>David moves the credit to guest 1's NCL account by emailing cruisenext@ncl.com.</li>
                                 <li>Then the booking is made. Credits only work on a new booking, so the booking waits until the credit is in the account.</li>
                             </ol>
-                            <p class="hint" id="msTwoNote" hidden>If NCL ends its DoubleUp offer before the booking is made, only one credit can be used.</p>
+                            <p class="hint" id="msTwoNote" hidden></p>
                         </section>
                         <section class="ms-sec">
                             <h3>Guest details</h3>
@@ -1761,7 +1802,10 @@
             }
             const cn = !!MS.books && MS.books.some(b => b.credits);
             document.getElementById("msCn").hidden = !cn;
-            document.getElementById("msTwoNote").hidden = !(MS.books && MS.books.some(b => b.credits === 2));
+            const many = MS.books && MS.books.some(b => b.credits > 1) && OFFER;
+            const note = document.getElementById("msTwoNote");
+            note.hidden = !many;
+            note.textContent = many ? `If NCL ends its ${OFFER.short} offer before the booking is made, only one credit can be used.` : "";
             document.getElementById("msLatNeed").textContent = cn ? "(required for CruiseNext)" : "(if guest 1 has one)";
         }
 
@@ -1909,7 +1953,7 @@
                     lines: shownLines(shipKey(b.s), ".row:not(.total):not(.onboard)"), total: b.price, onboard: shownLines(shipKey(b.s), ".row.onboard"),
                     deposit_choice: b.choice,
                     ncl_deposit: b.dep ? { amount: b.dep.amount, rule: b.dep.rule, due_hours: b.dep.hours, offer: b.dep.offer ? b.dep.offer.title : null } : null,
-                    credits: b.credits, credit_value: b.creditValue, due_at_booking: b.dueNow, balance: b.balance,
+                    credits: b.credits, credit_offer: b.credits > 1 ? OFFER.name : null, credit_value: b.creditValue, due_at_booking: b.dueNow, balance: b.balance,
                     balance_due: b.past ? "when booking" : b.final, pay_david: b.payDavid,
                 })),
                 guests: order.map((a, i) => ({
@@ -2484,7 +2528,7 @@
         const floridaPromise = fetch(FLORIDA_URL, { cache: "no-cache" })
             .then(r => r.ok ? r.json() : null)
             .catch(() => null);
-        // The DoubleUp watch is optional: without it Make Selection offers one CruiseNext credit.
+        // The CruiseNext offer watch is optional: without it Make Selection offers one CruiseNext credit.
         const offersPromise = fetch(OFFERS_URL, { cache: "no-cache" })
             .then(r => r.ok ? r.json() : null)
             .catch(() => null);
@@ -2514,7 +2558,7 @@
                 DATA = d;
                 COUNTS = usableCounts(cnt);
                 loadFlorida(fl);
-                OFFERS = of && of.schema_version === 1 && of.doubleup ? of : null;
+                OFFER = readOffer(of);
                 G = d.sailings.find(s => s.id.startsWith("getaway"));
                 A = d.sailings.find(s => s.id.startsWith("aura"));
                 if (!G || !A) throw new Error("a sailing is missing");

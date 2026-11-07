@@ -26,8 +26,10 @@ to light, Eastern dates), its runs against a stand-in for NCL (call counts, the 
 cabin's own amount, the hold guard on signed-in answers, the sail-date stop), the --push guard
 (noreply email, main only) and tools/check_florida.py.
 
-DoubleUp watch (5.2.0): tools/fetch_offers.py on NCL's real banner markup (tools/test_data/
-cruisenext_doubleup.html, saved 2026-10-28) and on stand-in pages: started, ended, appeared and
+CruiseNext offer watch (5.2.0, 5.3.0): tools/fetch_offers.py on NCL's real banner markup (tools/test_data/
+cruisenext_doubleup.html, saved 2026-10-28, and cruisenext_tripleup.html, saved 2026-11-07), on
+stand-in pages (DoubleUp, TripleUp, QuadUp, a heading and text that disagree), schema 1 files,
+the one-time fix for 2026-11-06, and on stand-in pages: started, ended, appeared and
 changed, one issue per change with its own marker, retries of an unreported change, pages that
 can't be read, wording that can't be read, Eastern dates, and tools/check_offers.py. Also: no
 em dash in any tracked file.
@@ -990,115 +992,213 @@ def offers_page(banner_text=None, title="Limited-Time Offer: DoubleUp!", terms=T
 
 
 def test_offers():
-    """DoubleUp watch (5.2.0): tools/fetch_offers.py reads the banner, one issue per change, and
-    tools/check_offers.py. A stand-in for NCL's page; no NCL calls."""
+    """CruiseNext offer watch (5.2.0, any multi-credit offer and schema 2 since 5.3.0):
+    tools/fetch_offers.py reads the banner, one issue per change, and tools/check_offers.py. NCL's
+    real markup and stand-in pages; no NCL calls."""
     import check_offers as co
     import fetch_offers as fo
     day = lambda d, h=10: dt.datetime(2026, 10, d, h, 21, tzinfo=dt.timezone.utc)
+    nov = lambda d, h=10: dt.datetime(2026, 11, d, h, 21, tzinfo=dt.timezone.utc)
     with open(os.path.join(TEST_DATA, "cruisenext_doubleup.html"), encoding="utf-8") as f:
         real = f.read()
+    with open(os.path.join(TEST_DATA, "cruisenext_tripleup.html"), encoding="utf-8") as f:
+        real3 = f.read()
     now_text = ("Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply TWO "
                 "CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*")
+    three_text = now_text.replace("TWO", "THREE")
 
     # First run on NCL's real markup (saved 2026-10-28): the "watch started" issue.
     first = fo.build(real, None, day(29))
-    du = first["doubleup"]
-    check("DoubleUp: banner read from NCL's real markup", (du["listed"], du["title"], du["text"]),
-          (True, "Limited-Time Offer: DoubleUp!", now_text))
-    check("DoubleUp: Balcony and above", du["types"], ["BALCONY", "MINISUITE", "SUITE", "HAVEN"])
-    check("DoubleUp: 90 days before sailing", (du["min_days"], du["min_months"]), (90, None))
-    check("DoubleUp: first run is a started change, not yet reported",
+    du = first["multi_credit"]
+    check("Offer: schema 2", first["schema_version"], 2)
+    check("Offer: banner read from NCL's real markup", (du["listed"], du["title"], du["name"], du["credits"], du["text"]),
+          (True, "Limited-Time Offer: DoubleUp!", "DoubleUp!", 2, now_text))
+    check("Offer: Balcony and above", du["types"], ["BALCONY", "MINISUITE", "SUITE", "HAVEN"])
+    check("Offer: 90 days before sailing", (du["min_days"], du["min_months"]), (90, None))
+    check("Offer: first run is a started change, not yet reported",
           (first["last_change"]["kind"], first["last_change"]["reported"], first["last_change"]["old_listed"]),
           ("started", False, None))
-    check("DoubleUp: first file passes the format check", co.check(first), [])
+    check("Offer: first file passes the format check (schema 2 only)", co.check(first, any_schema=False), [])
     title, body, marker = fo.issue(first)
-    check("DoubleUp: started issue title", title, "DoubleUp watch started (Oct 29, 2026)")
-    check("DoubleUp: issue mentions the owner, the link and the new text",
-          ["@DASatizabal" in body, fo.CRUISENEXT_URL in body, now_text in body, marker in body], [True] * 4)
-    check("DoubleUp: issue text has no em dash", EM_DASH in title + body, False)
+    check("Offer: started issue title", title, "CruiseNext offer watch started (Oct 29, 2026)")
+    check("Offer: issue mentions the owner, the link, the new text and credits",
+          ["@DASatizabal" in body, fo.CRUISENEXT_URL in body, now_text in body, marker in body, "New credits: 2" in body], [True] * 5)
+    check("Offer: issue text has no em dash", EM_DASH in title + body, False)
 
     # Not reported yet (the issue couldn't be opened): the next day tries again with the same marker.
     retry = fo.build(real, first, day(30))
-    check("DoubleUp: an unreported change is tried again with the same marker",
+    check("Offer: an unreported change is tried again with the same marker",
           (fo.issue(retry) or (None, None, None))[2], marker)
-    check("DoubleUp: state date kept while nothing changes", retry["doubleup"]["since"], "2026-10-29")
+    check("Offer: state date kept while nothing changes", retry["multi_credit"]["since"], "2026-10-29")
 
     # Reported: the next days open nothing.
     first["last_change"]["reported"] = True
     same = fo.build(real, first, day(30))
-    check("DoubleUp: same text the next day opens no issue", fo.issue(same), None)
-    check("DoubleUp: same text keeps the last change as it was", same["last_change"], first["last_change"])
-    check("DoubleUp: read_on moves to today", same["doubleup"]["read_on"], "2026-10-30")
-    check("DoubleUp: same-day file passes", co.check(same), [])
+    check("Offer: same text the next day opens no issue", fo.issue(same), None)
+    check("Offer: same text keeps the last change as it was", same["last_change"], first["last_change"])
+    check("Offer: read_on moves to today", same["multi_credit"]["read_on"], "2026-10-30")
+    check("Offer: same-day file passes", co.check(same, any_schema=False), [])
+
+    # TripleUp on NCL's real markup (saved 2026-11-07): a "changed" issue, DoubleUp to TripleUp.
+    trip = fo.build(real3, same, nov(7))
+    t = trip["multi_credit"]
+    check("Offer: TripleUp read from NCL's real markup", (t["listed"], t["name"], t["credits"], t["text"], t["types"], t["min_days"]),
+          (True, "TripleUp!", 3, three_text, ["BALCONY", "MINISUITE", "SUITE", "HAVEN"], 90))
+    ch = trip["last_change"]
+    check("Offer: DoubleUp to TripleUp is a changed change with both names and credits",
+          (ch["kind"], ch["old_name"], ch["old_credits"], ch["new_name"], ch["new_credits"]), ("changed", "DoubleUp!", 2, "TripleUp!", 3))
+    check("Offer: TripleUp file passes", co.check(trip, any_schema=False), [])
+    t_title, t_body, _ = fo.issue(trip)
+    check("Offer: changed issue title names both offers", t_title, "CruiseNext offer changed: DoubleUp to TripleUp (Nov 7, 2026)")
+    check("Offer: changed issue shows old and new text and credits",
+          [f'Old: DoubleUp!: "{now_text}"' in t_body, "Old credits: 2" in t_body, f'New: TripleUp!: "{three_text}"' in t_body,
+           "New credits: 3" in t_body, "up to 3 CruiseNext credits per booking (TripleUp)" in t_body], [True] * 5)
+    trip["last_change"]["reported"] = True
+    # Same name, another number in both heading and text is impossible (the name gives the number);
+    # the same name with new wording is a text change.
+    reworded = fo.build(offers_page(three_text.replace("any sailing", "all sailings"), "Limited-Time Offer: TripleUp!"), trip, nov(8))
+    check("Offer: TripleUp with new wording is a text change", fo.issue(reworded)[0], "CruiseNext offer text changed: TripleUp (Nov 8, 2026)")
+
+    # Headings with or without "!", spaces or hyphens, and the number in words or digits.
+    for heading, text, want in [("Limited-Time Offer: Double Up", now_text, ("Double Up", 2)),
+                                ("Limited-Time Offer: Triple-Up!", three_text, ("Triple-Up!", 3)),
+                                ("QuadUp!", now_text.replace("TWO", "FOUR"), ("QuadUp!", 4)),
+                                ("Quadruple Up!", now_text.replace("TWO", "4"), ("Quadruple Up!", 4)),
+                                ("TRIPLEUP", now_text.replace("TWO", "three"), ("TRIPLEUP", 3))]:
+        got = fo.build(offers_page(text, heading), same, day(31))
+        check(f"Offer: heading {heading!r}", (got["multi_credit"]["name"], got["multi_credit"]["credits"], got["warnings"]), want + ([],))
+        check(f"Offer: heading {heading!r} passes", co.check(got, any_schema=False), [])
+
+    # The heading and the text disagree, or the number can't be read: null credits, a warning, one credit.
+    for name, heading, text in [("heading TripleUp, text TWO", "Limited-Time Offer: TripleUp!", now_text),
+                                ("no number in the text", "Limited-Time Offer: TripleUp!",
+                                 "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply extra CruiseNext credits.")]:
+        got = fo.build(offers_page(text, heading), same, day(31))
+        m = got["multi_credit"]
+        check(f"Offer: {name}: credits null with a warning", (m["listed"], m["credits"], len(got["warnings"]), "one credit" in got["warnings"][0]),
+              (True, None, 1, True))
+        check(f"Offer: {name}: passes the format check", co.check(got, any_schema=False), [])
+        check(f"Offer: {name}: the issue says one credit", "one CruiseNext credit per booking" in fo.issue(got)[1], True)
 
     # The banner ends, changes, comes back: one issue each, each with its own marker.
     ended = fo.build(offers_page(None), same, day(31))
-    check("DoubleUp: banner gone is an ended change", (ended["last_change"]["kind"], ended["doubleup"]["listed"]), ("ended", False))
-    check("DoubleUp: ended file passes", co.check(ended), [])
+    check("Offer: banner gone is an ended change", (ended["last_change"]["kind"], ended["multi_credit"]["listed"]), ("ended", False))
+    check("Offer: ended file passes", co.check(ended, any_schema=False), [])
     e_title, e_body, e_marker = fo.issue(ended)
-    check("DoubleUp: ended issue title and texts", (e_title, "(no DoubleUp banner on the page)" in e_body, now_text in e_body),
-          ("DoubleUp offer ended (Oct 31, 2026)", True, True))
+    check("Offer: ended issue title and texts", (e_title, "(no multi-credit offer on the page)" in e_body, now_text in e_body),
+          ("CruiseNext offer ended: DoubleUp (Oct 31, 2026)", True, True))
     ended["last_change"]["reported"] = True
     back = fo.build(offers_page(now_text), ended, day(31, 20))
-    check("DoubleUp: banner back is an appeared change", back["last_change"]["kind"], "appeared")
-    check("DoubleUp: every change has its own marker",
+    check("Offer: banner back is an appeared change", (back["last_change"]["kind"], fo.issue(back)[0]),
+          ("appeared", "CruiseNext offer appeared: DoubleUp (Oct 31, 2026)"))
+    check("Offer: every change has its own marker",
           len({marker, e_marker, back["last_change"]["marker"]}), 3)
     back["last_change"]["reported"] = True
     new_text = "Book ANY stateroom on any sailing booked at least 6 months in advance and apply TWO CruiseNext credits."
     changed = fo.build(offers_page(new_text), back, dt.datetime(2026, 11, 2, 14, tzinfo=dt.timezone.utc))
-    check("DoubleUp: new text is a changed change", changed["last_change"]["kind"], "changed")
-    check("DoubleUp: any stateroom, 6 months", (changed["doubleup"]["types"], changed["doubleup"]["min_days"], changed["doubleup"]["min_months"]),
+    check("Offer: new text is a changed change", (changed["last_change"]["kind"], fo.issue(changed)[0]),
+          ("changed", "CruiseNext offer text changed: DoubleUp (Nov 2, 2026)"))
+    check("Offer: any stateroom, 6 months", (changed["multi_credit"]["types"], changed["multi_credit"]["min_days"], changed["multi_credit"]["min_months"]),
           (fo.TYPE_ORDER, None, 6))
-    check("DoubleUp: changed file passes", co.check(changed), [])
+    check("Offer: changed file passes", co.check(changed, any_schema=False), [])
     c_body = fo.issue(changed)[1]
-    check("DoubleUp: changed issue shows old and new text", (f'Old text: "{now_text}"' in c_body, f'New text: "{new_text}"' in c_body), (True, True))
-    check("DoubleUp: Eastern date, not UTC (Nov 2 at 3:30 AM UTC is Nov 1, 10:30 PM in Miami)",
+    check("Offer: changed issue shows old and new text", (f'Old: DoubleUp!: "{now_text}"' in c_body, f'New: DoubleUp!: "{new_text}"' in c_body), (True, True))
+    check("Offer: Eastern date, not UTC (Nov 2 at 3:30 AM UTC is Nov 1, 10:30 PM in Miami)",
           fo.build(offers_page(None), back, dt.datetime(2026, 11, 2, 3, 30, tzinfo=dt.timezone.utc))["checked_on"], "2026-11-01")
-    check("DoubleUp: evening run belongs to the Eastern day",
+    check("Offer: evening run belongs to the Eastern day",
           fo.build(offers_page(None), back, dt.datetime(2026, 11, 3, 2, 0, tzinfo=dt.timezone.utc))["checked_on"], "2026-11-02")
 
     # Pages that can't be read keep the previous state, warn, and open nothing.
     for name, page, error in [("a page without CruiseNext terms", offers_page(now_text, terms=False), None),
                               ("an error loading the page", None, "RuntimeError: NCL answered HTTP 403"),
-                              ("a DoubleUp heading with no text", offers_page("").replace("<p></p>", ""), None),
+                              ("a multi-credit heading with no text", offers_page("").replace("<p></p>", ""), None),
                               ("offer text far from the heading", offers_page(now_text).replace(
-                                  "</h3>", "</h3><div>" + " " * (fo.NEAR + 10) + "</div>"), None)]:
+                                  "</h3>", "</h3><div>" + " " * (fo.NEAR + 10) + "</div>"), None),
+                              ("THREE credits under an unknown heading", offers_page(three_text, "Limited-Time Offer: TrioBonus!"), None)]:
         kept = fo.build(page, same, day(31), page_error=error)
-        check(f"DoubleUp: {name} keeps the state", (kept["read_ok"], kept["doubleup"], kept["last_change"]),
-              (False, same["doubleup"], same["last_change"]))
-        check(f"DoubleUp: {name} opens no issue and warns", (fo.issue(kept), len(kept["warnings"])), (None, 1))
-        check(f"DoubleUp: {name} passes the format check", co.check(kept), [])
+        check(f"Offer: {name} keeps the state", (kept["read_ok"], kept["multi_credit"], kept["last_change"]),
+              (False, same["multi_credit"], same["last_change"]))
+        check(f"Offer: {name} opens no issue and warns", (fo.issue(kept), len(kept["warnings"])), (None, 1))
+        check(f"Offer: {name} passes the format check", co.check(kept, any_schema=False), [])
+    other = fo.build(offers_page("Book any stateroom and apply ONE CruiseNext credit.", "Limited-Time Offer: Bonus!"), same, day(31))
+    check("Offer: an unknown heading with one credit is no multi-credit offer (ended)", (other["read_ok"], other["last_change"]["kind"]), (True, "ended"))
     none_yet = fo.build(None, None, day(29), page_error="URLError: timed out")
-    check("DoubleUp: no previous file and no page: nothing read yet, no issue", (none_yet["doubleup"], fo.issue(none_yet)), (None, None))
-    check("DoubleUp: nothing read yet passes", co.check(none_yet), [])
+    check("Offer: no previous file and no page: nothing read yet, no issue", (none_yet["multi_credit"], fo.issue(none_yet)), (None, None))
+    check("Offer: nothing read yet passes", co.check(none_yet, any_schema=False), [])
 
     # Wording that can't be read: saved as null with a warning, never guessed.
-    odd = fo.build(offers_page("Book something special stateroom and apply TWO credits."), same, day(31))
-    check("DoubleUp: unknown wording gives null types and lead time",
-          (odd["doubleup"]["types"], odd["doubleup"]["min_days"], odd["doubleup"]["min_months"], len(odd["warnings"])), (None, None, None, 2))
-    check("DoubleUp: unknown wording passes the format check", co.check(odd), [])
-    check("DoubleUp: unknown wording means one credit", "one CruiseNext credit" in fo.issue(odd)[1], True)
+    odd = fo.build(offers_page("Book something special stateroom and apply TWO CruiseNext credits."), same, day(31))
+    check("Offer: unknown wording gives null types and lead time",
+          (odd["multi_credit"]["types"], odd["multi_credit"]["min_days"], odd["multi_credit"]["min_months"], len(odd["warnings"])), (None, None, None, 2))
+    check("Offer: unknown wording passes the format check", co.check(odd, any_schema=False), [])
+    check("Offer: unknown wording means one credit", "one CruiseNext credit" in fo.issue(odd)[1], True)
     for text, want in [("Book a Club Balcony Suite and above stateroom", ["MINISUITE", "SUITE", "HAVEN"]),
                        ("Book a Balcony, Club Balcony Suite or Suite stateroom", ["BALCONY", "MINISUITE", "SUITE"]),
                        ("Book a Suite or The Haven stateroom", ["SUITE", "HAVEN"]),
                        ("Book a ANY stateroom", fo.TYPE_ORDER),
                        ("Apply two credits", None)]:
-        check(f"DoubleUp types: {text}", fo.read_types(text), want)
-    check("DoubleUp: 120 days before sailing", fo.read_lead_time("at least 120 days before sailing"), (120, None))
+        check(f"Offer types: {text}", fo.read_types(text), want)
+    check("Offer: 120 days before sailing", fo.read_lead_time("at least 120 days before sailing"), (120, None))
+
+    # Schema 1 (5.2.0) previous files: read, written back as schema 2, same state is no change.
+    s1 = {"schema_version": 1, "saved_at": "2026-10-30T10:21:00Z", "checked_on": "2026-10-30", "source": fo.CRUISENEXT_URL,
+          "read_ok": True, "warnings": [],
+          "doubleup": {"listed": True, "title": "Limited-Time Offer: DoubleUp!", "text": now_text, "types": ["BALCONY", "MINISUITE", "SUITE", "HAVEN"],
+                       "min_days": 90, "min_months": None, "read_on": "2026-10-30", "since": "2026-10-29"},
+          "last_change": {"kind": "started", "on": "2026-10-29", "old_listed": None, "old_text": None, "new_listed": True,
+                          "new_text": now_text, "marker": "doubleup-0123456789ab", "reported": True}}
+    check("Offer: a schema 1 file passes the release check's format check", co.check(s1), [])
+    check("Offer: a schema 1 file is refused as a new file", bool(co.check(s1, any_schema=False)), True)
+    from1 = fo.build(real, s1, day(31))
+    check("Offer: schema 1 with the same DoubleUp: no change, written as schema 2",
+          (from1["schema_version"], fo.issue(from1), from1["multi_credit"]["since"], from1["last_change"]["marker"], from1["last_change"]["new_credits"]),
+          (2, None, "2026-10-29", "doubleup-0123456789ab", 2))
+    check("Offer: schema 1 carried over passes", co.check(from1, any_schema=False), [])
+    kept1 = fo.build(None, s1, day(31), page_error="URLError: timed out")
+    check("Offer: schema 1 kept on an unreadable page passes", (kept1["read_ok"], co.check(kept1, any_schema=False)), (False, []))
+
+    # The one-time fix (5.3.0): exactly main's 2026-11-06 schema 1 file, then a multi-credit offer.
+    wrong = {"schema_version": 1, "saved_at": "2026-11-06T10:20:57Z", "checked_on": "2026-11-06", "source": fo.CRUISENEXT_URL,
+             "read_ok": True, "warnings": [],
+             "doubleup": {"listed": False, "title": None, "text": None, "types": None, "min_days": None, "min_months": None,
+                          "read_on": "2026-11-06", "since": "2026-11-06"},
+             "last_change": {"kind": "ended", "on": "2026-11-06", "old_listed": True, "old_text": now_text, "new_listed": False,
+                             "new_text": None, "marker": "doubleup-04e33a276287", "reported": True}}
+    fixed = fo.build(real3, wrong, nov(7))
+    check("Offer fix: main's 2026-11-06 'ended' then TripleUp is DoubleUp to TripleUp",
+          (fixed["last_change"]["kind"], fo.issue(fixed)[0]), ("changed", "CruiseNext offer changed: DoubleUp to TripleUp (Nov 7, 2026)"))
+    check("Offer fix: the file passes", co.check(fixed, any_schema=False), [])
+    fixed["last_change"]["reported"] = True
+    check("Offer fix: the next run (schema 2) opens nothing", fo.issue(fo.build(real3, fixed, nov(8))), None)
+    check("Offer fix: still no offer is no change", fo.issue(fo.build(offers_page(None), wrong, nov(7))), None)
+    check("Offer fix: the same DoubleUp back is an ordinary appeared",
+          fo.build(real, wrong, nov(7))["last_change"]["kind"], "appeared")
+    for name, data in [("another date", dict(wrong, last_change=dict(wrong["last_change"], on="2026-11-05"))),
+                       ("another old text", dict(wrong, last_change=dict(wrong["last_change"], old_text=new_text))),
+                       ("a schema 2 file", dict(fo.build(offers_page(None), same, nov(6)), checked_on="2026-11-06"))]:
+        check(f"Offer fix: not used with {name}", fo.build(real3, data, nov(7))["last_change"]["kind"], "appeared")
 
     # The format check refuses anything outside its lists.
     bad_cases = {
         "an extra key": dict(same, guest_email="x"),
-        "read_ok true with nothing read": dict(same, doubleup=None),
-        "a banner with a new line": dict(same, doubleup=dict(same["doubleup"], text="two\nlines")),
-        "unknown cabin type": dict(same, doubleup=dict(same["doubleup"], types=["YACHT"])),
-        "no banner but text": dict(ended, doubleup=dict(ended["doubleup"], text="x")),
+        "read_ok true with nothing read": dict(same, multi_credit=None),
+        "a banner with a new line": dict(same, multi_credit=dict(same["multi_credit"], text="two\nlines")),
+        "unknown cabin type": dict(same, multi_credit=dict(same["multi_credit"], types=["YACHT"])),
+        "no banner but text": dict(ended, multi_credit=dict(ended["multi_credit"], text="x")),
+        "no banner but credits": dict(ended, multi_credit=dict(ended["multi_credit"], credits=2)),
         "bad marker": dict(same, last_change=dict(same["last_change"], marker="x")),
         "read_ok false without a warning": dict(same, read_ok=False, warnings=[]),
-        "types null without a warning": dict(same, doubleup=dict(same["doubleup"], types=None)),
+        "types null without a warning": dict(same, multi_credit=dict(same["multi_credit"], types=None)),
+        "credits null without a warning": dict(same, multi_credit=dict(same["multi_credit"], credits=None)),
+        "5 credits": dict(same, multi_credit=dict(same["multi_credit"], credits=5)),
+        "a name that isn't an offer name": dict(same, multi_credit=dict(same["multi_credit"], name="Free stuff")),
+        "a name not in the title": dict(same, multi_credit=dict(same["multi_credit"], name="TripleUp!")),
+        "the old doubleup key in schema 2": dict({k: v for k, v in same.items() if k != "multi_credit"}, doubleup=same["multi_credit"]),
+        "changed with nothing different": dict(trip, last_change=dict(trip["last_change"], old_name="TripleUp!", old_credits=3, old_text=three_text)),
+        "schema 3": dict(same, schema_version=3),
     }
     for name, data in bad_cases.items():
-        check(f"DoubleUp format check refuses {name}", bool(co.check(data)), True)
+        check(f"Offer format check refuses {name}", bool(co.check(data)), True)
 
     # main(): exactly 1 NCL page load at the CruiseNext address, the issue files, --mark-reported.
     folder = tempfile.mkdtemp(prefix="june-offers-")
@@ -1107,24 +1207,24 @@ def test_offers():
 
     def fake_request(url, body=None, raw=False, page=False):
         calls.append((url, page))
-        return real
+        return real3
     fo.fp.request = fake_request
     try:
         out, issue_dir = os.path.join(folder, "offers.new.json"), os.path.join(folder, "issue")
         fo.main(["--out", out, "--issue-dir", issue_dir])
-        check("DoubleUp main: 1 NCL page load at the CruiseNext address", calls, [(fo.CRUISENEXT_URL, True)])
-        check("DoubleUp main: issue files written", sorted(os.listdir(issue_dir)), ["body.md", "marker.txt", "title.txt"])
+        check("Offer main: 1 NCL page load at the CruiseNext address", calls, [(fo.CRUISENEXT_URL, True)])
+        check("Offer main: issue files written", sorted(os.listdir(issue_dir)), ["body.md", "marker.txt", "title.txt"])
         fo.main(["--mark-reported", out])
         with open(out, encoding="utf-8") as f:
             saved_file = json.load(f)
-        check("DoubleUp main: --mark-reported marks the change", saved_file["last_change"]["reported"], True)
-        check("DoubleUp main: the written file passes", co.check(saved_file), [])
+        check("Offer main: --mark-reported marks the change", saved_file["last_change"]["reported"], True)
+        check("Offer main: the written file passes", co.check(saved_file, any_schema=False), [])
         issue_dir2 = os.path.join(folder, "issue2")
         fo.main(["--previous", out, "--out", os.path.join(folder, "next.json"), "--issue-dir", issue_dir2])
-        check("DoubleUp main: next run with the same banner writes no issue", os.path.exists(issue_dir2), False)
+        check("Offer main: next run with the same banner writes no issue", os.path.exists(issue_dir2), False)
     finally:
         fo.fp.request = old_request
-    check("DoubleUp: the CruiseNext address passes the address guard", bool(fo.fp.FORBIDDEN.search(fo.CRUISENEXT_URL)), False)
+    check("Offer: the CruiseNext address passes the address guard", bool(fo.fp.FORBIDDEN.search(fo.CRUISENEXT_URL)), False)
 
 
 # ---------- Payment data (5.2.0, prices schema 4) ----------
