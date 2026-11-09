@@ -13,8 +13,9 @@ and the switch off (NOTES.md, "Florida resident rates").
 
 Make Selection (5.2.0, NOTES.md "Make Selection"): the window on every card at 360 px, the price
 without gratuities (gratuities listed, not added), NCL's deposit and the 2-For-1 line, one and two
-CruiseNext credits (DoubleUp from a test data/offers.json: on, read too long ago, ended, a cabin
-type it doesn't cover), a Haven deposit (10% of the fare, a credit covering part of it), the
+CruiseNext credits (DoubleUp and TripleUp from a test data/offers.json, schema 2 and schema 1:
+one, two and three credits, read too long ago, ended, credits not read, a cabin type it doesn't
+cover), a Haven deposit (10% of the fare, a credit covering part of it), the
 Florida answer overriding the page switch, 8 nights as two bookings with totals, the checks on
 every field (a kid's date of birth that doesn't match the age on the page), a schema 3 price
 file (deposit not found), and sending to a stand-in for the Worker (the request it gets, nothing
@@ -564,15 +565,19 @@ with sync_playwright() as pw:
     # Make Selection (5.2.0): the booking request window.
     today_e = dt.datetime.now(MIAMI).date()
 
-    def offers_file(listed=True, read_days_ago=0, types=("BALCONY", "MINISUITE", "SUITE", "HAVEN"), min_days=90):
+    def offers_file(listed=True, read_days_ago=0, types=("BALCONY", "MINISUITE", "SUITE", "HAVEN"), min_days=90,
+                    name="DoubleUp!", credits=2, schema=2):
+        """A test data/offers.json: schema 2 (5.3.0, "multi_credit") or schema 1 (5.2.0, "doubleup")."""
         on = (today_e - dt.timedelta(days=read_days_ago)).isoformat()
-        return {"schema_version": 1, "saved_at": f"{on}T12:00:00Z", "checked_on": on, "source": "https://www.ncl.com/cruise-deals/cruisenext",
-                "read_ok": True, "warnings": [],
-                "doubleup": {"listed": listed, "title": "Limited-Time Offer: DoubleUp!" if listed else None,
-                             "text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply TWO CruiseNext credits." if listed else None,
-                             "types": list(types) if listed else None, "min_days": min_days if listed else None, "min_months": None,
-                             "read_on": on, "since": on},
-                "last_change": None}
+        word = {2: "TWO", 3: "THREE", 4: "FOUR"}.get(credits, "SOME")
+        offer = {"listed": listed, "title": f"Limited-Time Offer: {name}" if listed else None,
+                 "text": f"Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply {word} CruiseNext credits." if listed else None,
+                 "types": list(types) if listed else None, "min_days": min_days if listed else None, "min_months": None,
+                 "read_on": on, "since": on}
+        if schema == 2:
+            offer.update(name=name if listed else None, credits=credits if listed else None)
+        return {"schema_version": schema, "saved_at": f"{on}T12:00:00Z", "checked_on": on, "source": "https://www.ncl.com/cruise-deals/cruisenext",
+                "read_ok": True, "warnings": [], ("multi_credit" if schema == 2 else "doubleup"): offer, "last_change": None}
 
     # A stand-in for Cloudflare Turnstile: Cloudflare's own script is never loaded in the test.
     TURNSTILE_STUB = ("window.turnstile = { render: (el, o) => { setTimeout(() => o.callback('test-token'), 0); return 'w1'; },"
@@ -686,7 +691,8 @@ with sync_playwright() as pw:
     page.check("input[name='msDepG'][value='credit2']")
     rows = booking_rows(page, "G")
     same("Make Selection, two credits: $500 off, pay David $250", [rows[-4], rows[-1]], [("CruiseNext credits toward the cruise: 2 x $250", "−$500"), ("Pay David for the credits", "$250")])
-    check("Make Selection, two credits: note about DoubleUp ending", page.is_visible("#msTwoNote"))
+    same("Make Selection, two credits: note about DoubleUp ending", (page.is_visible("#msTwoNote"), page.inner_text("#msTwoNote")),
+         (True, "If NCL ends its DoubleUp offer before the booking is made, only one credit can be used."))
     page.click("#msSend")
     st = page.inner_text("#msStatus")
     check("Make Selection: sending an empty form lists what's missing", "Enter guest 1's first name." in st and "Enter guest 1's Latitudes number" in st, st[:200])
@@ -697,15 +703,74 @@ with sync_playwright() as pw:
     check("Make Selection: no script errors", not errs, errs[:3])
     page.close()
 
-    # 2. DoubleUp: read too long ago, ended, or not covering the cabin: one credit only.
+    # 2. The offer read too long ago, ended, not covering the cabin, or its number of credits
+    # unread (null): one credit only.
     for name, offers, stored in [("read 4 days ago", offers_file(read_days_ago=4), None), ("ended", offers_file(listed=False), None),
                                  ("Inside cabin", doubleup_on, {"adults": 2, "kids": [], "type": "inside", "mode": "same"}),
+                                 ("TripleUp, Inside cabin", offers_file(name="TripleUp!", credits=3), {"adults": 2, "kids": [], "type": "inside", "mode": "same"}),
+                                 ("credits not read", offers_file(name="TripleUp!", credits=None), None),
                                  ("no offers file", None, None)]:
         page, errs, _ = ms_open("ms_api" if offers is not None else "real", stored=stored, offers=offers)
         page.click('button[data-select="G"]')
         page.check("input[name='msFl'][value='no']")
-        same(f"Make Selection, DoubleUp {name}: one credit only", len(choice_texts(page, "G")), 2)
-        check(f"Make Selection, DoubleUp {name}: no script errors", not errs, errs[:3])
+        same(f"Make Selection, offer {name}: one credit only", len(choice_texts(page, "G")), 2)
+        check(f"Make Selection, offer {name}: no offer sentence in the explainer", "offer is running" not in page.inner_text("#msMath .ms-explain")
+              or name in ("Inside cabin", "TripleUp, Inside cabin"), page.inner_text("#msMath .ms-explain"))
+        check(f"Make Selection, offer {name}: no script errors", not errs, errs[:3])
+        page.close()
+
+    # 2b. One, two and three credits (5.3.0): the offer's name and number in the explainer, the
+    # choices, the math and the note, at 360 px. Schema 1 files (5.2.0) still give DoubleUp's two.
+    tripleup_on = offers_file(name="TripleUp!", credits=3)
+    for name, offers, n in [("no offer", offers_file(listed=False), 1), ("DoubleUp", doubleup_on, 2),
+                            ("DoubleUp, schema 1 file", offers_file(schema=1), 2), ("TripleUp", tripleup_on, 3),
+                            ("QuadUp", offers_file(name="QuadUp!", credits=4), 4)]:
+        page, errs, sent = ms_open("ms_api", stored={"adults": 2, "kids": [], "type": "balcony", "mode": "same"}, offers=offers)
+        page.click('button[data-select="G"]')
+        page.check("input[name='msFl'][value='no']")
+        texts = [t.split("\n")[0] for t in choice_texts(page, "G")]
+        words = {2: "Two", 3: "Three", 4: "Four"}
+        offer = {2: "DoubleUp", 3: "TripleUp", 4: "QuadUp"}.get(n)
+        want = ["One of David's CruiseNext credits: $250 toward the cruise, you pay David $125"]
+        want += [f"{words[k]} of David's CruiseNext credits (NCL's {offer} offer): ${250 * k:,} toward the cruise, you pay David ${125 * k:,}" for k in range(2, n + 1)]
+        same(f"Make Selection, {name}: NCL's deposit and one to {n} credits", texts[1:], want)
+        fine = page.eval_on_selector_all("#msMath [data-booking='G'] .ms-choice",
+                                         "els => els.map(e => [e.querySelector('input').value, (e.querySelector('.ms-fine') || {}).innerText || null])")
+        same(f"Make Selection, {name}: the fine print line only under the 3 and 4 credit choices", fine,
+             [["ncl", None]] + [[f"credit{k}", {3: "NCL's fine print still mentions two credits. David will confirm the third with NCL before booking.",
+                                                4: "NCL's fine print still mentions two credits. David will confirm the third and fourth with NCL before booking."}.get(k)]
+                                for k in range(1, n + 1)])
+        explain = page.inner_text("#msMath .ms-explain")
+        sentence = (None if n == 1 else f"On a Balcony or higher cabin, while NCL's {offer} offer is running, you can use "
+                    f"{'two' if n == 2 else 'up to ' + words[n].lower()}: ${250 * n:,} toward your cruise for ${125 * n:,}.")
+        same(f"Make Selection, {name}: the explainer's offer sentence", sentence in explain if sentence else "offer is running" in explain, bool(sentence))
+        check(f"Make Selection, {name}: no hard-coded DoubleUp or two", n == 2 or ("DoubleUp" not in page.inner_text("#msDialog")), explain)
+        page.check(f"input[name='msDepG'][value='credit{n}']")
+        rows = booking_rows(page, "G")
+        same(f"Make Selection, {name}: {n} x $250 off, pay David ${125 * n:,}", [rows[-4], rows[-1]],
+             [(f"CruiseNext {'credits' if n > 1 else 'credit'} toward the cruise: {n} x $250", f"−${250 * n:,}"), ("Pay David for the credits", f"${125 * n:,}")])
+        same(f"Make Selection, {name}: the note about the offer ending", (page.is_visible("#msTwoNote"), page.inner_text("#msTwoNote") if n > 1 else ""),
+             (n > 1, f"If NCL ends its {offer} offer before the booking is made, only one credit can be used." if n > 1 else ""))
+        if n > 1:   # back to fewer credits: the math follows
+            page.check("input[name='msDepG'][value='credit1']")
+            same(f"Make Selection, {name}: back to one credit", booking_rows(page, "G")[-4], ("CruiseNext credit toward the cruise: 1 x $250", "−$250"))
+            check(f"Make Selection, {name}: the note hides with one credit", not page.is_visible("#msTwoNote"))
+            page.check(f"input[name='msDepG'][value='credit{n}']")
+        check(f"Make Selection, {name}: no sideways scrolling at 360 px", wide(page) <= 360 and dialog_fits(page), wide(page))
+        if SHOTS:
+            page.screenshot(path=os.path.join(SHOTS, f"make_selection_{n}_credits_360.png"), full_page=False)
+        if n == 3:   # the request carries the number and the offer's name
+            fill_guests(page, [None, None])
+            page.fill("#g0_latitudes", "123456789")
+            page.fill("#msName", "Test Sender")
+            page.fill("#msEmail", "sender@example.com")
+            page.click("#msSend")
+            page.wait_for_selector(".ms-status.ok")
+            b0 = ((sent[0] if sent else {}).get("bookings") or [{}])[0]
+            same("Make Selection, TripleUp send: credit3, 3 credits, the offer's name, $750, pay David $375",
+                 (b0.get("deposit_choice"), b0.get("credits"), b0.get("credit_offer"), b0.get("credit_value"), b0.get("pay_david")),
+                 ("credit3", 3, "TripleUp!", 750, 375))
+        check(f"Make Selection, {name}: no script errors", not errs, errs[:3])
         page.close()
 
     # 3. Haven on the Aura: NCL's 10% rule, a credit covers part of the deposit.
