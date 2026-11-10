@@ -1,28 +1,39 @@
 {
- "schema_version": 1,
- "saved_at": "2026-11-09T10:20:54Z",
- "checked_on": "2026-11-09",
+ "schema_version": 2,
+ "saved_at": "2026-11-10T10:20:55Z",
+ "checked_on": "2026-11-10",
  "source": "https://www.ncl.com/cruise-deals/cruisenext",
  "read_ok": true,
  "warnings": [],
- "doubleup": {
-  "listed": false,
-  "title": null,
-  "text": null,
-  "types": null,
-  "min_days": null,
+ "multi_credit": {
+  "listed": true,
+  "title": "Limited-Time Offer: TripleUp!",
+  "name": "TripleUp!",
+  "credits": 3,
+  "text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply THREE CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
+  "types": [
+   "BALCONY",
+   "MINISUITE",
+   "SUITE",
+   "HAVEN"
+  ],
+  "min_days": 90,
   "min_months": null,
-  "read_on": "2026-11-09",
-  "since": "2026-11-06"
+  "read_on": "2026-11-10",
+  "since": "2026-11-10"
  },
  "last_change": {
-  "kind": "ended",
-  "on": "2026-11-06",
+  "kind": "changed",
+  "on": "2026-11-10",
   "old_listed": true,
+  "old_name": "DoubleUp!",
+  "old_credits": 2,
   "old_text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply TWO CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
-  "new_listed": false,
-  "new_text": null,
-  "marker": "doubleup-04e33a276287",
+  "new_listed": true,
+  "new_name": "TripleUp!",
+  "new_credits": 3,
+  "new_text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply THREE CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
+  "marker": "offer-07f6731e299b",
   "reported": true
  }
 }
