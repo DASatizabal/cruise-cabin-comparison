@@ -1,6 +1,6 @@
 {
  "schema_version": 4,
- "saved_at": "2026-11-11T10:22:18Z",
+ "saved_at": "2026-11-12T10:22:19Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   2,
@@ -14,14 +14,14 @@
    "child_per_day": 40.0,
    "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; 2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. Includes prepaid service charges.",
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-11-11"
+   "checked_at": "2026-11-12"
   },
   "open_bar": {
    "per_day_2_to_5_nights": 32.0,
    "per_day_6_plus_nights": 28.5,
    "soda_per_day": 12.5,
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-11-11"
+   "checked_at": "2026-11-12"
   },
   "service_charge": {
    "suite_haven_per_night": 25.0,
@@ -32,7 +32,7 @@
     "HAVEN"
    ],
    "source": "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge",
-   "checked_at": "2026-11-11"
+   "checked_at": "2026-11-12"
   }
  },
  "rate_warnings": [],
@@ -44,7 +44,7 @@
   ],
   "source": "https://www.ncl.com/terms#payment-deposit-schedule",
   "percent_of_fare": 10,
-  "confirmed_on": "2026-11-11",
+  "confirmed_on": "2026-11-12",
   "confirmed_by": "aura-2027-06-14 H6 at 5 guests"
  },
  "checks": {
@@ -62,16 +62,16 @@
     "sailing": "getaway-2027-06-11",
     "guests": 3,
     "category": "IX",
-    "expected": 1305,
-    "ncl_total": 1305,
+    "expected": 1255,
+    "ncl_total": 1255,
     "ok": true
    },
    {
     "sailing": "getaway-2027-06-11",
     "guests": 4,
     "category": "IX",
-    "expected": 1720,
-    "ncl_total": 1720,
+    "expected": 1620,
+    "ncl_total": 1620,
     "ok": true
    },
    {
@@ -120,8 +120,8 @@
     "sailing": "getaway-2027-06-11",
     "party": "1 adult, 15, 7",
     "category": "IX",
-    "expected": 1130.5,
-    "ncl_total": 1130.5,
+    "expected": 1080.5,
+    "ncl_total": 1080.5,
     "ok": true
    },
    {
@@ -265,33 +265,33 @@
     ],
     "duration": 3,
     "sail_start": "2027-06-11T00:00:00",
-    "checked_at": "2026-11-11T10:20:57Z"
+    "checked_at": "2026-11-12T10:21:00Z"
    },
    "depart": "2027-06-11",
    "return": "2027-06-14",
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-11-11",
+   "saved_at": "2026-11-12",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-11-11T10:20:57Z",
+     "as_of": "2026-11-12T10:21:00Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-11-11T10:20:57Z",
+     "as_of": "2026-11-12T10:21:00Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-11-11T10:20:57Z",
+     "as_of": "2026-11-12T10:21:00Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-11-11T10:20:57Z",
+     "as_of": "2026-11-12T10:21:00Z",
      "why": null
     }
    },
@@ -303,14 +303,14 @@
      "soda_under_21_position_2": 37.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-11-11"
+     "checked_at": "2026-11-12"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 1 Meal",
      "per_guest": 20,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-11-11"
+     "checked_at": "2026-11-12"
     }
    },
    "kids_sail_free": null,
@@ -348,14 +348,14 @@
     "source": "NCL price-summary paymentOptions",
     "final_payment_due": "2027-02-11",
     "standard_deposit_per_guest": 50.0,
-    "standard_deposit_checked_at": "2026-11-11",
+    "standard_deposit_checked_at": "2026-11-12",
     "by_guests": {
      "2": {
       "deposit": 100.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-11T10:20:57Z",
+      "as_of": "2026-11-12T10:21:00Z",
       "why": null
      },
      "3": {
@@ -363,7 +363,7 @@
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-11T10:20:57Z",
+      "as_of": "2026-11-12T10:21:00Z",
       "why": null
      },
      "4": {
@@ -371,7 +371,7 @@
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-11T10:20:57Z",
+      "as_of": "2026-11-12T10:21:00Z",
       "why": null
      },
      "5": {
@@ -379,7 +379,7 @@
       "deposit_type": "OCEANVIEW",
       "deposit_category": "O5",
       "due_hours": 90,
-      "as_of": "2026-11-11T10:20:57Z",
+      "as_of": "2026-11-12T10:21:00Z",
       "why": null
      }
     },
@@ -389,7 +389,7 @@
      "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
      "codes": [],
      "types": [],
-     "checked_at": "2026-11-11T10:20:57Z"
+     "checked_at": "2026-11-12T10:21:00Z"
     }
    },
    "price_summaries": [
@@ -431,11 +431,11 @@
      "type": "INSIDE",
      "category": "IX",
      "fare_code": "ALL4CHO",
-     "fare_total": 507,
+     "fare_total": 457,
      "fare_per_guest": [
       179,
       179,
-      149
+      99
      ],
      "taxes_per_guest": [
       150,
@@ -458,7 +458,7 @@
        20
       ]
      },
-     "grand_total": 1305,
+     "grand_total": 1255,
      "deposit": 150.0,
      "deposit_due_hours": 90,
      "final_payment_due": "2027-02-11"
@@ -468,12 +468,12 @@
      "type": "INSIDE",
      "category": "IX",
      "fare_code": "ALL4CHO",
-     "fare_total": 656,
+     "fare_total": 556,
      "fare_per_guest": [
       179,
       179,
-      149,
-      149
+      99,
+      99
      ],
      "taxes_per_guest": [
       150,
@@ -499,7 +499,7 @@
        20
       ]
      },
-     "grand_total": 1720,
+     "grand_total": 1620,
      "deposit": 200.0,
      "deposit_due_hours": 90,
      "final_payment_due": "2027-02-11"
@@ -619,16 +619,16 @@
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 319.0,
-         "cabin_total": 957,
-         "added_vs_2": 299
+         "price_pp": 302.33,
+         "cabin_total": 907,
+         "added_vs_2": 249
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 314.0,
-         "cabin_total": 1256,
-         "added_vs_2": 598
+         "price_pp": 289.0,
+         "cabin_total": 1156,
+         "added_vs_2": 498
         },
         "5": {
          "available": false,
@@ -659,16 +659,16 @@
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 332.33,
-         "cabin_total": 997,
-         "added_vs_2": 299
+         "price_pp": 315.66,
+         "cabin_total": 947,
+         "added_vs_2": 249
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 324.0,
-         "cabin_total": 1296,
-         "added_vs_2": 598
+         "price_pp": 299.0,
+         "cabin_total": 1196,
+         "added_vs_2": 498
         },
         "5": {
          "available": false,
@@ -706,16 +706,16 @@
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 339.0,
-         "cabin_total": 1017,
-         "added_vs_2": 299
+         "price_pp": 322.33,
+         "cabin_total": 967,
+         "added_vs_2": 249
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 329.0,
-         "cabin_total": 1316,
-         "added_vs_2": 598
+         "price_pp": 304.0,
+         "cabin_total": 1216,
+         "added_vs_2": 498
         },
         "5": {
          "available": false,
@@ -753,16 +753,16 @@
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 345.66,
-         "cabin_total": 1037,
-         "added_vs_2": 299
+         "price_pp": 329.0,
+         "cabin_total": 987,
+         "added_vs_2": 249
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 334.0,
-         "cabin_total": 1336,
-         "added_vs_2": 598
+         "price_pp": 309.0,
+         "cabin_total": 1236,
+         "added_vs_2": 498
         },
         "5": {
          "available": false,
@@ -800,9 +800,9 @@
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 352.33,
-         "cabin_total": 1057,
-         "added_vs_2": 299
+         "price_pp": 335.66,
+         "cabin_total": 1007,
+         "added_vs_2": 249
         },
         "4": {
          "available": false,
@@ -846,16 +846,16 @@
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 359.0,
-         "cabin_total": 1077,
-         "added_vs_2": 299
+         "price_pp": 342.33,
+         "cabin_total": 1027,
+         "added_vs_2": 249
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 344.0,
-         "cabin_total": 1376,
-         "added_vs_2": 598
+         "price_pp": 319.0,
+         "cabin_total": 1276,
+         "added_vs_2": 498
         },
         "5": {
          "available": false,
@@ -2135,32 +2135,27 @@
        "title": "The Haven Deluxe Owner's Suite with Large Balcony",
        "guarantee": false,
        "solo": false,
-       "capacity": 4,
+       "capacity": null,
        "by_guests": {
         "2": {
-         "available": true,
-         "sold_out": false,
-         "price_pp": 3919.0,
-         "cabin_total": 7838
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
         },
         "3": {
-         "available": true,
-         "sold_out": false,
-         "price_pp": 2745.66,
-         "cabin_total": 8237,
-         "added_vs_2": 399
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
         },
         "4": {
-         "available": true,
-         "sold_out": false,
-         "price_pp": 2159.0,
-         "cabin_total": 8636,
-         "added_vs_2": 798
+         "available": false,
+         "sold_out": true,
+         "reason": "Sold out"
         },
         "5": {
          "available": false,
-         "sold_out": false,
-         "reason": "Holds only 4 guests"
+         "sold_out": true,
+         "reason": "Sold out"
         }
        },
        "description": "The Haven Deluxe Owner's Suite with Large Balcony, Deck 16, forward",
@@ -2195,33 +2190,33 @@
     ],
     "duration": 5,
     "sail_start": "2027-06-14T00:00:00",
-    "checked_at": "2026-11-11T10:21:36Z"
+    "checked_at": "2026-11-12T10:21:41Z"
    },
    "depart": "2027-06-14",
    "return": "2027-06-19",
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-11-11",
+   "saved_at": "2026-11-12",
    "party_sizes": {
     "2": {
      "updated": true,
-     "as_of": "2026-11-11T10:21:36Z",
+     "as_of": "2026-11-12T10:21:41Z",
      "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-11-11T10:21:36Z",
+     "as_of": "2026-11-12T10:21:41Z",
      "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-11-11T10:21:36Z",
+     "as_of": "2026-11-12T10:21:41Z",
      "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-11-11T10:21:36Z",
+     "as_of": "2026-11-12T10:21:41Z",
      "why": null
     }
    },
@@ -2233,14 +2228,14 @@
      "soda_under_21_position_2": 62.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-11-11"
+     "checked_at": "2026-11-12"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 2 Meals",
      "per_guest": 40,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-11-11"
+     "checked_at": "2026-11-12"
     }
    },
    "kids_sail_free": null,
@@ -2286,14 +2281,14 @@
     "source": "NCL price-summary paymentOptions",
     "final_payment_due": "2027-02-14",
     "standard_deposit_per_guest": 50.0,
-    "standard_deposit_checked_at": "2026-11-11",
+    "standard_deposit_checked_at": "2026-11-12",
     "by_guests": {
      "2": {
       "deposit": 100.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-11T10:21:36Z",
+      "as_of": "2026-11-12T10:21:41Z",
       "why": null
      },
      "3": {
@@ -2301,7 +2296,7 @@
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-11T10:21:36Z",
+      "as_of": "2026-11-12T10:21:41Z",
       "why": null
      },
      "4": {
@@ -2309,7 +2304,7 @@
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-11T10:21:36Z",
+      "as_of": "2026-11-12T10:21:41Z",
       "why": null
      },
      "5": {
@@ -2317,7 +2312,7 @@
       "deposit_type": "HAVEN",
       "deposit_category": "H6",
       "due_hours": 23,
-      "as_of": "2026-11-11T10:21:36Z",
+      "as_of": "2026-11-12T10:21:41Z",
       "why": null
      }
     },
@@ -2327,7 +2322,7 @@
      "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
      "codes": [],
      "types": [],
-     "checked_at": "2026-11-11T10:21:36Z"
+     "checked_at": "2026-11-12T10:21:41Z"
     }
    },
    "price_summaries": [

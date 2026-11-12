@@ -1,17 +1,20 @@
 {
  "schema_version": 2,
- "saved_at": "2026-11-11T10:20:57Z",
- "checked_on": "2026-11-11",
+ "saved_at": "2026-11-12T10:20:58Z",
+ "checked_on": "2026-11-12",
  "source": "https://www.ncl.com/cruise-deals/cruisenext",
  "read_ok": true,
  "warnings": [],
  "multi_credit": {
   "listed": true,
-  "title": "Limited-Time Offer: TripleUp!",
-  "name": "TripleUp!",
-  "credits": 3,
-  "text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply THREE CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
+  "title": "Limited-Time Offer: DoubleUp!",
+  "name": "DoubleUp!",
+  "credits": 2,
+  "text": "Book ANY stateroom on any sailing at least 90 days prior to sailing and apply TWO CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
   "types": [
+   "STUDIO",
+   "INSIDE",
+   "OCEANVIEW",
    "BALCONY",
    "MINISUITE",
    "SUITE",
@@ -19,21 +22,21 @@
   ],
   "min_days": 90,
   "min_months": null,
-  "read_on": "2026-11-11",
-  "since": "2026-11-10"
+  "read_on": "2026-11-12",
+  "since": "2026-11-12"
  },
  "last_change": {
   "kind": "changed",
-  "on": "2026-11-10",
+  "on": "2026-11-12",
   "old_listed": true,
-  "old_name": "DoubleUp!",
-  "old_credits": 2,
-  "old_text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply TWO CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
+  "old_name": "TripleUp!",
+  "old_credits": 3,
+  "old_text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply THREE CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
   "new_listed": true,
-  "new_name": "TripleUp!",
-  "new_credits": 3,
-  "new_text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply THREE CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
-  "marker": "offer-07f6731e299b",
+  "new_name": "DoubleUp!",
+  "new_credits": 2,
+  "new_text": "Book ANY stateroom on any sailing at least 90 days prior to sailing and apply TWO CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
+  "marker": "offer-356d9e861ab8",
   "reported": true
  }
 }
