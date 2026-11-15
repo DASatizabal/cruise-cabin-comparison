@@ -545,3 +545,125 @@ test("booking: three credits with NCL's TripleUp offer (5.3.0); credits must mat
     assert.equal((await post(worker, env, "/booking", bad(k))).status, 400, JSON.stringify(k));
   }
 });
+
+// ---------- 1 guest (5.4.0, solo travelers) ----------
+// The prices with 1 guest prices shaped like NCL's answers in the probe of 2026-11-15 (solo cabins
+// priced for one; a regular cabin for 1 guest at twice its per guest fare for 2 guests, plus taxes
+// for one), as tools/test_tools.py's schema5 makes them for the Python tests.
+const PROBE_SOLO = { getaway: { T1: 539, IT: 509, OT: 569, BT: 639 }, aura: { T1: 2089, IT: null, OT: null, BT: 3109 } };
+function withOneGuest(over = () => {}) {
+  return pricesWith((p, g, a) => {
+    p.schema_version = 5;
+    for (const s of [g, a]) {
+      const tax = s.taxes_per_guest;
+      s.party_sizes = { "1": { updated: true, checked: true, as_of: s.party_sizes["2"].as_of, why: null }, ...s.party_sizes };
+      for (const { c } of cats(s)) {
+        const two = c.by_guests["2"];
+        let one;
+        if (c.solo) {
+          const price = PROBE_SOLO[s.id.split("-")[0]][c.code];
+          one = price ? { available: true, sold_out: false, price_pp: price, cabin_total: price } : { available: false, sold_out: true, reason: "Sold out" };
+        } else if (two.available) {
+          const pp = Math.round((2 * (two.price_pp - tax) + tax) * 100) / 100;
+          one = { available: true, sold_out: false, price_pp: pp, cabin_total: Math.round(pp) };
+        } else one = { available: false, sold_out: two.sold_out, reason: "Sold out for this party size" };
+        c.by_guests = { "1": one, ...c.by_guests };
+      }
+    }
+    over(p, g, a);
+  });
+}
+const soloIT = s => cats(s).find(({ c }) => c.code === "IT").c;
+
+test("1 guest watch: a solo cabin, the drop per guest is the whole cabin, singular wording; florida true refused", async () => {
+  const { db, env } = fresh();
+  const P = withOneGuest();
+  files({ prices: P });
+  const g1 = P.sailings.find(s => s.id.startsWith("getaway"));
+  const r = await post(worker, env, "/watch", watchBody({ guests: 1, cabin: "IT" }));
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  const m = lastMail();
+  assert.ok(m.body.includes("1 guest, website price"), m.body);
+  assert.ok(m.body.includes("an email when the price drops by at least $20 per guest ($20 for the cabin)"), m.body);
+  assert.ok(m.body.includes("an email if it is no longer available for 1 guest"), m.body);
+  assert.equal(db.rows("watches")[0].baseline, soloIT(g1).by_guests["1"].cabin_total);
+  const fl = await post(worker, env, "/watch", watchBody({ guests: 1, cabin: "IT", florida: true }));
+  assert.deepEqual([fl.status, fl.body.error, fl.body.message], [400, "florida", "Florida resident prices aren't checked for 1 guest, so only the website price can be watched."]);
+  // The Florida resident price at 2 guests still takes the discount; at 1 guest never.
+  files({ prices: P, florida: floridaFile({ [GB.code]: 60 }) });
+  const regular = catIn(g1, GB.code);
+  assert.equal(worker.__t.priceNow({ prices: P, counts: null, florida: floridaFile({ [GB.code]: 60 }) },
+               { ship: "G", code: GB.code, guests: 1, florida: true }, NOW).price, regular.by_guests["1"].cabin_total);
+});
+
+test("1 guest watch: no usable 1 guest prices (a file from before 5.4.0, or not checked today) is refused, never sold out", async () => {
+  const { db, env } = fresh();
+  files();   // the committed schema 4 file: no party size 1
+  let r = await post(worker, env, "/watch", watchBody({ guests: 1, cabin: GB.code }));
+  assert.deepEqual([r.status, r.body.error, r.body.message], [400, "unchecked", "Prices for 1 guest show after the next daily refresh."]);
+  // A confirmed 1 guest watch, then a day where party size 1 is not checked: skipped, no sold out email.
+  files({ prices: withOneGuest() });
+  await started(env, { guests: 1, cabin: "IT" });
+  await worker.__t.runChecks(env, NOW);
+  const sends = net.mails.length;
+  const notChecked = withOneGuest((p, g) => {
+    g.party_sizes["1"] = { updated: false, checked: false, as_of: null, why: "test" };
+    for (const { c } of cats(g)) c.by_guests["1"] = { available: false, sold_out: false, reason: "Not checked today" };
+  });
+  files({ prices: notChecked });
+  const c = await worker.__t.runChecks(env, NOW);
+  assert.deepEqual([c.sent, net.mails.length - sends, db.rows("watches")[0].sold_out_sent], [0, 0, 0], "not checked is never sold out");
+  files({ prices: PRICES });   // back to a file without 1 guest prices: skipped too
+  assert.equal((await worker.__t.runChecks(env, NOW)).sent, 0);
+  assert.equal(db.rows("watches")[0].sold_out_sent, 0);
+});
+
+test("1 guest watch: a real drop and a real sell out at 1 guest; few left from the 1 guest counts", async () => {
+  const { db, env } = fresh();
+  files({ prices: withOneGuest() });
+  await started(env, { guests: 1, cabin: "IT", drop_pp: 20 });
+  await worker.__t.runChecks(env, NOW);
+  const was = db.rows("watches")[0].baseline;
+  files({ prices: withOneGuest((p, g) => { soloIT(g).by_guests["1"].cabin_total = was - 20; }) });
+  let r = await worker.__t.runChecks(env, NOW);
+  assert.equal(r.sent, 1);
+  assert.ok(lastMail().body.includes(`$20 less ($20 per guest)`), lastMail().body);
+  const counts = countsFile();
+  counts.sailings[getaway.id].IT = { open_decks: [5], open_locations: ["forward"], by_guests: { "1": { cabins_left: 4, reliable: true, why: null, checked_at: hoursAgo(1) } } };
+  files({ prices: withOneGuest((p, g) => { soloIT(g).by_guests["1"].cabin_total = was - 20; }), counts });
+  r = await worker.__t.runChecks(env, NOW);
+  assert.equal(r.sent, 1);
+  assert.ok(lastMail().body.includes("Only 4 of these cabins left for 1 guest"), lastMail().body);
+  files({ prices: withOneGuest((p, g) => { soloIT(g).by_guests["1"] = { available: false, sold_out: true, reason: "Sold out" }; }), counts });
+  r = await worker.__t.runChecks(env, NOW);
+  assert.equal(r.sent, 1);
+  assert.ok(lastMail().body.includes("No longer available for 1 guest (NCL: Sold out)"), lastMail().body);
+});
+
+test("1 guest booking: one guest, the Florida question in the singular, NCL's deposit for 1 guest, the solo cabin line", async () => {
+  const { env } = fresh();
+  files();
+  const one = bookingBody({ party: { adults: 1, kid_ages: [] }, florida: { residents: true, address: { street: "1 Test Street", city: "Miami", state: "FL", zip: "33101" } } });
+  one.guests = [one.guests[0]];
+  Object.assign(one.bookings[0], { cabin_type: "Inside", category: "IT", description: "Solo Inside, Decks 5 and 9", total: 625,
+    lines: [{ item: "Cruise fare", value: "$359" }, { item: "Taxes, fees and port expenses: 1 x $150", value: "$150" }],
+    onboard: [], deposit_choice: "ncl", credits: 0, credit_value: 0, due_at_booking: 50, balance: 575, pay_david: 0,
+    ncl_deposit: { amount: 50, rule: "for 1 guest", due_hours: 84, offer: "2-For-1 Deposits" } });
+  const sends = net.mails.length;
+  const r = await post(worker, env, "/booking", one);
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  const [toDavid, copy] = net.mails.slice(sends);
+  for (const body of [toDavid.body, copy.body]) {
+    for (const x of ["Party: 1 adult", "Is guest 1 a Florida resident? Yes (Florida resident prices aren't checked for 1 guest, so the answer doesn't change the price.)",
+                     "Cabin: Inside: Solo Inside, Decks 5 and 9 (IT). A solo cabin can't add a second guest later.",
+                     "Deposit: NCL's deposit: $50 for 1 guest, due within 84 hours of booking, with NCL's 2-For-1 Deposits offer"]) assert.ok(body.includes(x), x + "\n" + body);
+    assert.ok(!body.includes("guest 2") && !body.includes("Guest 2"), body);
+  }
+  // A regular cabin for 1 guest has no solo line.
+  one.bookings[0].category = "IF";
+  await post(worker, env, "/booking", one);
+  assert.ok(!lastMail().body.includes("A solo cabin"), lastMail().body);
+  // The party must match the guests: 1 adult with 2 guests listed is refused.
+  const bad = bookingBody({ party: { adults: 1, kid_ages: [] } });
+  assert.equal((await post(worker, env, "/booking", bad)).status, 400);
+});

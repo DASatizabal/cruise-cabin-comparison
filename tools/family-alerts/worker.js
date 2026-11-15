@@ -40,6 +40,12 @@ const OPTIONS = {
   8: { label: "Option 3: 8 nights", ships: ["G", "A"] },
 };
 const SHIP_NAMES = { G: "Norwegian Getaway", A: "Norwegian Aura" };
+// 5.4.0: 1 guest (solo travelers). Florida resident prices are checked for 2 guests only, so a
+// watch for 1 guest watches the website price. Solo cabins hold one guest.
+const SOLO_CODES = ["T1", "IT", "OT", "BT"];
+const SOLO_NO_SECOND = "A solo cabin can't add a second guest later.";
+const ONE_LATER = "Prices for 1 guest show after the next daily refresh.";
+const guestsText = n => plural(n, "guest", "guests");
 const MAX_WATCHES = 10;        // watches per email address (started or waiting for the link)
 const MAX_NEW_PER_DAY = 3;     // unconfirmed watches per email address in 24 hours
 const CONFIRM_HOURS = 48;      // an unconfirmed watch is deleted after this
@@ -203,14 +209,17 @@ function priceNow(data, w, now) {
   const found = ship && findCategory(ship, w.code);
   const e = found && found.cat.by_guests && found.cat.by_guests[String(n)];
   const ps = ship && ship.party_sizes && ship.party_sizes[String(n)];
+  // 5.4.0: a party size the file doesn't have (1 guest before 5.4.0) or didn't check today counts as
+  // not updated, so it is never read as sold out.
   const p = { ship, cat: found ? found.cat : null, type: found ? found.type : null,
-              updated: !!ship && !(ps && ps.updated === false),
+              updated: !!ship && !!ps && ps.updated !== false && ps.checked !== false, usable: !!ps && ps.checked !== false,
               available: !!(e && e.available && Number.isFinite(e.cabin_total)),
               reason: !found ? "no longer on NCL's list" : e && e.reason ? e.reason : "not available", price: null };
   if (p.available) {
     const taxes = Number.isFinite(ship.taxes_per_guest) ? ship.taxes_per_guest * n : null;
     const fare = taxes === null ? e.cabin_total : e.cabin_total - taxes;
-    p.price = cents(e.cabin_total - (w.florida ? Math.min(flOff(data.florida, ship, found.cat.code, now) * Math.min(n, 2), fare) : 0));
+    // Florida resident prices are checked for 2 guests: nothing comes off at 1 guest (5.4.0).
+    p.price = cents(e.cabin_total - (w.florida && n > 1 ? Math.min(flOff(data.florida, ship, found.cat.code, now) * Math.min(n, 2), fare) : 0));
   }
   return p;
 }
@@ -220,13 +229,13 @@ function watchLabel(p, w) {
   return [`${OPTIONS[w.option].label}${w.option === "8" ? `, the ${p.ship.ship_short} cabin` : ""}`,
           `${p.ship.ship}, ${fmtDay(p.ship.depart)} to ${fmtIso(p.ship.return)} (${plural(p.ship.nights, "night", "nights")})`,
           `Cabin: ${p.cat.description || p.cat.title} (${p.cat.code})${p.cat.guarantee ? `. ${GUARANTEE_TEXT}` : ""}`,
-          `${w.guests} guests, ${w.florida ? "Florida resident price (when NCL offers one on this cabin)" : "website price"}`].join("\n");
+          `${guestsText(w.guests)}, ${w.florida ? "Florida resident price (when NCL offers one on this cabin)" : "website price"}`].join("\n");
 }
 // The person's choices, in words (emails and the page's manage list say the same).
 function choicesText(w) {
   return [`an email when the price drops by at least ${money(w.drop_pp)} per guest (${money(w.drop_pp * w.guests)} for the cabin)`,
           w.few ? `an email when fewer than ${FEW_LEFT} of these cabins are left` : null,
-          w.sold_out ? `an email if it is no longer available for ${w.guests} guests` : null,
+          w.sold_out ? `an email if it is no longer available for ${guestsText(w.guests)}` : null,
           w.frequency === "daily" ? "at most one email a day, in the morning" : "emails as soon as a check finds something (prices are checked twice a day)"].filter(Boolean);
 }
 const rowWatch = row => ({ option: row.option, ship: row.ship, code: row.code, guests: row.guests, florida: !!row.florida,
@@ -283,11 +292,12 @@ async function startWatch(env, body, req) {
   const opt = OPTIONS[body.option];
   const n = body.guests;
   if (!opt || !opt.ships.includes(body.ship) || typeof body.cabin !== "string" || !/^[A-Z0-9]{1,4}$/.test(body.cabin) ||
-      !Number.isInteger(n) || n < 2 || n > 5 || typeof body.florida !== "boolean" || typeof body.few !== "boolean" ||
+      !Number.isInteger(n) || n < 1 || n > 5 || typeof body.florida !== "boolean" || typeof body.few !== "boolean" ||
       typeof body.sold_out !== "boolean" || !["now", "daily"].includes(body.frequency)) return refuse(...BAD);
   if (typeof body.drop_pp !== "number" || !Number.isFinite(body.drop_pp) || body.drop_pp < DROP_MIN || body.drop_pp > DROP_MAX) {
     return refuse("drop", `Choose a drop from ${money(DROP_MIN)} to ${money(DROP_MAX)} per guest.`);
   }
+  if (n === 1 && body.florida) return refuse("florida", "Florida resident prices aren't checked for 1 guest, so only the website price can be watched.");
   const page = pageFor(body.page, req.origin);
   if (!page) return refuse(...BAD);
   if (!(await turnstileOk(env, body.turnstile, req.ip))) return refuse("check", "The check above the button didn't pass. Please try it again.");
@@ -299,7 +309,8 @@ async function startWatch(env, body, req) {
               few: body.few, sold_out: body.sold_out, frequency: body.frequency };
   const p = priceNow(data, w, now);
   if (!p.cat) return refuse("cabin", "That cabin isn't on NCL's list today, so there is no price to watch. Please reload the page.");
-  if (p.price === null) return refuse("unavailable", `That cabin isn't available for ${n} guests today, so there is no price to watch.`);
+  if (!p.usable) return refuse("unchecked", ONE_LATER);
+  if (p.price === null) return refuse("unavailable", `That cabin isn't available for ${guestsText(n)} today, so there is no price to watch.`);
   if (p.cat.guarantee) w.few = false;   // NCL doesn't show how many Guarantee cabins are left
 
   const day = new Date(now.getTime() - 86400000).toISOString(), live = new Date(now.getTime() - CONFIRM_HOURS * 3600000).toISOString();
@@ -421,7 +432,7 @@ function evaluate(data, row, now) {
   const items = [], set = {};
   if (!p.available) {
     if (w.sold_out && !row.sold_out_sent) {
-      items.push(`No longer available for ${n} guests (NCL: ${p.reason}). You won't get this email again; the watch stays on in case it comes back.`);
+      items.push(`No longer available for ${guestsText(n)} (NCL: ${p.reason}). You won't get this email again; the watch stays on in case it comes back.`);
       set.sold_out_sent = 1;
     }
     return { items, set, drop: false };
@@ -435,7 +446,7 @@ function evaluate(data, row, now) {
     const c = data.counts.sailings[p.ship.id] && data.counts.sailings[p.ship.id][p.cat.code];
     const g = c && c.by_guests && c.by_guests[String(n)];
     if (g && g.reliable && Number.isInteger(g.cabins_left) && g.cabins_left >= 1 && g.cabins_left < FEW_LEFT) {
-      items.push(`Only ${g.cabins_left} of these cabins left for ${n} guests (cabins left as of ${fmtIso(easternDay(new Date(data.counts.saved_at)))}). You won't get this email again.`);
+      items.push(`Only ${g.cabins_left} of these cabins left for ${guestsText(n)} (cabins left as of ${fmtIso(easternDay(new Date(data.counts.saved_at)))}). You won't get this email again.`);
       set.few_sent = 1;
     }
   }
@@ -538,7 +549,7 @@ function readBooking(b) {
   const adults = int(party.adults, 1, 5);
   const kids = list(party.kid_ages, 0, 4).map(a => int(a, 0, 20));
   const total = adults + kids.length;
-  if (total < 2 || total > 5) fail();
+  if (total < 1 || total > 5) fail();
   const option = oneOf(b.option, Object.values(OPTIONS).map(o => o.label));
   const fl = obj(b.florida);
   const residents = bool(fl.residents);
@@ -605,7 +616,7 @@ function depositText(k) {
   }
   const d = k.deposit;
   if (!d || d.amount === null) return "NCL's deposit (not found on NCL today; David will confirm it)";
-  return `NCL's deposit: ${money(d.amount)}${d.rule ? ` (${d.rule})` : ""}${d.hours ? `, due within ${d.hours} hours of booking` : ""}${d.offer ? `, with NCL's ${d.offer} offer` : ""}`;
+  return `NCL's deposit: ${money(d.amount)}${d.rule === "for 1 guest" ? " for 1 guest" : d.rule ? ` (${d.rule})` : ""}${d.hours ? `, due within ${d.hours} hours of booking` : ""}${d.offer ? `, with NCL's ${d.offer} offer` : ""}`;
 }
 const dueText = k => k.balance_due === "when booking" ? "due when booking" : k.balance_due ? `due by ${fmtIso(k.balance_due)}` : "due by NCL's final payment date (not found on NCL today)";
 
@@ -619,11 +630,13 @@ function bookingText(b, full) {
   out.push("", CHANGE_TEXT, "", `Option: ${b.option}`, `Party: ${partyText(b.party)}`,
            `Prepay gratuities on the page: ${b.prepay ? "yes" : "no, service charges are paid onboard"}`,
            `Florida resident rate switch on the page: ${b.flSwitch ? "on" : "off"}`,
-           `Are guest 1 and guest 2 Florida residents? ${b.residents ? "Yes" : "No"}`);
+           b.guests.length === 1
+             ? `Is guest 1 a Florida resident? ${b.residents ? "Yes" : "No"} (Florida resident prices aren't checked for 1 guest, so the answer doesn't change the price.)`
+             : `Are guest 1 and guest 2 Florida residents? ${b.residents ? "Yes" : "No"}`);
   if (b.address && mine) out.push(`Guest 1's Florida home address: ${b.address.street}, ${b.address.city}, ${b.address.state} ${b.address.zip}`);
   b.bookings.forEach((k, i) => {
     out.push("", `${b.bookings.length > 1 ? `Booking ${i + 1}: ` : ""}${k.ship}, ${fmtDay(k.depart)} to ${fmtIso(k.return)} (${plural(k.nights, "night", "nights")})`,
-             `Cabin: ${k.cabin_type}: ${k.description} (${k.category})${k.guarantee ? `. ${GUARANTEE_TEXT}` : ""}`,
+             `Cabin: ${k.cabin_type}: ${k.description} (${k.category})${k.guarantee ? `. ${GUARANTEE_TEXT}` : ""}${b.guests.length === 1 && SOLO_CODES.includes(k.category) ? `. ${SOLO_NO_SECOND}` : ""}`,
              `Free at Sea: Unlimited Open Bar ${yes(k.free_at_sea.bar)}, Specialty Dining ${yes(k.free_at_sea.dining)}, Free at Sea Plus ${yes(k.free_at_sea.plus)}`);
     out.push(...k.lines.map(x => `${x.item}: ${x.value}`), `Total: ${amount(k.price)}`);
     if (k.onboard.length) out.push(...k.onboard.map(x => `${x.item}: ${x.value}`), "  Can be removed at Guest Services.");

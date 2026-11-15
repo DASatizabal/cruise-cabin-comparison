@@ -825,6 +825,8 @@
         const ONE_LATER = "Prices for 1 guest show after the next daily refresh.";
         const SOLO_LABEL = "Priced for one (no single supplement)";
         const SINGLE_LABEL = "Single occupancy price (includes NCL's single supplement)";
+        const SOLO_NO_SECOND = "A solo cabin can't add a second guest later.";
+        const MS_FL_ONE = "Florida resident prices aren't checked for 1 guest yet, so your answer doesn't change the price.";
         // Option tiles (5.2.0), in tile order. Each tile is an on/off button; the full card of each
         // selected option shows below the tiles, in this order. None is selected on the first visit.
         const OPTIONS = [{ key: "G", label: "Option 1: 3 nights" }, { key: "A", label: "Option 2: 5 nights" }, { key: "8", label: "Option 3: 8 nights" }];
@@ -1600,6 +1602,7 @@
             const pay = s.payment, rules = DATA.deposit_rules;
             if (!pay || !rules) return null;
             const suite = suiteHaven(s, c);
+            if (k.n === 1) return depositOne(s, c, k, pay, rules, suite);
             const e = pay.by_guests && pay.by_guests[String(k.n)];
             const hours = e && e.deposit !== null && rules.suite_haven_types.includes(e.deposit_type) === suite ? e.due_hours : null;
             if (suite) {
@@ -1610,6 +1613,30 @@
             const per = pay.standard_deposit_per_guest;
             if (!per) return null;
             return { amount: Math.round(per * k.n * 100) / 100, hours, partial: false, offer: pay.deposit_offer, rule: `${money(per)} per guest x ${k.n}` };
+        }
+
+        // 1 guest (5.4.0; NOTES.md, "Solo travelers (5.4.0)"): the $50 per guest deposit for a solo
+        // cabin or a regular one up to a Club Balcony Suite, while NCL's own 1 guest deposits match it
+        // (standard_deposit_1_guest_ok); Suite and The Haven only once a 1 guest Suite or Haven
+        // summary has shown the 10% rule (one_guest_confirmed_on). Otherwise David will confirm (null).
+        // The hours to pay come from NCL's 1 guest summary for that kind of cabin (solo or regular).
+        // NCL's 2-For-1 Deposits text shows only while NCL's 1 guest answer lists it and the 1 guest
+        // deposit is half of NCL's standard $100 per person (owner's rule, 2026-11-15).
+        const NCL_STANDARD_DEPOSIT_PP = 100;   // NCL's terms, 1 to 6 day sailings (NOTES.md, "Research for 5.2.0")
+        function depositOne(s, c, k, pay, rules, suite) {
+            const one = c.solo ? pay.solo_1_guest : (pay.by_guests || {})["1"];
+            const same = one && one.deposit !== null && rules.suite_haven_types.includes(one.deposit_type) === suite;
+            const hours = same ? one.due_hours : null;
+            if (suite) {
+                if (!rules.percent_of_fare || !rules.one_guest_confirmed_on || k.fare === null) return null;
+                return { amount: Math.round((k.fare - k.fl.amount) * rules.percent_of_fare) / 100, hours, partial: true, offer: null, one: true,
+                         rule: `${rules.percent_of_fare}% of the cruise fare, NCL's rule for Suites and The Haven` };
+            }
+            const per = pay.standard_deposit_per_guest;
+            if (!per || pay.standard_deposit_1_guest_ok !== true) return null;
+            const amount = Math.round(per * 100) / 100;
+            const half = (same ? one.deposit : amount) === NCL_STANDARD_DEPOSIT_PP / 2;
+            return { amount, hours, partial: false, offer: half ? pay.deposit_offer_1_guest || null : null, one: true, rule: "for 1 guest" };
         }
 
         // NCL's multi-credit offer (DoubleUp, TripleUp, QuadUp) from data/offers.json: schema 2
@@ -1709,8 +1736,8 @@
             const d = b.dep, name = `msDep${key}`;
             const opt = (value, html) => `<label class="ms-choice"><input type="radio" name="${name}" value="${value}" data-ms-dep="${key}" ${b.choice === value ? "checked" : ""}><span>${html}</span></label>`;
             const nclText = b.past ? `Pay NCL in full when booking (NCL's final payment date, ${fmtIso(b.final)}, has passed)`
-                : d ? `NCL's deposit: <strong>${money(d.amount)}</strong> (${esc(d.rule)})${d.hours ? `, due within ${d.hours} hours of booking` : ""}`
-                : `NCL's deposit (${notFound}; David will confirm it)`;
+                : d ? `NCL's deposit: <strong>${money(d.amount)}</strong>${d.rule === "for 1 guest" ? " for 1 guest" : ` (${esc(d.rule)})`}${d.hours ? `, due within ${d.hours} hours of booking` : ""}`
+                : soloParty() ? "NCL's deposit for 1 guest (David will confirm it)" : `NCL's deposit (${notFound}; David will confirm it)`;
             const offer = d && d.offer && !b.past ? `<span class="cat-meta" style="display:block">Includes NCL's ${esc(d.offer.title)} offer${d.offer.description ? `: ${esc(d.offer.description)}` : ""}</span>` : "";
             const partial = suiteHaven(s, c) ? `<span class="cat-meta" style="display:block">On a ${esc(c.typeTitle)} cabin a credit covers part of NCL's deposit, not all of it.</span>` : "";
             let choices = opt("ncl", nclText + offer)
@@ -1790,6 +1817,7 @@
                 <div class="ms-item"><strong>${esc(s.ship)}</strong>, ${fmtDay(s.depart)} to ${fmtDay(s.return)}, 2027 (${s.nights} nights)
                     <div>${esc(c.typeTitle)}: ${catHtml(c)}</div>
                     ${c.guarantee ? `<div class="cat-meta gty">${GUARANTEE_TEXT}</div>` : ""}
+                    ${c.solo && soloParty() ? `<div class="cat-meta ms-solo">${SOLO_NO_SECOND}</div>` : ""}
                     <div class="cat-meta">Free at Sea: ${esc(offersText(s))}</div>
                 </div>`).join("");
             const early = todayEastern() < CRUISENEXT.readyOn;
@@ -1809,10 +1837,11 @@
                         </section>
                         <section class="ms-sec">
                             <h3>Florida resident rate</h3>
-                            <fieldset class="ms-q" id="msFlQ"><legend>Are guest 1 and guest 2 Florida residents?</legend>
+                            <fieldset class="ms-q" id="msFlQ"><legend>${soloParty() ? "Is guest 1 a Florida resident?" : "Are guest 1 and guest 2 Florida residents?"}</legend>
                                 <label class="ms-choice"><input type="radio" name="msFl" value="yes"><span>Yes</span></label>
                                 <label class="ms-choice"><input type="radio" name="msFl" value="no"><span>No</span></label>
                             </fieldset>
+                            ${soloParty() ? `<p class="ms-note" id="msFlOne">${MS_FL_ONE}</p>` : ""}
                             <p class="hint">NCL's Florida resident rate is for guests who live in Florida, and NCL asks for proof of residency. David will confirm with NCL.</p>
                             <div class="ms-note" id="msFlNote" hidden></div>
                             <div class="ms-fields" id="msAddr" hidden>
@@ -1893,6 +1922,7 @@
         function renderFlNote() {
             const note = document.getElementById("msFlNote");
             const parts = [];
+            if (soloParty()) { note.hidden = true; return; }   // at 1 guest the answer changes nothing (MS_FL_ONE says so)
             if (MS.florida !== state.flResident) {
                 parts.push(MS.florida ? "The Florida resident rate switch on the page is off. Your answer turns the Florida resident rate on for this request."
                                       : "The Florida resident rate switch on the page is on. Your answer turns the Florida resident rate off for this request.");
@@ -1969,7 +1999,7 @@
             const errs = [];
             const bad = (id, text) => { const el = document.getElementById(id); if (el) el.setAttribute("aria-invalid", "true"); errs.push(text); };
             const need = (id, text) => { if (!msValue(id)) bad(id, text); };
-            if (MS.florida === null) errs.push("Answer whether guest 1 and guest 2 are Florida residents.");
+            if (MS.florida === null) errs.push(soloParty() ? "Answer whether guest 1 is a Florida resident." : "Answer whether guest 1 and guest 2 are Florida residents.");
             for (const [s] of MS.items) if (!MS.deposit[shipKey(s)]) errs.push(`Choose how to pay the deposit${MS.items.length > 1 ? ` for the ${s.ship_short} booking` : ""}.`);
             if (MS.florida) {
                 need("msStreet", "Enter guest 1's street address.");

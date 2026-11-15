@@ -131,6 +131,7 @@ sites["solo_kept"] = test_tools.schema5(real)
 _k = next(x for x in sites["solo_kept"]["sailings"] if x["id"].startswith("getaway"))
 _k["party_sizes"]["1"].update(updated=False, why="RuntimeError: test", as_of=(dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ"))
 sites["solo_fl"] = test_tools.schema5(real)
+sites["solo_api"] = test_tools.schema5(real)   # Make Selection and the price watch at 1 guest, with the stand-in Worker
 FL_SITES["solo_fl"] = fl_copy({("Getaway", "BF"): 60}, 0)
 FAMILY_API_TEST = "https://family-alerts.test"
 site_root = tempfile.mkdtemp(prefix="june-page-")
@@ -140,7 +141,7 @@ for name, data in sites.items():
     # The Worker's address and the Turnstile key: the stand-in on "ms_api", empty everywhere else.
     with open(os.path.join(REPO, "index.html"), encoding="utf-8") as f:
         html = f.read()
-    api, key = (FAMILY_API_TEST, "test-site-key") if name == "ms_api" else ("", "")
+    api, key = (FAMILY_API_TEST, "test-site-key") if name in ("ms_api", "solo_api") else ("", "")
     html, n1 = re.subn(r'const FAMILY_API = "[^"]*";', f'const FAMILY_API = "{api}";', html)
     html, n2 = re.subn(r'const TURNSTILE_SITE_KEY = "[^"]*";', f'const TURNSTILE_SITE_KEY = "{key}";', html)
     assert (n1, n2) == (1, 1)
@@ -1529,6 +1530,95 @@ with sync_playwright() as pw:
     same("1 guest, price watch: no Florida question, the website price", (page.locator("input[name='pwFl']").count(), page.inner_text("#pwFlOne"), page.evaluate("PW.florida")),
          (0, "Florida resident prices aren't checked for 1 guest, so the website price is watched.", False))
     check("1 guest, Florida: no script errors", not errs, errs[:3])
+    page.close()
+
+    # 5. Make Selection at 1 guest (item 5): the Florida question, NCL's deposit for 1 guest with the
+    # 2-For-1 text (half of NCL's $100), the solo line, one guest, the request.
+    S1 = {"adults": 1, "kids": [], "type": "inside", "mode": "same", "compare": ["G", "A", "8"]}
+    page, errs, sent = ms_open("solo_api", stored=S1, offers=offers_file())
+    page.click('button[data-select="G"]')
+    same("Make Selection, 1 guest: the Florida question in the singular, the line that it doesn't change the price",
+         (page.inner_text("#msFlQ legend"), page.inner_text("#msFlOne")),
+         ("Is guest 1 a Florida resident?", "Florida resident prices aren't checked for 1 guest yet, so your answer doesn't change the price."))
+    check("Make Selection, 1 guest: a solo cabin can't add a second guest", "A solo cabin can't add a second guest later." in page.inner_text("#msDialog .ms-item"))
+    page.check("input[name='msFl'][value='yes']")
+    same("Make Selection, 1 guest: Yes still asks for guest 1's Florida address, and no note about the switch", (page.is_visible("#msAddr"), page.is_visible("#msFlNote")), (True, False))
+    sg1 = next(x for x in sites["solo_api"]["sailings"] if x["id"].startswith("getaway"))
+    hours = sg1["payment"]["solo_1_guest"]["due_hours"]
+    texts = choice_texts(page, "G")
+    same("Make Selection, 1 guest: NCL's deposit for 1 guest, then one credit (Solo Inside isn't covered by DoubleUp)", [t.split("\n")[0] for t in texts],
+         [f"NCL's deposit: $50 for 1 guest, due within {hours} hours of booking", "One of David's CruiseNext credits: $250 toward the cruise, you pay David $125"])
+    check("Make Selection, 1 guest: NCL's 2-For-1 Deposits text ($50 is half of NCL's $100)", "Includes NCL's 2-For-1 Deposits offer: Lock-in this vacation today" in texts[0], texts[0])
+    page.check("input[name='msDepG'][value='ncl']")
+    total = money(page.inner_text('.card[data-option="G"] .price-total'))
+    same("Make Selection, 1 guest: deposit and balance", booking_rows(page, "G")[-2:], [("Deposit to NCL at booking", "$50"), ("Balance, due by Feb 11, 2027", page_money(total - 50))])
+    same("Make Selection, 1 guest: one guest's details", (page.query_selector("#g0_first") is not None, page.query_selector("#g1_first") is None), (True, True))
+    fill_guests(page, [None])
+    page.fill("#msStreet", "1 Test Street"); page.fill("#msCity", "Miami"); page.fill("#msZip", "33101")
+    page.check("#msMe")
+    page.click("#msSend")
+    page.wait_for_selector("#msDialog .ms-status.ok")
+    req = sent[-1]
+    same("Make Selection, 1 guest: the request", (req["party"], req["florida"]["residents"], len(req["guests"]), req["bookings"][0]["category"],
+         req["bookings"][0]["ncl_deposit"]["rule"], req["bookings"][0]["ncl_deposit"]["offer"]), ({"adults": 1, "kid_ages": []}, True, 1, "IT", "for 1 guest", "2-For-1 Deposits"))
+    page.close()
+    # The 2-For-1 text only while NCL's 1 guest answer lists it and the deposit is half of $100; a deposit not confirmed is left to David.
+    for name, js, want in (("not listed at 1 guest", "G.payment.deposit_offer_1_guest = null", None),
+                           ("not half of $100", "G.payment.solo_1_guest.deposit = 100", None),
+                           ("not confirmed", "G.payment.standard_deposit_1_guest_ok = false", "NCL's deposit for 1 guest (David will confirm it)")):
+        page, errs, sent = ms_open("solo_api", stored=S1, offers=offers_file())
+        page.evaluate(js)
+        page.click('button[data-select="G"]')
+        page.check("input[name='msFl'][value='no']")
+        first = choice_texts(page, "G")[0]
+        if want:
+            same(f"Make Selection, 1 guest, deposit {name}", first.split("\n")[0], want)
+        else:
+            check(f"Make Selection, 1 guest, 2-For-1 text left out: {name}", "2-For-1" not in first and first.startswith("NCL's deposit: $50 for 1 guest"), first)
+        page.close()
+    # A Solo Balcony: DoubleUp covers Balcony, so two credits; The Haven at 1 guest: David confirms the deposit.
+    page, errs, sent = ms_open("solo_api", stored=dict(S1, type="balcony"), offers=offers_file())
+    page.click('button[data-select="G"]')
+    page.check("input[name='msFl'][value='no']")
+    same("Make Selection, 1 guest, Solo Balcony: the solo line and up to two credits (DoubleUp, Balcony)",
+         ("A solo cabin can't add a second guest later." in page.inner_text("#msDialog .ms-item"), len(choice_texts(page, "G"))), (True, 3))
+    page.close()
+    page, errs, sent = ms_open("solo_api", stored=dict(S1, type="haven"), offers=offers_file())
+    page.click('button[data-select="G"]')
+    page.check("input[name='msFl'][value='no']")
+    same("Make Selection, 1 guest, The Haven: deposit left to David (no 1 guest Haven summary yet), no solo line",
+         (choice_texts(page, "G")[0].split("\n")[0], "A solo cabin" in page.inner_text("#msDialog .ms-item")), ("NCL's deposit for 1 guest (David will confirm it)", False))
+    check("Make Selection, 1 guest: the window fits at 360 px, no script errors", dialog_fits(page) and not errs, errs[:3])
+    page.close()
+
+    # 6. The price watch at 1 guest (item 6): no Florida question, florida false and guests 1 in the request.
+    page, errs, sent = pw_open("solo_api", stored=S1)
+    page.click('.card[data-option="G"] button[data-watch="G"]')
+    same("Price watch, 1 guest: the drop note for one guest", page.inner_text("#pwDropNote"), "With 1 guest, that's a drop of $20 or more for the cabin.")
+    page.fill("#pwEmail", "solo@example.com")
+    page.click("#pwSend")
+    page.wait_for_selector("#pwDialog .ms-status.ok")
+    body = [b for p_, b in sent if p_ == "/watch"][-1]
+    same("Price watch, 1 guest: the request", (body["guests"], body["florida"], body["cabin"]), (1, False, "IT"))
+    check("Price watch, 1 guest: no script errors", not errs, errs[:3])
+    page.close()
+
+    # 7. 8 nights at 1 guest (item 7): Different cabins, a Solo Inside on the Getaway and a regular Balcony on the
+    # Aura; Make Selection has two bookings (the solo line only under the solo one), a watch button per ship.
+    page, errs, sent = ms_open("solo_api", stored=dict(S1, mode="different", diffG="IT", diffA="BF", compare=["8"]), offers=offers_file())
+    same("8 nights, 1 guest: a watch button per ship", page.eval_on_selector_all('.card[data-option="8"] button[data-watch]', "els => els.map(e => e.dataset.watch)"), ["8G", "8A"])
+    page.click('button[data-select="8"]')
+    page.check("input[name='msFl'][value='no']")
+    items = page.eval_on_selector_all("#msDialog .ms-item", "els => els.map(e => e.innerText)")
+    same("8 nights, 1 guest: the solo line under the Getaway's Solo Inside only", ["A solo cabin can't add a second guest later." in t for t in items], [True, False])
+    same("8 nights, 1 guest: NCL's deposit for 1 guest on each booking", [choice_texts(page, k)[0].split(",")[0] for k in ("G", "A")],
+         ["NCL's deposit: $50 for 1 guest", "NCL's deposit: $50 for 1 guest"])
+    page.check("input[name='msDepG'][value='ncl']")
+    page.check("input[name='msDepA'][value='credit1']")
+    eight = money(page.inner_text('.card[data-option="8"] .price-total'))
+    tot = dict(page.evaluate("[...[...document.querySelectorAll('#msMath .ms-booking')].pop().querySelectorAll('.row')].map(r => [r.querySelector('.k').innerText, r.querySelector('.v').innerText])"))
+    same("8 nights, 1 guest: both bookings together (the 8 night Total, $50 to NCL, one credit)", (money(tot["Total"]), tot["Paid to NCL at booking"]), (eight, "$50"))
+    check("8 nights, 1 guest: no script errors", not errs, errs[:3])
     page.close()
 
     browser.close()
