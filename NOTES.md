@@ -849,3 +849,12 @@ NCL calls per week, before and after 5.4.0 (Florida light check weekly; 122 inst
 |---|---|---|---|---|
 | Before 5.4.0 | 189 (27 a day) | 624 | 22 (10) | 835 |
 | After 5.4.0 | 231 (33 a day) | about 664 to 680 | 22 (10) | about 917 to 933 |
+
+### Item 3: Florida resident rate at 1 guest (page only)
+
+No NCL calls and no runner change: `data/florida.json` stays at 2 guests. In `index.html` (`cost()`), at 1 guest nothing comes off any total (the cards, the list prices, the full tables). Owner's answers (2026-11-15):
+- The grey line "Florida resident rate: not checked for 1 guest" ("no discount") shows only on a ship where `data/florida.json` has a 2 guest discount (the switch on, the file at most 15 days old). Elsewhere there is no Florida line, as at 2 guests, so the page never hints at a discount that isn't there.
+- Under the switch at 1 guest, after the usual text: "Florida resident prices are checked for 2 guests, so they aren't used for 1 guest."
+- Price watch at 1 guest: no "Are you a Florida resident?" question; the window says "Florida resident prices aren't checked for 1 guest, so the website price is watched." and sends `florida` false. The Worker refuses `florida` true at 1 guest (item 6).
+- Make Selection at 1 guest still asks "Is guest 1 a Florida resident?" (it goes in the booking email), with a line that it doesn't change the price at 1 guest (item 5).
+- Tested in Chromium at 360 px with the page set to 1 adult (the counter allows 1 from item 4) and a test Florida file with a discount on the Getaway only: the Getaway line, no Aura line, the switch text, Balcony BF $844 for 1 guest with nothing off, the watch window without the question; no sideways scrolling, no script errors.

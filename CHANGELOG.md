@@ -21,6 +21,8 @@ Solo travelers: party size 1 (1 adult in a cabin). Built on branch `solo-travele
 - Cabin counts at 1 guest in `data/counts.json`: each solo category open for 1 guest gets one call (Solo Studio from its location totals; Solo Inside, Oceanview and Balcony from their own cabins in the call's deck lists, unreliable when a deck's list is full and ends with the solo code or another code comes before a solo cabin), on full sweep days and on light days when under 15. Regular cabins at 1 guest copy their 2 guest count (`"same_as": "2"`). `tools/check_counts.py` checks both.
 - `fetch_counts.py --guests 1`: a test run by hand that counts only party size 1, keeps everything else, marks the file `only_guests`, and refuses to write in the `data` folder (so it can never look like today's counts to `decide_run.py`). The workflow never uses it.
 
+- Florida resident rate at 1 guest (page): `data/florida.json` is checked for 2 guests, so nothing comes off at 1 guest. On a ship with a 2 guest Florida discount the card says "Florida resident rate: not checked for 1 guest"; under the switch: "Florida resident prices are checked for 2 guests, so they aren't used for 1 guest." The price watch window at 1 guest doesn't ask about Florida and watches the website price.
+
 NCL calls: the price job goes from 27 to 33 a day (2 availability calls and 4 price summaries for 1 guest; 32 or 31 if a ship has no solo cabin available). Counts add up to 6 a day today (8 at most), about 40 to 56 a week. Per week about 917 to 933 instead of 835 (NOTES.md has the table).
 
 ### Tests

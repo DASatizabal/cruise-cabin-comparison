@@ -793,6 +793,8 @@
         const FLORIDA_URL = "data/florida.json";
         const FL_OLD_DAYS = 9, FL_MAX_AGE_DAYS = 15;
         const FL_MIN_OFF = 1;   // dollars off per guest that count as a discount (cents are rounding)
+        // 5.4.0: data/florida.json is checked for 2 guests only, so at 1 guest nothing comes off.
+        const FL_ONE_GUEST = "Florida resident prices are checked for 2 guests, so they aren't used for 1 guest.";
         // Make Selection (5.2.0): the booking request window. Deposits and the final payment date
         // come from data/prices.json (schema 4, read daily from NCL's price summaries); more than
         // one CruiseNext credit only while data/offers.json (the CruiseNext offer watch: DoubleUp,
@@ -1042,9 +1044,11 @@
             // checked dollar amount for this category comes off the fare of guests 1 and 2 (never
             // more than the fare). Cabins not checked, and a Florida fare at or above the website
             // fare, get no discount.
+            // 1 guest (5.4.0): data/florida.json is checked for 2 guests only, so nothing comes off; on
+            // a ship with a 2 guest discount the card says the rate isn't checked for 1 guest.
             const fare = taxes === null ? null : e.cabin_total - taxes;
-            const fl = { shown: flOn && flShipActive(s), entry: null, perGuest: 0, guests: Math.min(n, 2), amount: 0 };
-            if (fl.shown) {
+            const fl = { shown: flOn && flShipActive(s), one: n === 1, entry: null, perGuest: 0, guests: Math.min(n, 2), amount: 0 };
+            if (fl.shown && !fl.one) {
                 fl.entry = flEntry(s, c.code);
                 fl.perGuest = flOff(fl.entry);
                 fl.amount = Math.min(fl.perGuest * fl.guests, fare === null ? e.cabin_total : fare);
@@ -1120,6 +1124,7 @@
                    <div class="${cls}"><span class="k">Taxes, fees and port expenses: ${k.n} x ${money(s.taxes_per_guest)}</span><span class="v">${money(k.taxes)}</span></div>`;
             const fl = k.fl, flWhen = fl.entry ? fmtShort(fl.entry.checked_at) : "";
             const flRow = !fl.shown ? ""
+                : fl.one ? `<div class="${cls} muted"><span class="k">Florida resident rate: not checked for 1 guest</span><span class="v">no discount</span></div>`
                 : !fl.entry ? `<div class="${cls} muted"><span class="k">Florida resident rate: not checked for this cabin</span><span class="v">no discount</span></div>`
                 : !fl.amount ? `<div class="${cls} muted"><span class="k">Florida resident rate (checked ${esc(flWhen)}): no discount for this cabin</span><span class="v">$0</span></div>`
                 : `<div class="${cls}"><span class="k">Florida resident rate (checked ${esc(flWhen)}): ${plural(fl.guests, "guest", "guests")} x ${money(fl.perGuest)} off the fare</span><span class="v">&minus;${money(fl.amount)}</span></div>`;
@@ -2054,11 +2059,12 @@
                         </section>
                         <section class="ms-sec">
                             <h3>Florida resident</h3>
+                            ${n === 1 ? `<p class="ms-note" id="pwFlOne">Florida resident prices aren't checked for 1 guest, so the website price is watched.</p>` : `
                             <fieldset class="ms-q" id="pwFlQ"><legend>Are you a Florida resident?</legend>
                                 <label class="ms-choice"><input type="radio" name="pwFl" value="yes"><span>Yes</span></label>
                                 <label class="ms-choice"><input type="radio" name="pwFl" value="no"><span>No</span></label>
                             </fieldset>
-                            <p class="hint">It only decides which price is watched: NCL's Florida resident price or the website price.</p>
+                            <p class="hint">It only decides which price is watched: NCL's Florida resident price or the website price.</p>`}
                             <div id="pwPrice"></div>
                         </section>
                         <section class="ms-sec">
@@ -2123,8 +2129,9 @@
             if (!item) return;
             const dlg = document.getElementById("pwDialog");
             dropTurnstile();
+            // At 1 guest (5.4.0) there is no Florida question: the website price is watched (florida false).
             PW = { mode: "form", key: option, label: option === "8" ? `${sel.label}, the ${item[0].ship_short} cabin` : sel.label,
-                   ship: item[0], cabin: item[1], florida: null, token: null, widget: null, sending: false };
+                   ship: item[0], cabin: item[1], florida: guests() === 1 ? false : null, token: null, widget: null, sending: false };
             dlg.innerHTML = watchForm();
             renderPwPrice();
             renderPwDrop();
@@ -2317,6 +2324,7 @@
                     text = `NCL's Florida resident prices${one ? ` on the ${one.ship_short}` : ""}, checked ${when}.${old} The discount comes off the fare for guests 1 and 2 and varies by cabin. Cabins not checked show the website price.${one ? ` The ${otherShip(one).ship_short} has no Florida resident discount right now.` : ""} Confirm with NCL.`;
                 }
             }
+            if (on && guests() === 1) text += " " + FL_ONE_GUEST;
             const desc = document.getElementById("flDesc");
             desc.textContent = text;
             desc.hidden = !text;
