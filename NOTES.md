@@ -920,3 +920,15 @@ The request carries `ncl_deposit.rule` "for 1 guest"; the Worker writes "NCL's d
 ### Item 7: 8 nights at 1 guest
 
 Built with the page (item 4): solo cabins on both ships, same cabin mode by broad type (a Solo Studio on each ship, or a Solo Inside on the Getaway with the Aura's cheapest Inside while its Solo Inside is sold out), and in Different cabins mode a solo cabin on one ship with a regular cabin on the other. Make Selection: two bookings, NCL's deposit for 1 guest on each, the solo line only under the solo booking; a watch button per ship. Tested in `tools/page_test.py` (465 checks).
+
+### Owner's test from the preview and the Worker redeploy (2026-11-15)
+
+Steps given one at a time; every result matched:
+1. Turnstile widget `cruise family`: `raw.githack.com` added for the test.
+2. Worker `cruise-family-alerts`: the branch's `worker.js` pasted at commit 5cc4daf (with the `TEST_PAGE` fix for the `preview/` copy), `TEST_ORIGIN` set to `"https://raw.githack.com"` in Cloudflare's editor only; the address showed "Cruise family alerts. Nothing to see here."
+3. From the preview pinned at 5cc4daf: a 2 guest watch started and confirmed; a 1 guest watch refused with "Prices for 1 guest show after the next daily refresh." (the Worker reads the live page's prices, which have no 1 guest prices until the merge); a 1 guest booking request on a Solo Inside and a 1 guest 8 night booking request (Solo Inside on the Getaway, Balcony BF on the Aura) sent, with the singular Florida question, "$50 for 1 guest" with NCL's 2-For-1 Deposits offer, and the solo line only under the solo booking; the test watch stopped; no email address, name or link in the Worker's logs. (The first try of the 2 guest watch was refused as 1 guest because the preview remembered 1 adult from an earlier visit; with 2 adults it worked.)
+4. The repository's `worker.js` (5cc4daf, `TEST_ORIGIN = ""`) pasted again, and `raw.githack.com` removed from the Turnstile widget (only `dasatizabal.github.io` left).
+
+Then the `preview/` folder was removed from the branch, so the release check is green again. `tools/check_release.py` keeps failing whenever a `preview/` folder exists.
+
+Until the first daily refresh on main after the merge, `data/prices.json` stays schema 4: the page holds the adult counter at 2 ("Prices for 1 guest show after the next daily refresh.") and the Worker refuses 1 guest watches with the same words. The first refresh writes schema 5 (33 NCL calls) and the first counts run after it adds the 1 guest counts.
