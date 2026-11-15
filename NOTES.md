@@ -831,3 +831,21 @@ NCL calls per day, prices job: before 27 (`fetch_prices.py` 26, CruiseNext page 
 Page test note (2026-11-15): `tools/page_test.py` fails 4 checks on an untouched main as well (the deposit is now "due within 90 hours" in today's data where the test expects a fixed number, its "schema 3 file" copy is a schema 4 file now, and a 404 on one test site). They are test data that aged, not page bugs; fixed with the page work (item 4).
 
 Release check lesson (2026-11-15): commit 62da33d failed on GitHub because the saved availability answers held NCL's em dashes. `test_tools.py` passed locally only because `test_no_em_dashes` reads tracked files (`git ls-files`) and the new files weren't staged yet. From then on the full tests run after staging new files and before every commit.
+
+### Item 2: cabin counts at 1 guest
+
+- `tools/fetch_counts.py`: solo categories (T1, IT, OT, BT) open for 1 guest in today's prices get one cabin/availability call each at 1 guest, on full sweep days and, by the light rule (owner's answer), on light days when their last reliable count was under 15. Solo Studio (T1, alone in its type) is its call's location totals. IT, OT and BT are their own cabins in the call's deck lists (cheapest first), with the owner's deck rules: unreliable when a deck's list is full (15) and ends with the solo code, or when any other code comes before a solo cabin; also when the call shows another broad type's code, or no cabin of the code is listed. Their `open_decks` and `open_locations` come from that call (solo cabins have no 2 guest call).
+- Regular categories at 1 guest: `by_guests["1"]` is a copy of `by_guests["2"]` with `"same_as": "2"` (decision 1 above), no call. Copies are not listed again in `unreliable`.
+- No 1 guest counts on a ship whose prices have no usable 1 guest prices (schema 4, or `party_sizes["1"].checked` false).
+- `--guests 1` (a test run by hand only, the owner's guard): counts only party size 1 and keeps every other entry and `last_full_sweep` from `--previous`, marks the file `"only_guests": [1]`, and refuses to write anywhere in the repository's `data` folder before any NCL call, so its `saved_at` and `mode` can never make `tools/decide_run.py` think today's counts are done. `tools/check_counts.py` refuses a file with `only_guests` (the workflow's check of `data/counts.new.json`) unless asked to check a test file. The workflow never uses `--guests` (tested).
+- `tools/check_counts.py`: keys 1 to 5; a solo cabin has only "1"; a regular cabin's "1" must be a `same_as` copy equal to its "2".
+- The page and the Worker read `by_guests[guests]`, so at 1 guest they read the solo counts and the copies with no special case (items 4 and 6).
+
+NCL calls, counts job: from the last week on main (Nov 9 to 15: light 77, 77, full 142, light 58, 61, full 142, light 67) 624 a week. 1 guest adds the open solo categories, 6 today (Getaway 4, Aura 2; 8 at most), on full sweep days and on light days when a solo count is under 15: up to 6 a day today (8 at most), about 40 to 56 a week. Counts after: about 664 to 680 a week.
+
+NCL calls per week, before and after 5.4.0 (Florida light check weekly; 122 instead of 22 while a discount lasts):
+
+| | Prices | Counts | Florida (signed in) | Total |
+|---|---|---|---|---|
+| Before 5.4.0 | 189 (27 a day) | 624 | 22 (10) | 835 |
+| After 5.4.0 | 231 (33 a day) | about 664 to 680 | 22 (10) | about 917 to 933 |

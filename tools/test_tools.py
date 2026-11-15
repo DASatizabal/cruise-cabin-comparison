@@ -1883,6 +1883,201 @@ def test_saved_one_guest():
         fp.request = keep
 
 
+class CountsNCL:
+    """A stand-in for NCL's itinerary and cabin/availability calls (tools/fetch_counts.py). Each
+    category has its own cabins (made up, spread over decks and locations); a call for a category
+    at N guests answers with it and every pricier category of its broad type at N guests (prices
+    from the price file), cabins listed cheapest first per deck and cut at 15, as NCL does
+    (NOTES.md, "Cabin counts" and "Solo travelers (5.4.0)"). Solo cabins as in the probe of
+    2026-11-15: Getaway IT 1 cabin on Mid deck 5, 2 on Forward deck 9, 7 on Forward deck 5.
+    misorder: (code, deck) where another code is listed first; full: a code with 15 cabins on one deck."""
+
+    def __init__(self, prices, misorder=None, full=None):
+        self.prices, self.calls, self.misorder, self.full = prices, [], misorder, full
+        self.cabins = {}
+        locs = ["Forward", "Mid", "Aft"]
+        for s in prices["sailings"]:
+            for t in s["types"]:
+                for i, c in enumerate(t["categories"]):
+                    if c["guarantee"]:
+                        continue
+                    if c["code"] == "IT" and s["id"].startswith("getaway"):
+                        cab = [("Mid", 5)] + [("Forward", 9)] * 2 + [("Forward", 5)] * 7
+                    elif c["code"] == "T1":
+                        cab = [("Forward", 12)] * 20 + [("Mid", 12)] * 9
+                    else:
+                        n = 3 + (sum(map(ord, c["code"])) % 17)
+                        cab = [(locs[(i + k) % 3], 6 + (i + k) % 9) for k in range(n)]
+                    if full == c["code"]:
+                        cab = [("Forward", 5)] * 15 + [("Mid", 5)] * 3
+                    self.cabins[(s["id"], c["code"])] = cab
+
+    def __call__(self, url, body=None, raw=False, page=False):
+        self.calls.append(url)
+        assert not fp.FORBIDDEN.search(url)
+        if "/itinerary/" in url:
+            s = next(x for x in self.prices["sailings"] if x["package_id"] == url.split("packageId=")[1])
+            i = s["ncl_ids"]
+            ans = {"sailing": {"packageId": int(i["package_id"]), "sailStartDate": s["depart"] + "T00:00:00", "sailingId": int(i["sailing_id"])},
+                   "ship": {"code": i["ship_code"]}, "destinations": [{"code": "X"}], "duration": s["nights"]}
+            return (ans, json.dumps(ans).encode()) if raw else ans
+        assert url == fp.CABIN_AVAILABILITY_URL
+        f = body["stateroomSearchFilter"]
+        s = next(x for x in self.prices["sailings"] if x["package_id"] == f["sailing"]["packageId"])
+        g, code = str(f["numberOfGuests"]), f["pricedCategoryCode"]
+        t = next(t for t in s["types"] if t["code"] == f["stateroomTypeCode"])
+        price = lambda c: c["by_guests"][g]["price_pp"]
+        me = next(c for c in t["categories"] if c["code"] == code)
+        inc = sorted([c for c in t["categories"] if not c["guarantee"] and c["by_guests"][g]["available"] and (c is me or price(c) > price(me))],
+                     key=lambda c: (price(c), c is not me))
+        locations = []
+        for loc in ("Forward", "Mid", "Aft"):
+            decks = {}
+            for c in inc:
+                for l, d in self.cabins[(s["id"], c["code"])]:
+                    if l == loc:
+                        decks.setdefault(d, []).append({"pricedCategoryCode": c["code"], "deckNumber": d, "shipLocation": l, "cabinNumber": "REMOVED"})
+            if not decks:
+                continue
+            listed = []
+            for d, cabs in sorted(decks.items()):
+                if self.misorder == (code, d):
+                    cabs = [{"pricedCategoryCode": "IA", "deckNumber": d, "shipLocation": loc}] + cabs
+                listed.append({"deckNumber": d, "numberOfCabins": min(len(cabs), 15), "cabins": cabs[:15]})
+            locations.append({"name": loc, "numberOfCabins": sum(len(c) for c in decks.values()), "lowestPriceCategory": inc[0]["code"], "decks": listed})
+        ans = {"results": {"availablePositionInShip": locations}}
+        return (ans, json.dumps(ans).encode()) if raw else ans
+
+
+def counts_run(ncl, folder, prices, previous=None, mode="full", guests=None, out=None):
+    """One whole fetch_counts.py run (main) against the stand-in, no network. Returns the file it wrote."""
+    pp, prev = os.path.join(folder, "prices.json"), os.path.join(folder, "counts.previous.json")
+    out = out or os.path.join(folder, "counts.new.json")
+    with open(pp, "w", encoding="utf-8") as f:
+        json.dump(prices, f)
+    if previous is not None:
+        with open(prev, "w", encoding="utf-8") as f:
+            json.dump(previous, f)
+    elif os.path.exists(prev):
+        os.remove(prev)
+    keep = (fp.request, fp.log, fp.PAUSE_SECONDS, sys.argv)
+    fp.request, fp.log = ncl, (lambda m: None)
+    sys.argv = ["fetch_counts.py", "--prices", pp, "--previous", prev, "--out", out, "--mode", mode] + (["--guests", guests] if guests else [])
+    try:
+        fetch_counts.main()
+    finally:
+        fp.request, fp.log, fp.PAUSE_SECONDS, sys.argv = keep
+    with open(out, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def test_counts_one_guest():
+    """Cabin counts at 1 guest (5.4.0): solo categories counted from their own call, regular
+    categories copying their 2 guest count, the deck rules, light days, and --guests 1."""
+    import check_counts
+    folder = tempfile.mkdtemp(prefix="june-counts-")
+    with open(os.path.join(os.path.dirname(TOOLS), "data", "prices.json"), encoding="utf-8") as f:
+        real = json.load(f)
+    p5 = schema5(real)
+    solo_open = sum(1 for s in p5["sailings"] for t in s["types"] for c in t["categories"] if c["solo"] and c["by_guests"]["1"]["available"])
+    check("counts: 6 solo categories open for 1 guest in the test prices (Getaway 4, Aura 2, as in the probe)", solo_open, 6)
+
+    # A full sweep on schema 4 prices (no 1 guest) and on schema 5 prices: exactly 6 calls more.
+    n4, n5 = CountsNCL(schema4(real)), CountsNCL(p5)
+    c4 = counts_run(n4, folder, schema4(real))
+    c5 = counts_run(n5, folder, p5)
+    check("counts: 1 guest adds one call per open solo category (6), nothing else", len(n5.calls) - len(n4.calls), 6)
+    check("counts: still 2 itinerary calls", sum("/itinerary/" in u for u in n5.calls), 2)
+    check("counts: schema 4 prices, no 1 guest entries", any("1" in c["by_guests"] for cats in c4["sailings"].values() for c in cats.values()), False)
+    check("counts: the full sweep file passes the format check", check_counts.check(c5), [])
+    g = c5["sailings"]["getaway-2027-06-11"]
+    check("counts: Getaway IT from its own cabin list (1 + 2 + 7)", (g["IT"]["by_guests"]["1"]["cabins_left"], g["IT"]["by_guests"]["1"]["reliable"]), (10, True))
+    check("counts: IT open decks and locations from the 1 guest call", (g["IT"]["open_decks"], g["IT"]["open_locations"]), ([5, 9], ["forward", "midship"]))
+    check("counts: Solo Studio from its location totals (no list limit: 20 on one deck)", g["T1"]["by_guests"]["1"]["cabins_left"], 29)
+    check("counts: solo cabins only at 1 guest", sorted(g["IT"]["by_guests"]), ["1"])
+    two = g["IA"]["by_guests"]["2"]
+    check("counts: a regular cabin at 1 guest is its 2 guest count, same_as 2", g["IA"]["by_guests"]["1"], dict(two, same_as="2"))
+    check("counts: copies are not listed again as unreliable", any(u["guests"] == "1" and u["category"] not in fp.SOLO_CODES for u in c5["unreliable"]), False)
+    check("counts: no Guarantee entry", "IX" in g, False)
+    check("counts: the Aura's sold out Solo Inside has no count", "1" in c5["sailings"]["aura-2027-06-14"].get("IT", {}).get("by_guests", {}), False)
+
+    # The deck rules for solo cabins.
+    mis = counts_run(CountsNCL(p5, misorder=("IT", 9)), folder, p5)
+    e = mis["sailings"]["getaway-2027-06-11"]["IT"]["by_guests"]["1"]
+    check("counts: another code before a solo cabin makes it unreliable", (e["cabins_left"], e["reliable"], "deck 9: another code is listed before" in e["why"]), (None, False, True))
+    full = counts_run(CountsNCL(p5, full="IT"), folder, p5)
+    e = full["sailings"]["getaway-2027-06-11"]["IT"]["by_guests"]["1"]
+    check("counts: a full list (15) ending with the solo code makes it unreliable", (e["reliable"], "the list is full (15) and ends with IT" in (e["why"] or "")), (False, True))
+    check("counts: unreliable solo counts are listed", any(u["category"] == "IT" and u["guests"] == "1" for u in full["unreliable"]), True)
+    check("counts: a full list that goes on with pricier codes is fine (the probe's decks 9 and 5)", solo_count_ok(), True)
+
+    # Light day: solo counts under 15 are checked again, others kept; copies follow "2".
+    ln = CountsNCL(p5)
+    light = counts_run(ln, folder, p5, previous=c5, mode="light")
+    lg = light["sailings"]["getaway-2027-06-11"]
+    check("counts, light day: IT (10) checked again, T1 (29) kept",
+          (lg["IT"]["by_guests"]["1"]["checked_at"] == light["saved_at"], lg["T1"]["by_guests"]["1"] == g["T1"]["by_guests"]["1"]), (True, True))
+    check("counts, light day: the file passes", check_counts.check(light), [])
+    check("counts, light day: copies still equal the 2 guest entry", all(c["by_guests"]["1"] == dict(c["by_guests"]["2"], same_as="2")
+          for c in lg.values() if "same_as" in c["by_guests"].get("1", {})), True)
+
+    # Prices without usable 1 guest prices on the Getaway: no 1 guest counts there, no calls.
+    nc = not_checked_1(real)
+    ncn = CountsNCL(nc)
+    cn = counts_run(ncn, folder, nc)
+    check("counts, 1 guest not checked: no 1 guest entries on the Getaway", any("1" in c["by_guests"] for c in cn["sailings"]["getaway-2027-06-11"].values()), False)
+    check("counts, 1 guest not checked: the Aura's 2 solo calls only", len(ncn.calls) - len(n4.calls), 2)
+
+    # --guests 1: only the solo calls (and the itinerary calls), everything else as before, never in the data folder.
+    gn = CountsNCL(p5)
+    c4 = dict(c4, last_full_sweep="2026-11-14T10:22:19Z")   # an older full sweep, which a --guests 1 run must not move
+    t1 = counts_run(gn, folder, p5, previous=c4, mode="full", guests="1", out=os.path.join(folder, "solo-test.json"))
+    check("--guests 1: 2 itinerary calls and 6 solo calls, 8 in all", (len(gn.calls), sum("/itinerary/" in u for u in gn.calls)), (8, 2))
+    check("--guests 1: every 2 to 5 guest count exactly as in the previous file",
+          all({k: v for k, v in c["by_guests"].items() if k != "1"} == c4["sailings"][sid].get(code, {}).get("by_guests", {})
+              for sid, cats in t1["sailings"].items() for code, c in cats.items() if code not in fp.SOLO_CODES), True)
+    check("--guests 1: last_full_sweep unchanged, marked only_guests", (t1["last_full_sweep"], t1["only_guests"]), (c4["last_full_sweep"], [1]))
+    check("--guests 1: passes the check as a test file", check_counts.check(t1, test_file=True), [])
+    check("--guests 1: refused as data/counts.json by the workflow's check", any("only_guests" in x for x in check_counts.check(t1)), True)
+    data_dir = os.path.join(os.path.dirname(TOOLS), "data")
+    for name in ("counts.json", "counts.new.json", os.path.join("sub", "x.json")):
+        target = os.path.join(data_dir, name)
+        before = os.path.exists(target) and os.path.getmtime(target)
+        calls = CountsNCL(p5)
+        try:
+            counts_run(calls, folder, p5, previous=c4, guests="1", out=target)
+            refused = False
+        except SystemExit as e:
+            refused = "refusing to write" in str(e)
+        check(f"--guests 1: refuses to write data/{name}, before any NCL call",
+              (refused, len(calls.calls), (os.path.exists(target) and os.path.getmtime(target)) == before), (True, 0, True))
+    with open(os.path.join(os.path.dirname(TOOLS), ".github", "workflows", "refresh-prices.yml"), encoding="utf-8") as f:
+        check("the workflow never uses --guests", "--guests" in f.read(), False)
+
+    # The format check on 1 guest entries.
+    def broken(change):
+        d = json.loads(json.dumps(c5))
+        change(d["sailings"]["getaway-2027-06-11"])
+        return check_counts.check(d)
+    has = lambda errs, text: any(text in x for x in errs)
+    check("counts format: a solo cabin with a 2 guest count fails", has(broken(lambda s: s["IT"]["by_guests"].update({"2": s["IA"]["by_guests"]["2"]})), "1 guest only"), True)
+    check("counts format: a regular cabin's own 1 guest count fails",
+          has(broken(lambda s: s["IA"]["by_guests"]["1"].pop("same_as")), "is a copy of its 2 guest count"), True)
+    check("counts format: a copy that differs from 2 guests fails",
+          has(broken(lambda s: s["IA"]["by_guests"]["1"].update(checked_at="2026-01-01T00:00:00Z")), "must equal the 2 guest entry"), True)
+    check("counts format: same_as at 3 guests fails",
+          has(broken(lambda s: s["IA"]["by_guests"]["3"].update(same_as="2")), "same_as is only"), True)
+
+
+def solo_count_ok():
+    """fetch_counts.solo_count on the probe's real Getaway IT answer (decks with 15 listed, IT first)."""
+    r = saved("cabin_availability_getaway_IT_1_2026-11-15")
+    locs = r["results"]["availablePositionInShip"]
+    lists = [(l["name"], d.get("deckNumber") or d.get("number"), [c["pricedCategoryCode"] for c in d.get("cabins") or []]) for l in locs for d in l.get("decks") or []]
+    count, why = fetch_counts.solo_count({"foreign": [], "totals": {}, "lists": lists}, "IT", alone=False)
+    return count == 10 and why is None
+
+
 def test_family_checks():
     """Release check (5.2.0): the family alerts Worker's preview address must be off to merge."""
     import check_release
@@ -1934,6 +2129,7 @@ if __name__ == "__main__":
     test_payment()
     test_one_guest()
     test_saved_one_guest()
+    test_counts_one_guest()
     test_eastern_dates()
     test_family_checks()
     test_no_em_dashes()
