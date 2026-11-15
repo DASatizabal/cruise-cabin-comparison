@@ -1455,7 +1455,9 @@ with sync_playwright() as pw:
     note = page.inner_text("#soloNote")
     check("1 guest: the Sailing solo note", page.is_visible("#soloNote") and note.startswith("Sailing solo") and page.locator("#soloNote li").count() == 6, note)
     check("1 guest: the note's 'today' part (every regular cabin at the fare for two)", 'today NCL charges the fare for two guests, which NCL calls "Free 2nd Guest"' in note, note)
-    check("1 guest: no names in the note", "David" not in note, note)
+    check("1 guest: the Studio Lounge point with NCL's two sources (owner's wording)",
+          "Solo Studio guests have access to NCL's private Studio Lounge. On the Getaway, NCL's descriptions also list it for Solo Inside, Solo Oceanview and Solo Balcony, "
+          "but NCL's solo cabins page limits it to Solo Studio, so David will confirm before booking." in note, note)
     same("1 guest: Studio is the first cabin type button", page.evaluate("[...document.querySelectorAll('.card[data-option=\"G\"] [data-type]')].map(b => b.dataset.type)")[:2], ["studio", "inside"])
     page.click('.card[data-option="G"] button[data-type="inside"]')
     g_card = page.query_selector('.card[data-option="G"]')

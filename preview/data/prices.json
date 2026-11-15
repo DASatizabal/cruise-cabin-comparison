@@ -1,6 +1,6 @@
 {
  "schema_version": 5,
- "saved_at": "2026-11-15T10:22:30Z",
+ "saved_at": "2026-11-15T19:35:20Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   1,
@@ -55,74 +55,38 @@
    {
     "sailing": "getaway-2027-06-11",
     "guests": 2,
+    "kind": "regular",
     "category": "IX",
     "expected": 890,
     "ncl_total": 890,
-    "ok": true,
-    "kind": "regular"
+    "ok": true
    },
    {
     "sailing": "getaway-2027-06-11",
     "guests": 3,
+    "kind": "regular",
     "category": "IX",
     "expected": 1255,
     "ncl_total": 1255,
-    "ok": true,
-    "kind": "regular"
+    "ok": true
    },
    {
     "sailing": "getaway-2027-06-11",
     "guests": 4,
+    "kind": "regular",
     "category": "IX",
     "expected": 1620,
     "ncl_total": 1620,
-    "ok": true,
-    "kind": "regular"
+    "ok": true
    },
    {
     "sailing": "getaway-2027-06-11",
     "guests": 5,
+    "kind": "regular",
     "category": "O5",
     "expected": 2465,
     "ncl_total": 2465,
-    "ok": true,
-    "kind": "regular"
-   },
-   {
-    "sailing": "aura-2027-06-14",
-    "guests": 2,
-    "category": "IX",
-    "expected": 2558,
-    "ncl_total": 2558,
-    "ok": true,
-    "kind": "regular"
-   },
-   {
-    "sailing": "aura-2027-06-14",
-    "guests": 3,
-    "category": "IX",
-    "expected": 3517,
-    "ncl_total": 3517,
-    "ok": true,
-    "kind": "regular"
-   },
-   {
-    "sailing": "aura-2027-06-14",
-    "guests": 4,
-    "category": "IX",
-    "expected": 4476,
-    "ncl_total": 4476,
-    "ok": true,
-    "kind": "regular"
-   },
-   {
-    "sailing": "aura-2027-06-14",
-    "guests": 5,
-    "category": "H6",
-    "expected": 15295,
-    "ncl_total": 15295,
-    "ok": true,
-    "kind": "regular"
+    "ok": true
    },
    {
     "sailing": "getaway-2027-06-11",
@@ -140,6 +104,42 @@
     "category": "IT",
     "expected": 625,
     "ncl_total": 625,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 2,
+    "kind": "regular",
+    "category": "IX",
+    "expected": 2558,
+    "ncl_total": 2558,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 3,
+    "kind": "regular",
+    "category": "IX",
+    "expected": 3517,
+    "ncl_total": 3517,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 4,
+    "kind": "regular",
+    "category": "IX",
+    "expected": 4476,
+    "ncl_total": 4476,
+    "ok": true
+   },
+   {
+    "sailing": "aura-2027-06-14",
+    "guests": 5,
+    "kind": "regular",
+    "category": "H6",
+    "expected": 15295,
+    "ncl_total": 15295,
     "ok": true
    },
    {
@@ -251,6 +251,28 @@
     "ok": true
    },
    {
+    "sailing": "getaway-2027-06-11",
+    "guests": 1,
+    "kind": "regular",
+    "type": "INSIDE",
+    "category": "IX",
+    "rule": "same deposit per guest at 1 guest",
+    "deposit": 50.0,
+    "expected": 50.0,
+    "ok": true
+   },
+   {
+    "sailing": "getaway-2027-06-11",
+    "guests": 1,
+    "kind": "solo",
+    "type": "INSIDE",
+    "category": "IT",
+    "rule": "same deposit per guest at 1 guest",
+    "deposit": 50.0,
+    "expected": 50.0,
+    "ok": true
+   },
+   {
     "sailing": "aura-2027-06-14",
     "guests": 5,
     "type": "HAVEN",
@@ -291,28 +313,6 @@
     "ok": true
    },
    {
-    "sailing": "getaway-2027-06-11",
-    "guests": 1,
-    "kind": "regular",
-    "type": "INSIDE",
-    "category": "IX",
-    "rule": "same deposit per guest at 1 guest",
-    "deposit": 50.0,
-    "expected": 50,
-    "ok": true
-   },
-   {
-    "sailing": "getaway-2027-06-11",
-    "guests": 1,
-    "kind": "solo",
-    "type": "INSIDE",
-    "category": "IT",
-    "rule": "same deposit per guest at 1 guest",
-    "deposit": 50.0,
-    "expected": 50,
-    "ok": true
-   },
-   {
     "sailing": "aura-2027-06-14",
     "guests": 1,
     "kind": "regular",
@@ -320,7 +320,7 @@
     "category": "IX",
     "rule": "same deposit per guest at 1 guest",
     "deposit": 50.0,
-    "expected": 50,
+    "expected": 50.0,
     "ok": true
    },
    {
@@ -331,7 +331,7 @@
     "category": "T1",
     "rule": "same deposit per guest at 1 guest",
     "deposit": 50.0,
-    "expected": 50,
+    "expected": 50.0,
     "ok": true
    }
   ],
@@ -385,7 +385,7 @@
     ],
     "duration": 3,
     "sail_start": "2027-06-11T00:00:00",
-    "checked_at": "2026-11-15T10:21:02Z"
+    "checked_at": "2026-11-15T19:33:45Z"
    },
    "depart": "2027-06-11",
    "return": "2027-06-14",
@@ -397,32 +397,32 @@
     "1": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-15T10:21:02Z",
+     "as_of": "2026-11-15T19:33:45Z",
      "why": null
     },
     "2": {
      "updated": true,
-     "as_of": "2026-11-15T10:21:02Z",
-     "why": null,
-     "checked": true
+     "checked": true,
+     "as_of": "2026-11-15T19:33:45Z",
+     "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-11-15T10:21:02Z",
-     "why": null,
-     "checked": true
+     "checked": true,
+     "as_of": "2026-11-15T19:33:45Z",
+     "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-11-15T10:21:02Z",
-     "why": null,
-     "checked": true
+     "checked": true,
+     "as_of": "2026-11-15T19:33:45Z",
+     "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-11-15T10:21:02Z",
-     "why": null,
-     "checked": true
+     "checked": true,
+     "as_of": "2026-11-15T19:33:45Z",
+     "why": null
     }
    },
    "taxes_per_guest": 150,
@@ -484,40 +484,40 @@
       "deposit": 50.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
-      "due_hours": 84,
-      "as_of": "2026-11-15T10:21:02Z",
+      "due_hours": 81,
+      "as_of": "2026-11-15T19:33:45Z",
       "why": null
      },
      "2": {
       "deposit": 100.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
-      "due_hours": 90,
-      "as_of": "2026-11-15T10:21:02Z",
+      "due_hours": 81,
+      "as_of": "2026-11-15T19:33:45Z",
       "why": null
      },
      "3": {
       "deposit": 150.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
-      "due_hours": 90,
-      "as_of": "2026-11-15T10:21:02Z",
+      "due_hours": 81,
+      "as_of": "2026-11-15T19:33:45Z",
       "why": null
      },
      "4": {
       "deposit": 200.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
-      "due_hours": 90,
-      "as_of": "2026-11-15T10:21:02Z",
+      "due_hours": 81,
+      "as_of": "2026-11-15T19:33:45Z",
       "why": null
      },
      "5": {
       "deposit": 250.0,
       "deposit_type": "OCEANVIEW",
       "deposit_category": "O5",
-      "due_hours": 90,
-      "as_of": "2026-11-15T10:21:02Z",
+      "due_hours": 81,
+      "as_of": "2026-11-15T19:33:45Z",
       "why": null
      }
     },
@@ -527,14 +527,14 @@
      "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
      "codes": [],
      "types": [],
-     "checked_at": "2026-11-15T10:21:02Z"
+     "checked_at": "2026-11-15T19:33:45Z"
     },
     "solo_1_guest": {
      "deposit": 50.0,
      "deposit_type": "INSIDE",
      "deposit_category": "IT",
-     "due_hours": 84,
-     "as_of": "2026-11-15T10:21:02Z",
+     "due_hours": 81,
+     "as_of": "2026-11-15T19:33:45Z",
      "why": null
     },
     "standard_deposit_1_guest_ok": true,
@@ -544,8 +544,16 @@
      "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
      "codes": [],
      "types": [],
-     "checked_at": "2026-11-15T10:21:02Z"
+     "checked_at": "2026-11-15T19:33:45Z"
     }
+   },
+   "single_supplement": {
+    "rule": "the fare for 1 guest is twice the per guest fare for 2 guests",
+    "categories": 32,
+    "matching": 32,
+    "all_match": true,
+    "ncl_fare_line": "Free 2nd Guest",
+    "as_of": "2026-11-15T19:33:45Z"
    },
    "price_summaries": [
     {
@@ -575,7 +583,7 @@
      },
      "grand_total": 624,
      "deposit": 50.0,
-     "deposit_due_hours": 84,
+     "deposit_due_hours": 81,
      "final_payment_due": "2027-02-11",
      "kind": "regular"
     },
@@ -606,7 +614,7 @@
      },
      "grand_total": 625,
      "deposit": 50.0,
-     "deposit_due_hours": 84,
+     "deposit_due_hours": 81,
      "final_payment_due": "2027-02-11",
      "kind": "solo"
     },
@@ -620,6 +628,7 @@
       179,
       179
      ],
+     "fare_title": "Free 2nd Guest",
      "taxes_per_guest": [
       150,
       150
@@ -640,7 +649,7 @@
      },
      "grand_total": 890,
      "deposit": 100.0,
-     "deposit_due_hours": 90,
+     "deposit_due_hours": 81,
      "final_payment_due": "2027-02-11",
      "kind": "regular"
     },
@@ -655,6 +664,7 @@
       179,
       99
      ],
+     "fare_title": "Free 2nd Guest",
      "taxes_per_guest": [
       150,
       150,
@@ -678,7 +688,7 @@
      },
      "grand_total": 1255,
      "deposit": 150.0,
-     "deposit_due_hours": 90,
+     "deposit_due_hours": 81,
      "final_payment_due": "2027-02-11",
      "kind": "regular"
     },
@@ -694,6 +704,7 @@
       99,
       99
      ],
+     "fare_title": "Free 2nd Guest",
      "taxes_per_guest": [
       150,
       150,
@@ -720,7 +731,7 @@
      },
      "grand_total": 1620,
      "deposit": 200.0,
-     "deposit_due_hours": 90,
+     "deposit_due_hours": 81,
      "final_payment_due": "2027-02-11",
      "kind": "regular"
     },
@@ -737,6 +748,7 @@
       159,
       159
      ],
+     "fare_title": "Free 2nd Guest",
      "taxes_per_guest": [
       150,
       150,
@@ -766,7 +778,7 @@
      },
      "grand_total": 2465,
      "deposit": 250.0,
-     "deposit_due_hours": 90,
+     "deposit_due_hours": 81,
      "final_payment_due": "2027-02-11",
      "kind": "regular"
     }
@@ -2613,15 +2625,7 @@
       }
      ]
     }
-   ],
-   "single_supplement": {
-    "rule": "the fare for 1 guest is twice the per guest fare for 2 guests",
-    "categories": 32,
-    "matching": 32,
-    "all_match": true,
-    "ncl_fare_line": "Free 2nd Guest",
-    "as_of": "2026-11-15T10:21:02Z"
-   }
+   ]
   },
   {
    "id": "aura-2027-06-14",
@@ -2640,7 +2644,7 @@
     ],
     "duration": 5,
     "sail_start": "2027-06-14T00:00:00",
-    "checked_at": "2026-11-15T10:21:38Z"
+    "checked_at": "2026-11-15T19:34:31Z"
    },
    "depart": "2027-06-14",
    "return": "2027-06-19",
@@ -2652,32 +2656,32 @@
     "1": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-15T10:21:38Z",
+     "as_of": "2026-11-15T19:34:31Z",
      "why": null
     },
     "2": {
      "updated": true,
-     "as_of": "2026-11-15T10:21:38Z",
-     "why": null,
-     "checked": true
+     "checked": true,
+     "as_of": "2026-11-15T19:34:31Z",
+     "why": null
     },
     "3": {
      "updated": true,
-     "as_of": "2026-11-15T10:21:38Z",
-     "why": null,
-     "checked": true
+     "checked": true,
+     "as_of": "2026-11-15T19:34:31Z",
+     "why": null
     },
     "4": {
      "updated": true,
-     "as_of": "2026-11-15T10:21:38Z",
-     "why": null,
-     "checked": true
+     "checked": true,
+     "as_of": "2026-11-15T19:34:31Z",
+     "why": null
     },
     "5": {
      "updated": true,
-     "as_of": "2026-11-15T10:21:38Z",
-     "why": null,
-     "checked": true
+     "checked": true,
+     "as_of": "2026-11-15T19:34:31Z",
+     "why": null
     }
    },
    "taxes_per_guest": 160,
@@ -2747,32 +2751,32 @@
       "deposit": 50.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
-      "due_hours": 84,
-      "as_of": "2026-11-15T10:21:38Z",
+      "due_hours": 81,
+      "as_of": "2026-11-15T19:34:31Z",
       "why": null
      },
      "2": {
       "deposit": 100.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
-      "due_hours": 90,
-      "as_of": "2026-11-15T10:21:38Z",
+      "due_hours": 81,
+      "as_of": "2026-11-15T19:34:31Z",
       "why": null
      },
      "3": {
       "deposit": 150.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
-      "due_hours": 90,
-      "as_of": "2026-11-15T10:21:38Z",
+      "due_hours": 81,
+      "as_of": "2026-11-15T19:34:31Z",
       "why": null
      },
      "4": {
       "deposit": 200.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
-      "due_hours": 90,
-      "as_of": "2026-11-15T10:21:38Z",
+      "due_hours": 81,
+      "as_of": "2026-11-15T19:34:31Z",
       "why": null
      },
      "5": {
@@ -2780,7 +2784,7 @@
       "deposit_type": "HAVEN",
       "deposit_category": "H6",
       "due_hours": 23,
-      "as_of": "2026-11-15T10:21:38Z",
+      "as_of": "2026-11-15T19:34:31Z",
       "why": null
      }
     },
@@ -2790,14 +2794,14 @@
      "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
      "codes": [],
      "types": [],
-     "checked_at": "2026-11-15T10:21:38Z"
+     "checked_at": "2026-11-15T19:34:31Z"
     },
     "solo_1_guest": {
      "deposit": 50.0,
      "deposit_type": "STUDIO",
      "deposit_category": "T1",
-     "due_hours": 84,
-     "as_of": "2026-11-15T10:21:38Z",
+     "due_hours": 81,
+     "as_of": "2026-11-15T19:34:31Z",
      "why": null
     },
     "standard_deposit_1_guest_ok": true,
@@ -2807,8 +2811,16 @@
      "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
      "codes": [],
      "types": [],
-     "checked_at": "2026-11-15T10:21:38Z"
+     "checked_at": "2026-11-15T19:34:31Z"
     }
+   },
+   "single_supplement": {
+    "rule": "the fare for 1 guest is twice the per guest fare for 2 guests",
+    "categories": 32,
+    "matching": 32,
+    "all_match": true,
+    "ncl_fare_line": "Free 2nd Guest",
+    "as_of": "2026-11-15T19:34:31Z"
    },
    "price_summaries": [
     {
@@ -2838,7 +2850,7 @@
      },
      "grand_total": 2198,
      "deposit": 50.0,
-     "deposit_due_hours": 84,
+     "deposit_due_hours": 81,
      "final_payment_due": "2027-02-14",
      "kind": "regular"
     },
@@ -2869,7 +2881,7 @@
      },
      "grand_total": 2289,
      "deposit": 50.0,
-     "deposit_due_hours": 84,
+     "deposit_due_hours": 81,
      "final_payment_due": "2027-02-14",
      "kind": "solo"
     },
@@ -2883,6 +2895,7 @@
       919,
       919
      ],
+     "fare_title": "Free 2nd Guest",
      "taxes_per_guest": [
       160,
       160
@@ -2903,7 +2916,7 @@
      },
      "grand_total": 2558,
      "deposit": 100.0,
-     "deposit_due_hours": 90,
+     "deposit_due_hours": 81,
      "final_payment_due": "2027-02-14",
      "kind": "regular"
     },
@@ -2918,6 +2931,7 @@
       919,
       599
      ],
+     "fare_title": "Free 2nd Guest",
      "taxes_per_guest": [
       160,
       160,
@@ -2941,7 +2955,7 @@
      },
      "grand_total": 3517,
      "deposit": 150.0,
-     "deposit_due_hours": 90,
+     "deposit_due_hours": 81,
      "final_payment_due": "2027-02-14",
      "kind": "regular"
     },
@@ -2957,6 +2971,7 @@
       599,
       599
      ],
+     "fare_title": "Free 2nd Guest",
      "taxes_per_guest": [
       160,
       160,
@@ -2983,7 +2998,7 @@
      },
      "grand_total": 4476,
      "deposit": 200.0,
-     "deposit_due_hours": 90,
+     "deposit_due_hours": 81,
      "final_payment_due": "2027-02-14",
      "kind": "regular"
     },
@@ -3000,6 +3015,7 @@
       599,
       599
      ],
+     "fare_title": "Free 2nd Guest",
      "taxes_per_guest": [
       160,
       160,
@@ -4994,15 +5010,7 @@
       }
      ]
     }
-   ],
-   "single_supplement": {
-    "rule": "the fare for 1 guest is twice the per guest fare for 2 guests",
-    "categories": 32,
-    "matching": 32,
-    "all_match": true,
-    "ncl_fare_line": "Free 2nd Guest",
-    "as_of": "2026-11-15T10:21:38Z"
-   }
+   ]
   }
  ]
 }
