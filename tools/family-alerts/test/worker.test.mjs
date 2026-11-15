@@ -172,6 +172,17 @@ test("watch: a raw.githack.com preview works only while TEST_ORIGIN is set (test
     assert.equal(r.status, 200, JSON.stringify(r.body));
     assert.ok(lastMail().body.includes(GITHACK_PAGE + "#confirm="));
     assert.equal((await post(testing, env, "/watch", watchBody({ page: GITHACK_PAGE }))).body.error, "request");
+    // 5.4.0: the preview/ copy pinned to a commit works too; nothing else on raw.githack.com does.
+    const PREVIEW = GITHACK_PAGE.replace(/index\.html$/, "preview/index.html");
+    const ok = await post(testing, env, "/watch", watchBody({ page: PREVIEW, email: "preview@example.com" }), GITHACK);
+    assert.equal(ok.status, 200, JSON.stringify(ok.body));
+    assert.ok(lastMail().body.includes(PREVIEW + "#confirm="), "the email's links go back to the preview copy");
+    for (const bad of [GITHACK_PAGE.replace(/index\.html$/, "preview/other.html"), GITHACK_PAGE.replace(/index\.html$/, "tools/index.html"),
+                       GITHACK_PAGE.replace(/index\.html$/, "preview/preview/index.html"), PREVIEW + "?x=1",
+                       "https://raw.githack.com/someone/else/0123456789abcdef0123456789abcdef01234567/preview/index.html"]) {
+      assert.equal((await post(testing, env, "/watch", watchBody({ page: bad, email: "preview@example.com" }), GITHACK)).body.error, "request", bad);
+    }
+    assert.equal((await post(worker, env, "/watch", watchBody({ page: PREVIEW }), GITHACK)).status, 403, "the committed Worker refuses the preview copy");
     // The Worker as committed: no preview address.
     assert.equal(worker.__t.TEST_ORIGIN, "");
     assert.equal((await post(worker, env, "/watch", watchBody({ page: GITHACK_PAGE }), GITHACK)).status, 403);
