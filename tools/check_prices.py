@@ -6,6 +6,10 @@
 Exits 1 and lists every problem when the file is malformed, a sailing is missing,
 or a formula cross check failed. The refresh workflow runs this on the new file
 before it replaces the old one.
+
+Schema 5 (5.4.0) adds party size 1 (solo travelers): by_guests and party_sizes "1", two price
+summaries at 1 guest (kind "regular" and "solo"), the 1 guest deposits, the single supplement
+facts, and party size 1 "not checked today" (it never fails the run).
 """
 import datetime as dt
 import json
@@ -13,11 +17,17 @@ import re
 import sys
 
 EXPECTED_SAILINGS = {"getaway-2027-06-11", "aura-2027-06-14"}
-GUEST_KEYS = ["2", "3", "4", "5"]
+GUEST_KEYS = ["1", "2", "3", "4", "5"]
+GUEST_KEYS_4 = ["2", "3", "4", "5"]          # schema 4 files (the committed file until the first refresh after 5.4.0)
+NOT_CHECKED = "Not checked today"
 MATCH_KEYS = {"studio", "inside", "oceanview", "balcony", "mini_suite", "suite", "haven"}
 PERCENT_RULE = "10% of the cruise fare"
 PER_GUEST_RULE = "same deposit per guest"
-PAYMENT_KEYS = {"source", "final_payment_due", "standard_deposit_per_guest", "standard_deposit_checked_at", "by_guests", "deposit_offer"}
+ONE_GUEST_RULE = "same deposit per guest at 1 guest"
+ONE_GUEST_PERCENT_RULE = "10% of the cruise fare at 1 guest"
+PAYMENT_KEYS_4 = {"source", "final_payment_due", "standard_deposit_per_guest", "standard_deposit_checked_at", "by_guests", "deposit_offer"}
+PAYMENT_KEYS = PAYMENT_KEYS_4 | {"solo_1_guest", "standard_deposit_1_guest_ok", "deposit_offer_1_guest"}
+SUPPLEMENT_KEYS = {"rule", "categories", "matching", "all_match", "ncl_fare_line", "as_of"}
 DEPOSIT_ENTRY_KEYS = {"deposit", "deposit_type", "deposit_category", "due_hours", "as_of", "why"}
 
 
@@ -37,22 +47,31 @@ def is_money(v):
     return isinstance(v, (int, float)) and not isinstance(v, bool) and v > 0
 
 
-def check(data, allow_schema_3=False):
-    """Problems with a price file. Every file fetch_prices.py writes is schema 4.
+def is_time(v):
+    try:
+        dt.datetime.strptime(v, "%Y-%m-%dT%H:%M:%SZ")
+        return True
+    except (TypeError, ValueError):
+        return False
 
-    allow_schema_3: only for the release check (tools/check_release.py) on the committed file,
-    which stays the schema 3 file written before 5.2.0 until the first refresh on main after
-    the merge. Such a file is checked as before (no payment, deposit_rules or deposit checks).
-    The refresh workflow's check of each new file never allows it.
+
+def check(data, allow_schema_4=False):
+    """Problems with a price file. Every file fetch_prices.py writes is schema 5.
+
+    allow_schema_4: only for the release check (tools/check_release.py) on the committed file,
+    which stays the schema 4 file written before 5.4.0 until the first refresh on main after the
+    merge. Such a file is checked as before (party sizes 2 to 5, no 1 guest data). The refresh
+    workflow's check of each new file never allows it.
     """
     if not isinstance(data, dict):
         return ["the file is not a JSON object"]
-    old = allow_schema_3 and data.get("schema_version") == 3
+    old = allow_schema_4 and data.get("schema_version") == 4
+    keys = GUEST_KEYS_4 if old else GUEST_KEYS
     errors = []
     err = errors.append
 
-    if data.get("schema_version") != 4 and not old:
-        err("schema_version must be 4")
+    if data.get("schema_version") != 5 and not old:
+        err("schema_version must be 5")
     warnings = data.get("warnings")
     rate_warnings = data.get("rate_warnings")
     if not isinstance(warnings, list) or not all(isinstance(w, str) for w in warnings) \
@@ -67,19 +86,27 @@ def check(data, allow_schema_3=False):
         dt.datetime.strptime(data.get("saved_at", ""), "%Y-%m-%dT%H:%M:%SZ")
     except (TypeError, ValueError):
         err("saved_at must look like 2026-10-07T10:17:00Z")
-    if data.get("guest_counts") != [2, 3, 4, 5]:
-        err("guest_counts must be [2, 3, 4, 5]")
+    if data.get("guest_counts") != [int(g) for g in keys]:
+        err(f"guest_counts must be [{', '.join(keys)}]")
 
     checks = data.get("checks")
     if not isinstance(checks, dict) or not isinstance(checks.get("formula"), list) \
             or not isinstance(checks.get("extra_guest_mismatches"), list):
         err("checks.formula and checks.extra_guest_mismatches must be lists")
     else:
-        if len(checks["formula"]) != len(EXPECTED_SAILINGS) * len(GUEST_KEYS):
-            err("checks.formula must have one entry per sailing per party size")
+        # One formula check per sailing per party size from 2 to 5. Schema 5, 1 guest: one for the
+        # regular cabin's summary and one for the solo cabin's (when a solo cabin is available),
+        # none when party size 1 is not checked today (checked per sailing below).
         for c in checks["formula"]:
             if c.get("ok") is not True:
                 err(f"formula cross check failed: {c}")
+        for sid in EXPECTED_SAILINGS:
+            for g in GUEST_KEYS_4:
+                n = sum(1 for c in checks["formula"] if c.get("sailing") == sid and str(c.get("guests")) == g)
+                if n != 1:
+                    err(f"checks.formula must have one entry for {sid} at {g} guests (found {n})")
+        if not old and not isinstance(checks.get("one_guest"), list):
+            err("checks.one_guest must be a list")
         ages = checks.get("ages")
         if not isinstance(ages, list) or len(ages) != len(EXPECTED_SAILINGS):
             err("checks.ages must have one entry per sailing")
@@ -90,16 +117,16 @@ def check(data, allow_schema_3=False):
                 if c.get("ok") is False or (c.get("ok") is None and not c.get("why")) or c.get("ok") not in (True, False, None):
                     err(f"age cross check failed: {c}")
 
-    # Deposits (schema 4): a deposit check that failed is allowed (logged), but then the number it
-    # checks must be empty (null): the Suite and Haven rule, or that ship's standard deposit.
+    # Deposits (schema 4 and 5): a deposit check that failed is allowed (logged), but then the number
+    # it checks must be empty (null): the Suite and Haven rule, or that ship's standard deposit.
     deposit_checks = []
-    if not old:
+    if True:
         deposit_checks = (checks or {}).get("deposits") if isinstance(checks, dict) else None
         if not isinstance(deposit_checks, list):
             err("checks.deposits must be a list")
             deposit_checks = []
         for c in deposit_checks:
-            if not isinstance(c, dict) or c.get("sailing") not in EXPECTED_SAILINGS or c.get("rule") not in (PERCENT_RULE, PER_GUEST_RULE) \
+            if not isinstance(c, dict) or c.get("sailing") not in EXPECTED_SAILINGS or c.get("rule") not in (PERCENT_RULE, PER_GUEST_RULE, ONE_GUEST_RULE, ONE_GUEST_PERCENT_RULE) \
                     or not isinstance(c.get("ok"), bool) or not is_money(c.get("deposit")) or not is_money(c.get("expected")):
                 err(f"checks.deposits entry is malformed: {c}")
         rules = data.get("deposit_rules")
@@ -122,6 +149,15 @@ def check(data, allow_schema_3=False):
                 err("deposit_rules.suite_haven_types must be SUITE and HAVEN")
             if not str(rules.get("source", "")).startswith("https://www.ncl.com/"):
                 err("deposit_rules.source must be an NCL page")
+            if data.get("schema_version") == 5:
+                # The 10% rule confirmed on a 1 guest Suite or Haven summary (5.4.0), or null.
+                if "one_guest_confirmed_on" not in rules:
+                    err("deposit_rules.one_guest_confirmed_on is missing (null until a 1 guest Suite or Haven summary confirms it)")
+                one_on = rules.get("one_guest_confirmed_on")
+                if one_on is not None and (not is_date(one_on) or pct is None):
+                    err("deposit_rules.one_guest_confirmed_on must be a date, and null while the rule is empty")
+                if one_on is not None and any(isinstance(c, dict) and c.get("rule") == ONE_GUEST_PERCENT_RULE and c.get("ok") is False for c in deposit_checks):
+                    err("a 1 guest Suite or Haven deposit check failed but deposit_rules.one_guest_confirmed_on is set")
 
     rates = data.get("rates")
     if not isinstance(rates, dict):
@@ -214,8 +250,8 @@ def check(data, allow_schema_3=False):
         if ksf is not None and (not isinstance(ksf, dict) or not ksf.get("title") or not isinstance(ksf.get("types"), list)
                                 or not all(isinstance(t, str) for t in ksf["types"]) or not isinstance(ksf.get("codes", []), list)):
             err(f"{p}: kids_sail_free must be null or have a title and a list of types")
-        if not old:
-            check_payment(s, p, deposit_checks, warned, err)
+        one_checked = not old and isinstance(s.get("party_sizes"), dict) and (s["party_sizes"].get("1") or {}).get("checked") is not False
+        check_payment(s, p, deposit_checks, warned, err, keys, old, one_checked)
         if not isinstance((s.get("terminal") or {}).get("text"), str):
             err(f"{p}: terminal.text is missing")
         ports = s.get("ports")
@@ -225,14 +261,25 @@ def check(data, allow_schema_3=False):
             err(f"{p}: every port day needs a date")
 
         ps = s.get("party_sizes")
-        if not isinstance(ps, dict) or sorted(ps) != GUEST_KEYS:
-            err(f"{p}: party_sizes must have the keys 2, 3, 4, 5")
+        if not isinstance(ps, dict) or sorted(ps) != keys:
+            err(f"{p}: party_sizes must have the keys {', '.join(keys)}")
         else:
-            if not any(v.get("updated") is True for v in ps.values()):
-                err(f"{p}: no party size was updated")
+            if not any(ps[g].get("updated") is True for g in GUEST_KEYS_4):
+                err(f"{p}: no party size from 2 to 5 guests was updated")
             for g, v in ps.items():
                 if not isinstance(v.get("updated"), bool):
                     err(f"{p}: party_sizes.{g}.updated must be true or false")
+                if not old and not isinstance(v.get("checked"), bool):
+                    err(f"{p}: party_sizes.{g}.checked must be true or false")
+                if v.get("checked") is False:
+                    # Party size 1 only (5.4.0): no usable prices for 1 guest today, never guessed.
+                    if g != "1":
+                        err(f"{p}: only party size 1 can be not checked")
+                    if v.get("updated") is not False or v.get("as_of") is not None or not v.get("why"):
+                        err(f"{p}: party_sizes.1 not checked must be not updated, with as_of null and a why")
+                    if not warned(s.get("ship_short", "?"), "1 guest not checked"):
+                        err(f"{p}: party size 1 not checked without a warning")
+                    continue
                 try:
                     as_of = dt.datetime.strptime(v.get("as_of", ""), "%Y-%m-%dT%H:%M:%SZ")
                     saved = dt.datetime.strptime(data.get("saved_at", ""), "%Y-%m-%dT%H:%M:%SZ")
@@ -247,7 +294,8 @@ def check(data, allow_schema_3=False):
         if not isinstance(types, list) or not types:
             err(f"{p}: types is empty")
             continue
-        available_for = {g: False for g in GUEST_KEYS}
+        available_for = {g: False for g in keys}
+        solo_at_1 = False
         for t in types:
             tp = f"{p} type {t.get('code', '?')}"
             if not t.get("code") or not t.get("title"):
@@ -284,12 +332,14 @@ def check(data, allow_schema_3=False):
                 if not isinstance(c.get("shares_ncl_description_with"), list):
                     err(f"{cp}: shares_ncl_description_with must be a list")
                 bg = c.get("by_guests")
-                if not isinstance(bg, dict) or sorted(bg) != GUEST_KEYS:
-                    err(f"{cp}: by_guests must have exactly the keys 2, 3, 4, 5")
+                if not isinstance(bg, dict) or sorted(bg) != keys:
+                    err(f"{cp}: by_guests must have exactly the keys {', '.join(keys)}")
                     continue
-                for g in GUEST_KEYS:
+                for g in keys:
                     e = bg[g]
-                    ep = f"{cp} at {g} guests"
+                    ep = f"{cp} at {'1 guest' if g == '1' else g + ' guests'}"
+                    if g == "1" and not one_checked and (e.get("available") is not False or e.get("reason") != NOT_CHECKED):
+                        err(f"{ep}: party size 1 is not checked today, so the cabin must be unavailable with the reason {NOT_CHECKED!r}")
                     if not isinstance(e.get("available"), bool) or not isinstance(e.get("sold_out"), bool):
                         err(f"{ep}: available and sold_out must be true or false")
                         continue
@@ -299,10 +349,14 @@ def check(data, allow_schema_3=False):
                             err(f"{ep}: price_pp must be a positive number")
                         elif not is_int(e.get("cabin_total")) or abs(e["cabin_total"] - pp * int(g)) > 0.5 + 0.01 * int(g):
                             err(f"{ep}: cabin_total must be price_pp x {g}, rounded to whole dollars")
-                        if g != "2" and bg["2"].get("available") and not is_int(e.get("added_vs_2")):
+                        if g not in ("1", "2") and bg["2"].get("available") and not is_int(e.get("added_vs_2")):
                             err(f"{ep}: added_vs_2 is missing")
+                        if g == "1" and "added_vs_2" in e:
+                            err(f"{ep}: added_vs_2 is only for 3 guests and more")
                         if not c.get("solo"):
                             available_for[g] = True
+                        elif g == "1":
+                            solo_at_1 = True
                         if "cabins_left" in e or "count_reliable" in e:
                             err(f"{ep}: cabin counts belong in data/counts.json, not in prices")
                     else:
@@ -311,18 +365,78 @@ def check(data, allow_schema_3=False):
                         if not isinstance(e.get("reason"), str) or not e["reason"]:
                             err(f"{ep}: unavailable without a reason")
         for g, ok in available_for.items():
-            if not ok:
-                err(f"{p}: no cabin is available for {g} guests")
+            if not ok and (g != "1" or one_checked):
+                err(f"{p}: no cabin is available for {'1 guest' if g == '1' else g + ' guests'}")
+        if not old:
+            check_one_guest(s, p, checks if isinstance(checks, dict) else {}, one_checked, solo_at_1, err)
     return errors
 
 
-def check_payment(s, p, deposit_checks, warned, err):
-    """A sailing's payment block (schema 4): deposits and the final payment date from NCL's price
-    summaries. Each empty (null) number needs a warning naming the ship."""
+def check_one_guest(s, p, checks, one_checked, solo_at_1, err):
+    """Party size 1 (schema 5, 5.4.0): its price summaries and formula checks (a regular one, and a
+    solo one when a solo cabin is available; none when not checked today), the checks of its
+    summaries against the page's tax and gratuity amounts, and the single supplement facts."""
+    sid = s.get("id")
+    sums = s.get("price_summaries")
+    if not isinstance(sums, list) or not all(isinstance(x, dict) for x in sums):
+        err(f"{p}: price_summaries must be a list")
+        return
+    for x in sums:
+        if x.get("kind") not in ("regular", "solo") or (x["kind"] == "solo" and x.get("guests") != 1):
+            err(f"{p}: every price summary needs kind regular or solo (solo at 1 guest only)")
+    for g in (1, 2, 3, 4, 5):
+        for kind in ("regular", "solo"):
+            if sum(1 for x in sums if x.get("guests") == g and x.get("kind") == kind) > 1:
+                err(f"{p}: more than one {kind} price summary for {g} guests")
+    one = {x.get("kind") for x in sums if x.get("guests") == 1}
+    formulas = [c for c in checks.get("formula") or [] if isinstance(c, dict) and c.get("sailing") == sid and c.get("guests") == 1]
+    kinds = sorted(c.get("kind") for c in formulas)
+    if one_checked:
+        want = ["regular", "solo"] if solo_at_1 else ["regular"]
+        if kinds != want:
+            err(f"{p}: checks.formula at 1 guest must be {want} (found {kinds})")
+        if "regular" not in one:
+            err(f"{p}: no regular price summary for 1 guest")
+    else:
+        if one or formulas:
+            err(f"{p}: party size 1 is not checked today, so it has no price summary or formula check")
+    updated = ((s.get("party_sizes") or {}).get("1") or {}).get("updated") is True
+    for c in checks.get("one_guest") or []:
+        if not isinstance(c, dict) or c.get("sailing") not in EXPECTED_SAILINGS or not isinstance(c.get("ok"), bool):
+            err(f"checks.one_guest entry is malformed: {c}")
+        elif c["sailing"] == sid and c["ok"] is False and updated:
+            err(f"{p}: a 1 guest check failed but party size 1 is updated: {c}")
+    if "single_supplement" not in s:
+        err(f"{p}: single_supplement is missing (null without 1 guest prices)")
+        return
+    ss = s["single_supplement"]
+    if ss is None:
+        return
+    if not one_checked:
+        err(f"{p}: single_supplement must be null while party size 1 is not checked")
+    if not isinstance(ss, dict) or set(ss) != SUPPLEMENT_KEYS:
+        err(f"{p}: single_supplement must have exactly {sorted(SUPPLEMENT_KEYS)}")
+        return
+    n, m = ss["categories"], ss["matching"]
+    if not is_int(n) or not is_int(m) or n < 0 or not 0 <= m <= n:
+        err(f"{p}: single_supplement categories and matching must be whole numbers, matching at most categories")
+    elif ss["all_match"] is not (n > 0 and m == n):
+        err(f"{p}: single_supplement.all_match must say whether every category matched")
+    if not isinstance(ss["rule"], str) or (ss["ncl_fare_line"] is not None and not isinstance(ss["ncl_fare_line"], str)):
+        err(f"{p}: single_supplement.rule must be text and ncl_fare_line text or null")
+    if not is_time(ss["as_of"]):
+        err(f"{p}: single_supplement.as_of must be a time")
+
+
+def check_payment(s, p, deposit_checks, warned, err, keys=GUEST_KEYS, old=False, one_checked=True):
+    """A sailing's payment block (schema 4, and schema 5 with 1 guest): deposits and the final
+    payment date from NCL's price summaries. Each empty (null) number needs a warning naming the
+    ship."""
     ship = s.get("ship_short", "?")
     pay = s.get("payment")
-    if not isinstance(pay, dict) or set(pay) != PAYMENT_KEYS:
-        err(f"{p}: payment must have exactly {sorted(PAYMENT_KEYS)}")
+    want = PAYMENT_KEYS_4 if old else PAYMENT_KEYS
+    if not isinstance(pay, dict) or set(pay) != want:
+        err(f"{p}: payment must have exactly {sorted(want)}")
         return
     if pay["source"] != "NCL price-summary paymentOptions":
         err(f"{p}: payment.source must be NCL price-summary paymentOptions")
@@ -344,11 +458,33 @@ def check_payment(s, p, deposit_checks, warned, err):
                                and c.get("ok") is False for c in deposit_checks):
         err(f"{p}: a deposit per guest check failed but payment.standard_deposit_per_guest is set")
     bg = pay["by_guests"]
-    if not isinstance(bg, dict) or sorted(bg) != GUEST_KEYS:
-        err(f"{p}: payment.by_guests must have exactly the keys 2, 3, 4, 5")
+    entries = []
+    if not isinstance(bg, dict) or sorted(bg) != keys:
+        err(f"{p}: payment.by_guests must have exactly the keys {', '.join(keys)}")
     else:
-        for g, e in bg.items():
-            ep = f"{p}: payment.by_guests.{g}"
+        entries = [(f"{p}: payment.by_guests.{g}", g, e) for g, e in bg.items()]
+    if not old:
+        solo = pay["solo_1_guest"]
+        if solo is not None:
+            entries.append((f"{p}: payment.solo_1_guest", "1", solo))
+            if not one_checked:
+                err(f"{p}: payment.solo_1_guest must be null while party size 1 is not checked")
+        ok1 = pay["standard_deposit_1_guest_ok"]
+        if ok1 not in (True, False, None):
+            err(f"{p}: payment.standard_deposit_1_guest_ok must be true, false or null")
+        if ok1 is True and per is None:
+            err(f"{p}: payment.standard_deposit_1_guest_ok can't be true without a standard deposit")
+        if ok1 is not True and one_checked and per is not None and not warned(ship, "deposit for 1 guest"):
+            err(f"{p}: the deposit for 1 guest is not confirmed but there is no warning")
+        if ok1 is not False and any(isinstance(c, dict) and c.get("sailing") == s.get("id") and c.get("rule") == ONE_GUEST_RULE
+                                    and c.get("ok") is False for c in deposit_checks):
+            err(f"{p}: a 1 guest deposit check failed but payment.standard_deposit_1_guest_ok is not false")
+        off1 = pay["deposit_offer_1_guest"]
+        if off1 is not None and (not isinstance(off1, dict) or not off1.get("title") or not isinstance(off1.get("types"), list)
+                                 or not isinstance(off1.get("codes"), list)):
+            err(f"{p}: payment.deposit_offer_1_guest must be null or have a title, types and codes")
+    if True:
+        for ep, g, e in entries:
             if not isinstance(e, dict) or set(e) != DEPOSIT_ENTRY_KEYS:
                 err(f"{ep} must have exactly {sorted(DEPOSIT_ENTRY_KEYS)}")
                 continue
@@ -361,6 +497,10 @@ def check_payment(s, p, deposit_checks, warned, err):
                 err(f"{ep}: deposit must be a positive number with its cabin type and category")
             if e["due_hours"] is not None and (not isinstance(e["due_hours"], int) or isinstance(e["due_hours"], bool) or e["due_hours"] < 1):
                 err(f"{ep}: due_hours must be a positive whole number or null")
+            if g == "1" and not one_checked:
+                if e["as_of"] is not None or e["deposit"] is not None:
+                    err(f"{ep}: party size 1 is not checked, so as_of and deposit must be null")
+                continue
             try:
                 dt.datetime.strptime(e["as_of"] or "", "%Y-%m-%dT%H:%M:%SZ")
             except (TypeError, ValueError):

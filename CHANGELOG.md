@@ -2,6 +2,27 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [5.4.0] - 2026-11-15
+
+Solo travelers: party size 1 (1 adult in a cabin). Built on branch `solo-traveler-5.4.0` in the order the owner set, one item at a time; not merged until the owner approves. NOTES.md, "Solo travelers (5.4.0)".
+
+### Added
+- Prices for 1 guest in `data/prices.json` (schema 5): `guest_counts` [1, 2, 3, 4, 5], and `by_guests` and `party_sizes` have "1". At 1 guest the price job makes one availability call per ship and two price summaries: the cheapest regular cabin (the same rule as 2 to 5 guests) and the cheapest available solo cabin (Solo Studio, Solo Inside, Solo Oceanview, Solo Balcony), each with its own formula check and labelled `kind` regular or solo in `price_summaries`. Capacity still comes from the 2 guest call.
+- Each 1 guest price summary is checked against the amounts the page uses for every party size: NCL's tax line per guest and the Free at Sea gratuities per guest from the age test (`checks.one_guest`). A summary that disagrees fails party size 1 only.
+- Party size 1 never fails the run and never stops the prices for 2 to 5 guests (owner's rule). When it fails, the previous 1 guest prices are kept for up to 3 days ("Not updated today"); otherwise every cabin is "Not checked today" for 1 guest, `party_sizes["1"].checked` is false, with a warning. "Every party size failed" and "kept prices too old" count 2 to 5 guests only.
+- 1 guest deposits, checked on their own so they never change the deposit for 2 to 5 guests: `payment.by_guests["1"]` (the regular cabin), `payment.solo_1_guest`, `payment.standard_deposit_1_guest_ok` (each 1 guest deposit up to Club Balcony Suite equals the $50 per guest deposit; false with a warning, and null when there is nothing to compare), `payment.deposit_offer_1_guest` (NCL's deposit offer as the 1 guest answer lists it) and `deposit_rules.one_guest_confirmed_on` (the 10% Suite and Haven rule confirmed on a 1 guest Suite or Haven summary; null until one is).
+- `single_supplement` per sailing: how many regular categories charge twice the 2 guest per guest fare for 1 guest, and the title of NCL's fare line ("Free 2nd Guest"), for the page's "Sailing solo" note.
+- A run page notice per ship: "1 guest Getaway: updated today, cheapest solo IT $625 with Free at Sea, single supplement: 32 of 32 regular categories ...".
+
+### Changed
+- `tools/check_prices.py` checks schema 5. The release check accepts the committed schema 4 file until the first refresh on main after the merge (the schema 3 allowance is gone: main has had schema 4 since 5.2.0).
+- The extra guest check and `added_vs_2` skip 1 guest.
+
+NCL calls: the price job goes from 27 to 33 a day (2 availability calls and 4 price summaries for 1 guest; 32 or 31 if a ship has no solo cabin available).
+
+### Tests
+- `tools/test_tools.py`: whole runs against a stand-in for NCL with solo cabins (32 calls; the two 1 guest summaries; kept 1 guest prices; not checked with no previous file, a schema 4 previous file and kept prices over 3 days old; 2 to 5 guests all failing still fails the run; tax and Open Bar lines that differ; no solo cabin; a 1 guest deposit that differs; a 1 guest Haven deposit at 10% and not; a single supplement that differs), each party size picking its own price summary when prices are kept, the format check, and NCL's real 1 guest answers of 2026-11-15 in `tools/test_data/` (hold guard, solo prices, Free at Sea codes, the deposit offer, formula, tax and gratuity checks, $50 in 84 hours, "Free 2nd Guest").
+
 ## [5.3.0] - 2026-11-07
 
 The DoubleUp watch misread a real change: on 2026-11-06 NCL replaced DoubleUp with TripleUp (three credits), the watch only knew DoubleUp headings, so it recorded "ended" and Make Selection offered one credit. Still 1 NCL page load a day; no new NCL calls.

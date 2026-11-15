@@ -150,7 +150,8 @@ def saved(name):
         return json.load(f)
 
 
-SAVED_PRICE_SUMMARIES = sorted(f[:-5] for f in os.listdir(TEST_DATA) if f.startswith("price_summary_getaway_"))
+# The 2026-10-06 and 07 Getaway price summaries (the 1 guest ones of 2026-11-15 are tested in test_saved_one_guest).
+SAVED_PRICE_SUMMARIES = sorted(f[:-5] for f in os.listdir(TEST_DATA) if f.startswith("price_summary_getaway_B4"))
 
 
 def test_hold_signal():
@@ -470,14 +471,23 @@ def test_check_prices_ids():
         bad = json.loads(json.dumps(old))
         bad["sailings"][0]["ncl_ids"]["package_id"] = "1"
         check("release check of a schema 3 file still checks ncl_ids", any("does not match" in e for e in check_prices.check(bad, allow_schema_3=True)), True)
-    new = schema4(old)
+    if old.get("schema_version") == 4:
+        check("release check accepts the committed schema 4 file", check_prices.check(old, allow_schema_4=True), [])
+        check("the refresh's check of a new file never accepts schema 4", "schema_version must be 5" in check_prices.check(old), True)
+        bad = json.loads(json.dumps(old))
+        bad["sailings"][0]["ncl_ids"]["package_id"] = "1"
+        check("release check of a schema 4 file still checks ncl_ids", any("does not match" in e for e in check_prices.check(bad, allow_schema_4=True)), True)
+        bad = json.loads(json.dumps(old))
+        bad["sailings"][0]["payment"]["by_guests"]["2"]["deposit"] = None
+        check("release check of a schema 4 file still checks the payment data", any("empty deposit needs" in e for e in check_prices.check(bad, allow_schema_4=True)), True)
+    new = schema5(old)
     new["warnings"] = []
     for s in new["sailings"]:
         s["ncl_ids"] = {"itinerary_code": s["itinerary_code"], "package_id": s["package_id"], "sailing_id": "60533",
                         "ship_code": s["ship_short"].upper(), "found_on": f"https://www.ncl.com/cruises/{s['itinerary_code']}",
                         "checked_at": "2026-10-15T10:20:00Z"}
         s.setdefault("kids_sail_free", None)
-    check("schema 4 file with ncl_ids passes", check_prices.check(new), [])
+    check("schema 5 file with ncl_ids passes", check_prices.check(new), [])
     bad = json.loads(json.dumps(new))
     bad["sailings"][0]["ncl_ids"]["package_id"] = "1"
     check("ncl_ids that don't match the sailing fail", any("does not match" in e for e in check_prices.check(bad)), True)
@@ -524,10 +534,114 @@ def schema4(data):
     return d
 
 
+# Solo cabins for 1 guest as NCL priced them in the probe of 2026-11-15 (cabin total with taxes);
+# None is sold out. Regular cabins for 1 guest: NCL charged twice the per guest fare for 2 guests
+# on every category of both ships, plus taxes for one guest ("Free 2nd Guest").
+PROBE_SOLO = {"getaway-2027-06-11": {"T1": 539, "IT": 509, "OT": 569, "BT": 639},
+              "aura-2027-06-14": {"T1": 2089, "IT": None, "OT": None, "BT": 3109}}
+
+
+def schema5(data):
+    """A schema 5 copy of a price file (5.4.0, party size 1). A schema 4 file (the committed one
+    until the first refresh after 5.4.0) gets 1 guest prices shaped like NCL's answers in the probe
+    of 2026-11-15: the solo prices above, regular cabins at twice the 2 guest fare per guest plus
+    taxes for one, and the two 1 guest price summaries (regular and solo, $50 deposit in 84 hours)
+    with their formula checks, as fetch_prices.py would write them."""
+    d = schema4(data)
+    if d["schema_version"] == 5:
+        return d
+    d["schema_version"] = 5
+    d["guest_counts"] = [1, 2, 3, 4, 5]
+    d["checks"]["one_guest"] = []
+    d["deposit_rules"]["one_guest_confirmed_on"] = None
+    for s in d["sailings"]:
+        tax = s["taxes_per_guest"] or 0
+        grat = s["gratuities"]
+        for g, st in s["party_sizes"].items():
+            st["checked"] = True
+        s["party_sizes"] = {"1": {"updated": True, "checked": True, "as_of": s["party_sizes"]["2"]["as_of"], "why": None}, **s["party_sizes"]}
+        picks = {}
+        for t in s["types"]:
+            for c in t["categories"]:
+                two = c["by_guests"]["2"]
+                if c["solo"]:
+                    price = PROBE_SOLO[s["id"]].get(c["code"])
+                    one = ({"available": True, "sold_out": False, "price_pp": float(price), "cabin_total": price} if price
+                           else {"available": False, "sold_out": True, "reason": "Sold out"})
+                elif two["available"]:
+                    pp = round(2 * (two["price_pp"] - tax) + tax, 2)
+                    one = {"available": True, "sold_out": False, "price_pp": pp, "cabin_total": int(round(pp))}
+                else:
+                    one = {"available": False, "sold_out": two["sold_out"], "reason": "Sold out" if two["sold_out"] else "Sold out for this party size"}
+                c["by_guests"] = {"1": one, **c["by_guests"]}
+                if one["available"]:
+                    kind = "solo" if c["solo"] else "regular"
+                    if kind not in picks or one["price_pp"] < picks[kind][2]["price_pp"]:
+                        picks[kind] = (t, c, one)
+        for x in s["price_summaries"]:
+            x.setdefault("kind", "regular")
+        two_sum = next(x for x in s["price_summaries"] if x["guests"] == 2)
+        ones = []
+        for kind in ("regular", "solo"):
+            if kind not in picks:
+                continue
+            t, c, one = picks[kind]
+            bar = grat["open_bar"]["per_guest"] if grat else 0
+            dining = grat["specialty_dining"]["per_guest"] if grat else 0
+            ones.append({"guests": 1, "type": t["code"], "category": c["code"],
+                         "fare_code": "CHOALL4M" if t["code"] in ("SUITE", "HAVEN") else "ALL4CHO",
+                         "fare_total": one["cabin_total"] - tax, "fare_per_guest": [one["cabin_total"] - tax], "fare_title": "Free 2nd Guest",
+                         "taxes_per_guest": [tax], "open_bar": {"title": "Unlimited Open Bar", "per_guest": [bar]},
+                         "specialty_dining": {"title": grat["specialty_dining"]["title"] if grat else "Specialty Dining", "per_guest": [dining]},
+                         "grand_total": one["cabin_total"] + bar + dining, "deposit": 50.0, "deposit_due_hours": 84,
+                         "final_payment_due": two_sum.get("final_payment_due"), "kind": kind})
+            d["checks"]["formula"].append({"sailing": s["id"], "guests": 1, "kind": kind, "category": c["code"],
+                                           "expected": one["cabin_total"] + bar + dining, "ncl_total": one["cabin_total"] + bar + dining, "ok": True})
+            d["checks"]["one_guest"].append({"sailing": s["id"], "kind": kind, "category": c["code"], "ok": True, "why": None})
+            d["checks"]["deposits"].append({"sailing": s["id"], "guests": 1, "kind": kind, "type": t["code"], "category": c["code"],
+                                            "rule": fp.ONE_GUEST_RULE, "deposit": 50.0, "expected": 50, "ok": True})
+        s["price_summaries"] = ones + s["price_summaries"]
+        for c in d["checks"]["formula"]:
+            c.setdefault("kind", "regular")
+        pay = s["payment"]
+        entry = lambda x: {"deposit": x["deposit"], "deposit_type": x["type"], "deposit_category": x["category"],
+                           "due_hours": x["deposit_due_hours"], "as_of": s["party_sizes"]["1"]["as_of"], "why": None}
+        pay["by_guests"] = {"1": entry(ones[0]), **pay["by_guests"]}
+        pay["solo_1_guest"] = entry(ones[1]) if len(ones) > 1 else None
+        pay["standard_deposit_1_guest_ok"] = True
+        pay["deposit_offer_1_guest"] = dict(pay["deposit_offer"]) if pay["deposit_offer"] else None
+        types = {t["code"]: {"categories": {c["code"]: c for c in t["categories"]}} for t in s["types"]}
+        s["single_supplement"] = fp.single_supplement(types, s["taxes_per_guest"], {"regular": ones[0]}, s["party_sizes"])
+    return d
+
+
+def not_checked_1(data, ship="getaway"):
+    """A schema 5 copy where party size 1 is not checked today on one ship (5.4.0): no usable 1
+    guest prices, as fetch_prices.py writes it after a failure with nothing to keep."""
+    d = schema5(data)
+    s = next(x for x in d["sailings"] if x["id"].startswith(ship))
+    why = "RuntimeError: NCL answered HTTP 500; the previous file has no prices for 1 guest"
+    s["party_sizes"]["1"] = {"updated": False, "checked": False, "as_of": None, "why": why}
+    for t in s["types"]:
+        for c in t["categories"]:
+            c["by_guests"]["1"] = {"available": False, "sold_out": False, "reason": fp.NOT_CHECKED}
+    s["price_summaries"] = [x for x in s["price_summaries"] if x["guests"] != 1]
+    d["checks"]["formula"] = [c for c in d["checks"]["formula"] if not (c["sailing"] == s["id"] and c["guests"] == 1)]
+    d["checks"]["one_guest"] = [c for c in d["checks"]["one_guest"] if c["sailing"] != s["id"]]
+    d["checks"]["deposits"] = [c for c in d["checks"]["deposits"] if not (c["sailing"] == s["id"] and c["guests"] == 1)]
+    s["payment"]["by_guests"]["1"] = {"deposit": None, "deposit_type": None, "deposit_category": None, "due_hours": None, "as_of": None,
+                                      "why": "prices for 1 guest not checked today"}
+    s["payment"].update(solo_1_guest=None, standard_deposit_1_guest_ok=None, deposit_offer_1_guest=None)
+    s["single_supplement"] = None
+    d["warnings"] += [f"{s['ship_short']}: prices for 1 guest not checked today ({why}); 1 guest left out",
+                      f"{s['ship_short']}: no deposit for 1 guest (prices for 1 guest not checked today); left empty"]
+    return d
+
+
 def null_copy(data):
     """The test copy for "Not found on NCL today": Getaway taxes and gratuities, and every rate,
     null, each with the warning fetch_prices.py would write."""
-    d = schema4(data)
+    d = schema5(data)
     g = next(s for s in d["sailings"] if s["id"].startswith("getaway"))
     g["taxes_per_guest"] = None
     g["gratuities"] = None
@@ -658,7 +772,7 @@ def test_kids_sail_free():
     check("Kids Sail Free by title only", fp.kids_sail_free({"offerGroups": [{"promotionsInGroup": [{"promotion": {"offers": [{"title": "KIDS SAIL FREE"}]}}]}]})["types"], [])
     check("Kids Sail Free: the Free at Sea code is still read the same way", fp.default_fare_codes(KSF_ANSWER), {"INSIDE": "ALL4CHO", "BALCONY": "ALL4CHO"})
     with open(os.path.join(os.path.dirname(TOOLS), "data", "prices.json"), encoding="utf-8") as f:
-        real = schema4(json.load(f))
+        real = schema5(json.load(f))
     check("format check: kids_sail_free null passes", check_prices.check(real), [])
     d = json.loads(json.dumps(real))
     d["sailings"][0]["kids_sail_free"] = dict(k, checked_at="2026-10-15T10:20:00Z")
@@ -667,7 +781,7 @@ def test_kids_sail_free():
         d["sailings"][0]["kids_sail_free"] = bad
         check(f"format check: kids_sail_free {bad!r} rejected", any("kids_sail_free must be null" in e for e in check_prices.check(d)), True)
     del d["sailings"][0]["kids_sail_free"]
-    check("format check: kids_sail_free missing from a schema 4 file rejected", any("kids_sail_free is missing" in e for e in check_prices.check(d)), True)
+    check("format check: kids_sail_free missing from a schema 5 file rejected", any("kids_sail_free is missing" in e for e in check_prices.check(d)), True)
 
 
 # ---------- Florida resident rates (5.1.0) ----------
@@ -1234,16 +1348,27 @@ class PaymentNCL:
     2026-10-28 research saw them: $50 per guest up to Club Balcony Suite (due in 76 hours), 10%
     of the cruise fare for Suite and Haven (23 hours), final payment 120 days before sailing, and
     the 2-For-1 Deposits offer in the availability answers. The Aura at 5 guests has only Haven
-    cabins, so its cheapest cabin is a Haven (as on NCL today). Taxes $100 per guest."""
-    CATS = {"INSIDE": [("IX", 380), ("IA", 420)], "BALCONY": [("B4", 600)], "MINISUITE": [("MB", 678)],
-            "SUITE": [("SC", 2000)], "HAVEN": [("H6", 3500)]}
+    cabins, so its cheapest cabin is a Haven (as on NCL today). Taxes $100 per guest.
+
+    1 guest (5.4.0), as NCL answered in the probe of 2026-11-15: solo cabins (T1, IT, BT) are
+    available only at 1 guest, priced for one; a regular cabin for 1 guest costs twice its per guest
+    fare plus taxes for one, with the fare line titled "Free 2nd Guest"; $50 deposit in 84 hours.
+    Options change that for a test: no_solo (ships without a solo cabin), one_tax and one_bar
+    (other tax or Open Bar lines at 1 guest), one_haven (ships where only The Haven and the solo
+    cabins are open for 1 guest), odd_fare (codes whose 1 guest fare isn't twice the 2 guest one)."""
+    CATS = {"STUDIO": [("T1", 450)], "INSIDE": [("IX", 380), ("IA", 420), ("IT", 400)], "BALCONY": [("B4", 600), ("BT", 520)],
+            "MINISUITE": [("MB", 678)], "SUITE": [("SC", 2000)], "HAVEN": [("H6", 3500)]}
+    SOLO = {"T1", "IT", "BT"}
     TAX = 100
 
-    def __init__(self, fail=(), deposit=None, final=None, offer=True):
+    def __init__(self, fail=(), deposit=None, final=None, offer=True, no_solo=(), one_tax=None, one_bar=None,
+                 one_haven=(), odd_fare=()):
         self.fail = set(fail)               # (ship_short, guests) whose availability call fails
-        self.deposit = deposit or {}        # (ship_short, guests): deposit NCL lists instead of its rule
+        self.deposit = deposit or {}        # (ship_short, guests) or (ship_short, 1, code): deposit NCL lists instead of its rule
         self.final = final or {}            # (ship_short, guests): final payment date instead of the rule
         self.offer = offer
+        self.no_solo, self.one_haven, self.odd_fare = set(no_solo), set(one_haven), set(odd_fare)
+        self.one_tax, self.one_bar = one_tax or {}, one_bar or {}
         self.calls = []
         self.ship = {}
 
@@ -1251,8 +1376,22 @@ class PaymentNCL:
         return next(c for c in fp.SAILINGS if c["ship_short"] == self.ship[str(package_id)])
 
     def cats(self, ship, guests):
-        only_haven = ship == "Aura" and guests == 5
-        return {t: c for t, c in self.CATS.items() if not only_haven or t == "HAVEN"}
+        only_haven = (ship == "Aura" and guests == 5) or (guests == 1 and ship in self.one_haven)
+        return {t: [(c, p) for c, p in cats if (c in self.SOLO) == (guests == 1) or c not in self.SOLO]
+                for t, cats in self.CATS.items() if not only_haven or t == "HAVEN" or (guests == 1 and t in ("STUDIO", "INSIDE", "BALCONY"))}
+
+    def open(self, ship, guests, code):
+        if code in self.SOLO:
+            return guests == 1 and ship not in self.no_solo
+        if guests == 1 and ship in self.one_haven:
+            return code == "H6"
+        return True
+
+    def price(self, guests, code, base):
+        """NCL's average per guest price (with taxes) for the party."""
+        if guests != 1 or code in self.SOLO:
+            return base
+        return 2 * (base - self.TAX) + self.TAX + (30 if code in self.odd_fare else 0)
 
     def __call__(self, url, body=None, raw=False, page=False):
         self.calls.append(url)
@@ -1275,11 +1414,17 @@ class PaymentNCL:
             ship, g = self.ship[f["packageId"]], f["numberOfGuests"]
             if (ship, g) in self.fail:
                 raise RuntimeError("NCL answered HTTP 500")
-            types = [{"code": t, "title": t.title(), "stateroomsPricing": [{"stateroom": {"title": f"{t.title()} {code}"},
-                      "categoryPricing": [{"isAvailable": True, "standardOption": {"pricedCategoryCode": code, "price": price, "guestCapacity": 5}}]}
-                      for code, price in cats]} for t, cats in self.cats(ship, g).items()]
+
+            def pricing(code, price):
+                if not self.open(ship, g, code):
+                    return {"isAvailable": False, "isSoldOut": False, "standardOption": {"pricedCategoryCode": code, "guestCapacity": 0}}
+                return {"isAvailable": True, "standardOption": {"pricedCategoryCode": code, "price": self.price(g, code, price),
+                                                                "guestCapacity": 1 if code in self.SOLO else 5}}
+            types = [{"code": t, "title": t.title(), "stateroomsPricing": [
+                {"stateroom": {"title": f"Solo {t.title()}" if code in self.SOLO else f"{t.title()} {code}"}, "categoryPricing": [pricing(code, price)]}
+                for code, price in cats]} for t, cats in self.cats(ship, g).items()]
             groups = [{"code": "FREE-AT-SEA", "promotionsInGroup": [
-                {"isDefaultInGroup": True, "promotion": {"promotionCodes": ["ALL4CHO"], "stateroomTypes": ["INSIDE", "BALCONY", "MINISUITE"]}},
+                {"isDefaultInGroup": True, "promotion": {"promotionCodes": ["ALL4CHO"], "stateroomTypes": ["STUDIO", "INSIDE", "BALCONY", "MINISUITE"]}},
                 {"isDefaultInGroup": True, "promotion": {"promotionCodes": ["CHOALL4M"], "stateroomTypes": ["SUITE", "HAVEN"]}}]}]
             if self.offer:
                 groups.append({"code": "MORE-OFFERS", "promotionsInGroup": [{"promotion": {"promotionCodes": [], "stateroomTypes": [], "offers": [
@@ -1290,28 +1435,30 @@ class PaymentNCL:
             f = body["stateroomFilters"][0]
             ship, g, code, tcode = self.ship[body["packageId"]], f["numberOfGuests"], f["pricedCategoryCode"], f["stateroomTypeCode"]
             cfg = self.cfg_for(body["packageId"])
-            price = next(p for c, p in self.CATS[tcode] if c == code)
-            fare = price - self.TAX
+            price = self.price(g, code, next(p for c, p in self.CATS[tcode] if c == code))
+            tax = self.one_tax.get(ship, self.TAX) if g == 1 else self.TAX
             if f["guests"]:   # the age test: 1 adult, a 15 year old, a 7 year old
                 bar, dining = [96, 37.5, 0], [20, 20, 0]
             else:
-                bar, dining = [96] * g, [20] * g
-            fare_total = fare * g
+                bar, dining = [self.one_bar.get(ship, 96) if g == 1 else 96] * g, [20] * g
+            fare_total = (price - self.TAX) * g
             deposit = round(fare_total * 0.1, 2) if tcode in ("SUITE", "HAVEN") else 50 * g
-            deposit = self.deposit.get((ship, g), deposit)
+            deposit = self.deposit.get((ship, g, code), self.deposit.get((ship, g), deposit))
             final = self.final.get((ship, g), (dt.date.fromisoformat(cfg["depart"]) - dt.timedelta(days=120)).isoformat())
             options = [{"paymentType": "FULL", "amount": 1, "dueDate": final + "T23:59:59"}, {"paymentType": "MONTHLY", "amount": 1},
                        {"isDeposit": True, "paymentType": "HOLD", "amount": deposit, "dueHours": 76}]
             if deposit is not None:
-                options.insert(0, {"paymentType": "DEPOSIT", "amount": deposit, "dueHours": 23 if tcode in ("SUITE", "HAVEN") else 76,
-                                   "dueDate": "2026-10-31T23:59:59"})
+                options.insert(0, {"paymentType": "DEPOSIT", "amount": deposit,
+                                   "dueHours": 23 if tcode in ("SUITE", "HAVEN") else 84 if g == 1 else 76, "dueDate": "2026-10-31T23:59:59"})
             guests = lambda xs: [{"price": x} for x in xs]
+            fare_line = "Free 2nd Guest" if g == 1 else "Fare"
             return {"staterooms": [{"paymentOptions": options, "pricing": {"priceGroups": [
-                {"code": "STATEROOM", "priceItems": [{"code": "fare", "title": "Fare", "guests": guests([fare] * g)}]},
+                {"code": "STATEROOM", "priceItems": [{"code": "x-strikethrough", "itemType": "strikethrough", "title": "Inside"},
+                                                     {"code": "fare", "title": fare_line, "guests": guests([price - self.TAX] * g)}]},
                 {"code": "FREE-AT-SEA", "priceItems": [
                     {"code": "unlimited-open-bar-offer", "title": "Unlimited Open Bar", "guests": guests(bar)},
                     {"code": "specialty-dining-offer-2-4-nights", "title": "Specialty Dining - 1 Meal", "guests": guests(dining)}]},
-                {"code": "TAXES-AND-FEES", "priceItems": [{"code": "taxes-and-fees", "title": "Taxes", "guests": guests([self.TAX] * g)}]}]}}],
+                {"code": "TAXES-AND-FEES", "priceItems": [{"code": "taxes-and-fees", "title": "Taxes", "guests": guests([tax] * g)}]}]}}],
                 "total": {"grandTotal": round(price * g) + sum(bar) + sum(dining)}}
         raise AssertionError(f"unexpected NCL call {url}")
 
@@ -1406,12 +1553,13 @@ def test_payment():
     check("deposit offer read from a group's own offers", fp.deposit_offer(in_group)["title"], "Reduced Deposits")
     check("no deposit offer listed: None", fp.deposit_offer(KSF_ANSWER), None)
 
-    # A whole run: the same 26 NCL API calls and pages as before 5.2.0, nothing more.
+    # A whole run: 32 NCL calls (5.4.0: 26 before, plus 1 availability call and 2 price summaries
+    # per ship for 1 guest), nothing more.
     ncl = PaymentNCL()
     data, printed = price_run(ncl, folder)
-    check("payment run: 24 calls through request() (2 cruise pages, 2 itinerary, 2 route-events, 8 availability, 10 price summaries), "
-          "plus the 2 terms pages = 26 NCL calls, as before 5.2.0", len(ncl.calls), 24)
-    check("payment run: schema 4 file passes the format check", check_prices.check(data), [])
+    check("payment run: 30 calls through request() (2 cruise pages, 2 itinerary, 2 route-events, 10 availability, 14 price summaries), "
+          "plus the 2 terms pages = 32 NCL calls", len(ncl.calls), 30)
+    check("payment run: schema 5 file passes the format check", check_prices.check(data), [])
     g, a = data["sailings"]
     check("Getaway: $50 per guest, final payment Feb 11, 2027", (g["payment"]["standard_deposit_per_guest"], g["payment"]["final_payment_due"]), (50.0, "2027-02-11"))
     check("Aura: final payment Feb 14, 2027", a["payment"]["final_payment_due"], "2027-02-14")
@@ -1420,7 +1568,8 @@ def test_payment():
                                                                    a["payment"]["by_guests"]["5"]["due_hours"]), (1700.0, "HAVEN", 23))
     check("Suite and Haven rule confirmed today on the Aura Haven", (data["deposit_rules"]["percent_of_fare"], data["deposit_rules"]["confirmed_by"]),
           (10, "aura-2027-06-14 H6 at 5 guests"))
-    check("deposit checks: 7 per guest and 1 percent, all ok", (len(data["checks"]["deposits"]), all(c["ok"] for c in data["checks"]["deposits"])), (8, True))
+    check("deposit checks: 7 per guest and 1 percent, plus 2 for 1 guest per ship, all ok",
+          (len(data["checks"]["deposits"]), all(c["ok"] for c in data["checks"]["deposits"])), (12, True))
     check("deposit offer from the availability answers", g["payment"]["deposit_offer"]["title"], "2-For-1 Deposits")
     check("no warnings on a clean run", data["warnings"], [])
     check("run page notice for deposits", "::notice title=Deposits Getaway::$50 per guest up to Club Balcony Suite, Suite and Haven 10% of the fare, final payment 2027-02-11, offer: 2-For-1 Deposits" in printed, True)
@@ -1432,7 +1581,7 @@ def test_payment():
           (200.0, g["party_sizes"]["4"]["as_of"]))
     check("failed party size: file passes the format check", check_prices.check(day2), [])
 
-    # First run after the merge: the kept prices come from a schema 3 file (no deposits in them).
+    # The kept prices come from a file written before deposits were read (schema 3).
     old = json.loads(json.dumps(data))
     old["schema_version"] = 3
     for k in ("deposit_rules",):
@@ -1508,8 +1657,230 @@ def test_payment():
           any("check failed but payment.standard" in x for x in broken(lambda d: d["checks"]["deposits"][0].update(ok=False))), True)
     check("format: a deposit offer without a title fails",
           any("deposit_offer must be" in x for x in broken(lambda d: d["sailings"][0]["payment"]["deposit_offer"].update(title=""))), True)
-    check("format: a schema 3 file is refused outside the release check", "schema_version must be 4" in check_prices.check(old), True)
-    check("format: the release check accepts a schema 3 file", check_prices.check(old, allow_schema_3=True), [])
+    check("format: a schema 3 file is refused, in the release check too", ("schema_version must be 5" in check_prices.check(old),
+          "schema_version must be 5" in check_prices.check(old, allow_schema_4=True)), (True, True))
+
+
+def test_one_guest():
+    """Party size 1, solo travelers (5.4.0): two price summaries at 1 guest (regular and solo), the
+    1 guest deposits checked on their own, the single supplement facts, and party size 1 never
+    failing the run or stopping the prices for 2 to 5 guests."""
+    import check_prices
+    folder = tempfile.mkdtemp(prefix="june-one-guest-")
+    ncl = PaymentNCL()
+    data, printed = price_run(ncl, folder)
+    g, a = data["sailings"]
+    check("1 guest: schema 5 with party sizes 1 to 5", (data["schema_version"], data["guest_counts"], sorted(g["party_sizes"])),
+          (5, [1, 2, 3, 4, 5], ["1", "2", "3", "4", "5"]))
+    check("1 guest: 2 availability calls and 4 price summaries more than 2 to 5 guests",
+          (sum(u == fp.AVAILABILITY_URL for u in ncl.calls), sum(u == fp.PRICE_SUMMARY_URL for u in ncl.calls)), (10, 14))
+    ones = [(x["kind"], x["category"], x["grand_total"]) for x in g["price_summaries"] if x["guests"] == 1]
+    check("1 guest: the cheapest regular cabin (IX: $660 cabin, $776 with Free at Sea) and the cheapest solo cabin (IT)",
+          ones, [("regular", "IX", 776), ("solo", "IT", 516)])
+    check("1 guest: every price summary has its kind", sorted({x["kind"] for x in g["price_summaries"]}), ["regular", "solo"])
+    check("1 guest: a formula check for each kind", sorted(c["kind"] for c in data["checks"]["formula"] if c["sailing"] == g["id"] and c["guests"] == 1),
+          ["regular", "solo"])
+    cat = lambda s, code: next(c for t in s["types"] for c in t["categories"] if c["code"] == code)
+    check("1 guest: solo cabins priced for one", (cat(g, "IT")["by_guests"]["1"]["cabin_total"], cat(g, "T1")["by_guests"]["1"]["cabin_total"]), (400, 450))
+    check("1 guest: solo cabins not available for 2 guests, capacity still from the 2 guest call",
+          (cat(g, "IT")["by_guests"]["2"]["available"], cat(g, "IT")["by_guests"]["2"]["reason"], cat(g, "IT")["capacity"]),
+          (False, "Not available for 2 guests", None))
+    check("1 guest: a regular cabin at twice the per guest fare plus taxes for one", cat(g, "IA")["by_guests"]["1"]["cabin_total"], 740)
+    check("1 guest: no added_vs_2 at 1 guest", "added_vs_2" in cat(g, "IA")["by_guests"]["1"], False)
+    check("1 guest: by_guests keys in order 1 to 5", list(cat(g, "IA")["by_guests"]), ["1", "2", "3", "4", "5"])
+    check("1 guest: single supplement, every regular category twice the 2 guest fare, NCL's fare line",
+          {k: g["single_supplement"][k] for k in ("categories", "matching", "all_match", "ncl_fare_line")},
+          {"categories": 6, "matching": 6, "all_match": True, "ncl_fare_line": "Free 2nd Guest"})
+    pay = g["payment"]
+    check("1 guest: the regular and solo deposits, $50 in 84 hours, confirmed against $50 per guest",
+          (pay["by_guests"]["1"]["deposit"], pay["by_guests"]["1"]["deposit_category"], pay["solo_1_guest"]["deposit"],
+           pay["solo_1_guest"]["deposit_category"], pay["solo_1_guest"]["due_hours"], pay["standard_deposit_1_guest_ok"]),
+          (50.0, "IX", 50.0, "IT", 84, True))
+    check("1 guest: NCL's deposit offer as listed in the 1 guest answer", pay["deposit_offer_1_guest"]["title"], "2-For-1 Deposits")
+    check("1 guest: no Suite or Haven summary for 1 guest, so David confirms those", data["deposit_rules"]["one_guest_confirmed_on"], None)
+    check("1 guest: no warnings on a clean run", data["warnings"], [])
+    check("1 guest: run page notice", "::notice title=1 guest Getaway::updated today, cheapest solo IT $516 with Free at Sea, "
+          "single supplement: 6 of 6 regular categories charge twice the 2 guest fare per guest" in printed, True)
+
+    # The price summaries by party size: a failed 2 guest call keeps the 2 guest entry, never a 1 guest one.
+    day2, _ = price_run(PaymentNCL(fail={("Getaway", 2)}), folder, previous=data)
+    g2 = day2["sailings"][0]
+    two = [x for x in g2["price_summaries"] if x["guests"] == 2]
+    check("kept 2 guest prices: the 2 guest summary (not a 1 guest one) is kept", [(x["kind"], x["category"], x["guests"]) for x in two], [("regular", "IX", 2)])
+    check("kept 2 guest prices: its deposit is the 2 guest deposit", g2["payment"]["by_guests"]["2"]["deposit"], 100.0)
+    check("kept 2 guest prices: 1 guest summaries are today's own", [(x["kind"], x["guests"]) for x in g2["price_summaries"] if x["guests"] == 1],
+          [("regular", 1), ("solo", 1)])
+    check("kept 2 guest prices: file passes", check_prices.check(day2), [])
+    # A failed 1 guest call with yesterday's 1 guest prices: both kept, each where it belongs.
+    day3, _ = price_run(PaymentNCL(fail={("Getaway", 1)}), folder, previous=data)
+    g3 = day3["sailings"][0]
+    check("1 guest failed: kept prices, not updated, with their time", (g3["party_sizes"]["1"]["updated"], g3["party_sizes"]["1"]["checked"],
+          g3["party_sizes"]["1"]["as_of"]), (False, True, g["party_sizes"]["1"]["as_of"]))
+    check("1 guest failed: both kept 1 guest summaries, by kind", [(x["kind"], x["category"]) for x in g3["price_summaries"] if x["guests"] == 1],
+          [("regular", "IX"), ("solo", "IT")])
+    check("1 guest failed: the kept deposits (regular and solo)", (g3["payment"]["by_guests"]["1"]["deposit_category"], g3["payment"]["solo_1_guest"]["deposit_category"]),
+          ("IX", "IT"))
+    check("1 guest failed: the kept prices", cat(g3, "IT")["by_guests"]["1"]["cabin_total"], 400)
+    check("1 guest failed: the 2 to 5 guest prices are today's", all(g3["party_sizes"][k]["updated"] for k in "2345"), True)
+    check("1 guest failed: kept formula checks for 1 guest", sorted(c["kind"] for c in day3["checks"]["formula"] if c["sailing"] == g3["id"] and c["guests"] == 1),
+          ["regular", "solo"])
+    check("1 guest failed: file passes", check_prices.check(day3), [])
+
+    # A failed 1 guest call and nothing to keep: not checked today, the run goes on.
+    for name, prev in (("no previous file", None), ("a schema 4 previous file", schema4(json.loads(json.dumps(data)))),
+                       ("kept prices more than 3 days old", None)):
+        if name == "a schema 4 previous file":
+            prev["schema_version"] = 4
+            for s in prev["sailings"]:
+                s["party_sizes"].pop("1")
+        if name.startswith("kept"):
+            prev = json.loads(json.dumps(data))
+            prev["sailings"][0]["party_sizes"]["1"]["as_of"] = "2020-01-01T10:00:00Z"
+        nc, _ = price_run(PaymentNCL(fail={("Getaway", 1)}), folder, previous=prev)
+        gn = nc["sailings"][0]
+        check(f"1 guest not checked ({name}): party size 1", (gn["party_sizes"]["1"]["updated"], gn["party_sizes"]["1"]["checked"], gn["party_sizes"]["1"]["as_of"]),
+              (False, False, None))
+        check(f"1 guest not checked ({name}): every cabin 'Not checked today'",
+              {c["by_guests"]["1"]["reason"] for t in gn["types"] for c in t["categories"]}, {"Not checked today"})
+        check(f"1 guest not checked ({name}): warning", any(w.startswith("Getaway: prices for 1 guest not checked today") for w in nc["warnings"]), True)
+        check(f"1 guest not checked ({name}): no 1 guest summary, deposit or supplement",
+              ([x for x in gn["price_summaries"] if x["guests"] == 1], gn["payment"]["solo_1_guest"], gn["single_supplement"]), ([], None, None))
+        check(f"1 guest not checked ({name}): 2 to 5 guests updated, the Aura untouched",
+              (all(gn["party_sizes"][k]["updated"] for k in "2345"), nc["sailings"][1]["party_sizes"]["1"]["updated"]), (True, True))
+        check(f"1 guest not checked ({name}): file passes", check_prices.check(nc), [])
+    # 2 to 5 guests all failing still fails the run, even when 1 guest worked.
+    try:
+        price_run(PaymentNCL(fail={("Aura", n) for n in (2, 3, 4, 5)}), folder, previous=None)
+        check("every party size from 2 to 5 failed: the run fails", False, True)
+    except RuntimeError as e:
+        check("every party size from 2 to 5 failed: the run fails", "Every party size from 2 to 5 guests failed" in str(e), True)
+    # Every party size failing on a ship, 1 guest included: still that rule, never a 1 guest one.
+    try:
+        price_run(PaymentNCL(fail={("Aura", n) for n in (1, 2, 3, 4, 5)}), folder, previous=None)
+        check("every party size failed: the run fails", False, True)
+    except RuntimeError as e:
+        check("every party size failed: the run fails", "Every party size from 2 to 5 guests failed" in str(e), True)
+
+    # A 1 guest summary whose tax or Open Bar line differs from the amounts the page uses fails party size 1 only.
+    for name, opts in (("tax line", {"one_tax": {"Getaway": 120}}), ("Open Bar line", {"one_bar": {"Getaway": 192}})):
+        bad, _ = price_run(PaymentNCL(**opts), folder, previous=None)
+        gb = bad["sailings"][0]
+        check(f"1 guest {name} differs: party size 1 not checked, 2 to 5 updated",
+              (gb["party_sizes"]["1"]["checked"], all(gb["party_sizes"][k]["updated"] for k in "2345")), (False, True))
+        check(f"1 guest {name} differs: logged in checks.one_guest", [c["ok"] for c in bad["checks"]["one_guest"] if c["sailing"] == gb["id"]], [False, False])
+        check(f"1 guest {name} differs: file passes", check_prices.check(bad), [])
+    # No solo cabin available on the Aura: only the regular summary, which is not a failure.
+    ns = PaymentNCL(no_solo={"Aura"})
+    nos, _ = price_run(ns, folder, previous=None)
+    an = nos["sailings"][1]
+    check("no solo cabin: 1 price summary fewer", sum(u == fp.PRICE_SUMMARY_URL for u in ns.calls), 13)
+    check("no solo cabin: updated, regular summary only, no solo deposit",
+          (an["party_sizes"]["1"]["updated"], [x["kind"] for x in an["price_summaries"] if x["guests"] == 1], an["payment"]["solo_1_guest"]), (True, ["regular"], None))
+    check("no solo cabin: file passes", check_prices.check(nos), [])
+    # NCL's 1 guest deposit isn't the per guest one: left to David at 1 guest, $50 per guest kept for 2 to 5.
+    odd, _ = price_run(PaymentNCL(deposit={("Getaway", 1, "IT"): 100}), folder, previous=None)
+    po = odd["sailings"][0]["payment"]
+    check("1 guest deposit differs: not confirmed, standard deposit for 2 to 5 unchanged",
+          (po["standard_deposit_1_guest_ok"], po["standard_deposit_per_guest"], po["solo_1_guest"]["deposit"]), (False, 50.0, 100.0))
+    check("1 guest deposit differs: warning", any(w.startswith("Getaway: NCL's deposit for 1 guest today") and "left to David" in w for w in odd["warnings"]), True)
+    check("1 guest deposit differs: the per guest check of 2 to 5 guests passes", all(c["ok"] for c in odd["checks"]["deposits"] if c["rule"] == fp.PER_GUEST_RULE), True)
+    check("1 guest deposit differs: file passes", check_prices.check(odd), [])
+    # Only The Haven open for 1 guest on the Aura: its 10% deposit confirms the rule for 1 guest.
+    hv, _ = price_run(PaymentNCL(one_haven={"Aura"}), folder, previous=None)
+    check("1 guest Haven: 10% confirmed for 1 guest today", (hv["deposit_rules"]["one_guest_confirmed_on"], hv["deposit_rules"]["percent_of_fare"]),
+          (fp.eastern_day(dt.datetime.now(dt.timezone.utc)), 10))
+    check("1 guest Haven: file passes", check_prices.check(hv), [])
+    hb, _ = price_run(PaymentNCL(one_haven={"Aura"}, deposit={("Aura", 1, "H6"): 999}), folder, previous=hv)
+    check("1 guest Haven not 10%: empty for 1 guest, the 2 to 5 guest rule unchanged", (hb["deposit_rules"]["one_guest_confirmed_on"], hb["deposit_rules"]["percent_of_fare"]),
+          (None, 10))
+    check("1 guest Haven not 10%: warning", any(w.startswith("Deposits: NCL's Suite or Haven deposit for 1 guest") for w in hb["warnings"]), True)
+    check("1 guest Haven not 10%: file passes", check_prices.check(hb), [])
+    # A regular category whose 1 guest fare isn't twice the 2 guest one: the page leaves the "today" part out.
+    sp, _ = price_run(PaymentNCL(odd_fare={"IA"}), folder, previous=None)
+    check("single supplement: one category differs", {k: sp["sailings"][0]["single_supplement"][k] for k in ("categories", "matching", "all_match")},
+          {"categories": 6, "matching": 5, "all_match": False})
+
+    # The format check on the 1 guest data.
+    def broken(change, base=data):
+        d = json.loads(json.dumps(base))
+        change(d)
+        return check_prices.check(d)
+    has = lambda errs, text: any(text in e for e in errs)
+    check("format: a 1 guest summary without its kind fails", has(broken(lambda d: d["sailings"][0]["price_summaries"][0].pop("kind")), "kind regular or solo"), True)
+    check("format: a solo summary at 2 guests fails",
+          has(broken(lambda d: next(x for x in d["sailings"][0]["price_summaries"] if x["guests"] == 2).update(kind="solo")), "solo at 1 guest only"), True)
+    check("format: a missing 1 guest formula check fails", has(broken(lambda d: d["checks"].update(formula=[c for c in d["checks"]["formula"]
+          if not (c["guests"] == 1 and c["kind"] == "solo")])), "checks.formula at 1 guest"), True)
+    check("format: by_guests without 1 fails", has(broken(lambda d: d["sailings"][0]["types"][0]["categories"][0]["by_guests"].pop("1")), "exactly the keys 1, 2, 3, 4, 5"), True)
+    check("format: party size 1 not checked without a warning fails",
+          has(broken(lambda d: d.update(warnings=[]), base=nc), "not checked without a warning"), True)
+    check("format: not checked but a cabin priced for 1 guest fails",
+          has(broken(lambda d: d["sailings"][0]["types"][1]["categories"][0]["by_guests"].update({"1": {"available": True, "sold_out": False, "price_pp": 1.0, "cabin_total": 1}}), base=nc),
+              "must be unavailable"), True)
+    check("format: only party size 1 can be not checked",
+          has(broken(lambda d: d["sailings"][0]["party_sizes"]["3"].update(checked=False)), "only party size 1"), True)
+    check("format: a failed 1 guest deposit check with the deposit still confirmed fails",
+          has(broken(lambda d: d["sailings"][0]["payment"].update(standard_deposit_1_guest_ok=True), base=odd), "1 guest deposit check failed"), True)
+    check("format: an unconfirmed 1 guest deposit without a warning fails",
+          has(broken(lambda d: (d["sailings"][0]["payment"].update(standard_deposit_1_guest_ok=None), d.update(warnings=[]))), "no warning"), True)
+    check("format: single_supplement that doesn't add up fails",
+          has(broken(lambda d: d["sailings"][0]["single_supplement"].update(matching=3)), "all_match"), True)
+    check("format: single_supplement missing fails", has(broken(lambda d: d["sailings"][0].pop("single_supplement")), "single_supplement is missing"), True)
+    check("format: a 1 guest check that failed with party size 1 updated fails",
+          has(broken(lambda d: d["checks"]["one_guest"][0].update(ok=False)), "1 guest check failed but party size 1 is updated"), True)
+    check("format: one_guest_confirmed_on missing fails", has(broken(lambda d: d["deposit_rules"].pop("one_guest_confirmed_on")), "one_guest_confirmed_on is missing"), True)
+    # The schema 5 test copies the page tests use (test_tools.schema5 and not_checked_1) pass too.
+    with open(os.path.join(os.path.dirname(TOOLS), "data", "prices.json"), encoding="utf-8") as f:
+        real = json.load(f)
+    check("format: the schema 5 test copy of today's prices passes", check_prices.check(schema5(real)), [])
+    check("format: the not checked test copy passes", check_prices.check(not_checked_1(real)), [])
+
+
+def test_saved_one_guest():
+    """NCL's own 1 guest answers from the probe of 2026-11-15 (tools/test_data/, response bodies only;
+    the HOLD payment option's due date and every cabin number replaced with "REMOVED"): read the
+    way fetch_prices.py reads them."""
+    one = lambda name: saved(name + "_1_2026-11-15")
+    for name in ("price_summary_getaway_IT", "price_summary_getaway_IF", "price_summary_aura_T1", "price_summary_aura_IF"):
+        allowed = []
+        check(f"saved {name}: passes the hold guard as a price summary (only the HOLD payment option)",
+              (fp.hold_signal(one(name), price_summary=True, allowed=allowed), len(allowed)), (None, 1))
+        check(f"saved {name}: would stop the run as any other answer", fp.hold_signal(one(name)) is not None, True)
+    for name in ("availability_getaway", "availability_aura", "cabin_availability_aura_I4", "cabin_availability_getaway_IT"):
+        check(f"saved {name}: no hold signal", fp.hold_signal(one(name)), None)
+    # The availability answers: solo cabins, the default Free at Sea codes, the deposit offer.
+    rows = {}
+    for ship in ("getaway", "aura"):
+        res = one(f"availability_{ship}")["results"][0]["result"]
+        rows[ship] = {so["pricedCategoryCode"]: (cp.get("isAvailable"), so.get("price"))
+                      for t in res["stateroomTypesPricing"] for sp in t["stateroomsPricing"] for cp in sp["categoryPricing"]
+                      for so in [cp.get("standardOption") or {}] if so.get("pricedCategoryCode")}
+        check(f"saved {ship} availability: default Free at Sea codes", fp.default_fare_codes(res),
+              {"STUDIO": "ALL4CHO", "INSIDE": "ALL4CHO", "OCEANVIEW": "ALL4CHO", "MINISUITE": "ALL4CHO", "BALCONY": "ALL4CHO", "HAVEN": "CHOALL4M", "SUITE": "CHOALL4M"})
+        check(f"saved {ship} availability: NCL's deposit offer at 1 guest", fp.deposit_offer(res)["title"], "2-For-1 Deposits")
+        check(f"saved {ship} availability: no Kids Sail Free", fp.kids_sail_free(res), None)
+    check("saved Getaway: every solo cabin available for 1 guest", [rows["getaway"][c] for c in ("T1", "IT", "OT", "BT")],
+          [(True, 539), (True, 509), (True, 569), (True, 639)])
+    check("saved Aura: Solo Inside and Solo Oceanview sold out", [rows["aura"][c] for c in ("T1", "IT", "OT", "BT")],
+          [(True, 2089), (False, None), (False, None), (True, 3109)])
+    # The price summaries, as fetch_price_summary reads them, against the page's amounts.
+    keep = fp.request
+    try:
+        for ship, code, tcode, avail, taxes, bar, dining in (("getaway", "IT", "INSIDE", 509, 150, 96, 20), ("getaway", "IF", "INSIDE", 548, 150, 96, 20),
+                                                             ("aura", "T1", "STUDIO", 2089, 160, 160, 40), ("aura", "IF", "INSIDE", 2098, 160, 160, 40)):
+            fp.request = lambda url, body=None, raw=False, page=False, n=f"price_summary_{ship}_{code}": one(n)
+            cfg = dict(next(c for c in fp.SAILINGS if c["id"].startswith(ship)), package_id="1")
+            sm = fp.fetch_price_summary(cfg, 1, tcode, code, "ALL4CHO")
+            sm["kind"] = "solo" if code in fp.SOLO_CODES else "regular"
+            f = fp.formula_check(cfg, 1, sm, avail, sm["kind"])
+            check(f"saved {ship} {code}: formula check (availability price + Open Bar + Specialty Dining = NCL's total)", (f["ok"], f["ncl_total"]),
+                  (True, avail + bar + dining))
+            grat = {"open_bar": {"per_guest": bar}, "specialty_dining": {"per_guest": dining}}
+            check(f"saved {ship} {code}: tax and gratuity lines equal the page's amounts", [c["ok"] for c in fp.one_guest_checks(cfg, [sm], taxes, grat)], [True])
+            check(f"saved {ship} {code}: $50 deposit in 84 hours", (sm["deposit"], sm["deposit_due_hours"]), (50.0, 84))
+            check(f"saved {ship} {code}: NCL's fare line is 'Free 2nd Guest'", sm["fare_title"], "Free 2nd Guest")
+    finally:
+        fp.request = keep
 
 
 def test_family_checks():
@@ -1561,6 +1932,8 @@ if __name__ == "__main__":
     test_florida_clone_guard()
     test_offers()
     test_payment()
+    test_one_guest()
+    test_saved_one_guest()
     test_eastern_dates()
     test_family_checks()
     test_no_em_dashes()
