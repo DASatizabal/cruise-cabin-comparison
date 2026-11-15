@@ -1,0 +1,42 @@
+{
+ "schema_version": 2,
+ "saved_at": "2026-11-15T10:21:01Z",
+ "checked_on": "2026-11-15",
+ "source": "https://www.ncl.com/cruise-deals/cruisenext",
+ "read_ok": true,
+ "warnings": [],
+ "multi_credit": {
+  "listed": true,
+  "title": "Limited-Time Offer: DoubleUp!",
+  "name": "DoubleUp!",
+  "credits": 2,
+  "text": "Book ANY stateroom on any sailing at least 90 days prior to sailing and apply TWO CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
+  "types": [
+   "STUDIO",
+   "INSIDE",
+   "OCEANVIEW",
+   "BALCONY",
+   "MINISUITE",
+   "SUITE",
+   "HAVEN"
+  ],
+  "min_days": 90,
+  "min_months": null,
+  "read_on": "2026-11-15",
+  "since": "2026-11-12"
+ },
+ "last_change": {
+  "kind": "changed",
+  "on": "2026-11-12",
+  "old_listed": true,
+  "old_name": "TripleUp!",
+  "old_credits": 3,
+  "old_text": "Book a Balcony and above stateroom on any sailing at least 90 days prior to sailing and apply THREE CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
+  "new_listed": true,
+  "new_name": "DoubleUp!",
+  "new_credits": 2,
+  "new_text": "Book ANY stateroom on any sailing at least 90 days prior to sailing and apply TWO CruiseNext, CruiseNext Haven, CruiseNext Lite credits.*",
+  "marker": "offer-356d9e861ab8",
+  "reported": true
+ }
+}

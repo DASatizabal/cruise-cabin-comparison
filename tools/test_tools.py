@@ -615,6 +615,42 @@ def schema5(data):
     return d
 
 
+def schema3(data):
+    """A schema 3 copy of a price file (before 5.2.0: no payment data, no deposit rules or checks),
+    for the page's "deposit not found" test."""
+    d = json.loads(json.dumps(data))
+    d["schema_version"] = 3
+    d.pop("deposit_rules", None)
+    d["checks"].pop("deposits", None)
+    for s in d["sailings"]:
+        s.pop("payment", None)
+        for ps in s["price_summaries"]:
+            for k in ("deposit", "deposit_due_hours", "final_payment_due"):
+                ps.pop(k, None)
+    return d
+
+
+def one_guest_counts(counts, prices):
+    """A copy of data/counts.json with 1 guest entries as tools/fetch_counts.py writes them (5.4.0):
+    the solo cabins open for 1 guest in the price file (Getaway IT 10, the others 8 and up) and a
+    same_as copy of the 2 guest count for every regular cabin open for 1 guest."""
+    d = json.loads(json.dumps(counts))
+    for s in prices["sailings"]:
+        cats = d["sailings"].setdefault(s["id"], {})
+        for t in s["types"]:
+            for i, c in enumerate(t["categories"]):
+                if c["guarantee"] or not c["by_guests"]["1"]["available"]:
+                    continue
+                if c["solo"]:
+                    n = 10 if c["code"] == "IT" and s["id"].startswith("getaway") else 8 + i
+                    cats[c["code"]] = {"open_decks": None, "open_locations": None, "by_guests": {"1": {
+                        "cabins_left": n, "reliable": True, "why": None, "checked_at": d["saved_at"]}}}
+                elif c["code"] in cats and "2" in cats[c["code"]]["by_guests"]:
+                    bg = cats[c["code"]]["by_guests"]
+                    cats[c["code"]]["by_guests"] = {"1": dict(bg["2"], same_as="2"), **bg}
+    return d
+
+
 def not_checked_1(data, ship="getaway"):
     """A schema 5 copy where party size 1 is not checked today on one ship (5.4.0): no usable 1
     guest prices, as fetch_prices.py writes it after a failure with nothing to keep."""
@@ -2091,6 +2127,10 @@ def test_family_checks():
     check("release check: only one of the page settings fails", any("both be set" in x for x in check_release.family_checks(off, page("https://a.workers.dev", ""))), True)
     check("release check: a trailing slash fails", any("trailing slash" in x for x in check_release.family_checks(off, page("https://a.workers.dev/", "k"))), True)
     check("release check: http fails", any("not an https" in x for x in check_release.family_checks(off, page("http://a.workers.dev", "k"))), True)
+    root = tempfile.mkdtemp(prefix="june-preview-")
+    check("release check: no preview/ folder passes", check_release.preview_check(root), [])
+    os.makedirs(os.path.join(root, "preview"))
+    check("release check: a preview/ folder fails (5.4.0, remove it before merging)", any("preview/ exists" in x for x in check_release.preview_check(root)), True)
     with open(os.path.join(os.path.dirname(TOOLS), "tools", "family-alerts", "worker.js"), encoding="utf-8") as f:
         check("release check: the Worker file has the TEST_ORIGIN line", bool(re.search(r'^const TEST_ORIGIN = "[^"]*";$', f.read(), re.M)), True)
 

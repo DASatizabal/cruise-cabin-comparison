@@ -704,7 +704,14 @@
             background: var(--white); color: var(--red); font: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer;
         }
         .pw-stop:disabled { border-color: var(--gray-300); color: var(--gray-500); cursor: default; }
+        /* Sailing solo (5.4.0): shown at 1 guest only. */
+        .solo-note { margin-top: 0.8rem; padding: 0.7rem 0.85rem; border-radius: 10px; background: var(--gray-50, #f5f7fa); border: 1px solid var(--gray-300); font-size: 0.85rem; }
+        .solo-note strong { display: block; margin-bottom: 0.3rem; }
+        .solo-note ul { margin: 0; padding-left: 1.1rem; }
+        .solo-note li { margin: 0.2rem 0; }
+        .solo-line { margin-top: 0.6rem; font-size: 0.85rem; }
     </style>
+    <link rel="icon" href="data:,">
 </head>
 <body>
     <header class="hero">
@@ -742,6 +749,7 @@
             </div>
             <div class="guest-msg" id="guestMsg" role="status" aria-live="polite"></div>
             <div class="guest-summary" id="guestSummary"></div>
+            <div class="solo-note" id="soloNote" hidden></div>
         </section>
 
         <section class="panel" aria-label="Florida resident rate and gratuities">
@@ -811,11 +819,16 @@
         // credits reach his account within 3 days after his sailing ends on Nov 23, 2026.
         const CRUISENEXT = { credit: 250, cost: 125, signup: "https://www.ncl.com/account-access/register",
                              readyOn: "2026-11-26", sailingEnds: "Nov 23, 2026" };
-        const MIN_GUESTS = 2, MAX_GUESTS = 5;
+        // 5.4.0: 1 guest (solo travelers). The counter stops at 2 while either ship has no usable
+        // 1 guest prices (a file from before 5.4.0, or party size 1 not checked today).
+        const MIN_GUESTS = 1, MAX_GUESTS = 5;
+        const ONE_LATER = "Prices for 1 guest show after the next daily refresh.";
+        const SOLO_LABEL = "Priced for one (no single supplement)";
+        const SINGLE_LABEL = "Single occupancy price (includes NCL's single supplement)";
         // Option tiles (5.2.0), in tile order. Each tile is an on/off button; the full card of each
         // selected option shows below the tiles, in this order. None is selected on the first visit.
         const OPTIONS = [{ key: "G", label: "Option 1: 3 nights" }, { key: "A", label: "Option 2: 5 nights" }, { key: "8", label: "Option 3: 8 nights" }];
-        const TYPE_ORDER = ["inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];
+        const TYPE_ORDER = ["studio", "inside", "oceanview", "balcony", "mini_suite", "suite", "haven"];   // Studio at 1 guest only
         const STORE_KEY = "cruise-decision-guide-v5";
         // 5.0.0: the prepay switch default changed to off. Choices saved under the old key are
         // carried over once (guests, kid ages, cabins, Free at Sea), all but the prepay switch.
@@ -892,9 +905,15 @@
         }
 
         // ---------- data access ----------
-        // Solo cabins (T1, IT, OT, BT) and Studio only fit one guest, so they are hidden everywhere.
-        const types = s => s.types.filter(t => t.match !== "studio");
-        const catsOf = t => t.categories.filter(c => !c.solo);
+        // Solo cabins (T1, IT, OT, BT) and Studio only fit one guest, so they are shown at 1 guest
+        // only (5.4.0) and hidden at 2 to 5 guests.
+        const soloParty = () => guests() === 1;
+        const types = s => s.types.filter(t => t.match !== "studio" || soloParty());
+        const catsOf = t => t.categories.filter(c => !c.solo || soloParty());
+        // Both ships have usable 1 guest prices (schema 5, party size 1 checked).
+        const oneGuestOk = () => !!DATA && [G, A].every(s => { const st = s && s.party_sizes && s.party_sizes["1"]; return !!st && st.checked !== false; });
+        // The label under a cabin at 1 guest: priced for one (solo), or single occupancy (regular).
+        const oneLabel = c => !soloParty() ? "" : c.solo ? SOLO_LABEL : SINGLE_LABEL;
         const allCats = s => types(s).flatMap(t => catsOf(t).map(c => Object.assign({ typeTitle: t.title, typeMatch: t.match }, c)));
         const findCat = (s, code) => allCats(s).find(c => c.code === code);
         const typeOf = (s, key) => types(s).find(t => t.match === key);
@@ -928,9 +947,9 @@
 
         function noneAvailableText(s, t, n) {
             const reasons = catsOf(t).map(c => entry(c, n).reason || "");
-            if (reasons.length && reasons.every(r => r.startsWith("Holds only"))) return `No ${t.title} cabin on the ${s.ship_short} holds ${n} guests.`;
+            if (reasons.length && reasons.every(r => r.startsWith("Holds only"))) return `No ${t.title} cabin on the ${s.ship_short} holds ${plural(n, "guest", "guests")}.`;
             if (reasons.length && reasons.every(r => r === "Sold out")) return `${t.title} is sold out on the ${s.ship_short}.`;
-            return `No ${t.title} cabin on the ${s.ship_short} is available for ${n} guests.`;
+            return `No ${t.title} cabin on the ${s.ship_short} is available for ${plural(n, "guest", "guests")}.`;
         }
 
         // The chosen category for a ship in "same type" mode: the saved pick if it is still
@@ -1080,12 +1099,12 @@
         function listNote(where) {
             const n = guests();
             if (!agesKnown()) {
-                return `<div class="cat-list-note">${where === "8" ? `Each price is NCL's fare with taxes for both cabins (this cabin plus the cabin chosen on the other ship) for ${n} guests.` : `Each price is NCL's fare with taxes for ${n} guests.`} Choose every kid's age above to see each cabin's total with your choices.</div>`;
+                return `<div class="cat-list-note">${where === "8" ? `Each price is NCL's fare with taxes for both cabins (this cabin plus the cabin chosen on the other ship) for ${plural(n, "guest", "guests")}.` : `Each price is NCL's fare with taxes for ${plural(n, "guest", "guests")}.`} Choose every kid's age above to see each cabin's total with your choices.</div>`;
             }
             const same = where === "card" || where === "8" ? "the same as the Total below" : `the same as the Total on the ${where} card`;
             return `<div class="cat-list-note">${where === "8"
                 ? `Each price is the 8 night total with your choices: this cabin plus the cabin chosen on the other ship, ${same}.`
-                : `Each price is the cabin total for ${n} guests with your choices, ${same}.`}</div>`;
+                : `Each price is the cabin total for ${plural(n, "guest", "guests")} with your choices, ${same}.`}</div>`;
         }
 
         // NCL broad type code (INSIDE, ..., SUITE, HAVEN) of a category on a ship.
@@ -1146,6 +1165,7 @@
         // or the 3 or 4 guest price is missing (NOTES.md, "Kids Sail Free").
         function ksfNote(s, c, prefix = "") {
             const k = s.kids_sail_free;
+            if (soloParty()) return "";   // never at 1 guest (5.4.0)
             if (!k || s.taxes_per_guest == null || !k.types.includes((typeOfCat(s, c) || "").toUpperCase())) return "";
             const pos = [3, 4].filter(g => c.by_guests[String(g)] && c.by_guests[String(g - 1)] && entry(c, g).available && entry(c, g - 1).available);
             if (!pos.length) return "";
@@ -1163,6 +1183,53 @@
             return `<div class="ksf-note"><strong>${esc(lead)}</strong> ${esc(text)}</div>`;
         }
 
+        // 1 guest (5.4.0): the cheapest solo cabin of the card's cabin type against the cheapest
+        // regular non-Guarantee cabin of that type for one guest, by the price the lists show (the
+        // card's Total). Solo Studio has no regular Studio, so it is compared with the cheapest
+        // regular Inside. A cheaper Guarantee cabin of that type gets its own sentence. No line for
+        // types without solo cabins. prefix: the ship's name on the 8 night card.
+        function soloLine(s, t, prefix = "") {
+            if (!soloParty() || !t) return "";
+            const solos = t.categories.filter(c => c.solo);
+            const studio = t.match === "studio";
+            const regType = studio ? typeOf(s, "inside") : t;
+            if (!solos.length || !regType) return "";
+            const cheapest = list => list.sort(byListPrice(s, 1))[0];
+            const solo = cheapest(solos.filter(c => isAvail(c, 1)));
+            const regs = regType.categories.filter(c => !c.solo && isAvail(c, 1));
+            const reg = cheapest(regs.filter(c => !c.guarantee)), gty = cheapest(regs.filter(c => c.guarantee));
+            let text = "";
+            if (!solo) {
+                text = `Solo cabins of this type are ${solos.every(c => entry(c, 1).sold_out) ? "sold out" : "not available"} for 1 guest on the ${s.ship_short}.`;
+            } else if (reg) {
+                const d = listPrice(s, reg) - listPrice(s, solo);
+                const what = studio ? "a regular Inside (the cheapest regular cabin)" : `a regular ${t.title}`;
+                text = `Today a ${solo.title} costs ${d === 0 ? "the same as" : `${money(Math.abs(d))} ${d > 0 ? "less" : "more"} than`} ${what} for one guest.`;
+                if (gty && listPrice(s, gty) < listPrice(s, solo)) {
+                    text += ` A Guarantee ${studio ? "Inside" : t.title} is ${money(listPrice(s, solo) - listPrice(s, gty))} less, but NCL picks the cabin location.`;
+                }
+            }
+            if (!text) return "";
+            return `<div class="solo-line">${prefix ? `<strong>On the ${esc(prefix)}:</strong> ` : ""}${esc(text)}</div>`;
+        }
+
+        // The "Sailing solo" note (5.4.0), at 1 guest only. Every point has an NCL source (NOTES.md,
+        // "Solo travelers (5.4.0)"). The "today" part shows only while NCL's 1 guest prices for every
+        // regular cabin on both ships are the fare for two (single_supplement.all_match).
+        function soloNote() {
+            const today = [G, A].every(s => s.single_supplement && s.single_supplement.all_match);
+            const line = [G, A].map(s => s.single_supplement && s.single_supplement.ncl_fare_line).find(Boolean);
+            const supp = today ? ` (today NCL charges the fare for two guests${line ? `, which NCL calls "${esc(line)}"` : ""})` : "";
+            return `<strong>Sailing solo</strong><ul>
+                <li>A regular cabin for 1 guest includes NCL's single supplement${supp}. Taxes, fees, port expenses and service charges are for 1 guest only.</li>
+                <li>Solo cabins (Solo Studio, Solo Inside, Solo Oceanview, Solo Balcony) are priced for one, with no single supplement. They aren't always cheaper, so both are shown.</li>
+                <li>Solo Studio guests have access to NCL's private Studio Lounge.</li>
+                <li>Anyone under 21 must stay in the same stateroom as a guest 21 or older, or in a connecting or adjoining one. The exception is US or Canadian military aged 18 to 20 with a verified ID.me account.</li>
+                <li>Latitudes Rewards: 1 point per cruise night.</li>
+                <li>A solo cabin is for one guest, so a second guest can't be added later.</li>
+            </ul>`;
+        }
+
         // Prices kept from an earlier day for this party size (NCL failed today's check).
         function staleNote(ships) {
             const n = String(guests());
@@ -1170,7 +1237,7 @@
                 const st = s.party_sizes && s.party_sizes[n];
                 if (!st || st.updated !== false) return "";
                 const when = new Date(st.as_of).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" });
-                return `<div class="notice stale"><strong>Not updated today.</strong> ${esc(s.ship_short)} prices for ${n} guests are from ${esc(when)}.</div>`;
+                return `<div class="notice stale"><strong>Not updated today.</strong> ${esc(s.ship_short)} prices for ${n === "1" ? "1 guest" : n + " guests"} are from ${esc(when)}.</div>`;
             }).join("");
         }
 
@@ -1222,12 +1289,12 @@
                 ${taxNote}
                 <div class="price-label">${k.onboard ? "Total to pay now" : "Total"} for ${plural(n, "guest", "guests")}</div>
                 <div class="price-total">${money(k.now)}</div>
-                <div class="price-pp">${moneyR(k.now / n)} per person</div>
+                ${n > 1 ? `<div class="price-pp">${moneyR(k.now / n)} per person</div>` : ""}
                 <div class="rows">
                     ${rowsHtml}
                     <div class="row total"><span class="k">Total</span><span class="v">${money(k.now)}</span></div>
                     ${onboardHtml}
-                    <div class="row"><span class="k">Cost per night${k.onboard ? " (paid now)" : ""}</span><span class="v">${moneyR(perNight)} (${moneyR(perNight / n)} per person)</span></div>
+                    <div class="row"><span class="k">Cost per night${k.onboard ? " (paid now)" : ""}</span><span class="v">${moneyR(perNight)}${n > 1 ? ` (${moneyR(perNight / n)} per person)` : ""}</span></div>
                 </div>`;
         }
 
@@ -1270,7 +1337,8 @@
             const meta = [c.size, c.capacity && !c.description.includes("holds up to") ? `holds up to ${c.capacity}` : ""].filter(Boolean).join(", ");
             return `<div class="cabin-line">${catHtml(c)}
                 ${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}
-                ${c.guarantee ? `<div class="cat-meta gty">${GUARANTEE_TEXT}</div>` : ""}</div>`;
+                ${c.guarantee ? `<div class="cat-meta gty">${GUARANTEE_TEXT}</div>` : ""}
+                ${oneLabel(c) ? `<div class="cat-meta one">${esc(oneLabel(c))}</div>` : ""}</div>`;
         }
 
         // One cabin button. When it is the only available option it is shown already selected,
@@ -1280,7 +1348,7 @@
                 ? `class="only" aria-pressed="true" aria-disabled="true" tabindex="-1"`
                 : `data-pick="${field}" data-code="${esc(c.code)}" aria-pressed="${pressed}"`;
             return `<li><button type="button" ${attrs}>
-                    <span>${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}${gaugeHtml(c, n)}</span>
+                    <span>${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}${oneLabel(c) ? `<span class="cat-meta one" style="display:block">${esc(oneLabel(c))}</span>` : ""}${gaugeHtml(c, n)}</span>
                     <span class="price">${money(price)}</span>
                 </button></li>`;
         }
@@ -1293,7 +1361,7 @@
             if (!list.length) return "";
             const field = s === G ? "pickG" : "pickA";
             const only = list.length === 1;
-            return `<div class="cat-list-title">${esc(t.title)} cabins on the ${esc(s.ship_short)} for ${n} guests</div>${note}<ul class="cat-list">${list.map(c => catButton(c, n, field, c.code === chosen.code, only, listPrice(s, c) + add)).join("")}</ul>`;
+            return `<div class="cat-list-title">${esc(t.title)} cabins on the ${esc(s.ship_short)} for ${plural(n, "guest", "guests")}</div>${note}<ul class="cat-list">${list.map(c => catButton(c, n, field, c.code === chosen.code, only, listPrice(s, c) + add)).join("")}</ul>`;
         }
 
         function daysList(s, title = "Day by day") {
@@ -1325,7 +1393,7 @@
                     offersHtml = offerToggles(s, full, `Free at Sea for this ${s.ship_short} cabin`);
                     listHtml = catPicker(s, tf.t, full, n, 0, listNote("card"));
                     SELECTIONS[shipKey(s)] = { label, items: [[s, full]] };
-                    body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k), onboardRows([[s, k]], false)) + ksfNote(s, full) + selectButton(shipKey(s));
+                    body += catHeader(full) + staleNote([s]) + totalBlock(k, s.nights, lineRows(s, k), onboardRows([[s, k]], false)) + ksfNote(s, full) + soloLine(s, tf.t) + selectButton(shipKey(s));
                 }
             }
             return `
@@ -1380,9 +1448,9 @@
                     const blocked = picks.filter(([, , c]) => !c);
                     if (blocked.length === 1) {
                         const [bs, bt] = blocked[0];
-                        body += `<div class="notice bad">${esc(typeName(state.type))} is available for ${n} guests on the ${esc(otherShip(bs).ship_short)} but not on the ${esc(bs.ship_short)}.</div>`;
+                        body += `<div class="notice bad">${esc(typeName(state.type))} is available for ${plural(n, "guest", "guests")} on the ${esc(otherShip(bs).ship_short)} but not on the ${esc(bs.ship_short)}.</div>`;
                     } else if (blocked.length === 2) {
-                        body += `<div class="notice bad">${esc(typeName(state.type))} is not available for ${n} guests on either ship.</div>`;
+                        body += `<div class="notice bad">${esc(typeName(state.type))} is not available for ${plural(n, "guest", "guests")} on either ship.</div>`;
                     } else {
                         chosen = picks.map(([s, , c]) => [s, findCat(s, c.code)]);
                         body += `<div class="cabin-line">Matched: ${catHtml(chosen[0][1])} on the Getaway and ${catHtml(chosen[1][1])} on the Aura. Pick a different one on each ship above.</div>`;
@@ -1405,12 +1473,13 @@
                                noTaxSplit: ks.flatMap(([, , k]) => k.noTaxSplit) };
                 offerSets = ks.map(([s, c]) => offerToggles(s, c, `Free at Sea for the ${s.ship_short} cabin (its own booking)`)).join("");
                 const rows = ks.map(([s, c, k]) => `
-                    <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}</div>
+                    <div class="ship-head">${esc(s.ship_short)} (${s.nights} nights): ${catHtml(c)}${c.guarantee ? `<span class="cat-meta gty" style="display:block">${GUARANTEE_TEXT}</span>` : ""}${oneLabel(c) ? `<span class="cat-meta one" style="display:block">${esc(oneLabel(c))}</span>` : ""}</div>
                     ${lineRows(s, k, true)}
                     <div class="row"><span class="k">${esc(s.ship_short)} total${k.onboard ? " to pay now" : ""}</span><span class="v">${agesKnown() ? money(k.now) : ""}</span></div>`).join("");
                 SELECTIONS["8"] = { label: OPTIONS[2].label, items: chosen };
                 body += staleNote([G, A]) + totalBlock(both, nights, rows, onboardRows(ks.map(([s, , k]) => [s, k]), true))
-                    + ks.map(([s, c]) => ksfNote(s, c, s.ship_short)).join("") + selectButton("8");
+                    + ks.map(([s, c]) => ksfNote(s, c, s.ship_short)).join("")
+                    + ks.map(([s, c]) => soloLine(s, s.types.find(t => t.categories.some(x => x.code === c.code)), s.ship_short)).join("") + selectButton("8");
             }
             return `
                 <article class="card" data-option="8">
@@ -1482,7 +1551,7 @@
                 const cats = [...availableIn(s, t, n), ...catsOf(t).filter(c => !isAvail(c, n))];
                 return `<tr class="group"><td colspan="2">${esc(t.title)}</td></tr>` + cats.map(c => {
                     const e = entry(c, n);
-                    const meta = [c.size, c.capacity && !c.description.includes("holds up to") ? `holds up to ${c.capacity}` : "", c.guarantee ? GUARANTEE_TEXT : ""].filter(Boolean).join(". ");
+                    const meta = [c.size, c.capacity && !c.description.includes("holds up to") ? `holds up to ${c.capacity}` : "", c.guarantee ? GUARANTEE_TEXT : "", oneLabel(c)].filter(Boolean).join(". ");
                     return e.available
                         ? `<tr class="pickable ${c.code === chosenCode ? "chosen" : ""}" data-ship="${s === G ? "G" : "A"}" data-code="${esc(c.code)}" data-typekey="${t.match}"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}${gaugeHtml(c, n)}</td><td>${money(listPrice(s, c))}<span class="pp-small">${moneyR(listPrice(s, c) / n)} pp</span></td></tr>`
                         : `<tr class="off"><td>${catHtml(c)}${meta ? `<div class="cat-meta">${esc(meta)}</div>` : ""}</td><td>${esc(e.reason)}</td></tr>`;
@@ -2273,6 +2342,9 @@
             const parts = [`${plural(n, "guest", "guests")} in the cabin`];
             if (agesKnown() && state.kids.length) parts.push(`NCL's guest order: ${guestOrder().map(a => a === null ? "adult" : `age ${a}`).join(", ")}`);
             document.getElementById("guestSummary").textContent = parts.join(". ") + ".";
+            const note = document.getElementById("soloNote");
+            note.hidden = !soloParty();
+            note.innerHTML = soloParty() ? soloNote() : "";
         }
 
         // The cabin type buttons, in each card after Free at Sea and above the cabin list (5.2.0).
@@ -2338,6 +2410,11 @@
 
         function render(msg) {
             SELECTIONS = {};
+            if (guests() < 2 && !oneGuestOk()) {
+                // A saved choice of 1 adult, or prices from before 5.4.0: 2 adults until 1 guest prices exist.
+                state.adults = 2;
+                msg = msg || ONE_LATER;
+            }
             renderPrepay();
             renderFl();
             normalize();
@@ -2359,11 +2436,11 @@
             if (step > 0 && n >= MAX_GUESTS) return `A cabin here holds at most ${MAX_GUESTS} guests, so remove someone before adding another.`;
             if (which === "adults") {
                 if (step < 0 && state.adults <= 1) return "Every cabin needs at least 1 adult (21 or older).";
-                if (step < 0 && n <= MIN_GUESTS) return `Prices are for at least ${MIN_GUESTS} guests in a cabin, so add a kid before removing an adult.`;
+                if (step < 0 && n <= 2 && !oneGuestOk()) return ONE_LATER;
                 state.adults += step;
             } else {
                 if (step < 0 && !state.kids.length) return "There are no kids to remove.";
-                if (step < 0 && n <= MIN_GUESTS) return `Prices are for at least ${MIN_GUESTS} guests in a cabin, so add an adult before removing a kid.`;
+                if (step < 0 && n <= 2 && !oneGuestOk()) return ONE_LATER;
                 if (step > 0) state.kids.push(null); else state.kids.pop();
             }
             return "";
