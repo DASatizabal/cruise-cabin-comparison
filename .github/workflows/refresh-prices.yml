@@ -2,8 +2,9 @@ name: Refresh prices
 
 # Daily, two parts in one run:
 # 1. Prices (job "refresh"): finds each sailing's NCL ids (cruise page, itinerary call), then
-#    NCL's vacation-builder API for both sailings at 2, 3, 4 and 5 guests, plus one age test per
-#    ship (26 calls with NCL's terms pages, 2 seconds apart, nothing held). First it reads the
+#    NCL's vacation-builder API for both sailings at 1, 2, 3, 4 and 5 guests (two price summaries
+#    at 1 guest: the cheapest regular and the cheapest solo cabin), plus one age test per ship
+#    (32 calls with NCL's terms pages, 2 seconds apart, nothing held). First it reads the
 #    multi-credit offer (DoubleUp, TripleUp, QuadUp) on NCL's CruiseNext page (1 page load,
 #    tools/fetch_offers.py) and opens one GitHub issue per change (main only). Commits data/prices.json and data/offers.json,
 #    then publishes the site (job "publish"). Never depends on counts.
@@ -12,7 +13,7 @@ name: Refresh prices
 #    data/counts.json, then publishes again (job "publish-counts"). If it fails, the published
 #    prices stay and the page keeps the last good counts.
 # Scheduled runs only happen on the default branch (main). The push trigger below lets the
-# development branch test the price part on GitHub's runners before it is merged (27
+# development branch test the price part on GitHub's runners before it is merged (33
 # NCL calls; counts are skipped on pushes and run on a branch only from a manual run with a
 # chosen count mode). Only main commits data files and publishes.
 # GitHub's schedules are best effort and have been unreliable here (NOTES.md), so the main

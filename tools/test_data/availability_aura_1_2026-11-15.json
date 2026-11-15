@@ -1,0 +1,4156 @@
+{
+ "results": [
+  {
+   "stateroomId": "0",
+   "result": {
+    "stateroomTypesPricing": [
+     {
+      "isSoldOut": false,
+      "price": 2089,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 2089,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 94,
+         "description": "Cool and hip, our studios have just what you need. Plus enjoy access to the private Studio Lounge, a great place to meet your neighbors for a pre-dinner drink",
+         "shortDescription": "Ideal for the solo traveler, featuring everything you to need to refresh, recharge and get back to the action on board.",
+         "stateroomMaxSize": 94,
+         "categoryIds": [
+          "T1"
+         ],
+         "code": "AURA.STUDIO-T1-STUDIO",
+         "deckLocations": [
+          {
+           "deck": 12,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-studio/NCL_AURA-Cruise-Stateroom-Shmtc_T1_Studio.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-Shmtc_T1_Studio.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-studio/NCL_AURA-Cruise-Stateroom-T1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-T1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-studio/NCL_AURA-Cruise-Stateroom-T1_Studio_Bathroom.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-T1_Studio_Bathroom.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 1,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "94",
+          "stateroomMax": "94",
+          "isMetric": false
+         },
+         "title": "Solo Studio"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "T1",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "T1",
+           "guestCapacity": 1,
+           "price": 2089
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       }
+      ],
+      "code": "STUDIO",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "Studio"
+     },
+     {
+      "isSoldOut": false,
+      "price": 2098,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 2318,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 160,
+         "description": "A comfortable and affordable option for families with two beds that convert to a queen and two Pullman beds.",
+         "shortDescription": "Style meets sophistication in modern staterooms that offer comfort and amenities like TV and more.",
+         "stateroomMaxSize": 160,
+         "categoryIds": [
+          "I4"
+         ],
+         "code": "AURA.INSIDE-I4-FAMILY INSIDE",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 9,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 15,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 16,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-1.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-1.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "160",
+          "stateroomMax": "160",
+          "isMetric": false
+         },
+         "title": "Family Inside"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "I4",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "I4",
+           "guestCapacity": 4,
+           "price": 2318
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 2098,
+        "stateroom": {
+         "stateroomMinSize": 160,
+         "description": "A stateroom priced just right, with many of the same amenities as an Oceanview. These staterooms feature two lower beds that convert to a queen.",
+         "shortDescription": "Style meets sophistication in modern staterooms that offer comfort and amenities like TV and more.",
+         "stateroomMaxSize": 263,
+         "categoryIds": [
+          "IF",
+          "IB",
+          "IA"
+         ],
+         "code": "AURA.INSIDE-IF-IB-IA-INSIDE",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 9,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 15,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 16,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-1.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-1.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "IB",
+          "IA"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "160",
+          "stateroomMax": "263",
+          "isMetric": false
+         },
+         "title": "Inside"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "IF",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "IF",
+           "guestCapacity": 4,
+           "price": 2098
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "IB",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "IB",
+           "guestCapacity": 2,
+           "price": 2118
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "IA",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "IA",
+           "guestCapacity": 3,
+           "price": 2158
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 1998,
+        "stateroom": {
+         "stateroomMinSize": 160,
+         "description": "As our lowest available rate for this category, a Guarantee Inside stateroom guarantees you’ll receive an Inside stateroom or better! Your stateroom may be on any deck and assigned up to one day prior to embarkation. Promotional rates and offers are excluded on this category (IX).",
+         "shortDescription": "Style meets sophistication in modern staterooms that offer comfort and amenities like TV and more.",
+         "stateroomMaxSize": 160,
+         "categoryIds": [
+          "IX"
+         ],
+         "code": "AURA.INSIDE-IX-SAILAWAY INSIDE",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-1.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-1.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": true,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "160",
+          "stateroomMax": "160",
+          "isMetric": false
+         },
+         "title": "Guarantee Inside"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "IX",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "IX",
+           "guestCapacity": 4,
+           "price": 1998
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "IT",
+           "pricedCategoryCode": "IT",
+           "guestCapacity": 0,
+           "isGTY": false,
+           "isWheelchairAccessible": false
+          },
+          "isAvailable": false,
+          "isSoldOut": true
+         }
+        ],
+        "stateroom": {
+         "stateroomMinSize": 160,
+         "description": "A stateroom priced just right, with many of the same amenities as an Oceanview. These staterooms feature a queen-size bed.",
+         "shortDescription": "Style meets sophistication in modern staterooms that offer comfort and amenities like TV and more.",
+         "stateroomMaxSize": 160,
+         "categoryIds": [
+          "IT"
+         ],
+         "code": "AURA.INSIDE-IT-SOLO INSIDE",
+         "deckLocations": [
+          {
+           "deck": 12,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 16,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-1.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-1.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-I4-IA-IB-IF-IX-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 1,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "160",
+          "stateroomMax": "160",
+          "isMetric": false
+         },
+         "title": "Solo Inside"
+        },
+        "isAvailable": false,
+        "isSoldOut": true
+       }
+      ],
+      "code": "INSIDE",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "Inside"
+     },
+     {
+      "isSoldOut": false,
+      "price": 2258,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 2798,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 235,
+         "description": "Wake up to a fabulous view of the latest port from your window and spread out with your family in style and comfort.",
+         "shortDescription": "Feel incredibly comfortable at sea with stylish staterooms that feature fine appointments and clear ocean views.",
+         "stateroomMaxSize": 370,
+         "categoryIds": [
+          "O4"
+         ],
+         "code": "AURA.OCEANVIEW-O4-FAMILY OCEANVIEW",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-O4-OA-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-O4-OA-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-O4-OA-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-O4-OA-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-O4-OA-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-O4-OA-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "O4"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "235",
+          "stateroomMax": "370",
+          "isMetric": false
+         },
+         "title": "Family Oceanview"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "O4",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "O4",
+           "guestCapacity": 4,
+           "price": 2798
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 2478,
+        "stateroom": {
+         "stateroomMinSize": 235,
+         "description": "Enjoy stylish, roomy accommodations and beautiful views from your window.",
+         "shortDescription": "Feel incredibly comfortable at sea with stylish staterooms that feature fine appointments and clear ocean views.",
+         "stateroomMaxSize": 235,
+         "categoryIds": [
+          "OA"
+         ],
+         "code": "AURA.OCEANVIEW-OA-LARGE OCEANVIEW WITH ROUND WINDOW",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-O4-OA-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-O4-OA-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-O4-OA-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-O4-OA-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-O4-OA-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-O4-OA-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "235",
+          "stateroomMax": "235",
+          "isMetric": false
+         },
+         "title": "Large Oceanview with Round Window"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "OA",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "OA",
+           "guestCapacity": 3,
+           "price": 2478
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 2258,
+        "stateroom": {
+         "stateroomMinSize": 186,
+         "description": "Take in the ever-changing seascape from your window and enjoy comfortable, stylish accommodations.",
+         "shortDescription": "Feel incredibly comfortable at sea with stylish staterooms that feature fine appointments and clear ocean views.",
+         "stateroomMaxSize": 186,
+         "categoryIds": [
+          "OB"
+         ],
+         "code": "AURA.OCEANVIEW-OB-OCEANVIEW WITH ROUND WINDOW",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-OB-OX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-OB-OX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-OB-OX-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-OB-OX-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-OB-OX-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-OB-OX-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "186",
+          "stateroomMax": "186",
+          "isMetric": false
+         },
+         "title": "Oceanview with Round Window"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "OB",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "OB",
+           "guestCapacity": 2,
+           "price": 2258
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 2158,
+        "stateroom": {
+         "stateroomMinSize": 186,
+         "description": "As our lowest available rate for this category, a Guarantee Oceanview stateroom guarantees you’ll receive an Oceanview stateroom or better! Your stateroom may be on any deck and assigned up to one day prior to embarkation. Promotional rates and offers are excluded on this category (OX).",
+         "shortDescription": "Feel incredibly comfortable at sea with stylish staterooms that feature fine appointments and clear ocean views.",
+         "stateroomMaxSize": 186,
+         "categoryIds": [
+          "OX"
+         ],
+         "code": "AURA.OCEANVIEW-OX-SAILAWAY OCEANVIEW",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 6,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-OB-OX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-OB-OX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-OB-OX-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-OB-OX-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-OB-OX-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-OB-OX-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": true,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "186",
+          "stateroomMax": "186",
+          "isMetric": false
+         },
+         "title": "Guarantee Oceanview"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "OX",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "OX",
+           "guestCapacity": 2,
+           "price": 2158
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "OT",
+           "pricedCategoryCode": "OT",
+           "guestCapacity": 0,
+           "isGTY": false,
+           "isWheelchairAccessible": false
+          },
+          "isAvailable": false,
+          "isSoldOut": true
+         }
+        ],
+        "stateroom": {
+         "stateroomMinSize": 186,
+         "description": "Take in the ever-changing seascape from your big picture window. Or kick back, relax and watch TV. When it’s bedtime, you can sleep in comfort.",
+         "shortDescription": "Feel incredibly comfortable at sea with stylish staterooms that feature fine appointments and clear ocean views.",
+         "stateroomMaxSize": 186,
+         "categoryIds": [
+          "OT"
+         ],
+         "code": "AURA.OCEANVIEW-OT-SOLO OCEANVIEW",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-OB-OX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-OB-OX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-OB-OX-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-OB-OX-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Stateroom-OB-OX-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-OB-OX-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 1,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "186",
+          "stateroomMax": "186",
+          "isMetric": false
+         },
+         "title": "Solo Oceanview"
+        },
+        "isAvailable": false,
+        "isSoldOut": true
+       }
+      ],
+      "code": "OCEANVIEW",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "Oceanview"
+     },
+     {
+      "isSoldOut": false,
+      "price": 3109,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 5658,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 288,
+         "balconyInfo": {
+          "minSize": 102,
+          "maxSize": 102
+         },
+         "description": "Aft location gives you exclusive access to the most exhilarating - and unforgettable - views. Open your floor-to-ceiling glass doors and enjoy it all from your private balcony.",
+         "shortDescription": "See the world from your room. Floor-to-ceiling glass doors open to your own private balcony – and breathtaking views.",
+         "stateroomMaxSize": 288,
+         "categoryIds": [
+          "B1"
+         ],
+         "code": "AURA.BALCONY-B1-AFT-FACING BALCONY",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX-MX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX-MX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-NEW.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-NEW.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "288",
+          "stateroomMax": "288",
+          "balconyMin": "102",
+          "balconyMax": "102",
+          "isMetric": false
+         },
+         "title": "Aft-Facing Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "B1",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "B1",
+           "guestCapacity": 4,
+           "price": 5658
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 3298,
+        "stateroom": {
+         "stateroomMinSize": 231,
+         "balconyInfo": {
+          "minSize": 45,
+          "maxSize": 45
+         },
+         "description": "Step onto the balcony and enjoy the views and fresh ocean breezes or read a bedtime story under the stars. There’s plenty of comfort and space to enjoy quality family time. Some can connect, too.",
+         "shortDescription": "See the world from your room. Floor-to-ceiling glass doors open to your own private balcony – and breathtaking views.",
+         "stateroomMaxSize": 231,
+         "categoryIds": [
+          "B4"
+         ],
+         "code": "AURA.BALCONY-B4-Family BALCONY",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 15,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 16,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX-MX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX-MX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-NEW.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-NEW.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "231",
+          "stateroomMax": "231",
+          "balconyMin": "45",
+          "balconyMax": "45",
+          "isMetric": false
+         },
+         "title": "Family Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "B4",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "B4",
+           "guestCapacity": 4,
+           "price": 3298
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 3118,
+        "stateroom": {
+         "stateroomMinSize": 231,
+         "balconyInfo": {
+          "minSize": 45,
+          "maxSize": 69
+         },
+         "description": "Floor-to-ceiling glass doors open to a private balcony with sweeping views. And some can connect. So enjoy breathtaking views and stylish accommodations in a stateroom perfectly designed with you in mind.",
+         "shortDescription": "See the world from your room. Floor-to-ceiling glass doors open to your own private balcony – and breathtaking views.",
+         "stateroomMaxSize": 358,
+         "categoryIds": [
+          "BF",
+          "BB",
+          "BA"
+         ],
+         "code": "AURA.BALCONY-BA-BB-BF-BALCONY",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 15,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 16,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX-MX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX-MX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-NEW.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-NEW.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "BF",
+          "BB",
+          "BA"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "231",
+          "stateroomMax": "358",
+          "balconyMin": "45",
+          "balconyMax": "69",
+          "isMetric": false
+         },
+         "title": "Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "BF",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "BF",
+           "guestCapacity": 4,
+           "price": 3118
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "BB",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "BB",
+           "guestCapacity": 3,
+           "price": 3158
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "BA",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "BA",
+           "guestCapacity": 3,
+           "price": 3238
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 3109,
+        "stateroom": {
+         "stateroomMinSize": 231,
+         "balconyInfo": {
+          "minSize": 45,
+          "maxSize": 45
+         },
+         "description": "Floor-to-ceiling glass doors open to a private balcony with sweeping views. So enjoy beautiful sunrises, breathtaking sunsets and a cozy and comfortable room designed with you in mind.",
+         "shortDescription": "See the world from your room. Floor-to-ceiling glass doors open to your own private balcony – and breathtaking views.",
+         "stateroomMaxSize": 231,
+         "categoryIds": [
+          "BT"
+         ],
+         "code": "AURA.BALCONY-BT-SOLO BALCONY",
+         "deckLocations": [
+          {
+           "deck": 12,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX-MX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX-MX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-NEW.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-NEW.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 1,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "231",
+          "stateroomMax": "231",
+          "balconyMin": "45",
+          "balconyMax": "45",
+          "isMetric": false
+         },
+         "title": "Solo Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "BT",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "BT",
+           "guestCapacity": 1,
+           "price": 3109
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "BX",
+           "pricedCategoryCode": "BX",
+           "guestCapacity": 0,
+           "isGTY": false,
+           "isWheelchairAccessible": false
+          },
+          "isAvailable": false,
+          "isSoldOut": true
+         }
+        ],
+        "stateroom": {
+         "stateroomMinSize": 231,
+         "balconyInfo": {
+          "minSize": 45,
+          "maxSize": 45
+         },
+         "description": "As our lowest available rate for this category, a Guarantee Balcony stateroom guarantees you’ll receive a Balcony stateroom or better! Please note that the view from your balcony may be fully obstructed or partially obstructed. Your stateroom may be on any deck and assigned up to one day prior to embarkation. Promotional rates and offers are excluded on this category (BX).",
+         "shortDescription": "See the world from your room. Floor-to-ceiling glass doors open to your own private balcony – and breathtaking views.",
+         "stateroomMaxSize": 231,
+         "categoryIds": [
+          "BX"
+         ],
+         "code": "AURA.BALCONY-BX-SAILAWAY BALCONY",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX-MX-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX-MX-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-NEW.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-NEW.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-balcony/NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-B9-B1-B4-BA-BB-BF-BX_Stateroom-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-inside/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": true,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "231",
+          "stateroomMax": "231",
+          "balconyMin": "45",
+          "balconyMax": "45",
+          "isMetric": false
+         },
+         "title": "Guarantee Balcony"
+        },
+        "isAvailable": false,
+        "isSoldOut": true
+       }
+      ],
+      "code": "BALCONY",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "Balcony"
+     },
+     {
+      "isSoldOut": false,
+      "price": 3698,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 4658,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 358,
+         "balconyInfo": {
+          "minSize": 129,
+          "maxSize": 185
+         },
+         "description": "Spread out in style, relish your spacious bath and enjoy the incredible views from your private, forward-facing balcony.<br><br>Due to potential high wind speeds at the front of the ship, this cabin features solid metal bulwarks (railings) and/or glass windscreens.",
+         "shortDescription": "Sublime, spacious suites ideal for the two of you or the whole family. Savor luxurious touches and breathtaking, private views.",
+         "stateroomMaxSize": 412,
+         "categoryIds": [
+          "M2"
+         ],
+         "code": "AURA.CLUB-BALCONY-SUITE-M2-FORWARD-FACING CLUB BALCONY SUITE WITH LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterrom-M2-Corner-Schematic.jpg",
+           "title": "NCL_AURA-Cruise-Staterrom-M2-Corner-Schematic.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Stateroom-M2-Corner-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-M2-Corner-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Stateroom-M2-Corner-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-M2-Corner-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "358",
+          "stateroomMax": "412",
+          "balconyMin": "129",
+          "balconyMax": "185",
+          "isMetric": false
+         },
+         "title": "Forward-Facing Club Balcony Suite with Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "M2",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "M2",
+           "guestCapacity": 4,
+           "price": 4658
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 4038,
+        "stateroom": {
+         "stateroomMinSize": 252,
+         "balconyInfo": {
+          "minSize": 46,
+          "maxSize": 62
+         },
+         "description": "All the space you need, and some can connect with another stateroom. Relax in your sitting area. Indulge in your spacious bath. Or step out onto your private balcony and breathe in the fresh air while taking in amazing views.",
+         "shortDescription": "Sublime, spacious suites ideal for the two of you or the whole family. Savor luxurious touches and breathtaking, private views.",
+         "stateroomMaxSize": 291,
+         "categoryIds": [
+          "M4"
+         ],
+         "code": "AURA.CLUB-BALCONY-SUITE-M4-FAMILY CLUB BALCONY SUITE",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Stateroom-M4-MA-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-M4-MA-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Stateroom-M4-MA-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-M4-MA-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Stateroom-M4-MA-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-M4-MA-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "252",
+          "stateroomMax": "291",
+          "balconyMin": "46",
+          "balconyMax": "62",
+          "isMetric": false
+         },
+         "title": "Family Club Balcony Suite"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "M4",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "M4",
+           "guestCapacity": 4,
+           "price": 4038
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 3898,
+        "stateroom": {
+         "stateroomMinSize": 265,
+         "balconyInfo": {
+          "minSize": 45,
+          "maxSize": 52
+         },
+         "description": "All the space you need to relax in style. Indulge in your spacious bath or step out onto your private balcony and breathe in the fresh air while taking in amazing views. Some can connect to other staterooms.",
+         "shortDescription": "Sublime, spacious suites ideal for the two of you or the whole family. Savor luxurious touches and breathtaking, private views.",
+         "stateroomMaxSize": 291,
+         "categoryIds": [
+          "MA"
+         ],
+         "code": "AURA.CLUB-BALCONY-SUITE-MA-CLUB BALCONY SUITE",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Stateroom-M4-MA-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-M4-MA-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Stateroom-M4-MA-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-M4-MA-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Stateroom-M4-MA-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-M4-MA-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "265",
+          "stateroomMax": "291",
+          "balconyMin": "45",
+          "balconyMax": "52",
+          "isMetric": false
+         },
+         "title": "Club Balcony Suite"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "MA",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "MA",
+           "guestCapacity": 2,
+           "price": 3898
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 3698,
+        "stateroom": {
+         "stateroomMinSize": 241,
+         "balconyInfo": {
+          "minSize": 75,
+          "maxSize": 75
+         },
+         "description": "All the space you need to relax in style. Indulge in your spacious bath or step out onto your private balcony and breathe in the fresh air while taking in amazing views. Some can connect to other staterooms.<br> <br> Due to potential high wind speeds at the front of the ship, this cabin features solid metal bulwarks (railings) and/or glass windscreens.",
+         "shortDescription": "Sublime, spacious suites ideal for the two of you or the whole family. Savor luxurious touches and breathtaking, private views.",
+         "stateroomMaxSize": 271,
+         "categoryIds": [
+          "MB"
+         ],
+         "code": "AURA.CLUB-BALCONY-SUITE-MB-FORWARD-FACING-CLUB BALCONY SUITE",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL-Aura-Cruise-Staterrom-MB-MX-Schematic-jpeg.png",
+           "title": "NCL-Aura-Cruise-Staterrom-MB-MX-Schematic-jpeg.png",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Stateroom-MB.png",
+           "title": "NCL_AURA-Cruise-Stateroom-MB.png",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-oceanview/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "241",
+          "stateroomMax": "271",
+          "balconyMin": "75",
+          "balconyMax": "75",
+          "isMetric": false
+         },
+         "title": "Forward-Facing Club Balcony Suite"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "MB",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "MB",
+           "guestCapacity": 2,
+           "price": 3698
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 3598,
+        "stateroom": {
+         "stateroomMinSize": 241,
+         "balconyInfo": {
+          "minSize": 75,
+          "maxSize": 75
+         },
+         "description": "As our lowest available rate for this category, a Guarantee Club Balcony Suite guarantees you’ll receive a Club Balcony Suite or better! Please note that the view from your balcony may be fully obstructed or partially obstructed. Your stateroom may be on any deck and assigned up to one day prior to embarkation. Promotional rates and offers are excluded on this category (MX).",
+         "shortDescription": "Sublime, spacious suites ideal for the two of you or the whole family. Savor luxurious touches and breathtaking, private views.",
+         "stateroomMaxSize": 241,
+         "categoryIds": [
+          "MX"
+         ],
+         "code": "AURA.CLUB-BALCONY-SUITE-MX-SAILAWAY CLUB BALCONY SUITE",
+         "deckLocations": [
+          {
+           "deck": 11,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Stateroom-M4-MA-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-M4-MA-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Stateroom-M4-MA-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-M4-MA-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": true,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "241",
+          "stateroomMax": "241",
+          "balconyMin": "75",
+          "balconyMax": "75",
+          "isMetric": false
+         },
+         "title": "Guarantee Club Balcony Suite"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "MX",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "MX",
+           "guestCapacity": 2,
+           "price": 3598
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       }
+      ],
+      "code": "MINISUITE",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "Club Balcony Suite"
+     },
+     {
+      "isSoldOut": false,
+      "price": 4218,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 5558,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 448,
+         "balconyInfo": {
+          "minSize": 195,
+          "maxSize": 195
+         },
+         "description": "Experience unforgettable aft-facing views from your private balcony and spacious accommodations to spread out. They can connect, too.",
+         "shortDescription": "Finished with the finest touches, spacious suites with luxury accommodations.",
+         "stateroomMaxSize": 448,
+         "categoryIds": [
+          "SI"
+         ],
+         "code": "AURA.SUITE-SI-AFT-FACING SUITE WITH BALCONY",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL-LUNA-Cruise-Staterrom-SI-Schematic.jpg",
+           "title": "NCL-LUNA-Cruise-Staterrom-SI-Schematic.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SI-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SI-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SI-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SI-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "448",
+          "stateroomMax": "448",
+          "balconyMin": "195",
+          "balconyMax": "195",
+          "isMetric": false
+         },
+         "title": "Aft-Facing Suite with Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "SI",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "SI",
+           "guestCapacity": 2,
+           "price": 5558
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 6038,
+        "stateroom": {
+         "stateroomMinSize": 388,
+         "balconyInfo": {
+          "minSize": 45,
+          "maxSize": 45
+         },
+         "description": "Perfect for families, these spacious Suites offer plenty of room for everyone to spread out plus beautiful views from the balcony.",
+         "shortDescription": "Finished with the finest touches, spacious suites with luxury accommodations.",
+         "stateroomMaxSize": 388,
+         "categoryIds": [
+          "SJ"
+         ],
+         "code": "AURA.SUITE-SJ-FAMILY SUITE WITH MASTER BEDROOM & LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 15,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 16,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SJ-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SJ-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SJ-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SJ-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "388",
+          "stateroomMax": "388",
+          "balconyMin": "45",
+          "balconyMax": "45",
+          "isMetric": false
+         },
+         "title": "Family Suite with Master Bedroom & Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "SJ",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "SJ",
+           "guestCapacity": 4,
+           "price": 6038
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 4758,
+        "stateroom": {
+         "stateroomMinSize": 412,
+         "balconyInfo": {
+          "minSize": 153,
+          "maxSize": 191
+         },
+         "description": "Take in the fresh air and spectacular views from your large, forward-facing balcony and relax in stylish accommodations.<br> <br> Due to potential high wind speeds at the front of the ship, this cabin features solid metal bulwarks (railings) and/or glass windscreens.",
+         "shortDescription": "Finished with the finest touches, spacious suites with luxury accommodations.",
+         "stateroomMaxSize": 487,
+         "categoryIds": [
+          "SK"
+         ],
+         "code": "AURA.SUITE-SK-FORWARD-FACING SUITE WITH MASTER BEDROOM & LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SK-Schematic.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-SK-Schematic.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SK-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SK-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL-AURA-Cruise-Staterrom-SK-Camera-1.png",
+           "title": "NCL-AURA-Cruise-Staterrom-SK-Camera-1.png",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "412",
+          "stateroomMax": "487",
+          "balconyMin": "153",
+          "balconyMax": "191",
+          "isMetric": false
+         },
+         "title": "Forward-Facing Suite with Master Bedroom & Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "SK",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "SK",
+           "guestCapacity": 4,
+           "price": 4758
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 4218,
+        "stateroom": {
+         "stateroomMinSize": 393,
+         "balconyInfo": {
+          "minSize": 129,
+          "maxSize": 129
+         },
+         "description": "Stunning forward-facing views and plenty of room for the whole family to enjoy.<br> <br> Due to potential high wind speeds at the front of the ship, this cabin features solid metal bulwarks (railings) and/or glass windscreens.",
+         "shortDescription": "Finished with the finest touches, spacious suites with luxury accommodations.",
+         "stateroomMaxSize": 434,
+         "categoryIds": [
+          "SL"
+         ],
+         "code": "AURA.SUITE-SL-FAMILY SUITE WITH LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SL-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SL-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SL-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SL-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SL-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SL-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "SL"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "393",
+          "stateroomMax": "434",
+          "balconyMin": "129",
+          "balconyMax": "129",
+          "isMetric": false
+         },
+         "title": "Forward-Facing Suite with Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "SL",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "SL",
+           "guestCapacity": 4,
+           "price": 4218
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 5118,
+        "stateroom": {
+         "stateroomMinSize": 480,
+         "balconyInfo": {
+          "minSize": 137,
+          "maxSize": 234
+         },
+         "description": "Perfect for families, these spacious Suites offer plenty of room for everyone to spread out plus beautiful views from the balcony.",
+         "shortDescription": "Finished with the finest touches, spacious suites with luxury accommodations.",
+         "stateroomMaxSize": 577,
+         "categoryIds": [
+          "SR"
+         ],
+         "code": "AURA.SUITE-SR-FAMILY SUITE WITH MASTER BEDROOM & BALCONY",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 15,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 16,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SJ-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SJ-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SJ-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SJ-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "480",
+          "stateroomMax": "577",
+          "balconyMin": "137",
+          "balconyMax": "234",
+          "isMetric": false
+         },
+         "title": "Family Suite with Master Bedroom & Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "SR",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "SR",
+           "guestCapacity": 4,
+           "price": 5118
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "SH",
+           "pricedCategoryCode": "SH",
+           "guestCapacity": 0,
+           "isGTY": false,
+           "isWheelchairAccessible": false
+          },
+          "isAvailable": false,
+          "isSoldOut": true
+         }
+        ],
+        "stateroom": {
+         "stateroomMinSize": 635,
+         "balconyInfo": {
+          "minSize": 370,
+          "maxSize": 370
+         },
+         "description": "Experience unforgettable aft-facing views from your private balcony and spacious accommodations to spread out.",
+         "shortDescription": "Finished with the finest touches, spacious suites with luxury accommodations.",
+         "stateroomMaxSize": 635,
+         "categoryIds": [
+          "SH"
+         ],
+         "code": "AURA.SUITE-SH-AFT-FACING SUITE WITH LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SH-Schematic.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-SH-Schematic.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SH-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SH-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-suites/NCL_AURA-Cruise-Stateroom-SH-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-SH-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-club-balcony/NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "title": "NCL_AURA-Cruise-Staterooms-Balcony-Bathroom.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "635",
+          "stateroomMax": "635",
+          "balconyMin": "370",
+          "balconyMax": "370",
+          "isMetric": false
+         },
+         "title": "Aft-Facing Suite with Large Balcony"
+        },
+        "isAvailable": false,
+        "isSoldOut": true
+       }
+      ],
+      "code": "SUITE",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "Suite"
+     },
+     {
+      "isSoldOut": false,
+      "price": 6758,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 23058,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 2100,
+         "balconyInfo": {
+          "minSize": 828,
+          "maxSize": 828
+         },
+         "description": "Your private paradise is ready. Relax in chic, luxurious comfort complete with floor-to-ceiling glass doors to let the outside in. Or take in vista after glorious vista from one of the most spacious balconies at sea.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 2100,
+         "categoryIds": [
+          "H2"
+         ],
+         "code": "AURA.HAVEN-H2-THE HAVEN PREMIERE OWNER'S SUITE WITH LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 14,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H2-Schematic.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-H2-Schematic.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H2-Master-Bedroom.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H2-Master-Bedroom.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H2-Balcony-Hot-Tub.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H2-Balcony-Hot-Tub.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H2-Living-Room.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H2-Living-Room.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 8,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "2100",
+          "stateroomMax": "2100",
+          "balconyMin": "828",
+          "balconyMax": "828",
+          "isMetric": false
+         },
+         "title": "The Haven Premier Owner's Suite with Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "H2",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "H2",
+           "guestCapacity": 8,
+           "price": 23058
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 18118,
+        "stateroom": {
+         "stateroomMinSize": 1607,
+         "balconyInfo": {
+          "minSize": 613,
+          "maxSize": 732
+         },
+         "description": "Pampering all the way. Marvel at glorious vistas from the aft-facing balcony. Get used to being spoiled with butler and concierge service plus access to The Haven amenities.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 1749,
+         "categoryIds": [
+          "H3"
+         ],
+         "code": "AURA.HAVEN-H3-THE HAVEN DELUXE OWNER'S SUITE WITH LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 13,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 15,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H3-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H3-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H3-Master-Bedroom.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H3-Master-Bedroom.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H3-Living-Room.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H3-Living-Room.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 6,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "1607",
+          "stateroomMax": "1749",
+          "balconyMin": "613",
+          "balconyMax": "732",
+          "isMetric": false
+         },
+         "title": "The Haven Deluxe Owner's Suite with Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "H3",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "H3",
+           "guestCapacity": 6,
+           "price": 18118
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 13758,
+        "stateroom": {
+         "stateroomMinSize": 974,
+         "balconyInfo": {
+          "minSize": 527,
+          "maxSize": 535
+         },
+         "description": "<p>Indulge in luxury and pamper yourself in The Haven with spacious accommodations, 24-hour butler and concierge service, and awe-inspiring views from your large, aft-facing balcony. *Suites on deck 10 (10302 & 10902) do not include the outdoor hot tub.</p>",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 994,
+         "categoryIds": [
+          "H4"
+         ],
+         "code": "AURA.HAVEN-H4-THE HAVEN AFT-FACING OWNER'S SUITE WITH MASTER BEDROOM & LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 10,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL-AURA-Cruise-Stateroom-H4-Deck-10-Schematic.jpg",
+           "title": "NCL-AURA-Cruise-Stateroom-H4-Deck-10-Schematic.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-HA-Bedroom.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-HA-Bedroom.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-HA-Balcony-Hot-Tub.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-HA-Balcony-Hot-Tub.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H4-Living-Room.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H4-Living-Room.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "974",
+          "stateroomMax": "994",
+          "balconyMin": "527",
+          "balconyMax": "535",
+          "isMetric": false
+         },
+         "title": "The Haven Aft-Facing Owner's Suite with Master Bedroom & Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "H4",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "H4",
+           "guestCapacity": 4,
+           "price": 13758
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 9078,
+        "stateroom": {
+         "stateroomMinSize": 541,
+         "balconyInfo": {
+          "minSize": 109,
+          "maxSize": 132
+         },
+         "description": "Indulge in the ultimate getaway with luxury accommodations, a large balcony to soak in the beautiful views and exclusive access to The Haven amenities. And let your butler and concierge pamper you.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 614,
+         "categoryIds": [
+          "H5"
+         ],
+         "code": "AURA.HAVEN-H5-THE HAVEN OWNER'S SUITE WITH LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 12,
+           "locations": [
+            "Mid",
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H5-Schematic.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-H5-Schematic.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H5-Bedroom.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H5-Bedroom.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H5-Living-Room.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H5-Living-Room.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "541",
+          "stateroomMax": "614",
+          "balconyMin": "109",
+          "balconyMax": "132",
+          "isMetric": false
+         },
+         "title": "The Haven Owner’s Suite with Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "H5",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "H5",
+           "guestCapacity": 4,
+           "price": 9078
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 11858,
+        "stateroom": {
+         "stateroomMinSize": 606,
+         "balconyInfo": {
+          "minSize": 138,
+          "maxSize": 190
+         },
+         "description": "Fine luxury and exceptional service await your family. Enjoy The Haven amenities, the attentiveness of a concierge and butler as well as fresh ocean breezes from your large balcony.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 658,
+         "categoryIds": [
+          "H6"
+         ],
+         "code": "AURA.HAVEN-H6-THE HAVEN 2-BEDROOM FAMILY VILLA WITH LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 13,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 15,
+           "locations": [
+            "Mid",
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL-Aura-Cruise-Stateroom-Haven-H6-Schemati-jpg.jpg",
+           "title": "NCL-Aura-Cruise-Stateroom-Haven-H6-Schemati-jpg.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H6-Master-Bedroom.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H6-Master-Bedroom.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H6-Living-Room-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H6-Living-Room-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 6,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "606",
+          "stateroomMax": "658",
+          "balconyMin": "138",
+          "balconyMax": "190",
+          "isMetric": false
+         },
+         "title": "The Haven 2-Bedroom Family Villa with Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "H6",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "H6",
+           "guestCapacity": 6,
+           "price": 11858
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 10158,
+        "stateroom": {
+         "stateroomMinSize": 830,
+         "balconyInfo": {
+          "minSize": 498,
+          "maxSize": 498
+         },
+         "description": "Marvel at unforgettable views from your large, aft-facing balcony and enjoy The Haven amenities, spacious, luxurious accommodations plus a butler and concierge to tend to your every wish.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 830,
+         "categoryIds": [
+          "HA"
+         ],
+         "code": "AURA.HAVEN-HA-THE HAVEN AFT-FACING PENTHOUSE WITH LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 11,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL-AURA-Cruise-Stateroom-HA-Schematic-jpeg.jpg",
+           "title": "NCL-AURA-Cruise-Stateroom-HA-Schematic-jpeg.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-HA-Bedroom.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-HA-Bedroom.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-HA-Balcony-Hot-Tub.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-HA-Balcony-Hot-Tub.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-HA-Bathroom.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-HA-Bathroom.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "830",
+          "stateroomMax": "830",
+          "balconyMin": "498",
+          "balconyMax": "498",
+          "isMetric": false
+         },
+         "title": "The Haven Aft-Facing Penthouse with Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "HA",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "HA",
+           "guestCapacity": 2,
+           "price": 10158
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 9558,
+        "stateroom": {
+         "stateroomMinSize": 496,
+         "balconyInfo": {
+          "minSize": 129,
+          "maxSize": 220
+         },
+         "description": "Your oasis awaits in The Haven. Enjoy stunning views from the aft-facing balcony, a stylish master bedroom (except ADA), luxury bath with jetted shower, The Haven amenities plus butler and concierge service.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 599,
+         "categoryIds": [
+          "HB"
+         ],
+         "code": "AURA.HAVEN-HB-THE HAVEN AFT-FACING PENTHOUSE WITH MASTER BEDROOM & LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 10,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-HB-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-HB-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-HB-Bedroom.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-HB-Bedroom.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-HB-Living-Room.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-HB-Living-Room.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "HB"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "496",
+          "stateroomMax": "599",
+          "balconyMin": "129",
+          "balconyMax": "220",
+          "isMetric": false
+         },
+         "title": "The Haven Aft-Facing Penthouse with Master Bedroom & Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "HB",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "HB",
+           "guestCapacity": 4,
+           "price": 9558
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 6758,
+        "stateroom": {
+         "stateroomMinSize": 368,
+         "balconyInfo": {
+          "minSize": 84,
+          "maxSize": 134
+         },
+         "description": "Breathtaking views await. These luxury Penthouses include access to The Haven amenities, a king-size bed, jetted shower, sitting area, large balcony, and butler and concierge service.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 418,
+         "categoryIds": [
+          "HE"
+         ],
+         "code": "AURA.HAVEN-HE-THE HAVEN PENTHOUSE WITH BALCONY",
+         "deckLocations": [
+          {
+           "deck": 12,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 15,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 17,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-HE-Schematic.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-HE-Schematic.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-HE-Camera-1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-HE-Camera-1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-HE-Camera-2.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-HE-Camera-2.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 3,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "368",
+          "stateroomMax": "418",
+          "balconyMin": "84",
+          "balconyMax": "134",
+          "isMetric": false
+         },
+         "title": "The Haven Penthouse with Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "HE",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "HE",
+           "guestCapacity": 3,
+           "price": 6758
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "H8",
+           "pricedCategoryCode": "H8",
+           "guestCapacity": 0,
+           "isGTY": false,
+           "isWheelchairAccessible": false
+          },
+          "isAvailable": false,
+          "isSoldOut": true
+         }
+        ],
+        "stateroom": {
+         "stateroomMinSize": 900,
+         "balconyInfo": {
+          "minSize": 114,
+          "maxSize": 118
+         },
+         "description": "Located in The Haven, these spacious two-story suites include a master bedroom with a king-size bed, a second bedroom with a queen-size bed that can be separated, and a living room with a double sofa bed. The luxurious accommodation also boasts three bathrooms, an expansive dining room, a large balcony, and butler and concierge services to tend to your every want or need.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 904,
+         "categoryIds": [
+          "H8"
+         ],
+         "code": "AURA.HAVEN-H8-THE HAVEN 2-BEDROOM DUPLEX SUITE WITH LARGE BALCONY",
+         "deckLocations": [
+          {
+           "deck": 15,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H8_Second-Floor-Schematic.jpg",
+           "title": "NCL_AURA-Cruise-Stateroom-H8_Second-Floor-Schematic.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H8_HavenDuplex_Bedroom.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H8_HavenDuplex_Bedroom.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H8_HavenDuplex_Entrance.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H8_HavenDuplex_Entrance.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-aura/aura-staterooms/aura-haven/NCL_AURA-Cruise-Stateroom-H8_HavenDuplex_Bathroom_1.jpeg",
+           "title": "NCL_AURA-Cruise-Stateroom-H8_HavenDuplex_Bathroom_1.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 6,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "900",
+          "stateroomMax": "904",
+          "balconyMin": "114",
+          "balconyMax": "118",
+          "isMetric": false
+         },
+         "title": "The Haven 2-Bedroom Duplex Suite with Large Balcony"
+        },
+        "isAvailable": false,
+        "isSoldOut": true
+       }
+      ],
+      "code": "HAVEN",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "The Haven"
+     }
+    ],
+    "offerGroups": [
+     {
+      "code": "FREE-AT-SEA",
+      "weight": 2,
+      "title": "Free at Sea™",
+      "description": "Free at Sea™ Package",
+      "promotionsInGroup": [
+       {
+        "isDefaultInGroup": true,
+        "promotion": {
+         "promotionCodes": [
+          "ALL4CHO"
+         ],
+         "stateroomTypes": [
+          "STUDIO",
+          "INSIDE",
+          "OCEANVIEW",
+          "MINISUITE",
+          "BALCONY"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "unlimited-open-bar-offer",
+           "title": "Unlimited Open Bar",
+           "shortTitle": "Bar",
+           "offerType": "beverage-package-offer",
+           "description": "<p>Enjoy the best beverage package at sea! Indulge in unlimited\npremium spirits such as Grey Goose, Casamigos, Woodford Reserve and more, plus\ncocktails, wine, beer, soft drinks and juice - all included. Simply pay the\npackage gratuities in advance, and the drinks are on us. With drinks on board\naveraging $15 each, there’s no better value.</p><p>Gratuities are $32 per person, per day for 2–5 night\nsailings and $28.50 per person, per day for sailings of 6 nights or more. This\nis reflected in the total price shown above and in the guest breakdown.<br></p><p>The package applies to all guests in the stateroom aged 21+.\nGuests 1 or 2 under age 21 will instead receive juice and unlimited fountain\nsoda for $12.50 per person per day. Guests 3–8 under 21 will not receive a\nbeverage package but may purchase one separately.</p>",
+           "inclusion": "Removable",
+           "weight": 1,
+           "alwaysApplicable": true,
+           "groupingCode": "unlimited-open-bar-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer",
+           "title": "Specialty Dining",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat. <br>  <br>   The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": true,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer-5-6-nights",
+           "title": "Specialty Dining - 2 Meals",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor 2 amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat.<br> <br> The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": false,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [
+            {
+             "min": 5,
+             "max": 6
+            }
+           ],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "BVSXIN"
+         ],
+         "stateroomTypes": [
+          "BALCONY",
+          "MINISUITE",
+          "INSIDE",
+          "OCEANVIEW",
+          "STUDIO"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "unlimited-open-bar-offer",
+           "title": "Unlimited Open Bar",
+           "shortTitle": "Bar",
+           "offerType": "beverage-package-offer",
+           "description": "<p>Enjoy the best beverage package at sea! Indulge in unlimited\npremium spirits such as Grey Goose, Casamigos, Woodford Reserve and more, plus\ncocktails, wine, beer, soft drinks and juice - all included. Simply pay the\npackage gratuities in advance, and the drinks are on us. With drinks on board\naveraging $15 each, there’s no better value.</p><p>Gratuities are $32 per person, per day for 2–5 night\nsailings and $28.50 per person, per day for sailings of 6 nights or more. This\nis reflected in the total price shown above and in the guest breakdown.<br></p><p>The package applies to all guests in the stateroom aged 21+.\nGuests 1 or 2 under age 21 will instead receive juice and unlimited fountain\nsoda for $12.50 per person per day. Guests 3–8 under 21 will not receive a\nbeverage package but may purchase one separately.</p>",
+           "inclusion": "Removable",
+           "weight": 1,
+           "alwaysApplicable": true,
+           "groupingCode": "unlimited-open-bar-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": true,
+        "promotion": {
+         "promotionCodes": [
+          "CHOALL4M"
+         ],
+         "stateroomTypes": [
+          "HAVEN",
+          "SUITE"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "unlimited-open-bar-offer",
+           "title": "Unlimited Open Bar",
+           "shortTitle": "Bar",
+           "offerType": "beverage-package-offer",
+           "description": "<p>Enjoy the best beverage package at sea! Indulge in unlimited\npremium spirits such as Grey Goose, Casamigos, Woodford Reserve and more, plus\ncocktails, wine, beer, soft drinks and juice - all included. Simply pay the\npackage gratuities in advance, and the drinks are on us. With drinks on board\naveraging $15 each, there’s no better value.</p><p>Gratuities are $32 per person, per day for 2–5 night\nsailings and $28.50 per person, per day for sailings of 6 nights or more. This\nis reflected in the total price shown above and in the guest breakdown.<br></p><p>The package applies to all guests in the stateroom aged 21+.\nGuests 1 or 2 under age 21 will instead receive juice and unlimited fountain\nsoda for $12.50 per person per day. Guests 3–8 under 21 will not receive a\nbeverage package but may purchase one separately.</p>",
+           "inclusion": "Removable",
+           "weight": 1,
+           "alwaysApplicable": true,
+           "groupingCode": "unlimited-open-bar-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer",
+           "title": "Specialty Dining",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat. <br>  <br>   The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": true,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer-5-6-nights",
+           "title": "Specialty Dining - 2 Meals",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor 2 amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat.<br> <br> The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": false,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [
+            {
+             "min": 5,
+             "max": 6
+            }
+           ],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "HSBVSXIN"
+         ],
+         "stateroomTypes": [
+          "HAVEN",
+          "SUITE"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "unlimited-open-bar-offer",
+           "title": "Unlimited Open Bar",
+           "shortTitle": "Bar",
+           "offerType": "beverage-package-offer",
+           "description": "<p>Enjoy the best beverage package at sea! Indulge in unlimited\npremium spirits such as Grey Goose, Casamigos, Woodford Reserve and more, plus\ncocktails, wine, beer, soft drinks and juice - all included. Simply pay the\npackage gratuities in advance, and the drinks are on us. With drinks on board\naveraging $15 each, there’s no better value.</p><p>Gratuities are $32 per person, per day for 2–5 night\nsailings and $28.50 per person, per day for sailings of 6 nights or more. This\nis reflected in the total price shown above and in the guest breakdown.<br></p><p>The package applies to all guests in the stateroom aged 21+.\nGuests 1 or 2 under age 21 will instead receive juice and unlimited fountain\nsoda for $12.50 per person per day. Guests 3–8 under 21 will not receive a\nbeverage package but may purchase one separately.</p>",
+           "inclusion": "Removable",
+           "weight": 1,
+           "alwaysApplicable": true,
+           "groupingCode": "unlimited-open-bar-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "DISXIN"
+         ],
+         "stateroomTypes": [
+          "BALCONY",
+          "MINISUITE",
+          "INSIDE",
+          "OCEANVIEW",
+          "STUDIO"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "specialty-dining-offer",
+           "title": "Specialty Dining",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat. <br>  <br>   The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": true,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer-5-6-nights",
+           "title": "Specialty Dining - 2 Meals",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor 2 amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat.<br> <br> The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": false,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [
+            {
+             "min": 5,
+             "max": 6
+            }
+           ],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "HSDISXIN"
+         ],
+         "stateroomTypes": [
+          "HAVEN",
+          "SUITE"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "specialty-dining-offer",
+           "title": "Specialty Dining",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat. <br>  <br>   The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": true,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer-5-6-nights",
+           "title": "Specialty Dining - 2 Meals",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor 2 amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat.<br> <br> The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": false,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [
+            {
+             "min": 5,
+             "max": 6
+            }
+           ],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "INTSHO"
+         ],
+         "stateroomTypes": [
+          "BALCONY",
+          "MINISUITE",
+          "INSIDE",
+          "OCEANVIEW",
+          "STUDIO"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "HSINTSHO"
+         ],
+         "stateroomTypes": [
+          "SUITE",
+          "HAVEN"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       }
+      ],
+      "isDefaultGroup": false,
+      "offers": [
+       {
+        "code": "unlimited-open-bar-offer",
+        "title": "Unlimited Open Bar",
+        "shortTitle": "Bar",
+        "offerType": "beverage-package-offer",
+        "description": "<p>Enjoy the best beverage package at sea! Indulge in unlimited\npremium spirits such as Grey Goose, Casamigos, Woodford Reserve and more, plus\ncocktails, wine, beer, soft drinks and juice - all included. Simply pay the\npackage gratuities in advance, and the drinks are on us. With drinks on board\naveraging $15 each, there’s no better value.</p><p>Gratuities are $32 per person, per day for 2–5 night\nsailings and $28.50 per person, per day for sailings of 6 nights or more. This\nis reflected in the total price shown above and in the guest breakdown.<br></p><p>The package applies to all guests in the stateroom aged 21+.\nGuests 1 or 2 under age 21 will instead receive juice and unlimited fountain\nsoda for $12.50 per person per day. Guests 3–8 under 21 will not receive a\nbeverage package but may purchase one separately.</p>",
+        "inclusion": "Removable",
+        "weight": 1,
+        "alwaysApplicable": true,
+        "groupingCode": "unlimited-open-bar-offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "specialty-dining-offer",
+        "title": "Specialty Dining",
+        "shortTitle": "Dining",
+        "offerType": "dining-offer",
+        "description": "Savor amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat. <br>  <br>   The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+        "inclusion": "Removable",
+        "weight": 2,
+        "alwaysApplicable": true,
+        "groupingCode": "specialty-dining-offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "specialty-dining-offer-5-6-nights",
+        "title": "Specialty Dining - 2 Meals",
+        "shortTitle": "Dining",
+        "offerType": "dining-offer",
+        "description": "Savor 2 amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat.<br> <br> The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+        "inclusion": "Removable",
+        "weight": 2,
+        "alwaysApplicable": false,
+        "groupingCode": "specialty-dining-offer",
+        "stateroomTypes": [],
+        "durations": [
+         {
+          "min": 5,
+          "max": 6
+         }
+        ],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "free-wifi-offer",
+        "title": "Wi-Fi Package",
+        "offerType": "wifi-package-offer",
+        "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+        "inclusion": "Mandatory",
+        "weight": 3,
+        "alwaysApplicable": true,
+        "groupingCode": "free-wifi-offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "excursion-credits-offer",
+        "title": "Excursion Credits",
+        "offerType": "shorex-offer",
+        "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+        "inclusion": "Mandatory",
+        "weight": 4,
+        "alwaysApplicable": true,
+        "groupingCode": "excursion-credits-offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       }
+      ]
+     },
+     {
+      "code": "MORE-OFFERS",
+      "weight": 4,
+      "title": "More Offers",
+      "promotionsInGroup": [
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [],
+         "stateroomTypes": [],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "2-For-1-Deposits-Offer",
+           "title": "2-For-1 Deposits",
+           "offerType": "auto-included-offer",
+           "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
+           "inclusion": "Mandatory",
+           "weight": 17,
+           "alwaysApplicable": true,
+           "groupingCode": "2-For-1-Deposits-Offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [],
+         "stateroomTypes": [],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "Risk-Free-Cancellation-Offer",
+           "title": "Risk-Free Cancellation",
+           "offerType": "auto-included-offer",
+           "description": "Cancel up to 120 days in advance for a full refund",
+           "inclusion": "Mandatory",
+           "weight": 23,
+           "alwaysApplicable": true,
+           "groupingCode": "Risk-Free-Cancellation-Offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "DISC50"
+         ],
+         "stateroomTypes": [],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "free-2nd-guest",
+           "title": "Free 2nd Guest",
+           "offerType": "auto-included-offer",
+           "description": " Buy 1st Guest & 2nd Guest Sails Free (Only Paying Taxes) ",
+           "inclusion": "Mandatory",
+           "weight": 26,
+           "alwaysApplicable": true,
+           "groupingCode": "free-2nd-guest",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       }
+      ],
+      "isDefaultGroup": false,
+      "offers": [
+       {
+        "code": "2-For-1-Deposits-Offer",
+        "title": "2-For-1 Deposits",
+        "offerType": "auto-included-offer",
+        "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
+        "inclusion": "Mandatory",
+        "weight": 17,
+        "alwaysApplicable": true,
+        "groupingCode": "2-For-1-Deposits-Offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "Risk-Free-Cancellation-Offer",
+        "title": "Risk-Free Cancellation",
+        "offerType": "auto-included-offer",
+        "description": "Cancel up to 120 days in advance for a full refund",
+        "inclusion": "Mandatory",
+        "weight": 23,
+        "alwaysApplicable": true,
+        "groupingCode": "Risk-Free-Cancellation-Offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "free-2nd-guest",
+        "title": "Free 2nd Guest",
+        "offerType": "auto-included-offer",
+        "description": " Buy 1st Guest & 2nd Guest Sails Free (Only Paying Taxes) ",
+        "inclusion": "Mandatory",
+        "weight": 26,
+        "alwaysApplicable": true,
+        "groupingCode": "free-2nd-guest",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "enableNewChangeStateroom": false,
+ "currency": {
+  "code": "USD"
+ }
+}

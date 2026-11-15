@@ -19,7 +19,7 @@ tools/refresh-trigger/ (workflow_dispatch with source "timer", 10:20 and 15:05 U
   - otherwise: run both
 Manual runs (source "manual") always run both, on main or on a branch (choose the count mode
 in the "Run workflow" form). Branch test runs (a push to the development branch) run prices
-only: counts are skipped, so a push costs about 26 NCL calls, not about 165 with a full counts
+only: counts are skipped, so a push costs about 33 NCL calls, not about 175 with a full counts
 sweep (owner's request, 2026-10-15).
 From the first sail date on (Jun 11, 2027, Eastern), every run skips everything, manual runs
 too: the Getaway has sailed, Options 1 and 3 are gone, and NCL no longer lists it, so the

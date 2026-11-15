@@ -1,0 +1,3549 @@
+{
+ "results": [
+  {
+   "stateroomId": "0",
+   "result": {
+    "stateroomTypesPricing": [
+     {
+      "isSoldOut": false,
+      "price": 539,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 539,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 97,
+         "description": "Cool and hip, our studios have just what you need. Plus enjoy access to the private Studio Complex and Lounge, a great place to meet your neighbors for a pre-dinner drink.",
+         "shortDescription": "Ideal for the solo traveler, featuring everything you to need to refresh, recharge and get back to the action on board.",
+         "stateroomMaxSize": 99,
+         "categoryIds": [
+          "T1"
+         ],
+         "code": "GETAWAY.Studio_T1.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 10,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/studio/NCL-Getaway-Cruise-Stateroom-Schmtc_Studio.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Schmtc_Studio.jpg",
+           "alt": "b98dffc5f9eb380cc59fc5926b1724b81c795940.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/studio/NCL-Stateroom-Getaway-Studio-Solo-Studio-T1-Bedroom .jpeg",
+           "title": "NCL-Stateroom-Getaway-Studio-Solo-Studio-T1-Bedroom .jpeg",
+           "alt": "95a537170ef1d3c0208f312c0009639b13ec4beb.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/studio/NCL-Stateroom-Getaway-Studio-Solo-Studio-T1-Lounge .jpeg",
+           "title": "NCL-Stateroom-Getaway-Studio-Solo-Studio-T1-Lounge .jpeg",
+           "alt": "2627ab5d8adab94d2489d95c0c0d9b485ddbae5a.png"
+          }
+         ],
+         "guestCapacity": 1,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "97",
+          "stateroomMax": "99",
+          "isMetric": false
+         },
+         "title": "Solo Studio"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "T1",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "T1",
+           "guestCapacity": 1,
+           "price": 539
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       }
+      ],
+      "code": "STUDIO",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "Studio"
+     },
+     {
+      "isSoldOut": false,
+      "price": 509,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 628,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 135,
+         "description": "An affordable family option and conveniently located near our kids’ area, these staterooms include two lower beds that convert to a queen-size bed and two pull-down beds. (Sleeps up to four. Door opens to center interior corridor.)",
+         "shortDescription": "Style meets sophistication in modern staterooms that offer comfort and amenities like TV and more.",
+         "stateroomMaxSize": 135,
+         "categoryIds": [
+          "I4"
+         ],
+         "code": "GETAWAY.Family Inside_I4.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 12,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Stateroom-Getaway-Inside-Solo-Inside-IT-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Getaway-Inside-Solo-Inside-IT-Bedroom-Schematic.jpeg",
+           "alt": "52aa89f0d0f45889fec513bf8f3be6d1127a2efc.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-_Inside_IF.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-_Inside_IF.jpg",
+           "alt": "7063ee4d2d1eef1859878315566fe641eefc67df.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "dbbc7f2b54b517c76b2d1455ab320395c880746e.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "135",
+          "stateroomMax": "135",
+          "isMetric": false
+         },
+         "title": "Family Inside"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "I4",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "I4",
+           "guestCapacity": 4,
+           "price": 628
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 548,
+        "stateroom": {
+         "stateroomMinSize": 129,
+         "description": "These staterooms include two lower beds that convert to a queen-size bed. Door opens to center interior corridor.",
+         "shortDescription": "Style meets sophistication in modern staterooms that offer comfort and amenities like TV and more.",
+         "stateroomMaxSize": 201,
+         "categoryIds": [
+          "IB",
+          "IA",
+          "IC",
+          "IF"
+         ],
+         "code": "GETAWAY.Inside_IA_IB_IC_IF.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 8,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 9,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Stateroom-Getaway-Inside-Solo-Inside-IT-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Getaway-Inside-Solo-Inside-IT-Bedroom-Schematic.jpeg",
+           "alt": "52aa89f0d0f45889fec513bf8f3be6d1127a2efc.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-_Inside_IF.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-_Inside_IF.jpg",
+           "alt": "7063ee4d2d1eef1859878315566fe641eefc67df.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "dbbc7f2b54b517c76b2d1455ab320395c880746e.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "IB",
+          "IA",
+          "IC"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "129",
+          "stateroomMax": "201",
+          "isMetric": false
+         },
+         "title": "Inside"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "IB",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "IB",
+           "guestCapacity": 4,
+           "price": 588
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "IA",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "IA",
+           "guestCapacity": 3,
+           "price": 608
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "IC",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "IC",
+           "guestCapacity": 4,
+           "price": 568
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "IF",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "IF",
+           "guestCapacity": 4,
+           "price": 548
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 509,
+        "stateroom": {
+         "stateroomMinSize": 129,
+         "description": "Exclusively for guests traveling solo, enjoy a great value and access to the Studio Lounge.",
+         "shortDescription": "Style meets sophistication in modern staterooms that offer comfort and amenities like TV and more.",
+         "stateroomMaxSize": 201,
+         "categoryIds": [
+          "IT"
+         ],
+         "code": "GETAWAY.Solo.Inside_IT.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 9,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Stateroom-Getaway-Inside-Solo-Inside-IT-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Getaway-Inside-Solo-Inside-IT-Bedroom-Schematic.jpeg",
+           "alt": "52aa89f0d0f45889fec513bf8f3be6d1127a2efc.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-_Inside_IF.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-_Inside_IF.jpg",
+           "alt": "7063ee4d2d1eef1859878315566fe641eefc67df.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "dbbc7f2b54b517c76b2d1455ab320395c880746e.png"
+          }
+         ],
+         "guestCapacity": 1,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "129",
+          "stateroomMax": "201",
+          "isMetric": false
+         },
+         "title": "Solo Inside"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "IT",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "IT",
+           "guestCapacity": 1,
+           "price": 509
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 508,
+        "stateroom": {
+         "stateroomMinSize": 135,
+         "description": "As our lowest available rate for this category, a Guarantee Inside stateroom guarantees you’ll receive an Inside stateroom or better! Your stateroom may be on any deck and assigned up to one day prior to embarkation.",
+         "shortDescription": "Style meets sophistication in modern staterooms that offer comfort and amenities like TV and more.",
+         "stateroomMaxSize": 135,
+         "categoryIds": [
+          "IX"
+         ],
+         "code": "GETAWAY.Sailaway Inside-IX.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 8,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 9,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Stateroom-Getaway-Inside-Solo-Inside-IT-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Getaway-Inside-Solo-Inside-IT-Bedroom-Schematic.jpeg",
+           "alt": "52aa89f0d0f45889fec513bf8f3be6d1127a2efc.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-_Inside_IF.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-_Inside_IF.jpg",
+           "alt": "7063ee4d2d1eef1859878315566fe641eefc67df.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "dbbc7f2b54b517c76b2d1455ab320395c880746e.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": true,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "135",
+          "stateroomMax": "135",
+          "isMetric": false
+         },
+         "title": "Guarantee Inside"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "IX",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "IX",
+           "guestCapacity": 4,
+           "price": 508
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       }
+      ],
+      "code": "INSIDE",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "Inside"
+     },
+     {
+      "isSoldOut": false,
+      "price": 569,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 788,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 161,
+         "description": "Wake up to a fabulous view of the latest port from your big picture window. Plus enjoy more space for you and family to spread out.",
+         "shortDescription": "Feel incredibly comfortable at sea with stylish staterooms that feature fine appointments and clear oceanviews.",
+         "stateroomMaxSize": 340,
+         "categoryIds": [
+          "O4",
+          "O5"
+         ],
+         "code": "GETAWAY.Family Oceanview_O4_O5.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/ncl_Gtwy_Schmtc_Fam_Ocnvw_O1.jpeg",
+           "title": "ncl_Gtwy_Schmtc_Fam_Ocnvw_O1.jpeg",
+           "alt": "16446fb7c237d4b2050d04a093d08eee421a211d.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/NCL-Getaway-Cruise-Stateroom-OceanView_Family.jpeg",
+           "title": "NCL-Getaway-Cruise-Stateroom-OceanView_Family.jpeg",
+           "alt": "6ac4d6458f11fb7c98ad60d55a3665286446b7a7.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "eaba553539395b1d3abc3a0948351bc908d878ad.png"
+          }
+         ],
+         "guestCapacity": 5,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "O4"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "161",
+          "stateroomMax": "340",
+          "isMetric": false
+         },
+         "title": "Family Oceanview"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "O4",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "O4",
+           "guestCapacity": 4,
+           "price": 788
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "O5",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "O5",
+           "guestCapacity": 5,
+           "price": 808
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 608,
+        "stateroom": {
+         "stateroomMinSize": 161,
+         "description": "Take in the ever-changing seascape from your big picture window. Or kick back, relax and watch TV in your room. When it’s bedtime, the two of you can sleep in comfort.",
+         "shortDescription": "Feel incredibly comfortable at sea with stylish staterooms that feature fine appointments and clear oceanviews.",
+         "stateroomMaxSize": 252,
+         "categoryIds": [
+          "OA",
+          "OB"
+         ],
+         "code": "GETAWAY.Oceanview with Picture Window_OA_OB.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 9,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/NCL_Getaway_Cruise_Oceanview.jpg",
+           "title": "NCL_Getaway_Cruise_Oceanview.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/ncl_Gtwy_OceanView_OA.jpeg",
+           "title": "ncl_Gtwy_OceanView_OA.jpeg",
+           "alt": "757c3113719ccaff69b9ff497a39f288c9dc6277.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "eaba553539395b1d3abc3a0948351bc908d878ad.png"
+          }
+         ],
+         "guestCapacity": 5,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "OA"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "161",
+          "stateroomMax": "252",
+          "isMetric": false
+         },
+         "title": "Oceanview with Picture Window"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "OA",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "OA",
+           "guestCapacity": 2,
+           "price": 628
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "OB",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "OB",
+           "guestCapacity": 2,
+           "price": 608
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 569,
+        "stateroom": {
+         "stateroomMinSize": 161,
+         "description": "Exclusively for one guest, enjoy amazing views from your window and access to the Studio Lounge.",
+         "shortDescription": "Feel incredibly comfortable at sea with stylish staterooms that feature fine appointments and clear oceanviews.",
+         "stateroomMaxSize": 252,
+         "categoryIds": [
+          "OT"
+         ],
+         "code": "GETAWAY.Solo.Oceanview_OT.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/NCL_Getaway_Cruise_Oceanview.jpg",
+           "title": "NCL_Getaway_Cruise_Oceanview.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/ncl_Gtwy_OceanView_OA.jpeg",
+           "title": "ncl_Gtwy_OceanView_OA.jpeg",
+           "alt": "757c3113719ccaff69b9ff497a39f288c9dc6277.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "eaba553539395b1d3abc3a0948351bc908d878ad.png"
+          }
+         ],
+         "guestCapacity": 1,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "161",
+          "stateroomMax": "252",
+          "isMetric": false
+         },
+         "title": "Solo Oceanview"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "OT",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "OT",
+           "guestCapacity": 1,
+           "price": 569
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 568,
+        "stateroom": {
+         "stateroomMinSize": 161,
+         "description": "As our lowest available rate for this category, a Guarantee Oceanview stateroom guarantees you'll receive an Oceanview stateroom or better! Please note that the view may be fully obstructed, partially obstructed, porthole or picture window. Your stateroom may be on any deck and assigned up to one day prior to embarkation.",
+         "shortDescription": "Feel incredibly comfortable at sea with stylish staterooms that feature fine appointments and clear oceanviews.",
+         "stateroomMaxSize": 161,
+         "categoryIds": [
+          "OX"
+         ],
+         "code": "GETAWAY.Sailaway Oceanview_OX.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 5,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 9,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/NCL_Getaway_Cruise_Oceanview.jpg",
+           "title": "NCL_Getaway_Cruise_Oceanview.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/ncl_Gtwy_OceanView_OA.jpeg",
+           "title": "ncl_Gtwy_OceanView_OA.jpeg",
+           "alt": "757c3113719ccaff69b9ff497a39f288c9dc6277.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/oceanview/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "eaba553539395b1d3abc3a0948351bc908d878ad.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": true,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "161",
+          "stateroomMax": "161",
+          "isMetric": false
+         },
+         "title": "Guarantee Oceanview"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "OX",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "OX",
+           "guestCapacity": 2,
+           "price": 568
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       }
+      ],
+      "code": "OCEANVIEW",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "Oceanview"
+     },
+     {
+      "isSoldOut": false,
+      "price": 639,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 948,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 207,
+         "balconyInfo": {
+          "minSize": 32,
+          "maxSize": 249
+         },
+         "description": "Facing aft gives you exclusive access to the most exhilarating - and unforgettable - views. Open your  doors and enjoy it all from your private balcony.",
+         "shortDescription": "Soak it all in. Day and night. Floor-to-ceiling glass doors open to your own private balcony – and breathtaking views.",
+         "stateroomMaxSize": 550,
+         "categoryIds": [
+          "B1"
+         ],
+         "code": "GETAWAY.Aft-Facing Balcony_B1.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "alt": "b801bdf491227d422dd7dc70404a786884058c93.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/ncl_Gtwy_Balcony_BC.jpeg",
+           "title": "ncl_Gtwy_Balcony_BC.jpeg",
+           "alt": "8734ef3d682f9a327524b079cd1b4f84e8944c6d.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "dbbc7f2b54b517c76b2d1455ab320395c880746e.png"
+          }
+         ],
+         "guestCapacity": 3,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "B1"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "207",
+          "stateroomMax": "550",
+          "balconyMin": "32",
+          "balconyMax": "249",
+          "isMetric": false
+         },
+         "title": "Aft-Facing Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "B1",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "B1",
+           "guestCapacity": 3,
+           "price": 948
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 788,
+        "stateroom": {
+         "stateroomMinSize": 204,
+         "balconyInfo": {
+          "minSize": 32,
+          "maxSize": 32
+         },
+         "description": "A prime location for families. Kids’ areas are conveniently nearby, keeping them close to the action. Plus many of these staterooms connect, making it easy to spread out yet stay together.",
+         "shortDescription": "Soak it all in. Day and night. Floor-to-ceiling glass doors open to your own private balcony – and breathtaking views.",
+         "stateroomMaxSize": 208,
+         "categoryIds": [
+          "B4"
+         ],
+         "code": "GETAWAY.Family Balcony_B4.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 13,
+           "locations": [
+            "Mid"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "alt": "b801bdf491227d422dd7dc70404a786884058c93.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/ncl_Gtwy_Balcony_BC.jpeg",
+           "title": "ncl_Gtwy_Balcony_BC.jpeg",
+           "alt": "8734ef3d682f9a327524b079cd1b4f84e8944c6d.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "dbbc7f2b54b517c76b2d1455ab320395c880746e.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "204",
+          "stateroomMax": "208",
+          "balconyMin": "32",
+          "balconyMax": "32",
+          "isMetric": false
+         },
+         "title": "Family Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "B4",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "B4",
+           "guestCapacity": 4,
+           "price": 788
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 788,
+        "stateroom": {
+         "stateroomMinSize": 245,
+         "balconyInfo": {
+          "minSize": 70,
+          "maxSize": 70
+         },
+         "description": "Floor-to-ceiling glass doors open to a large balcony and incredible ocean views. And with plenty of room to spread out, getting everyone ready is a breeze.",
+         "shortDescription": "Soak it all in. Day and night. Floor-to-ceiling glass doors open to your own private balcony – and breathtaking views.",
+         "stateroomMaxSize": 245,
+         "categoryIds": [
+          "B6"
+         ],
+         "code": "GETAWAY.Large Balcony_B6.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "alt": "b801bdf491227d422dd7dc70404a786884058c93.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/ncl_Gtwy_Balcony_BC.jpeg",
+           "title": "ncl_Gtwy_Balcony_BC.jpeg",
+           "alt": "8734ef3d682f9a327524b079cd1b4f84e8944c6d.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "dbbc7f2b54b517c76b2d1455ab320395c880746e.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "245",
+          "stateroomMax": "245",
+          "balconyMin": "70",
+          "balconyMax": "70",
+          "isMetric": false
+         },
+         "title": "Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "B6",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "B6",
+           "guestCapacity": 4,
+           "price": 788
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 728,
+        "stateroom": {
+         "stateroomMinSize": 204,
+         "balconyInfo": {
+          "minSize": 32,
+          "maxSize": 133
+         },
+         "description": "Floor-to-ceiling glass doors open to a private balcony with sweeping views. So enjoy beautiful sunrises, breathtaking sunsets and a cozy and comfortable room designed with you in mind.",
+         "shortDescription": "Soak it all in. Day and night. Floor-to-ceiling glass doors open to your own private balcony – and breathtaking views.",
+         "stateroomMaxSize": 366,
+         "categoryIds": [
+          "BB",
+          "BA",
+          "BF"
+         ],
+         "code": "GETAWAY.Balcony_BA_BB_BF.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 8,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 9,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Forward",
+            "Mid",
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "alt": "b801bdf491227d422dd7dc70404a786884058c93.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/ncl_Gtwy_Balcony_BC.jpeg",
+           "title": "ncl_Gtwy_Balcony_BC.jpeg",
+           "alt": "8734ef3d682f9a327524b079cd1b4f84e8944c6d.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "dbbc7f2b54b517c76b2d1455ab320395c880746e.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "BB",
+          "BA"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "204",
+          "stateroomMax": "366",
+          "balconyMin": "32",
+          "balconyMax": "133",
+          "isMetric": false
+         },
+         "title": "Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "BB",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "BB",
+           "guestCapacity": 4,
+           "price": 748
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "BA",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "BA",
+           "guestCapacity": 4,
+           "price": 768
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "BF",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "BF",
+           "guestCapacity": 4,
+           "price": 728
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 639,
+        "stateroom": {
+         "stateroomMinSize": 204,
+         "balconyInfo": {
+          "minSize": 32,
+          "maxSize": 133
+         },
+         "description": "Exclusively for one guest, enjoy amazing views from your own private balcony and access to the Studio Lounge.",
+         "shortDescription": "Soak it all in. Day and night. Floor-to-ceiling glass doors open to your own private balcony – and breathtaking views.",
+         "stateroomMaxSize": 366,
+         "categoryIds": [
+          "BT"
+         ],
+         "code": "GETAWAY.Solo.Balcony_BT.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "alt": "b801bdf491227d422dd7dc70404a786884058c93.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/ncl_Gtwy_Balcony_BC.jpeg",
+           "title": "ncl_Gtwy_Balcony_BC.jpeg",
+           "alt": "8734ef3d682f9a327524b079cd1b4f84e8944c6d.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "dbbc7f2b54b517c76b2d1455ab320395c880746e.png"
+          }
+         ],
+         "guestCapacity": 1,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "204",
+          "stateroomMax": "366",
+          "balconyMin": "32",
+          "balconyMax": "133",
+          "isMetric": false
+         },
+         "title": "Solo Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "BT",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "BT",
+           "guestCapacity": 1,
+           "price": 639
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 668,
+        "stateroom": {
+         "stateroomMinSize": 304,
+         "balconyInfo": {
+          "minSize": 129,
+          "maxSize": 129
+         },
+         "description": "As our lowest available rate for this category, a Guarantee Balcony stateroom guarantees you’ll receive a Balcony stateroom or better! Your stateroom may be on any deck and assigned up to one day prior to embarkation.",
+         "shortDescription": "Soak it all in. Day and night. Floor-to-ceiling glass doors open to your own private balcony – and breathtaking views.",
+         "stateroomMaxSize": 304,
+         "categoryIds": [
+          "BX"
+         ],
+         "code": "GETAWAY.Sailaway Balcony_BX.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 8,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Breakaway-Balcony-Family-Balcony-B4-Bedroom-Schematic.jpeg",
+           "alt": "b801bdf491227d422dd7dc70404a786884058c93.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/balcony/ncl_Gtwy_Balcony_BC.jpeg",
+           "title": "ncl_Gtwy_Balcony_BC.jpeg",
+           "alt": "8734ef3d682f9a327524b079cd1b4f84e8944c6d.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/inside/NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "title": "NCL-Getaway-Cruise-Stateroom-Standard_Bath.jpg",
+           "alt": "dbbc7f2b54b517c76b2d1455ab320395c880746e.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": true,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "304",
+          "stateroomMax": "304",
+          "balconyMin": "129",
+          "balconyMax": "129",
+          "isMetric": false
+         },
+         "title": "Guarantee Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "BX",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "BX",
+           "guestCapacity": 4,
+           "price": 668
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       }
+      ],
+      "code": "BALCONY",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "Balcony"
+     },
+     {
+      "isSoldOut": false,
+      "price": 828,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 1388,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 513,
+         "balconyInfo": {
+          "minSize": 210,
+          "maxSize": 282
+         },
+         "description": "Experience unforgettable aft-facing views from your private balcony. These spacious staterooms include plenty room for you to spread out.",
+         "shortDescription": "Sublime, spacious suites ideal for the two of you or the whole family. Savor luxurious touches and breathtaking, private views.",
+         "stateroomMaxSize": 585,
+         "categoryIds": [
+          "M1"
+         ],
+         "code": "GETAWAY.AFT-FACING CLUB BALCONY SUITE_M1.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 10,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/club-balcony-suite/NCL-Stateroom-Getaway-Club-Balcony-Suite-Sail-Away-Club-Balcony-Suite-MX-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Getaway-Club-Balcony-Suite-Sail-Away-Club-Balcony-Suite-MX-Bedroom-Schematic.jpeg",
+           "alt": "be649d89509340932b99221fbe4e4829b39cafcc.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/club-balcony-suite/ncl_Gtwy_MiniSuite_M2.jpeg",
+           "title": "ncl_Gtwy_MiniSuite_M2.jpeg",
+           "alt": "a373af819188d9fb72756ea7878ad922c06510c5.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "M1"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "513",
+          "stateroomMax": "585",
+          "balconyMin": "210",
+          "balconyMax": "282",
+          "isMetric": false
+         },
+         "title": "Aft-Facing Club Balcony Suite"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "M1",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "M1",
+           "guestCapacity": 2,
+           "price": 1388
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 888,
+        "stateroom": {
+         "stateroomMinSize": 239,
+         "balconyInfo": {
+          "minSize": 32,
+          "maxSize": 32
+         },
+         "description": "Convenient mid-ship location close to the kids' area. While the kids are entertained in Splash Academy or Entourage you can kick back and enjoy the ever-changing seascape from your private balcony.",
+         "shortDescription": "Sublime, spacious suites ideal for the two of you or the whole family. Savor luxurious touches and breathtaking, private views.",
+         "stateroomMaxSize": 239,
+         "categoryIds": [
+          "M4"
+         ],
+         "code": "GETAWAY.FAMILY CLUB BALCONY SUITE_M4.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/club-balcony-suite/NCL-Stateroom-Getaway-Club-Balcony-Suite-Sail-Away-Club-Balcony-Suite-MX-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Getaway-Club-Balcony-Suite-Sail-Away-Club-Balcony-Suite-MX-Bedroom-Schematic.jpeg",
+           "alt": "be649d89509340932b99221fbe4e4829b39cafcc.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/club-balcony-suite/ncl_Gtwy_MiniSuite_M2.jpeg",
+           "title": "ncl_Gtwy_MiniSuite_M2.jpeg",
+           "alt": "a373af819188d9fb72756ea7878ad922c06510c5.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "239",
+          "stateroomMax": "239",
+          "balconyMin": "32",
+          "balconyMax": "32",
+          "isMetric": false
+         },
+         "title": "Family Club Balcony Suite"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "M4",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "M4",
+           "guestCapacity": 4,
+           "price": 888
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 928,
+        "stateroom": {
+         "stateroomMinSize": 289,
+         "balconyInfo": {
+          "minSize": 82,
+          "maxSize": 103
+         },
+         "description": "Savor every sunrise and sunset together from the privacy of your large balcony. When you’re ready, all the excitement along the Waterfront is on the same deck, just steps away.",
+         "shortDescription": "Sublime, spacious suites ideal for the two of you or the whole family. Savor luxurious touches and breathtaking, private views.",
+         "stateroomMaxSize": 310,
+         "categoryIds": [
+          "M6"
+         ],
+         "code": "GETAWAY.CLUB BALCONY SUITE WITH LARGER BALCONY_M6.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 8,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/club-balcony-suite/NCL-Stateroom-Getaway-Club-Balcony-Suite-Sail-Away-Club-Balcony-Suite-MX-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Getaway-Club-Balcony-Suite-Sail-Away-Club-Balcony-Suite-MX-Bedroom-Schematic.jpeg",
+           "alt": "be649d89509340932b99221fbe4e4829b39cafcc.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/club-balcony-suite/ncl_Gtwy_MiniSuite_M2.jpeg",
+           "title": "ncl_Gtwy_MiniSuite_M2.jpeg",
+           "alt": "a373af819188d9fb72756ea7878ad922c06510c5.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "289",
+          "stateroomMax": "310",
+          "balconyMin": "82",
+          "balconyMax": "103",
+          "isMetric": false
+         },
+         "title": "Club Balcony Suite with Larger Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "M6",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "M6",
+           "guestCapacity": 4,
+           "price": 928
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 828,
+        "stateroom": {
+         "stateroomMinSize": 236,
+         "balconyInfo": {
+          "minSize": 32,
+          "maxSize": 103
+         },
+         "description": "All the space you need. Relax on your private balcony and breathe in the fresh air while taking in amazing views.",
+         "shortDescription": "Sublime, spacious suites ideal for the two of you or the whole family. Savor luxurious touches and breathtaking, private views.",
+         "stateroomMaxSize": 310,
+         "categoryIds": [
+          "MB",
+          "MA"
+         ],
+         "code": "GETAWAY.CLUB BALCONY SUITE_MA_MB.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 8,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 9,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Forward",
+            "Mid"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/club-balcony-suite/NCL-Stateroom-Getaway-Club-Balcony-Suite-Sail-Away-Club-Balcony-Suite-MX-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Getaway-Club-Balcony-Suite-Sail-Away-Club-Balcony-Suite-MX-Bedroom-Schematic.jpeg",
+           "alt": "be649d89509340932b99221fbe4e4829b39cafcc.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/club-balcony-suite/ncl_Gtwy_MiniSuite_M2.jpeg",
+           "title": "ncl_Gtwy_MiniSuite_M2.jpeg",
+           "alt": "a373af819188d9fb72756ea7878ad922c06510c5.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "236",
+          "stateroomMax": "310",
+          "balconyMin": "32",
+          "balconyMax": "103",
+          "isMetric": false
+         },
+         "title": "Club Balcony Suite"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "MB",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "MB",
+           "guestCapacity": 4,
+           "price": 828
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         },
+         {
+          "standardOption": {
+           "berthedCategoryCode": "MA",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "MA",
+           "guestCapacity": 4,
+           "price": 848
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 748,
+        "stateroom": {
+         "stateroomMinSize": 310,
+         "balconyInfo": {
+          "minSize": 103,
+          "maxSize": 103
+         },
+         "description": "Breathtaking vistas seem like they’re just for you when you enjoy them on your private balcony. As our lowest available rate for this category, a Guarantee Club Balcony Suite guarantees you’ll receive a Club Balcony Suite stateroom or better! Your stateroom may be on any deck and assigned up to one day prior to embarkation.",
+         "shortDescription": "Sublime, spacious suites ideal for the two of you or the whole family. Savor luxurious touches and breathtaking, private views.",
+         "stateroomMaxSize": 310,
+         "categoryIds": [
+          "MX"
+         ],
+         "code": "GETAWAY.SAIL AWAY CLUB BALCONY SUITE_MX.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 8,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 9,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/club-balcony-suite/NCL-Stateroom-Getaway-Club-Balcony-Suite-Sail-Away-Club-Balcony-Suite-MX-Bedroom-Schematic.jpeg",
+           "title": "NCL-Stateroom-Getaway-Club-Balcony-Suite-Sail-Away-Club-Balcony-Suite-MX-Bedroom-Schematic.jpeg",
+           "alt": "be649d89509340932b99221fbe4e4829b39cafcc.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/club-balcony-suite/ncl_Gtwy_MiniSuite_M2.jpeg",
+           "title": "ncl_Gtwy_MiniSuite_M2.jpeg",
+           "alt": "a373af819188d9fb72756ea7878ad922c06510c5.png"
+          }
+         ],
+         "guestCapacity": 3,
+         "isSailAway": true,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "310",
+          "stateroomMax": "310",
+          "balconyMin": "103",
+          "balconyMax": "103",
+          "isMetric": false
+         },
+         "title": "Guarantee Club Balcony Suite"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "MX",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "MX",
+           "guestCapacity": 3,
+           "price": 748
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       }
+      ],
+      "code": "MINISUITE",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "Club Balcony Suite"
+     },
+     {
+      "isSoldOut": false,
+      "price": 3448,
+      "stateroomsPricing": [
+       {
+        "isSoldOut": false,
+        "price": 7688,
+        "isBestAvailableByRanking": true,
+        "stateroom": {
+         "stateroomMinSize": 932,
+         "balconyInfo": {
+          "minSize": 204,
+          "maxSize": 204
+         },
+         "description": "Your private paradise is ready. Relax in chic, luxurious comfort complete with floor-to-ceiling windows. Take in vista after glorious vista from your spacious wrap around balcony then relax and unwind in your luxurious tub. This stateroom can connect to a Courtyard Penthouse.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 932,
+         "categoryIds": [
+          "H2"
+         ],
+         "code": "GETAWAY.The Haven Deluxe Owner's Suite with Large Balcony_H2.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 16,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl-Gtwy-Schmtc-Dlxe-Ownrs-Suite-H2.jpg",
+           "title": "ncl-Gtwy-Schmtc-Dlxe-Ownrs-Suite-H2.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_Cruise_DlxOwnSte_LR_H2.jpg",
+           "title": "ncl_Gtwy_Cruise_DlxOwnSte_LR_H2.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_DlxOwnSte_BR_H2.jpeg",
+           "title": "ncl_Gtwy_DlxOwnSte_BR_H2.jpeg",
+           "alt": "c8df46000f37b22bed9a411cf30be9869923821a.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_Cruise_DlxOwnSte_bath_H2.jpg",
+           "title": "ncl_Gtwy_Cruise_DlxOwnSte_bath_H2.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "932",
+          "stateroomMax": "932",
+          "balconyMin": "204",
+          "balconyMax": "204",
+          "isMetric": false
+         },
+         "title": "The Haven Deluxe Owner's Suite with Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "H2",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "H2",
+           "guestCapacity": 4,
+           "price": 7688
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 5588,
+        "stateroom": {
+         "stateroomMinSize": 572,
+         "balconyInfo": {
+          "minSize": 95,
+          "maxSize": 95
+         },
+         "description": "Pampering all the way. Glorious vistas are yours, through walls of windows or from your large, private balcony. Get used to being spoiled with premium amenities, 24/7 butler and concierge service and exclusive access to The Haven Courtyard, restaurant and lounge.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 572,
+         "categoryIds": [
+          "H3"
+         ],
+         "code": "GETAWAY.The Haven Deluxe Owner's Suite with Balcony_H3.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 16,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl-Gtwy-Schmtc-H3.jpg",
+           "title": "ncl-Gtwy-Schmtc-H3.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_OwnSte_LR_H3.jpeg",
+           "title": "ncl_Gtwy_OwnSte_LR_H3.jpeg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_OwnSte_BR_H3.jpeg",
+           "title": "ncl_Gtwy_OwnSte_BR_H3.jpeg",
+           "alt": "8a4d99f9820d40137a69e3e41fc9c40e9a03c442.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "572",
+          "stateroomMax": "572",
+          "balconyMin": "95",
+          "balconyMax": "95",
+          "isMetric": false
+         },
+         "title": "The Haven Deluxe Owner's Suite with Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "H3",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "H3",
+           "guestCapacity": 4,
+           "price": 5588
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 4688,
+        "stateroom": {
+         "stateroomMinSize": 534,
+         "balconyInfo": {
+          "minSize": 39,
+          "maxSize": 50
+         },
+         "description": "Your enclave awaits. Retreat with your family to a modern 2 bedroom, 2 bathroom stateroom with walls of windows and the finest touches throughout. Then enjoy the premium amenities of The Haven Courtyard, Lounge and Restaurant. Lose yourself with the calming sounds of the sea from your private balcony.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 545,
+         "categoryIds": [
+          "H6"
+         ],
+         "code": "GETAWAY.The Haven 2-Bedroom Family Villa with Balcony_H6.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 15,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 16,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_Schmtc_2_Bed_Fam_Villa_H4.jpeg",
+           "title": "ncl_Gtwy_Schmtc_2_Bed_Fam_Villa_H4.jpeg",
+           "alt": "e8c2c798cdc2a6048edd3ae578d41d30fdc9f13e.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_2BRFamVilla_H4_LR.jpeg",
+           "title": "ncl_Gtwy_2BRFamVilla_H4_LR.jpeg",
+           "alt": "433732d06a07e6f5ff48b0ef773f5c9037a94a96.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_Aft_PH_BR_H6.jpeg",
+           "title": "ncl_Gtwy_Aft_PH_BR_H6.jpeg",
+           "alt": "0410bd9fc43879a47ac384520405e4ea54924989.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_Aft_PH_bath_H6.jpeg",
+           "title": "ncl_Gtwy_Aft_PH_bath_H6.jpeg",
+           "alt": "1c56d20c90074ce816e935311b1a22bcebebedc7.png"
+          }
+         ],
+         "guestCapacity": 6,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "534",
+          "stateroomMax": "545",
+          "balconyMin": "39",
+          "balconyMax": "50",
+          "isMetric": false
+         },
+         "title": "The Haven 2-Bedroom Family Villa with Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "H6",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "H6",
+           "guestCapacity": 6,
+           "price": 4688
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 4288,
+        "stateroom": {
+         "stateroomMinSize": 789,
+         "balconyInfo": {
+          "minSize": 370,
+          "maxSize": 405
+         },
+         "description": "Experience unforgettable views from the privacy of your own balcony. Plus enjoy thoughtful, luxurious touches throughout as well as round-the-clock service from a certified butler.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 824,
+         "categoryIds": [
+          "H7"
+         ],
+         "code": "GETAWAY.The Haven Aft-Facing Penthouse with Master Bedroom & Large Balcony_H7.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl-Gtwy-Schmtc-Aft-Penthouse-H6.jpg",
+           "title": "ncl-Gtwy-Schmtc-Aft-Penthouse-H6.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_Aft_PH_LR_H6.jpeg",
+           "title": "ncl_Gtwy_Aft_PH_LR_H6.jpeg",
+           "alt": "8a73ed579a5b7f199af72c220936950be5b5b4f7.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_Aft_PH_BR_H6.jpeg",
+           "title": "ncl_Gtwy_Aft_PH_BR_H6.jpeg",
+           "alt": "0410bd9fc43879a47ac384520405e4ea54924989.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "789",
+          "stateroomMax": "824",
+          "balconyMin": "370",
+          "balconyMax": "405",
+          "isMetric": false
+         },
+         "title": "The Haven Aft-Facing Penthouse with Master Bedroom & Large Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "H7",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "H7",
+           "guestCapacity": 4,
+           "price": 4288
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 4188,
+        "stateroom": {
+         "stateroomMinSize": 655,
+         "balconyInfo": {
+          "minSize": 236,
+          "maxSize": 296
+         },
+         "description": "Experience unforgettable views from the privacy of your own balcony. Plus enjoy thoughtful, luxurious touches throughout as well as round-the-clock service from a certified butler.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 715,
+         "categoryIds": [
+          "HA"
+         ],
+         "code": "GETAWAY.The Haven Aft-Facing Penthouse with Master Bedroom & Balcony_HA.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 10,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Aft"
+           ]
+          },
+          {
+           "deck": 14,
+           "locations": [
+            "Aft"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl-Gtwy-Schmtc-Aft-Penthouse-H6.jpg",
+           "title": "ncl-Gtwy-Schmtc-Aft-Penthouse-H6.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_Aft_PH_LR_H6.jpeg",
+           "title": "ncl_Gtwy_Aft_PH_LR_H6.jpeg",
+           "alt": "8a73ed579a5b7f199af72c220936950be5b5b4f7.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_Aft_PH_BR_H6.jpeg",
+           "title": "ncl_Gtwy_Aft_PH_BR_H6.jpeg",
+           "alt": "0410bd9fc43879a47ac384520405e4ea54924989.png"
+          }
+         ],
+         "guestCapacity": 4,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "655",
+          "stateroomMax": "715",
+          "balconyMin": "236",
+          "balconyMax": "296",
+          "isMetric": false
+         },
+         "title": "The Haven Aft-Facing Penthouse with Master Bedroom & Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "HA",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "HA",
+           "guestCapacity": 4,
+           "price": 4188
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 3948,
+        "stateroom": {
+         "stateroomMinSize": 324,
+         "balconyInfo": {
+          "minSize": 48,
+          "maxSize": 79
+         },
+         "description": "Spacious and amazing. Floor-to-ceiling windows bring the spectacular views to you. Plus the personal service of a concierge and 24-hour certified butler makes sure every whim comes true.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 540,
+         "categoryIds": [
+          "HF"
+         ],
+         "code": "GETAWAY.The Haven Courtyard Penthouse with Balcony_HF.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 15,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 16,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_Schmtc_Crtyrd_Pnths_H5.jpeg",
+           "title": "ncl_Gtwy_Schmtc_Crtyrd_Pnths_H5.jpeg",
+           "alt": "ad2370fe0d73895c8290c08be21138dbf137ca0c.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_CtydPH_H5.jpeg",
+           "title": "ncl_Gtwy_CtydPH_H5.jpeg",
+           "alt": "338e37043d4738dafe9c389ab47b6d72c34af8cb.png"
+          }
+         ],
+         "guestCapacity": 3,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "HF"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "324",
+          "stateroomMax": "540",
+          "balconyMin": "48",
+          "balconyMax": "79",
+          "isMetric": false
+         },
+         "title": "The Haven Courtyard Penthouse with Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "HF",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "HF",
+           "guestCapacity": 3,
+           "price": 3948
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 3848,
+        "stateroom": {
+         "stateroomMinSize": 419,
+         "balconyInfo": {
+          "minSize": 32,
+          "maxSize": 32
+         },
+         "description": "Experience unforgettable views from the privacy of your own balcony. Plus enjoy thoughtful, luxurious touches throughout as well as round-the-clock service from a certified butler.<br>  <b>Please note: </b>Suite 13106 is wheelchair accessible and does not feature a separate bedroom.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 451,
+         "categoryIds": [
+          "HG"
+         ],
+         "code": "GETAWAY.The Haven Forward-Facing Penthouse with Balcony_HG.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 9,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 10,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 11,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 12,
+           "locations": [
+            "Forward"
+           ]
+          },
+          {
+           "deck": 13,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": true,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl-Gtwy-Schmtc-Forward-Penthouse-H7.jpg",
+           "title": "ncl-Gtwy-Schmtc-Forward-Penthouse-H7.jpg",
+           "alt": "cq5dam.thumbnail.319.319.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_FwdPH_LR_H7.jpeg",
+           "title": "ncl_Gtwy_FwdPH_LR_H7.jpeg",
+           "alt": "c6c9e7da44e22433387fe7f075defcc215fe35e4.png"
+          },
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_FwdPH_BR_H7.jpeg",
+           "title": "ncl_Gtwy_FwdPH_BR_H7.jpeg",
+           "alt": "6e4f5a4d2b3f697eb1e3fbc60f9dd2795dd2baa4.png"
+          }
+         ],
+         "guestCapacity": 3,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [
+          "HG"
+         ],
+         "sizeInfo": {
+          "stateroomMin": "419",
+          "stateroomMax": "451",
+          "balconyMin": "32",
+          "balconyMax": "32",
+          "isMetric": false
+         },
+         "title": "The Haven Forward-Facing Penthouse with Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "HG",
+           "isGTY": false,
+           "isWheelchairAccessible": true,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "HG",
+           "guestCapacity": 3,
+           "price": 3848
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       },
+       {
+        "isSoldOut": false,
+        "price": 3448,
+        "stateroom": {
+         "stateroomMinSize": 309,
+         "balconyInfo": {
+          "minSize": 54,
+          "maxSize": 54
+         },
+         "description": "Retreat from it all in your jacuzzi  or relax on your private balcony. Plus,  24/7 butler and concierge service and exclusive access to The Haven Courtyard, restaurant and lounge.",
+         "shortDescription": "The best address on board, The Haven is a world of luxury at the top of the ship, featuring 24-hour butler service.",
+         "stateroomMaxSize": 309,
+         "categoryIds": [
+          "HI"
+         ],
+         "code": "GETAWAY.Haven Penthouse Suite with Balcony_HI.R2-2024",
+         "deckLocations": [
+          {
+           "deck": 14,
+           "locations": [
+            "Forward"
+           ]
+          }
+         ],
+         "amenities": [],
+         "isWheelchairAccessible": false,
+         "floorplanImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_Schmtc_Spa_Suite_H9.jpeg",
+           "title": "ncl_Gtwy_Schmtc_Spa_Suite_H9.jpeg",
+           "alt": "690c50eaa38d1497dcbbee12c1aaabce5934edcd.png"
+          }
+         ],
+         "mainImages": [
+          {
+           "path": "/content/dam/ncl/us/en/ships/norwegian-getaway/getaway-staterooms/the-haven/ncl_Gtwy_SpaSuite_H9.jpeg",
+           "title": "ncl_Gtwy_SpaSuite_H9.jpeg",
+           "alt": "0c323131fb7e85399056b788fa6e90ed00fd42eb.png"
+          }
+         ],
+         "guestCapacity": 2,
+         "isSailAway": false,
+         "wheelchairAccessibleCategoryIds": [],
+         "sizeInfo": {
+          "stateroomMin": "309",
+          "stateroomMax": "309",
+          "balconyMin": "54",
+          "balconyMax": "54",
+          "isMetric": false
+         },
+         "title": "The Haven Penthouse Suite with Balcony"
+        },
+        "isAvailable": true,
+        "categoryPricing": [
+         {
+          "standardOption": {
+           "berthedCategoryCode": "HI",
+           "isGTY": false,
+           "isWheelchairAccessible": false,
+           "fareCode": "BESTFARE",
+           "pricedCategoryCode": "HI",
+           "guestCapacity": 2,
+           "price": 3448
+          },
+          "isAvailable": true,
+          "isSoldOut": false
+         }
+        ]
+       }
+      ],
+      "code": "HAVEN",
+      "amenities": [],
+      "isAvailable": true,
+      "title": "The Haven"
+     }
+    ],
+    "offerGroups": [
+     {
+      "code": "FREE-AT-SEA",
+      "weight": 2,
+      "title": "Free at Sea™",
+      "description": "Free at Sea™ Package",
+      "promotionsInGroup": [
+       {
+        "isDefaultInGroup": true,
+        "promotion": {
+         "promotionCodes": [
+          "ALL4CHO"
+         ],
+         "stateroomTypes": [
+          "STUDIO",
+          "INSIDE",
+          "OCEANVIEW",
+          "MINISUITE",
+          "BALCONY"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "unlimited-open-bar-offer",
+           "title": "Unlimited Open Bar",
+           "shortTitle": "Bar",
+           "offerType": "beverage-package-offer",
+           "description": "<p>Enjoy the best beverage package at sea! Indulge in unlimited\npremium spirits such as Grey Goose, Casamigos, Woodford Reserve and more, plus\ncocktails, wine, beer, soft drinks and juice - all included. Simply pay the\npackage gratuities in advance, and the drinks are on us. With drinks on board\naveraging $15 each, there’s no better value.</p><p>Gratuities are $32 per person, per day for 2–5 night\nsailings and $28.50 per person, per day for sailings of 6 nights or more. This\nis reflected in the total price shown above and in the guest breakdown.<br></p><p>The package applies to all guests in the stateroom aged 21+.\nGuests 1 or 2 under age 21 will instead receive juice and unlimited fountain\nsoda for $12.50 per person per day. Guests 3–8 under 21 will not receive a\nbeverage package but may purchase one separately.</p>",
+           "inclusion": "Removable",
+           "weight": 1,
+           "alwaysApplicable": true,
+           "groupingCode": "unlimited-open-bar-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer",
+           "title": "Specialty Dining",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat. <br>  <br>   The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": true,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer-2-4-nights",
+           "title": "Specialty Dining - 1 Meal",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor 1 amazing multi-course meal at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat.<br>    <br>    The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": false,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [
+            {
+             "min": 2,
+             "max": 4
+            }
+           ],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "BVSXIN"
+         ],
+         "stateroomTypes": [
+          "BALCONY",
+          "MINISUITE",
+          "INSIDE",
+          "OCEANVIEW",
+          "STUDIO"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "unlimited-open-bar-offer",
+           "title": "Unlimited Open Bar",
+           "shortTitle": "Bar",
+           "offerType": "beverage-package-offer",
+           "description": "<p>Enjoy the best beverage package at sea! Indulge in unlimited\npremium spirits such as Grey Goose, Casamigos, Woodford Reserve and more, plus\ncocktails, wine, beer, soft drinks and juice - all included. Simply pay the\npackage gratuities in advance, and the drinks are on us. With drinks on board\naveraging $15 each, there’s no better value.</p><p>Gratuities are $32 per person, per day for 2–5 night\nsailings and $28.50 per person, per day for sailings of 6 nights or more. This\nis reflected in the total price shown above and in the guest breakdown.<br></p><p>The package applies to all guests in the stateroom aged 21+.\nGuests 1 or 2 under age 21 will instead receive juice and unlimited fountain\nsoda for $12.50 per person per day. Guests 3–8 under 21 will not receive a\nbeverage package but may purchase one separately.</p>",
+           "inclusion": "Removable",
+           "weight": 1,
+           "alwaysApplicable": true,
+           "groupingCode": "unlimited-open-bar-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": true,
+        "promotion": {
+         "promotionCodes": [
+          "CHOALL4M"
+         ],
+         "stateroomTypes": [
+          "HAVEN",
+          "SUITE"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "unlimited-open-bar-offer",
+           "title": "Unlimited Open Bar",
+           "shortTitle": "Bar",
+           "offerType": "beverage-package-offer",
+           "description": "<p>Enjoy the best beverage package at sea! Indulge in unlimited\npremium spirits such as Grey Goose, Casamigos, Woodford Reserve and more, plus\ncocktails, wine, beer, soft drinks and juice - all included. Simply pay the\npackage gratuities in advance, and the drinks are on us. With drinks on board\naveraging $15 each, there’s no better value.</p><p>Gratuities are $32 per person, per day for 2–5 night\nsailings and $28.50 per person, per day for sailings of 6 nights or more. This\nis reflected in the total price shown above and in the guest breakdown.<br></p><p>The package applies to all guests in the stateroom aged 21+.\nGuests 1 or 2 under age 21 will instead receive juice and unlimited fountain\nsoda for $12.50 per person per day. Guests 3–8 under 21 will not receive a\nbeverage package but may purchase one separately.</p>",
+           "inclusion": "Removable",
+           "weight": 1,
+           "alwaysApplicable": true,
+           "groupingCode": "unlimited-open-bar-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer",
+           "title": "Specialty Dining",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat. <br>  <br>   The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": true,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer-2-4-nights",
+           "title": "Specialty Dining - 1 Meal",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor 1 amazing multi-course meal at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat.<br>    <br>    The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": false,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [
+            {
+             "min": 2,
+             "max": 4
+            }
+           ],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "HSBVSXIN"
+         ],
+         "stateroomTypes": [
+          "HAVEN",
+          "SUITE"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "unlimited-open-bar-offer",
+           "title": "Unlimited Open Bar",
+           "shortTitle": "Bar",
+           "offerType": "beverage-package-offer",
+           "description": "<p>Enjoy the best beverage package at sea! Indulge in unlimited\npremium spirits such as Grey Goose, Casamigos, Woodford Reserve and more, plus\ncocktails, wine, beer, soft drinks and juice - all included. Simply pay the\npackage gratuities in advance, and the drinks are on us. With drinks on board\naveraging $15 each, there’s no better value.</p><p>Gratuities are $32 per person, per day for 2–5 night\nsailings and $28.50 per person, per day for sailings of 6 nights or more. This\nis reflected in the total price shown above and in the guest breakdown.<br></p><p>The package applies to all guests in the stateroom aged 21+.\nGuests 1 or 2 under age 21 will instead receive juice and unlimited fountain\nsoda for $12.50 per person per day. Guests 3–8 under 21 will not receive a\nbeverage package but may purchase one separately.</p>",
+           "inclusion": "Removable",
+           "weight": 1,
+           "alwaysApplicable": true,
+           "groupingCode": "unlimited-open-bar-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "DISXIN"
+         ],
+         "stateroomTypes": [
+          "BALCONY",
+          "MINISUITE",
+          "INSIDE",
+          "OCEANVIEW",
+          "STUDIO"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "specialty-dining-offer",
+           "title": "Specialty Dining",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat. <br>  <br>   The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": true,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer-2-4-nights",
+           "title": "Specialty Dining - 1 Meal",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor 1 amazing multi-course meal at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat.<br>    <br>    The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": false,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [
+            {
+             "min": 2,
+             "max": 4
+            }
+           ],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "HSDISXIN"
+         ],
+         "stateroomTypes": [
+          "HAVEN",
+          "SUITE"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "specialty-dining-offer",
+           "title": "Specialty Dining",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat. <br>  <br>   The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": true,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "specialty-dining-offer-2-4-nights",
+           "title": "Specialty Dining - 1 Meal",
+           "shortTitle": "Dining",
+           "offerType": "dining-offer",
+           "description": "Savor 1 amazing multi-course meal at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat.<br>    <br>    The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+           "inclusion": "Removable",
+           "weight": 2,
+           "alwaysApplicable": false,
+           "groupingCode": "specialty-dining-offer",
+           "stateroomTypes": [],
+           "durations": [
+            {
+             "min": 2,
+             "max": 4
+            }
+           ],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "INTSHO"
+         ],
+         "stateroomTypes": [
+          "BALCONY",
+          "MINISUITE",
+          "INSIDE",
+          "OCEANVIEW",
+          "STUDIO"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "HSINTSHO"
+         ],
+         "stateroomTypes": [
+          "SUITE",
+          "HAVEN"
+         ],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "free-wifi-offer",
+           "title": "Wi-Fi Package",
+           "offerType": "wifi-package-offer",
+           "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+           "inclusion": "Mandatory",
+           "weight": 3,
+           "alwaysApplicable": true,
+           "groupingCode": "free-wifi-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          },
+          {
+           "code": "excursion-credits-offer",
+           "title": "Excursion Credits",
+           "offerType": "shorex-offer",
+           "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+           "inclusion": "Mandatory",
+           "weight": 4,
+           "alwaysApplicable": true,
+           "groupingCode": "excursion-credits-offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       }
+      ],
+      "isDefaultGroup": false,
+      "offers": [
+       {
+        "code": "unlimited-open-bar-offer",
+        "title": "Unlimited Open Bar",
+        "shortTitle": "Bar",
+        "offerType": "beverage-package-offer",
+        "description": "<p>Enjoy the best beverage package at sea! Indulge in unlimited\npremium spirits such as Grey Goose, Casamigos, Woodford Reserve and more, plus\ncocktails, wine, beer, soft drinks and juice - all included. Simply pay the\npackage gratuities in advance, and the drinks are on us. With drinks on board\naveraging $15 each, there’s no better value.</p><p>Gratuities are $32 per person, per day for 2–5 night\nsailings and $28.50 per person, per day for sailings of 6 nights or more. This\nis reflected in the total price shown above and in the guest breakdown.<br></p><p>The package applies to all guests in the stateroom aged 21+.\nGuests 1 or 2 under age 21 will instead receive juice and unlimited fountain\nsoda for $12.50 per person per day. Guests 3–8 under 21 will not receive a\nbeverage package but may purchase one separately.</p>",
+        "inclusion": "Removable",
+        "weight": 1,
+        "alwaysApplicable": true,
+        "groupingCode": "unlimited-open-bar-offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "specialty-dining-offer",
+        "title": "Specialty Dining",
+        "shortTitle": "Dining",
+        "offerType": "dining-offer",
+        "description": "Savor amazing multi-course meals at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat. <br>  <br>   The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+        "inclusion": "Removable",
+        "weight": 2,
+        "alwaysApplicable": true,
+        "groupingCode": "specialty-dining-offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "specialty-dining-offer-2-4-nights",
+        "title": "Specialty Dining - 1 Meal",
+        "shortTitle": "Dining",
+        "offerType": "dining-offer",
+        "description": "Savor 1 amazing multi-course meal at our award-winning Specialty Restaurants, such as Cagney’s Steakhouse or Le Bistro. Enjoy elevated dining experiences featuring globally inspired cuisine and exceptional service - all included. Simply pre-pay the package gratuities in advance, and the dining experience is on us. With an average of $60 per meal onboard, this value can’t be beat.<br>    <br>    The package applies to all guests on the reservation.  Guests under age 13 dine for free when ordering from the kids’ menu. If they choose to order from the specialty dining menu, a $20 cover charge will apply.",
+        "inclusion": "Removable",
+        "weight": 2,
+        "alwaysApplicable": false,
+        "groupingCode": "specialty-dining-offer",
+        "stateroomTypes": [],
+        "durations": [
+         {
+          "min": 2,
+          "max": 4
+         }
+        ],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "free-wifi-offer",
+        "title": "Wi-Fi Package",
+        "offerType": "wifi-package-offer",
+        "description": "Stay connected throughout your cruise with 150 minutes of hi-speed Wi-Fi per person included. Offer applies to all guests in the stateroom. ",
+        "inclusion": "Mandatory",
+        "weight": 3,
+        "alwaysApplicable": true,
+        "groupingCode": "free-wifi-offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "excursion-credits-offer",
+        "title": "Excursion Credits",
+        "offerType": "shorex-offer",
+        "description": "Receive a $50 credit toward every shore excursion. Offer applies to the first guest on the reservation.",
+        "inclusion": "Mandatory",
+        "weight": 4,
+        "alwaysApplicable": true,
+        "groupingCode": "excursion-credits-offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       }
+      ]
+     },
+     {
+      "code": "MORE-OFFERS",
+      "weight": 4,
+      "title": "More Offers",
+      "promotionsInGroup": [
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [],
+         "stateroomTypes": [],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "2-For-1-Deposits-Offer",
+           "title": "2-For-1 Deposits",
+           "offerType": "auto-included-offer",
+           "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
+           "inclusion": "Mandatory",
+           "weight": 17,
+           "alwaysApplicable": true,
+           "groupingCode": "2-For-1-Deposits-Offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [],
+         "stateroomTypes": [],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "Risk-Free-Cancellation-Offer",
+           "title": "Risk-Free Cancellation",
+           "offerType": "auto-included-offer",
+           "description": "Cancel up to 120 days in advance for a full refund",
+           "inclusion": "Mandatory",
+           "weight": 23,
+           "alwaysApplicable": true,
+           "groupingCode": "Risk-Free-Cancellation-Offer",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       },
+       {
+        "isDefaultInGroup": false,
+        "promotion": {
+         "promotionCodes": [
+          "DISC50"
+         ],
+         "stateroomTypes": [],
+         "notSailAwayCategoriesOnly": false,
+         "offers": [
+          {
+           "code": "free-2nd-guest",
+           "title": "Free 2nd Guest",
+           "offerType": "auto-included-offer",
+           "description": " Buy 1st Guest & 2nd Guest Sails Free (Only Paying Taxes) ",
+           "inclusion": "Mandatory",
+           "weight": 26,
+           "alwaysApplicable": true,
+           "groupingCode": "free-2nd-guest",
+           "stateroomTypes": [],
+           "durations": [],
+           "termsIncluded": [],
+           "termsExcluded": [],
+           "isFeatured": false,
+           "stateroomCategoryIds": []
+          }
+         ],
+         "stateroomCategoryIds": []
+        }
+       }
+      ],
+      "isDefaultGroup": false,
+      "offers": [
+       {
+        "code": "2-For-1-Deposits-Offer",
+        "title": "2-For-1 Deposits",
+        "offerType": "auto-included-offer",
+        "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
+        "inclusion": "Mandatory",
+        "weight": 17,
+        "alwaysApplicable": true,
+        "groupingCode": "2-For-1-Deposits-Offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "Risk-Free-Cancellation-Offer",
+        "title": "Risk-Free Cancellation",
+        "offerType": "auto-included-offer",
+        "description": "Cancel up to 120 days in advance for a full refund",
+        "inclusion": "Mandatory",
+        "weight": 23,
+        "alwaysApplicable": true,
+        "groupingCode": "Risk-Free-Cancellation-Offer",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       },
+       {
+        "code": "free-2nd-guest",
+        "title": "Free 2nd Guest",
+        "offerType": "auto-included-offer",
+        "description": " Buy 1st Guest & 2nd Guest Sails Free (Only Paying Taxes) ",
+        "inclusion": "Mandatory",
+        "weight": 26,
+        "alwaysApplicable": true,
+        "groupingCode": "free-2nd-guest",
+        "stateroomTypes": [],
+        "durations": [],
+        "termsIncluded": [],
+        "termsExcluded": [],
+        "isFeatured": false,
+        "stateroomCategoryIds": []
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "enableNewChangeStateroom": false,
+ "currency": {
+  "code": "USD"
+ }
+}

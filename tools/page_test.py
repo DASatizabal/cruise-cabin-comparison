@@ -120,7 +120,19 @@ for name in FL_SITES:
 
 sites["ksf"] = ksf_copy(real)
 sites["ms_api"] = test_tools.schema4(real)   # Make Selection with a stand-in for the Worker
-sites["schema3"] = real                       # the committed file until the first refresh after 5.2.0
+sites["schema3"] = test_tools.schema3(real)   # a file from before 5.2.0 (no payment data)
+# Solo travelers (5.4.0): a schema 5 copy with 1 guest prices shaped like NCL's answers in the probe
+# of 2026-11-15 (test_tools.schema5); the Getaway without usable 1 guest prices; kept 1 guest prices;
+# and a Florida discount on the Getaway BF for 2 guests. "real" is the committed schema 4 file
+# (no 1 guest prices): the adult counter holds at 2 there.
+sites["solo"] = test_tools.schema5(real)
+sites["solo_nc"] = test_tools.not_checked_1(real)
+sites["solo_kept"] = test_tools.schema5(real)
+_k = next(x for x in sites["solo_kept"]["sailings"] if x["id"].startswith("getaway"))
+_k["party_sizes"]["1"].update(updated=False, why="RuntimeError: test", as_of=(dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ"))
+sites["solo_fl"] = test_tools.schema5(real)
+sites["solo_api"] = test_tools.schema5(real)   # Make Selection and the price watch at 1 guest, with the stand-in Worker
+FL_SITES["solo_fl"] = fl_copy({("Getaway", "BF"): 60}, 0)
 FAMILY_API_TEST = "https://family-alerts.test"
 site_root = tempfile.mkdtemp(prefix="june-page-")
 for name, data in sites.items():
@@ -129,14 +141,19 @@ for name, data in sites.items():
     # The Worker's address and the Turnstile key: the stand-in on "ms_api", empty everywhere else.
     with open(os.path.join(REPO, "index.html"), encoding="utf-8") as f:
         html = f.read()
-    api, key = (FAMILY_API_TEST, "test-site-key") if name == "ms_api" else ("", "")
+    api, key = (FAMILY_API_TEST, "test-site-key") if name in ("ms_api", "solo_api") else ("", "")
     html, n1 = re.subn(r'const FAMILY_API = "[^"]*";', f'const FAMILY_API = "{api}";', html)
     html, n2 = re.subn(r'const TURNSTILE_SITE_KEY = "[^"]*";', f'const TURNSTILE_SITE_KEY = "{key}";', html)
     assert (n1, n2) == (1, 1)
     with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
         f.write(html)
     counts = os.path.join(REPO, "data", "counts.json")
-    if os.path.exists(counts):
+    if os.path.exists(counts) and name.startswith("solo"):
+        with open(counts, encoding="utf-8") as f:
+            c1 = test_tools.one_guest_counts(json.load(f), data)
+        with open(os.path.join(d, "data", "counts.json"), "w", encoding="utf-8") as f:
+            json.dump(c1, f)
+    elif os.path.exists(counts):
         shutil.copy(counts, os.path.join(d, "data"))
     with open(os.path.join(d, "data", "prices.json"), "w", encoding="utf-8") as f:
         json.dump(data, f)
@@ -669,7 +686,7 @@ with sync_playwright() as pw:
          ["LEGEND", "ms-explain", 1])
     texts = choice_texts(page, "G")
     same("Make Selection: NCL's deposit with the 2-For-1 line, one credit, two credits (DoubleUp, Balcony)", [t.split("\n")[0] for t in texts],
-         ["NCL's deposit: $100 ($50 per guest x 2), due within 76 hours of booking", "One of David's CruiseNext credits: $250 toward the cruise, you pay David $125",
+         [f"NCL's deposit: $100 ($50 per guest x 2), due within {gw['payment']['by_guests']['2']['due_hours']} hours of booking", "One of David's CruiseNext credits: $250 toward the cruise, you pay David $125",
           "Two of David's CruiseNext credits (NCL's DoubleUp offer): $500 toward the cruise, you pay David $250"])
     check("Make Selection: NCL's deposit offer in NCL's words", "Includes NCL's 2-For-1 Deposits offer: Lock-in this vacation today" in texts[0], texts[0])
     check("Make Selection: CruiseNext steps hidden until a credit is chosen", not page.is_visible("#msCn"))
@@ -1395,6 +1412,213 @@ with sync_playwright() as pw:
     if SHOTS:
         page.evaluate("() => { Object.assign(state, { kids: [] }); render(); }")
         page.query_selector('.card[data-option="G"]').screenshot(path=os.path.join(SHOTS, "list_prices_getaway.png"))
+    page.close()
+
+
+    # ---------- Solo travelers (5.4.0): party size 1 ----------
+    def solo_page(site, stored=None, viewport=None):
+        page = new_page(viewport=viewport)
+        errs = []
+        page.on("pageerror", lambda e: errs.append(str(e)))
+        page.on("console", lambda m: errs.append(m.text) if console_error(m) else None)
+        if stored is not None:
+            page.add_init_script(f"localStorage.setItem('cruise-decision-guide-v5', {json.dumps(json.dumps(stored))})")
+        page.goto(f"{base}/{site}/index.html")
+        page.wait_for_selector(".card .price-total")
+        return page, errs
+    minus = lambda page: page.click('button[data-count="adults"][data-step="-1"]')
+    width = lambda page: page.evaluate("Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)")
+    ONE_LATER = "Prices for 1 guest show after the next daily refresh."
+    solo_data = sites["solo"]
+    sg = next(x for x in solo_data["sailings"] if x["id"].startswith("getaway"))
+    sa = next(x for x in solo_data["sailings"] if x["id"].startswith("aura"))
+    scat = lambda s, code: next(c for t in s["types"] for c in t["categories"] if c["code"] == code)
+    one_total = lambda s, code: scat(s, code)["by_guests"]["1"]["cabin_total"] + s["gratuities"]["open_bar"]["per_guest"] + s["gratuities"]["specialty_dining"]["per_guest"]
+
+    # 1. No usable 1 guest prices (the committed schema 4 file; the Getaway not checked): the counter holds at 2.
+    for site in ("real", "solo_nc"):
+        page, errs = solo_page(site)
+        minus(page)
+        same(f"1 guest, {site}: the counter holds at 2 with the message", (page.inner_text("#adultCount"), page.inner_text("#guestMsg")), ("2", ONE_LATER))
+        page.close()
+        page, errs = solo_page(site, stored={"adults": 1, "kids": [], "type": "balcony", "mode": "same", "compare": ["G", "A", "8"]})
+        same(f"1 guest, {site}: a saved 1 adult opens as 2 adults with the message", (page.inner_text("#adultCount"), page.inner_text("#guestMsg")), ("2", ONE_LATER))
+        check(f"1 guest, {site}: no script errors", not errs, errs[:3])
+        page.close()
+
+    # 2. 1 guest: the counter, the note, the Studio button, the labels, the comparison lines, the totals.
+    page, errs = solo_page("solo")
+    minus(page)
+    same("1 guest: 1 adult and 0 kids allowed", (page.inner_text("#adultCount"), page.inner_text("#guestMsg"), page.inner_text("#guestSummary")),
+         ("1", "", "1 guest in the cabin."))
+    minus(page)
+    same("1 guest: at least 1 adult", page.inner_text("#guestMsg"), "Every cabin needs at least 1 adult (21 or older).")
+    note = page.inner_text("#soloNote")
+    check("1 guest: the Sailing solo note", page.is_visible("#soloNote") and note.startswith("Sailing solo") and page.locator("#soloNote li").count() == 6, note)
+    check("1 guest: the note's 'today' part (every regular cabin at the fare for two)", 'today NCL charges the fare for two guests, which NCL calls "Free 2nd Guest"' in note, note)
+    check("1 guest: the Studio Lounge point with NCL's two sources (owner's wording)",
+          "Solo Studio guests have access to NCL's private Studio Lounge. On the Getaway, NCL's descriptions also list it for Solo Inside, Solo Oceanview and Solo Balcony, "
+          "but NCL's solo cabins page limits it to Solo Studio, so David will confirm before booking." in note, note)
+    same("1 guest: Studio is the first cabin type button", page.evaluate("[...document.querySelectorAll('.card[data-option=\"G\"] [data-type]')].map(b => b.dataset.type)")[:2], ["studio", "inside"])
+    page.click('.card[data-option="G"] button[data-type="inside"]')
+    g_card = page.query_selector('.card[data-option="G"]')
+    items = page.evaluate("""[...document.querySelectorAll('.card[data-option="G"] .cat-list button')].map(b => [b.querySelector('.cat-code').innerText, b.innerText])""")
+    by_code = {c.strip("()"): t for c, t in items}
+    check("1 guest: Solo Inside in the list, labelled priced for one", "IT" in by_code and "Priced for one (no single supplement)" in by_code["IT"], by_code.get("IT"))
+    check("1 guest: a regular cabin labelled single occupancy", "Single occupancy price (includes NCL's single supplement)" in by_code.get("IF", ""), by_code.get("IF"))
+    same("1 guest: the default Inside is the cheapest non-Guarantee cabin, solo included", page.inner_text('.card[data-option="G"] .cabin-line .cat-code'), "(IT)")
+    it, iff, ix = one_total(sg, "IT"), one_total(sg, "IF"), one_total(sg, "IX")
+    same("1 guest: the comparison line (Getaway Inside, a cheaper Guarantee)", page.inner_text('.card[data-option="G"] .solo-line'),
+         f"Today a Solo Inside costs ${iff - it:,} less than a regular Inside for one guest. A Guarantee Inside is ${it - ix:,} less, but NCL picks the cabin location.")
+    same("1 guest: the Aura's Solo Inside is sold out", page.inner_text('.card[data-option="A"] .solo-line'), "Solo cabins of this type are sold out for 1 guest on the Aura.")
+    same("1 guest: the total is the solo cabin plus Open Bar and Specialty Dining for 1 guest", money(page.inner_text('.card[data-option="G"] .price-total')), it)
+    same("1 guest: 'Total to pay now for 1 guest' (prepay off), no per person line", (page.text_content('.card[data-option="G"] .price-label'), g_card.query_selector(".price-pp")),
+         ("Total to pay now for 1 guest", None))
+    check("1 guest: cost per night without a per person amount", "per person" not in page.inner_text('.card[data-option="G"] .rows'))
+    lines = [k for k, v in rows_of(g_card)]
+    check("1 guest: taxes for 1 guest", f"Taxes, fees and port expenses: 1 x ${sg['taxes_per_guest']:g}" in lines, lines)
+    check("1 guest: Open Bar for 1 guest", any(k.startswith("Unlimited Open Bar: 1 guest x $96") for k in lines), lines)
+    check("1 guest: no Kids Sail Free line", g_card.query_selector(".ksf-note") is None)
+    prices = page.evaluate("""[...document.querySelectorAll('.card[data-option="G"] .cat-list button')].map(b => [b.dataset.code || b.querySelector('.cat-code').innerText.replace(/[()]/g, ''), b.querySelector('.price').innerText])""")
+    want = page.evaluate("codes => codes.map(c => money(cost(G, findCat(G, c)).now))", [c for c, _ in prices])
+    same("1 guest: every list price is the card's Total for that cabin", [p for _, p in prices], want)
+    page.click('.card[data-option="G"] button[data-type="studio"]')
+    t1 = one_total(sg, "T1")
+    same("1 guest: Solo Studio against the cheapest regular Inside, and the cheaper Guarantee Inside", page.inner_text('.card[data-option="G"] .solo-line'),
+         f"Today a Solo Studio costs ${iff - t1:,} less than a regular Inside (the cheapest regular cabin) for one guest. A Guarantee Inside is ${t1 - ix:,} less, but NCL picks the cabin location."
+         if t1 < iff else f"Today a Solo Studio costs ${t1 - iff:,} more than a regular Inside (the cheapest regular cabin) for one guest. A Guarantee Inside is ${t1 - ix:,} less, but NCL picks the cabin location.")
+    page.click('.card[data-option="G"] button[data-type="haven"]')
+    check("1 guest: no comparison line for The Haven", page.query_selector('.card[data-option="G"] .solo-line') is None)
+    page.click('.card[data-option="G"] button[data-type="balcony"]')
+    eight = page.inner_text('.card[data-option="8"]')
+    check("1 guest, 8 nights: one comparison line per ship", "On the Getaway: Today a Solo Balcony costs" in eight and "On the Aura: Today a Solo Balcony costs" in eight, eight[:400])
+    page.click('.card[data-option="8"] button[data-mode="different"]')
+    page.select_option("#diffG", "IT")
+    page.select_option("#diffA", "BF")
+    same("1 guest, 8 nights, different cabins: a solo cabin on one ship, a regular one on the other", money(page.inner_text('.card[data-option="8"] .price-total')),
+         one_total(sg, "IT") + one_total(sa, "BF"))
+    tables = page.text_content(".tables")
+    check("1 guest: the full tables list the solo cabins with their label", "Solo Studio" in tables and "Priced for one (no single supplement)" in tables and "Every Getaway cabin for 1 guest" in tables, tables[:300])
+    same("1 guest: no sideways scrolling at 360 px", width(page) <= 360, True)
+    if SHOTS:
+        page.screenshot(path=os.path.join(SHOTS, "solo_1_guest.png"), full_page=True)
+    page.click('button[data-count="kids"][data-step="1"]')
+    check("1 adult and a kid: the note, Studio and solo cabins are gone", not page.is_visible("#soloNote") and page.query_selector('[data-type="studio"]') is None
+          and "Solo" not in page.inner_text('.card[data-option="G"] .card-picks'))
+    page.click('button[data-count="kids"][data-step="-1"]')
+    same("back to 1 guest by removing the kid", page.inner_text("#guestSummary"), "1 guest in the cabin.")
+    check("1 guest: no script errors", not errs, errs[:3])
+    page.close()
+
+    # 3. 1 guest saved: opens at 1 guest. Kept 1 guest prices: "Not updated today" in the singular.
+    page, errs = solo_page("solo", stored={"adults": 1, "kids": [], "type": "inside", "mode": "same", "compare": ["G", "A", "8"]})
+    same("1 guest saved: opens at 1 guest", page.inner_text("#adultCount"), "1")
+    page.close()
+    page, errs = solo_page("solo_kept", stored={"adults": 1, "kids": [], "type": "inside", "mode": "same", "compare": ["G"]})
+    check("1 guest, kept prices: 'Not updated today' for 1 guest", "Getaway prices for 1 guest are from" in page.inner_text('.card[data-option="G"]'))
+    page.close()
+
+    # 4. Florida at 1 guest (item 3): the Getaway BF has a $60 discount for 2 guests.
+    page, errs = solo_page("solo_fl", stored={"adults": 1, "kids": [], "type": "balcony", "mode": "same", "compare": ["G", "A"]})
+    page.click('.card[data-option="G"] .cat-list button[data-code="BF"]')
+    fl_rows = [k for k, v in rows_of(page.query_selector('.card[data-option="G"]')) if "Florida" in k]
+    same("1 guest, Florida: the Getaway says not checked for 1 guest, nothing off", (fl_rows, money(page.inner_text('.card[data-option="G"] .price-total'))),
+         (["Florida resident rate: not checked for 1 guest"], one_total(sg, "BF")))
+    same("1 guest, Florida: no Florida line on the Aura (no 2 guest discount there)", [k for k, v in rows_of(page.query_selector('.card[data-option="A"]')) if "Florida" in k], [])
+    check("1 guest, Florida: the switch text", page.inner_text("#flDesc").endswith("Florida resident prices are checked for 2 guests, so they aren't used for 1 guest."), page.inner_text("#flDesc"))
+    page.click('.card[data-option="G"] button[data-watch="G"]')
+    same("1 guest, price watch: no Florida question, the website price", (page.locator("input[name='pwFl']").count(), page.inner_text("#pwFlOne"), page.evaluate("PW.florida")),
+         (0, "Florida resident prices aren't checked for 1 guest, so the website price is watched.", False))
+    check("1 guest, Florida: no script errors", not errs, errs[:3])
+    page.close()
+
+    # 5. Make Selection at 1 guest (item 5): the Florida question, NCL's deposit for 1 guest with the
+    # 2-For-1 text (half of NCL's $100), the solo line, one guest, the request.
+    S1 = {"adults": 1, "kids": [], "type": "inside", "mode": "same", "compare": ["G", "A", "8"]}
+    page, errs, sent = ms_open("solo_api", stored=S1, offers=offers_file())
+    page.click('button[data-select="G"]')
+    same("Make Selection, 1 guest: the Florida question in the singular, the line that it doesn't change the price",
+         (page.inner_text("#msFlQ legend"), page.inner_text("#msFlOne")),
+         ("Is guest 1 a Florida resident?", "Florida resident prices aren't checked for 1 guest yet, so your answer doesn't change the price."))
+    check("Make Selection, 1 guest: a solo cabin can't add a second guest", "A solo cabin can't add a second guest later." in page.inner_text("#msDialog .ms-item"))
+    page.check("input[name='msFl'][value='yes']")
+    same("Make Selection, 1 guest: Yes still asks for guest 1's Florida address, and no note about the switch", (page.is_visible("#msAddr"), page.is_visible("#msFlNote")), (True, False))
+    sg1 = next(x for x in sites["solo_api"]["sailings"] if x["id"].startswith("getaway"))
+    hours = sg1["payment"]["solo_1_guest"]["due_hours"]
+    texts = choice_texts(page, "G")
+    same("Make Selection, 1 guest: NCL's deposit for 1 guest, then one credit (Solo Inside isn't covered by DoubleUp)", [t.split("\n")[0] for t in texts],
+         [f"NCL's deposit: $50 for 1 guest, due within {hours} hours of booking", "One of David's CruiseNext credits: $250 toward the cruise, you pay David $125"])
+    check("Make Selection, 1 guest: NCL's 2-For-1 Deposits text ($50 is half of NCL's $100)", "Includes NCL's 2-For-1 Deposits offer: Lock-in this vacation today" in texts[0], texts[0])
+    page.check("input[name='msDepG'][value='ncl']")
+    total = money(page.inner_text('.card[data-option="G"] .price-total'))
+    same("Make Selection, 1 guest: deposit and balance", booking_rows(page, "G")[-2:], [("Deposit to NCL at booking", "$50"), ("Balance, due by Feb 11, 2027", page_money(total - 50))])
+    same("Make Selection, 1 guest: one guest's details", (page.query_selector("#g0_first") is not None, page.query_selector("#g1_first") is None), (True, True))
+    fill_guests(page, [None])
+    page.fill("#msStreet", "1 Test Street"); page.fill("#msCity", "Miami"); page.fill("#msZip", "33101")
+    page.check("#msMe")
+    page.click("#msSend")
+    page.wait_for_selector("#msDialog .ms-status.ok")
+    req = sent[-1]
+    same("Make Selection, 1 guest: the request", (req["party"], req["florida"]["residents"], len(req["guests"]), req["bookings"][0]["category"],
+         req["bookings"][0]["ncl_deposit"]["rule"], req["bookings"][0]["ncl_deposit"]["offer"]), ({"adults": 1, "kid_ages": []}, True, 1, "IT", "for 1 guest", "2-For-1 Deposits"))
+    page.close()
+    # The 2-For-1 text only while NCL's 1 guest answer lists it and the deposit is half of $100; a deposit not confirmed is left to David.
+    for name, js, want in (("not listed at 1 guest", "G.payment.deposit_offer_1_guest = null", None),
+                           ("not half of $100", "G.payment.solo_1_guest.deposit = 100", None),
+                           ("not confirmed", "G.payment.standard_deposit_1_guest_ok = false", "NCL's deposit for 1 guest (David will confirm it)")):
+        page, errs, sent = ms_open("solo_api", stored=S1, offers=offers_file())
+        page.evaluate(js)
+        page.click('button[data-select="G"]')
+        page.check("input[name='msFl'][value='no']")
+        first = choice_texts(page, "G")[0]
+        if want:
+            same(f"Make Selection, 1 guest, deposit {name}", first.split("\n")[0], want)
+        else:
+            check(f"Make Selection, 1 guest, 2-For-1 text left out: {name}", "2-For-1" not in first and first.startswith("NCL's deposit: $50 for 1 guest"), first)
+        page.close()
+    # A Solo Balcony: DoubleUp covers Balcony, so two credits; The Haven at 1 guest: David confirms the deposit.
+    page, errs, sent = ms_open("solo_api", stored=dict(S1, type="balcony"), offers=offers_file())
+    page.click('button[data-select="G"]')
+    page.check("input[name='msFl'][value='no']")
+    same("Make Selection, 1 guest, Solo Balcony: the solo line and up to two credits (DoubleUp, Balcony)",
+         ("A solo cabin can't add a second guest later." in page.inner_text("#msDialog .ms-item"), len(choice_texts(page, "G"))), (True, 3))
+    page.close()
+    page, errs, sent = ms_open("solo_api", stored=dict(S1, type="haven"), offers=offers_file())
+    page.click('button[data-select="G"]')
+    page.check("input[name='msFl'][value='no']")
+    same("Make Selection, 1 guest, The Haven: deposit left to David (no 1 guest Haven summary yet), no solo line",
+         (choice_texts(page, "G")[0].split("\n")[0], "A solo cabin" in page.inner_text("#msDialog .ms-item")), ("NCL's deposit for 1 guest (David will confirm it)", False))
+    check("Make Selection, 1 guest: the window fits at 360 px, no script errors", dialog_fits(page) and not errs, errs[:3])
+    page.close()
+
+    # 6. The price watch at 1 guest (item 6): no Florida question, florida false and guests 1 in the request.
+    page, errs, sent = pw_open("solo_api", stored=S1)
+    page.click('.card[data-option="G"] button[data-watch="G"]')
+    same("Price watch, 1 guest: the drop note for one guest", page.inner_text("#pwDropNote"), "With 1 guest, that's a drop of $20 or more for the cabin.")
+    page.fill("#pwEmail", "solo@example.com")
+    page.click("#pwSend")
+    page.wait_for_selector("#pwDialog .ms-status.ok")
+    body = [b for p_, b in sent if p_ == "/watch"][-1]
+    same("Price watch, 1 guest: the request", (body["guests"], body["florida"], body["cabin"]), (1, False, "IT"))
+    check("Price watch, 1 guest: no script errors", not errs, errs[:3])
+    page.close()
+
+    # 7. 8 nights at 1 guest (item 7): Different cabins, a Solo Inside on the Getaway and a regular Balcony on the
+    # Aura; Make Selection has two bookings (the solo line only under the solo one), a watch button per ship.
+    page, errs, sent = ms_open("solo_api", stored=dict(S1, mode="different", diffG="IT", diffA="BF", compare=["8"]), offers=offers_file())
+    same("8 nights, 1 guest: a watch button per ship", page.eval_on_selector_all('.card[data-option="8"] button[data-watch]', "els => els.map(e => e.dataset.watch)"), ["8G", "8A"])
+    page.click('button[data-select="8"]')
+    page.check("input[name='msFl'][value='no']")
+    items = page.eval_on_selector_all("#msDialog .ms-item", "els => els.map(e => e.innerText)")
+    same("8 nights, 1 guest: the solo line under the Getaway's Solo Inside only", ["A solo cabin can't add a second guest later." in t for t in items], [True, False])
+    same("8 nights, 1 guest: NCL's deposit for 1 guest on each booking", [choice_texts(page, k)[0].split(",")[0] for k in ("G", "A")],
+         ["NCL's deposit: $50 for 1 guest", "NCL's deposit: $50 for 1 guest"])
+    page.check("input[name='msDepG'][value='ncl']")
+    page.check("input[name='msDepA'][value='credit1']")
+    eight = money(page.inner_text('.card[data-option="8"] .price-total'))
+    tot = dict(page.evaluate("[...[...document.querySelectorAll('#msMath .ms-booking')].pop().querySelectorAll('.row')].map(r => [r.querySelector('.k').innerText, r.querySelector('.v').innerText])"))
+    same("8 nights, 1 guest: both bookings together (the 8 night Total, $50 to NCL, one credit)", (money(tot["Total"]), tot["Paid to NCL at booking"]), (eight, "$50"))
+    check("8 nights, 1 guest: no script errors", not errs, errs[:3])
     page.close()
 
     browser.close()

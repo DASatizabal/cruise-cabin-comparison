@@ -13,6 +13,8 @@ Fails when:
   - the family alerts Worker (tools/family-alerts/worker.js) still accepts requests from the
     raw.githack.com preview (TEST_ORIGIN is not ""): temporary for testing, never merged
   - index.html sets only one of FAMILY_API and TURNSTILE_SITE_KEY, or a FAMILY_API that isn't https
+  - the preview/ folder exists (5.4.0): a copy of the page with test data for the raw.githack.com
+    preview of a branch, never merged ("Deploy site" never publishes it)
 """
 import os
 import re
@@ -30,6 +32,14 @@ SEMVER = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
 def read(name):
     with open(os.path.join(ROOT, name), encoding="utf-8") as f:
         return f.read()
+
+
+def preview_check(root):
+    """The preview/ folder (a copy of index.html and test data for a raw.githack.com preview pinned
+    to a branch commit) is for testing only: it must be removed before merging."""
+    if os.path.exists(os.path.join(root, "preview")):
+        return ["preview/ exists (the raw.githack.com preview copy for testing): remove it before merging"]
+    return []
 
 
 def family_checks(worker, page):
@@ -59,7 +69,7 @@ def main():
     import json
     try:
         data = json.loads(read("data/prices.json"))
-        problems += ["data/prices.json: " + e for e in check_prices.check(data, allow_schema_3=True)]
+        problems += ["data/prices.json: " + e for e in check_prices.check(data, allow_schema_4=True)]
     except Exception as e:
         problems.append(f"data/prices.json cannot be read: {e}")
 
@@ -102,6 +112,7 @@ def main():
         problems.append("index.html does not read data/prices.json")
 
     problems += family_checks(read("tools/family-alerts/worker.js"), page)
+    problems += preview_check(ROOT)
 
     if problems:
         print("Release check FAILED:")

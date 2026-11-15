@@ -20,13 +20,18 @@ Calls per run (2 seconds apart, no cookies, nothing is held or booked):
   - cruise page: 1 per ship, never retried (2)
   - itinerary: 1 per ship (2)
   - route-events: 1 per ship, for the day by day itinerary and to confirm the departure date (2)
-  - stateroom-types-availability: 1 per ship per party size 2, 3, 4, 5 (8)
-  - price-summary: 1 per ship per party size, for the cheapest available category,
-    to read NCL's tax line and Free at Sea gratuity lines (8)
+  - stateroom-types-availability: 1 per ship per party size 1, 2, 3, 4, 5 (10)
+  - price-summary: 1 per ship per party size 2 to 5, for the cheapest available category,
+    to read NCL's tax line and Free at Sea gratuity lines (8), and at 1 guest (5.4.0) 2 per
+    ship: the cheapest regular category and the cheapest available solo category (4)
   - price-summary age test: 1 per ship, guests 1 adult (reservation owner), a 15 year old
     and a 7 year old (birth dates only), to read the adult Open Bar, the under 21 soda
     package and the Specialty Dining amounts per guest (2)
   - NCL's promotion terms and service charge FAQ pages, each read once (2)
+  32 calls in all here (33 a day with tools/fetch_offers.py's CruiseNext page load); 31 when a
+  ship has no solo cabin available at 1 guest.
+Party size 1 (solo travelers, 5.4.0) never fails the run: when it fails, the previous 1 guest
+prices are kept for up to 3 days, else 1 guest is marked not checked today with a warning.
 POST requests never follow redirects; redirects, 5xx and network errors are retried after
 30, 60 and 120 seconds. Every NCL API answer is checked for a real hold signal (hold_signal:
 a hold or heldUntil key, a reservation ID key, or "hold" as a word); the run stops on one.
@@ -67,8 +72,12 @@ import time
 import urllib.request
 from zoneinfo import ZoneInfo
 
-SCHEMA_VERSION = 4
-GUEST_COUNTS = [2, 3, 4, 5]
+SCHEMA_VERSION = 5
+GUEST_COUNTS = [1, 2, 3, 4, 5]
+# Party size 1 (5.4.0, solo travelers) can never fail the run or stop the prices for 2 to 5
+# guests: the "every party size failed" and "kept prices too old" rules count these only.
+MAIN_COUNTS = [2, 3, 4, 5]
+ONE = 1
 PAUSE_SECONDS = 2
 TOLERANCE = 5
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36"
@@ -102,7 +111,7 @@ MATCH_KEYS = {
     "STUDIO": "studio", "INSIDE": "inside", "OCEANVIEW": "oceanview", "BALCONY": "balcony",
     "MINISUITE": "mini_suite", "SUITE": "suite", "HAVEN": "haven",
 }
-SOLO_CODES = {"T1", "IT", "OT", "BT"}          # one-guest cabins, hidden on the page
+SOLO_CODES = {"T1", "IT", "OT", "BT"}          # one-guest cabins, shown on the page at 1 guest only
 GUARANTEE_CODES = {"IX", "OX", "BX", "MX"}     # NCL picks the cabin location
 TERMINAL = {"confirmed": False, "text": "Expected: Terminal B (confirm on your eDocs)"}
 
@@ -492,6 +501,8 @@ def fetch_price_summary(cfg, guests, type_code, cat_code, fare_code, guest_list=
         "fare_code": fare_code,
         "fare_total": fare,
         "fare_per_guest": [l for l in next((l["per_guest"] for l in lines.values() if l["group"] == "STATEROOM"), [])],
+        # NCL's title for the fare line ("Free 2nd Guest" on a regular cabin for 1 guest, 2026-11-15).
+        "fare_title": next((l["title"] for l in lines.values() if l["group"] == "STATEROOM"), None),
         "taxes_per_guest": taxes,
         "open_bar": {"title": bar["title"], "per_guest": bar["per_guest"]} if bar else None,
         "specialty_dining": {"title": dining["title"], "per_guest": dining["per_guest"]} if dining else None,
@@ -629,7 +640,7 @@ def age_test_guests(depart):
             {"birthDate": born(7), "reservationOwner": False}]
 
 
-MAX_STALE_DAYS = 3   # kept prices older than this fail the run
+MAX_STALE_DAYS = 3   # kept prices older than this fail the run (2 to 5 guests; at 1 guest they are not used)
 
 # Deposits (5.2.0). Suite and Haven: NCL's rule, a deposit of 10% of the cruise fare (fare without
 # taxes), NCL's terms (payment and deposit timetable) and every Suite and Haven price summary of
@@ -640,18 +651,45 @@ DEPOSIT_PERCENT = 10
 DEPOSIT_PERCENT_TYPES = ["SUITE", "HAVEN"]
 PERCENT_RULE = "10% of the cruise fare"
 PER_GUEST_RULE = "same deposit per guest"
+# 1 guest (5.4.0): checked on their own, so NCL's deposit for one guest can never empty the deposit
+# for 2 to 5 guests. The probe of 2026-11-15 saw $50 for 1 guest (solo and regular Inside, Solo
+# Studio, both ships), the same as the per guest deposit at 2 to 5 guests.
+ONE_GUEST_RULE = "same deposit per guest at 1 guest"
+ONE_GUEST_PERCENT_RULE = "10% of the cruise fare at 1 guest"
 DEPOSIT_RULE_SOURCE = "https://www.ncl.com/terms#payment-deposit-schedule"
 DEPOSIT_RESEARCH = {"confirmed_on": "2026-10-28", "confirmed_by": "research run: every Suite and Haven price summary on both ships, 2 to 5 guests"}
+NOT_CHECKED = "Not checked today"   # every cabin's reason at 1 guest when party size 1 has no usable prices
+SUPPLEMENT_RULE = "the fare for 1 guest is twice the per guest fare for 2 guests"
 
 
 def parse_iso_z(s):
     return dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
 
 
-def fetch_party_size(cfg, g, fare_codes, offers):
-    """Availability and the price summary for one ship and party size, checked before use.
+def guests_text(g):
+    return "1 guest" if g == 1 else f"{g} guests"
 
-    Returns (rows, summary, formula). Raises if anything is missing or NCL's numbers disagree,
+
+def formula_check(cfg, g, summary, cabin_total, kind):
+    """Availability price x guests + the summary's own gratuity lines = NCL's total, within $5."""
+    grat = sum(sum(x["per_guest"]) for x in (summary["open_bar"], summary["specialty_dining"]) if x)
+    expected = cabin_total + grat
+    formula = {"sailing": cfg["id"], "guests": g, "kind": kind, "category": summary["category"], "expected": expected,
+               "ncl_total": summary["grand_total"], "ok": abs(expected - summary["grand_total"]) <= TOLERANCE}
+    if not formula["ok"]:
+        raise RuntimeError(f"formula check failed for {summary['category']} at {guests_text(g)}: expected {expected}, NCL total {summary['grand_total']}")
+    return formula
+
+
+def fetch_party_size(cfg, g, fare_codes, offers):
+    """Availability and the price summaries for one ship and party size, checked before use.
+
+    2 to 5 guests: one price summary, for the cheapest available category (solo cabins left out,
+    Guarantee cabins in). 1 guest (5.4.0): two, the cheapest regular category by the same rule and
+    the cheapest available solo category (none when no solo cabin is available, which is not a
+    failure), each with its own formula check and labelled "kind" regular or solo.
+
+    Returns (rows, summaries, formulas). Raises if anything is missing or NCL's numbers disagree,
     so a failed party size never leaves half its data behind.
     """
     result = fetch_availability(cfg, g)
@@ -661,7 +699,9 @@ def fetch_party_size(cfg, g, fare_codes, offers):
         offers["kids_sail_free"] = kids_sail_free(result)
     if not offers.get("deposit_offer"):
         offers["deposit_offer"] = deposit_offer(result)
-    rows, cheapest = [], None
+    if g == ONE:
+        offers["deposit_offer_1_guest"] = deposit_offer(result)
+    rows, cheapest, cheapest_solo = [], None, None
     for t in result.get("stateroomTypesPricing", []):
         for sp in t.get("stateroomsPricing", []):
             room = sp.get("stateroom") or {}
@@ -680,55 +720,97 @@ def fetch_party_size(cfg, g, fare_codes, offers):
                     # which then equals NCL's fare plus taxes for the party.
                     entry["price_pp"] = round(float(price), 2)
                     entry["cabin_total"] = int(round(price * g))
+                    pick = (t["code"], code, price, entry["cabin_total"])
                     if not solo and (cheapest is None or price < cheapest[2]):
-                        cheapest = (t["code"], code, price, entry["cabin_total"])
+                        cheapest = pick
+                    if solo and (cheapest_solo is None or price < cheapest_solo[2]):
+                        cheapest_solo = pick
                 rows.append({"type": t, "room": room, "so": so, "code": code, "title": title, "solo": solo, "entry": entry})
     if cheapest is None:
-        raise RuntimeError(f"no cabin available at a real price for {g} guests")
-    tcode, ccode, _, cabin_total = cheapest
-    fare_code = fare_codes.get(tcode)
-    if not fare_code:
-        raise RuntimeError(f"no Free at Sea promotion code found for {tcode}")
-    summary = fetch_price_summary(cfg, g, tcode, ccode, fare_code)
-    if (summary["grand_total"] or 0) <= 0:
-        raise RuntimeError(f"NCL's price summary for {ccode} at {g} guests was empty")
-    # Cross check: availability price x guests + this summary's own gratuity lines = its total.
-    grat = sum(sum(x["per_guest"]) for x in (summary["open_bar"], summary["specialty_dining"]) if x)
-    expected = cabin_total + grat
-    formula = {"sailing": cfg["id"], "guests": g, "category": ccode, "expected": expected,
-               "ncl_total": summary["grand_total"], "ok": abs(expected - summary["grand_total"]) <= TOLERANCE}
-    if not formula["ok"]:
-        raise RuntimeError(f"formula check failed for {ccode} at {g} guests: expected {expected}, NCL total {summary['grand_total']}")
-    return rows, summary, formula
+        raise RuntimeError(f"no cabin available at a real price for {guests_text(g)}")
+    picks = [("regular", cheapest)] + ([("solo", cheapest_solo)] if g == ONE and cheapest_solo else [])
+    summaries, formulas = [], []
+    for kind, (tcode, ccode, _, cabin_total) in picks:
+        fare_code = fare_codes.get(tcode)
+        if not fare_code:
+            raise RuntimeError(f"no Free at Sea promotion code found for {tcode}")
+        summary = fetch_price_summary(cfg, g, tcode, ccode, fare_code)
+        if (summary["grand_total"] or 0) <= 0:
+            raise RuntimeError(f"NCL's price summary for {ccode} at {guests_text(g)} was empty")
+        summary["kind"] = kind
+        formulas.append(formula_check(cfg, g, summary, cabin_total, kind))
+        summaries.append(summary)
+    if g == ONE and not cheapest_solo:
+        log("  1 guest: no solo cabin available, so no solo price summary")
+    return rows, summaries, formulas
 
 
-def payment_info(cfg, summaries, status, prev_s, offers, now, checks, warnings):
+def one_guest_checks(cfg, summaries, taxes_per_guest, gratuities):
+    """Party size 1's price summaries against the numbers the page uses for every party size: the
+    tax line per guest and the Free at Sea gratuities per guest (from the age test). The page works
+    out 1 guest's total from those, so a summary that disagrees fails party size 1 (never the run).
+    A number that is empty today (null) can't be compared and is not checked."""
+    out = []
+    for s in summaries:
+        why = []
+        tx = (s.get("taxes_per_guest") or [None])[0]
+        if taxes_per_guest is not None and (not isinstance(tx, (int, float)) or abs(tx - taxes_per_guest) > 0.01):
+            why.append(f"tax line {tx} per guest instead of {taxes_per_guest:g}")
+        if gratuities:
+            for key, name in (("open_bar", "Open Bar"), ("specialty_dining", "Specialty Dining")):
+                got = ((s.get(key) or {}).get("per_guest") or [None])[0]
+                want = gratuities[key]["per_guest"]
+                if not isinstance(got, (int, float)) or abs(got - want) > 0.01:
+                    why.append(f"{name} {got} instead of {want:g}")
+        out.append({"sailing": cfg["id"], "kind": s["kind"], "category": s["category"], "ok": not why, "why": "; ".join(why) or None})
+    return out
+
+
+def deposit_entry(s, st, g):
+    """The deposit NCL listed in the price summary in use for a party size (today's, or the kept
+    one), never guessed: null with a why when there is none."""
+    entry = {"deposit": None, "deposit_type": (s or {}).get("type"), "deposit_category": (s or {}).get("category"),
+             "due_hours": None, "as_of": st.get("as_of"), "why": None}
+    if st.get("checked") is False:
+        entry["why"] = f"prices for {guests_text(g)} not checked today"
+    elif not s or "deposit" not in s:
+        entry["why"] = "the kept prices are from before deposits were read"
+    elif s["deposit"] is None:
+        entry["why"] = "NCL's price summary listed no deposit"
+    else:
+        entry["deposit"], entry["due_hours"] = s["deposit"], s.get("deposit_due_hours")
+    return entry
+
+
+def payment_info(cfg, summaries, status, prev_s, offers, now, checks, warnings, one=None):
     """Deposits and the final payment date for one ship, from the price summaries in use (today's,
     or the kept ones for a party size that failed). Never guessed: a number NCL didn't show is
     null with a warning naming the ship.
 
       - by_guests[g]: the deposit in the summary for g guests, with its cabin type and category
-      - standard_deposit_per_guest: Inside to Club Balcony Suite deposit per guest, read today
-        (the same in every such summary of this ship), else the previous run's within 3 days
-      - final_payment_due: the FULL payment option's date (the earliest, with a warning, if
-        today's summaries disagree), else the previous run's with a warning
+        (1 guest: the regular cabin's summary)
+      - standard_deposit_per_guest: Inside to Club Balcony Suite deposit per guest at 2 to 5
+        guests, read today (the same in every such summary of this ship), else the previous
+        run's within 3 days
+      - final_payment_due: the FULL payment option's date at 2 to 5 guests (the earliest, with a
+        warning, if today's summaries disagree), else the previous run's with a warning
       - deposit_offer: NCL's deposit offer from today's availability answers, or None
+      - 1 guest (5.4.0): solo_1_guest (the solo cabin's deposit, or None when there is no solo
+        summary), standard_deposit_1_guest_ok (today's 1 guest deposits of Inside to Club Balcony
+        Suite and solo cabins equal standard_deposit_per_guest: True, False with a warning, or
+        None when there is nothing to compare) and deposit_offer_1_guest (NCL's deposit offer in
+        the 1 guest availability answer, or None). Checked on their own, so they never change the
+        deposit for 2 to 5 guests.
     """
     ship = cfg["ship_short"]
     now_iso = now.strftime("%Y-%m-%dT%H:%M:%SZ")
     today = eastern_day(now)
     prev_pay = (prev_s or {}).get("payment") or {}
+    one = one or {}
     by_guests, per_guest, dates = {}, {}, {}
-    for g in GUEST_COUNTS:
+    for g in MAIN_COUNTS:
         s, st = summaries.get(g), status[str(g)]
-        entry = {"deposit": None, "deposit_type": (s or {}).get("type"), "deposit_category": (s or {}).get("category"),
-                 "due_hours": None, "as_of": st["as_of"], "why": None}
-        if not s or "deposit" not in s:
-            entry["why"] = "the kept prices are from before deposits were read"
-        elif s["deposit"] is None:
-            entry["why"] = "NCL's price summary listed no deposit"
-        else:
-            entry["deposit"], entry["due_hours"] = s["deposit"], s.get("deposit_due_hours")
+        entry = deposit_entry(s, st, g)
         if entry["deposit"] is None:
             warnings.append(f"{ship}: no deposit for {g} guests ({entry['why']}); left empty")
             log("Warning: " + warnings[-1])
@@ -770,6 +852,51 @@ def payment_info(cfg, summaries, status, prev_s, offers, now, checks, warnings):
         warnings.append(f"{ship}: no Inside to Club Balcony Suite deposit in NCL's price summaries today; standard deposit left empty")
         log("Warning: " + warnings[-1])
 
+    # 1 guest (5.4.0), on its own.
+    st1 = status[str(ONE)]
+    e1 = deposit_entry(one.get("regular"), st1, ONE)
+    if e1["deposit"] is None:
+        warnings.append(f"{ship}: no deposit for 1 guest ({e1['why']}); left empty")
+        log("Warning: " + warnings[-1])
+    solo1 = deposit_entry(one["solo"], st1, ONE) if one.get("solo") else None
+    if solo1 and solo1["deposit"] is None:
+        warnings.append(f"{ship}: no deposit for the solo cabin for 1 guest ({solo1['why']}); left empty")
+        log("Warning: " + warnings[-1])
+    one_ok = None
+    if st1["updated"]:
+        reg = one.get("regular")
+        if reg and e1["deposit"] is not None and reg["type"] in DEPOSIT_PERCENT_TYPES:
+            expected = round(reg["fare_total"] * DEPOSIT_PERCENT / 100, 2)
+            checks["deposits"].append({"sailing": cfg["id"], "guests": ONE, "kind": "regular", "type": reg["type"], "category": reg["category"],
+                                       "rule": ONE_GUEST_PERCENT_RULE, "deposit": e1["deposit"], "expected": expected,
+                                       "ok": abs(e1["deposit"] - expected) <= 0.01})
+        cands = [(k, e) for k, e in (("regular", e1), ("solo", solo1))
+                 if e and e["deposit"] is not None and e["deposit_type"] not in DEPOSIT_PERCENT_TYPES]
+        if standard is not None and cands:
+            for k, e in cands:
+                checks["deposits"].append({"sailing": cfg["id"], "guests": ONE, "kind": k, "type": e["deposit_type"], "category": e["deposit_category"],
+                                           "rule": ONE_GUEST_RULE, "deposit": e["deposit"], "expected": standard,
+                                           "ok": abs(e["deposit"] - standard) <= 0.01})
+            one_ok = all(abs(e["deposit"] - standard) <= 0.01 for _, e in cands)
+            if not one_ok:
+                warnings.append(f"{ship}: NCL's deposit for 1 guest today ("
+                                + ", ".join(f"{e['deposit_category']} ${e['deposit']:g}" for _, e in cands)
+                                + f") is not the ${standard:g} per guest deposit; the deposit for 1 guest is left to David")
+                log("Warning: " + warnings[-1])
+    elif st1.get("checked") is not False and prev_pay.get("standard_deposit_1_guest_ok") is True and standard is not None:
+        one_ok = True   # kept 1 guest prices: the check that came with them
+    if one_ok is None and st1.get("checked") is not False and standard is not None:
+        warnings.append(f"{ship}: no Inside to Club Balcony Suite deposit for 1 guest to check today; the deposit for 1 guest is left to David")
+        log("Warning: " + warnings[-1])
+
+    if st1["updated"]:
+        offer1 = offers.get("deposit_offer_1_guest")
+        offer1 = dict(offer1, checked_at=now_iso) if offer1 else None
+    elif st1.get("checked") is not False:
+        offer1 = prev_pay.get("deposit_offer_1_guest")
+    else:
+        offer1 = None
+
     final_due = None
     if dates:
         final_due = min(dates)
@@ -792,17 +919,27 @@ def payment_info(cfg, summaries, status, prev_s, offers, now, checks, warnings):
         "final_payment_due": final_due,
         "standard_deposit_per_guest": standard,
         "standard_deposit_checked_at": standard_on,
-        "by_guests": by_guests,
+        "by_guests": {"1": e1, **by_guests},
         "deposit_offer": dict(offer, checked_at=now_iso) if offer else None,
+        "solo_1_guest": solo1,
+        "standard_deposit_1_guest_ok": one_ok,
+        "deposit_offer_1_guest": offer1,
     }
 
 
 def deposit_rules(checks, previous, today, warnings):
     """The Suite and Haven deposit rule (10% of the cruise fare), confirmed on today's Suite and
-    Haven price summaries when there are any. A summary that disagrees leaves the rule empty
-    (null) with a warning; the page then says NCL sets the deposit. With no such summary today the
-    previous run's rule is kept, or for the first schema 4 run the 2026-10-28 research."""
+    Haven price summaries for 2 to 5 guests when there are any. A summary that disagrees leaves the
+    rule empty (null) with a warning; the page then says NCL sets the deposit. With no such summary
+    today the previous run's rule is kept, or for the first schema 4 run the 2026-10-28 research.
+
+    one_guest_confirmed_on (5.4.0): the date a 1 guest Suite or Haven price summary last showed
+    exactly 10%. Until one does (the 1 guest summaries are for the cheapest cabins, so today none
+    is a Suite or Haven), the page says David will confirm a Suite or Haven deposit for 1 guest.
+    A 1 guest summary that disagrees empties it, with a warning, and never touches the rule for 2
+    to 5 guests."""
     base = {"suite_haven_types": DEPOSIT_PERCENT_TYPES, "source": DEPOSIT_RULE_SOURCE}
+    prev = (previous or {}).get("deposit_rules")
     pct = [c for c in checks["deposits"] if c["rule"] == PERCENT_RULE]
     if pct:
         bad = [c for c in pct if not c["ok"]]
@@ -811,16 +948,31 @@ def deposit_rules(checks, previous, today, warnings):
                             + ", ".join(f"{c['sailing']} {c['category']} at {c['guests']} guests: ${c['deposit']:g} instead of ${c['expected']:g}" for c in bad)
                             + "); Suite and Haven deposit left empty")
             log("Warning: " + warnings[-1])
-            return dict(base, percent_of_fare=None, confirmed_on=None, confirmed_by=None)
-        by = ", ".join(f"{c['sailing']} {c['category']} at {c['guests']} guests" for c in pct)
-        return dict(base, percent_of_fare=DEPOSIT_PERCENT, confirmed_on=today, confirmed_by=by)
-    prev = (previous or {}).get("deposit_rules")
-    if isinstance(prev, dict):
+            out = dict(base, percent_of_fare=None, confirmed_on=None, confirmed_by=None)
+        else:
+            by = ", ".join(f"{c['sailing']} {c['category']} at {c['guests']} guests" for c in pct)
+            out = dict(base, percent_of_fare=DEPOSIT_PERCENT, confirmed_on=today, confirmed_by=by)
+    elif isinstance(prev, dict):
         if prev.get("percent_of_fare") is None:
             warnings.append("Deposits: no Suite or Haven price summary today, and the last check didn't match; Suite and Haven deposit left empty")
             log("Warning: " + warnings[-1])
-        return dict(prev)
-    return dict(base, percent_of_fare=DEPOSIT_PERCENT, **DEPOSIT_RESEARCH)
+        out = {k: v for k, v in prev.items() if k != "one_guest_confirmed_on"}
+    else:
+        out = dict(base, percent_of_fare=DEPOSIT_PERCENT, **DEPOSIT_RESEARCH)
+
+    one = [c for c in checks["deposits"] if c["rule"] == ONE_GUEST_PERCENT_RULE]
+    one_on = prev.get("one_guest_confirmed_on") if isinstance(prev, dict) else None
+    if one:
+        if all(c["ok"] for c in one):
+            one_on = today
+        else:
+            one_on = None
+            warnings.append("Deposits: NCL's Suite or Haven deposit for 1 guest is not 10% of the cruise fare today ("
+                            + ", ".join(f"{c['sailing']} {c['category']}: ${c['deposit']:g} instead of ${c['expected']:g}" for c in one if not c["ok"])
+                            + "); Suite and Haven deposits for 1 guest are left to David")
+            log("Warning: " + warnings[-1])
+    out["one_guest_confirmed_on"] = one_on if out.get("percent_of_fare") is not None else None
+    return out
 
 
 def kept_gratuities(cfg, prev_s, previous, now, error, warnings):
@@ -839,12 +991,43 @@ def kept_gratuities(cfg, prev_s, previous, now, error, warnings):
     return None, {"sailing": cfg["id"], "party": "1 adult, 15, 7", "ok": None, "why": f"{type(error).__name__}: {error}"}
 
 
-def fetch_sailing(cfg, checks, warnings, previous=None):
-    """One sailing. Each party size (2 to 5) succeeds or fails on its own.
+def single_supplement(types, taxes_per_guest, one, status):
+    """What NCL's single supplement is today, for the page's "Sailing solo" note (5.4.0): how many
+    regular categories are available at 1 and 2 guests, and how many have a fare for 1 guest equal
+    to twice the per guest fare for 2 guests (within $1; the probe of 2026-11-15 saw this on all
+    32 regular categories of each ship), with the title of the fare line in NCL's 1 guest price
+    summary for a regular cabin ("Free 2nd Guest" that day). None without 1 guest prices or NCL's
+    tax line (the fares can't be told apart from the taxes then)."""
+    st = status[str(ONE)]
+    if st.get("checked") is False or taxes_per_guest is None:
+        return None
+    n = m = 0
+    for t in types.values():
+        for cat in t["categories"].values():
+            a, b = cat["by_guests"].get("1") or {}, cat["by_guests"].get("2") or {}
+            if cat["solo"] or not a.get("available") or not b.get("available"):
+                continue
+            n += 1
+            if abs((a["price_pp"] - taxes_per_guest) - 2 * (b["price_pp"] - taxes_per_guest)) <= 1:
+                m += 1
+    reg = one.get("regular") or {}
+    return {"rule": SUPPLEMENT_RULE, "categories": n, "matching": m, "all_match": n > 0 and m == n,
+            "ncl_fare_line": reg.get("fare_title"), "as_of": st["as_of"]}
 
-    A failed party size keeps the previous file's prices for that ship and party size, marked
-    in `party_sizes` as not updated, with the time they are from. The run fails if every party
-    size fails, if there is nothing to keep, or if kept prices are more than 3 days old.
+
+def fetch_sailing(cfg, checks, warnings, previous=None):
+    """One sailing. Each party size succeeds or fails on its own.
+
+    2 to 5 guests: a failed party size keeps the previous file's prices for that ship and party
+    size, marked in `party_sizes` as not updated, with the time they are from. The run fails if
+    every one of them fails, if there is nothing to keep, or if kept prices are more than 3 days
+    old.
+    1 guest (5.4.0, owner's rule): never fails the run and never stops the prices for 2 to 5
+    guests. A failed party size 1 (an NCL call, a formula check, or a 1 guest summary whose tax or
+    gratuity lines differ from the ones the page uses) keeps the previous 1 guest prices when they
+    are at most 3 days old ("Not updated today" on the page); otherwise every cabin is marked not
+    available for 1 guest with the reason "Not checked today", `party_sizes["1"].checked` is false,
+    and a warning names the ship. The page then holds the adult counter at 2.
     """
     log(f"{cfg['ship']} {cfg['depart']}")
     now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
@@ -856,15 +1039,9 @@ def fetch_sailing(cfg, checks, warnings, previous=None):
     ports = fetch_ports(cfg)
     nights = len(ports) - 1
     types, fare_codes, summaries, status, offers = {}, {}, {}, {}, {}
-    for g in GUEST_COUNTS:
-        try:
-            rows, summary, formula = fetch_party_size(cfg, g, fare_codes, offers)
-        except HoldSignal:
-            raise   # a hold signal stops the whole run, never just one party size
-        except Exception as e:
-            status[str(g)] = {"updated": False, "why": f"{type(e).__name__}: {e}"}
-            log(f"  {g} guests FAILED: {e}")
-            continue
+    one, one_rows, one_formulas = {"regular": None, "solo": None}, [], []
+
+    def merge(rows, g):
         for r in rows:
             t = r["type"]
             tentry = types.setdefault(t["code"], {"code": t["code"], "title": t.get("title") or t["code"].title(),
@@ -879,28 +1056,46 @@ def fetch_sailing(cfg, checks, warnings, previous=None):
                 cat["capacity"] = cap if isinstance(cap, int) and cap > 0 else None
                 cat["_group"] = r["room"]
             cat["by_guests"][str(g)] = r["entry"]
-        summaries[g] = summary
-        checks["formula"].append(formula)
-        status[str(g)] = {"updated": True, "as_of": now_iso, "why": None}
-        log(f"  {g} guests: cheapest {summary['category']} ({summary['type']}), price summary {summary['grand_total']}")
+
+    for g in GUEST_COUNTS:
+        try:
+            rows, sums, formulas = fetch_party_size(cfg, g, fare_codes, offers)
+        except HoldSignal:
+            raise   # a hold signal stops the whole run, never just one party size
+        except Exception as e:
+            status[str(g)] = {"updated": False, "checked": True, "why": f"{type(e).__name__}: {e}"}
+            log(f"  {guests_text(g)} FAILED: {e}")
+            continue
+        status[str(g)] = {"updated": True, "checked": True, "as_of": now_iso, "why": None}
+        if g == ONE:
+            # Merged after the tax and gratuity checks below, which need the 2 to 5 guest numbers.
+            one_rows, one_formulas = rows, formulas
+            for x in sums:
+                one[x["kind"]] = x
+            log("  1 guest: " + ", ".join(f"cheapest {x['kind']} {x['category']} ({x['type']}), price summary {x['grand_total']}" for x in sums))
+            continue
+        merge(rows, g)
+        summaries[g] = sums[0]
+        checks["formula"] += formulas
+        log(f"  {g} guests: cheapest {sums[0]['category']} ({sums[0]['type']}), price summary {sums[0]['grand_total']}")
 
     if not summaries:
-        raise RuntimeError(f"Every party size failed on the {cfg['ship']}")
+        raise RuntimeError(f"Every party size from 2 to 5 guests failed on the {cfg['ship']}")
 
-    # Keep the previous prices for any party size that failed today.
-    for g in GUEST_COUNTS:
-        st = status[str(g)]
-        if st["updated"]:
-            continue
+    def keep_previous(g):
+        """Keep the previous file's prices for party size g. Returns why they can't be kept, or
+        None when they were kept."""
         if not prev_s:
-            raise RuntimeError(f"{cfg['ship']} {g} guests failed and there are no previous prices to keep")
-        prev_st = (prev_s.get("party_sizes") or {}).get(str(g)) or {}
-        as_of = prev_st.get("as_of") or previous.get("saved_at")
+            return "there are no previous prices to keep"
+        prev_st = (prev_s.get("party_sizes") or {}).get(str(g))
+        if g == ONE and (not prev_st or prev_st.get("checked") is False):
+            return "the previous file has no prices for 1 guest"
+        as_of = (prev_st or {}).get("as_of") or previous.get("saved_at")
         age_days = (now - parse_iso_z(as_of)).total_seconds() / 86400
         if age_days > MAX_STALE_DAYS:
-            raise RuntimeError(f"{cfg['ship']} {g} guests failed and the kept prices are {age_days:.1f} days old (limit {MAX_STALE_DAYS})")
-        st["as_of"] = as_of
-        log(f"  {g} guests: keeping prices from {as_of}")
+            return f"the kept prices are {age_days:.1f} days old (limit {MAX_STALE_DAYS})"
+        status[str(g)]["as_of"] = as_of
+        log(f"  {guests_text(g)}: keeping prices from {as_of}")
         for pt in prev_s["types"]:
             tentry = types.setdefault(pt["code"], {"code": pt["code"], "title": pt["title"], "match": pt["match"], "categories": {}})
             for pc in pt["categories"]:
@@ -908,51 +1103,32 @@ def fetch_sailing(cfg, checks, warnings, previous=None):
                     "code": pc["code"], "title": pc["title"], "guarantee": pc["guarantee"], "solo": pc["solo"],
                     "capacity": pc.get("capacity"), "by_guests": {}, "_prev": pc})
                 cat.setdefault("_prev", pc)
-                e = dict(pc["by_guests"][str(g)])
+                e = dict(pc["by_guests"].get(str(g)) or {"available": False, "sold_out": False})
                 e.pop("added_vs_2", None)
                 e.pop("reason", None)
                 cat["by_guests"][str(g)] = e
-        prev_sum = next((x for x in prev_s.get("price_summaries", []) if x.get("guests") == g), None)
-        if prev_sum:
-            summaries[g] = prev_sum
-        prev_formula = next((x for x in (previous.get("checks") or {}).get("formula", [])
-                             if x.get("sailing") == cfg["id"] and x.get("guests") == g), None)
-        if prev_formula:
-            checks["formula"].append(dict(prev_formula, kept_from=as_of))
+        kept = [dict(x, kind=x.get("kind", "regular")) for x in prev_s.get("price_summaries", []) if x.get("guests") == g]
+        if g == ONE:
+            for x in kept:
+                one[x["kind"]] = x
+        elif kept:
+            summaries[g] = next((x for x in kept if x["kind"] == "regular"), kept[0])
+        for x in (previous.get("checks") or {}).get("formula", []):
+            if x.get("sailing") == cfg["id"] and x.get("guests") == g:
+                checks["formula"].append(dict(x, kind=x.get("kind", "regular"), kept_from=as_of))
+        return None
 
-    # Fill in categories that were missing from some calls, and the reasons.
-    for t in types.values():
-        for cat in t["categories"].values():
-            if cat["capacity"] is None and cat.get("_prev"):
-                cat["capacity"] = cat["_prev"].get("capacity")
-            two = cat["by_guests"].get("2", {})
-            for g in GUEST_COUNTS:
-                e = cat["by_guests"].setdefault(str(g), {"available": False, "sold_out": False})
-                if e["available"]:
-                    if g > 2 and two.get("available"):
-                        e["added_vs_2"] = e["cabin_total"] - two["cabin_total"]
-                    continue
-                if e["sold_out"]:
-                    e["reason"] = "Sold out"
-                elif cat["capacity"] is not None and cat["capacity"] < g:
-                    e["reason"] = f"Holds only {cat['capacity']} guests"
-                elif cat["capacity"] is not None:
-                    e["reason"] = "Sold out for this party size"
-                else:
-                    e["reason"] = f"Not available for {g} guests"
-            # Cross check: the extra guest price should be the same for guests 3, 4 and 5.
-            if two.get("available"):
-                per_extra = {g: (cat["by_guests"][str(g)]["cabin_total"] - two["cabin_total"]) / (g - 2)
-                             for g in GUEST_COUNTS[1:] if cat["by_guests"][str(g)]["available"]}
-                if len(per_extra) > 1 and max(per_extra.values()) - min(per_extra.values()) > TOLERANCE:
-                    checks["extra_guest_mismatches"].append({
-                        "sailing": cfg["id"], "category": cat["code"],
-                        "per_extra_guest": {str(k): round(v, 2) for k, v in per_extra.items()},
-                    })
+    # Keep the previous prices for any party size from 2 to 5 that failed today.
+    for g in MAIN_COUNTS:
+        if not status[str(g)]["updated"]:
+            why = keep_previous(g)
+            if why:
+                raise RuntimeError(f"{cfg['ship']} {g} guests failed and {why}")
 
-    # Taxes per guest (the same for every guest at any age), from today's first good summary.
-    # If NCL's summary has no tax line, taxes are left empty (null) with a warning, never guessed.
-    fresh = [summaries[g] for g in GUEST_COUNTS if status[str(g)]["updated"]]
+    # Taxes per guest (the same for every guest at any age), from today's first good summary for
+    # 2 to 5 guests. If NCL's summary has no tax line, taxes are left empty (null) with a warning,
+    # never guessed.
+    fresh = [summaries[g] for g in MAIN_COUNTS if status[str(g)]["updated"]]
     taxes = fresh[0]["taxes_per_guest"]
     taxes_per_guest = taxes[0] if taxes and isinstance(taxes[0], (int, float)) and not isinstance(taxes[0], bool) and taxes[0] > 0 else None
     if taxes_per_guest is None:
@@ -997,7 +1173,63 @@ def fetch_sailing(cfg, checks, warnings, previous=None):
         gratuities, age_check = kept_gratuities(cfg, prev_s, previous, now, e, warnings)
     checks["ages"].append(age_check)
 
-    payment = payment_info(cfg, summaries, status, prev_s, offers, now, checks, warnings)
+    # 1 guest: today's summaries must agree with the tax and gratuity amounts the page uses.
+    st1 = status[str(ONE)]
+    if st1["updated"]:
+        one_checks = one_guest_checks(cfg, [x for x in one.values() if x], taxes_per_guest, gratuities)
+        checks["one_guest"] += one_checks
+        bad = [c for c in one_checks if not c["ok"]]
+        if bad:
+            why = "NCL's 1 guest price summary differs from the amounts the page uses: " + "; ".join(f"{c['category']} {c['why']}" for c in bad)
+            st1 = status[str(ONE)] = {"updated": False, "checked": True, "why": why}
+            one = {"regular": None, "solo": None}
+            log(f"  1 guest FAILED: {why}")
+        else:
+            merge(one_rows, ONE)
+            checks["formula"] += one_formulas
+    if not st1["updated"]:
+        why = keep_previous(ONE)
+        if why:
+            st1 = status[str(ONE)] = {"updated": False, "checked": False, "as_of": None, "why": f"{st1['why']}; {why}"}
+            one = {"regular": None, "solo": None}
+            warnings.append(f"{cfg['ship_short']}: prices for 1 guest not checked today ({st1['why']}); 1 guest left out")
+            log("Warning: " + warnings[-1])
+            for t in types.values():
+                for cat in t["categories"].values():
+                    cat["by_guests"][str(ONE)] = {"available": False, "sold_out": False, "reason": NOT_CHECKED}
+
+    # Fill in categories that were missing from some calls, and the reasons.
+    for t in types.values():
+        for cat in t["categories"].values():
+            if cat["capacity"] is None and cat.get("_prev"):
+                cat["capacity"] = cat["_prev"].get("capacity")
+            two = cat["by_guests"].get("2", {})
+            for g in GUEST_COUNTS:
+                e = cat["by_guests"].setdefault(str(g), {"available": False, "sold_out": False})
+                if e["available"] or e.get("reason") == NOT_CHECKED:
+                    if e["available"] and g > 2 and two.get("available"):
+                        e["added_vs_2"] = e["cabin_total"] - two["cabin_total"]
+                    continue
+                if e["sold_out"]:
+                    e["reason"] = "Sold out"
+                elif cat["capacity"] is not None and cat["capacity"] < g:
+                    e["reason"] = f"Holds only {guests_text(cat['capacity'])}"
+                elif cat["capacity"] is not None:
+                    e["reason"] = "Sold out for this party size"
+                else:
+                    e["reason"] = f"Not available for {guests_text(g)}"
+            # Cross check: the extra guest price should be the same for guests 3, 4 and 5.
+            if two.get("available"):
+                per_extra = {g: (cat["by_guests"][str(g)]["cabin_total"] - two["cabin_total"]) / (g - 2)
+                             for g in MAIN_COUNTS if g > 2 and cat["by_guests"][str(g)]["available"]}
+                if len(per_extra) > 1 and max(per_extra.values()) - min(per_extra.values()) > TOLERANCE:
+                    checks["extra_guest_mismatches"].append({
+                        "sailing": cfg["id"], "category": cat["code"],
+                        "per_extra_guest": {str(k): round(v, 2) for k, v in per_extra.items()},
+                    })
+
+    payment = payment_info(cfg, summaries, status, prev_s, offers, now, checks, warnings, one)
+    supplement = single_supplement(types, taxes_per_guest, one, status)
 
     describe_categories(cfg, types)
     # A category described only from kept data (its 2-guest call failed today) keeps yesterday's description.
@@ -1012,6 +1244,8 @@ def fetch_sailing(cfg, checks, warnings, previous=None):
     out_types = []
     for t in types.values():
         cats = sorted(t["categories"].values(), key=lambda c: (c["by_guests"]["2"].get("price_pp") or 10 ** 9, c["code"]))
+        for c in cats:
+            c["by_guests"] = {str(g): c["by_guests"][str(g)] for g in GUEST_COUNTS}
         out_types.append({"code": t["code"], "title": t["title"], "match": t["match"], "categories": cats})
     return {
         "id": cfg["id"],
@@ -1026,7 +1260,7 @@ def fetch_sailing(cfg, checks, warnings, previous=None):
         "url": f"https://www.ncl.com/cruises/{cfg['itinerary_code']}",
         "source": "NCL vacation-builder API",
         "saved_at": eastern_day(now),
-        "party_sizes": status,
+        "party_sizes": {str(g): status[str(g)] for g in GUEST_COUNTS},
         "taxes_per_guest": taxes_per_guest,
         "gratuities": gratuities,
         # NCL's own offer text when listed today (from the availability answers already fetched).
@@ -1034,7 +1268,8 @@ def fetch_sailing(cfg, checks, warnings, previous=None):
         "terminal": TERMINAL,
         "ports": ports,
         "payment": payment,
-        "price_summaries": [summaries[g] for g in GUEST_COUNTS if g in summaries],
+        "single_supplement": supplement,
+        "price_summaries": [x for x in (one["regular"], one["solo"]) if x] + [summaries[g] for g in MAIN_COUNTS if g in summaries],
         "types": out_types,
     }
 
@@ -1129,7 +1364,7 @@ def main():
         except Exception:
             previous = None
 
-    checks = {"extra_guest_mismatches": [], "formula": [], "ages": [], "rates": [], "deposits": []}
+    checks = {"extra_guest_mismatches": [], "formula": [], "ages": [], "rates": [], "deposits": [], "one_guest": []}
     warnings = []
     sailings = [fetch_sailing(cfg, checks, warnings, previous) for cfg in SAILINGS]
     rules = deposit_rules(checks, previous, eastern_day(dt.datetime.now(dt.timezone.utc)), warnings)
@@ -1182,6 +1417,13 @@ def main():
               + (f", Suite and Haven {rules['percent_of_fare']}% of the fare" if rules["percent_of_fare"] else ", Suite and Haven rule not confirmed")
               + f", final payment {pay['final_payment_due'] or 'not found'}"
               + (f", offer: {pay['deposit_offer']['title']}" if pay["deposit_offer"] else ", no deposit offer listed"))
+    for s in sailings:
+        st, ss = s["party_sizes"]["1"], s["single_supplement"]
+        solo = next((x for x in s["price_summaries"] if x["guests"] == 1 and x["kind"] == "solo"), None)
+        print(f"::notice title=1 guest {s['ship_short']}::"
+              + ("not checked today" if st["checked"] is False else ("updated today" if st["updated"] else f"kept from {st['as_of']}"))
+              + (f", cheapest solo {solo['category']} ${solo['grand_total']:g} with Free at Sea" if solo else ", no solo cabin available" if st["checked"] else "")
+              + (f", single supplement: {ss['matching']} of {ss['categories']} regular categories charge twice the 2 guest fare per guest" if ss else ""))
     for w in warnings:
         print(f"::warning title=Price refresh::{w}")
 

@@ -6,13 +6,18 @@
 Separate from tools/check_prices.py on purpose: a bad counts file must never block a price
 publish. The counts job runs this before it replaces data/counts.json; the page also ignores
 a counts file it can't use.
+
+1 guest (5.4.0): solo categories (T1, IT, OT, BT) have only "1", counted at 1 guest; a regular
+category's "1" is a copy of its "2" with "same_as": "2" (the owner's decision after the probe of
+2026-11-15).
 """
 import datetime as dt
 import json
 import sys
 
 EXPECTED_SAILINGS = {"getaway-2027-06-11", "aura-2027-06-14"}
-GUEST_KEYS = {"2", "3", "4", "5"}
+GUEST_KEYS = {"1", "2", "3", "4", "5"}
+SOLO_CODES = {"T1", "IT", "OT", "BT"}
 GUARANTEE_CODES = {"IX", "OX", "BX", "MX"}
 LOCATIONS = {"forward", "midship", "aft"}
 
@@ -29,11 +34,18 @@ def is_time(v):
         return False
 
 
-def check(data):
+def check(data, test_file=False):
+    """Problems with a counts file. test_file: a `fetch_counts.py --guests 1` test run's own file
+    (5.4.0), which carries "only_guests"; data/counts.json never may, so the workflow's check and
+    the release check refuse it."""
     errors = []
     err = errors.append
     if not isinstance(data, dict):
         return ["the file is not a JSON object"]
+    if "only_guests" in data and not test_file:
+        err("only_guests: this is a --guests test file, never data/counts.json")
+    if test_file and data.get("only_guests") != [1]:
+        err("only_guests must be [1] in a --guests 1 test file")
     if data.get("schema_version") != 1:
         err("schema_version must be 1")
     for k in ("saved_at", "last_full_sweep"):
@@ -72,10 +84,23 @@ def check(data):
                 err(f"{p}: open_locations must be a list of forward, midship, aft or null")
             bg = c.get("by_guests")
             if not isinstance(bg, dict) or not set(bg) <= GUEST_KEYS:
-                err(f"{p}: by_guests must be keyed by 2, 3, 4, 5")
+                err(f"{p}: by_guests must be keyed by 1, 2, 3, 4, 5")
                 continue
+            if code in SOLO_CODES and set(bg) - {"1"}:
+                err(f"{p}: a solo cabin is counted at 1 guest only")
             for g, e in bg.items():
-                ep = f"{p} at {g} guests"
+                ep = f"{p} at {'1 guest' if g == '1' else g + ' guests'}"
+                if not isinstance(e, dict):
+                    err(f"{ep}: must be an object")
+                    continue
+                if "same_as" in e:
+                    # A regular cabin at 1 guest: its 2 guest count, unchanged.
+                    if g != "1" or e["same_as"] != "2" or code in SOLO_CODES:
+                        err(f"{ep}: same_as is only for a regular cabin at 1 guest, and must be \"2\"")
+                    elif {k: v for k, v in e.items() if k != "same_as"} != bg.get("2"):
+                        err(f"{ep}: a same_as copy must equal the 2 guest entry")
+                elif g == "1" and code not in SOLO_CODES:
+                    err(f"{ep}: a regular cabin at 1 guest is a copy of its 2 guest count (same_as)")
                 left = e.get("cabins_left")
                 if not isinstance(e.get("reliable"), bool):
                     err(f"{ep}: reliable must be true or false")
