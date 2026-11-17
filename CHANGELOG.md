@@ -2,6 +2,18 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [5.5.0] - 2026-11-17
+
+Who's coming: the family tree at the top of the page, above the hero, colored by who is going. Built on branch `family-tree-5.5.0`; no NCL calls. NOTES.md, "Who's coming".
+
+### Added
+- A "Who's coming" section above the hero with the family tree, drawn in the browser by Mermaid 12.3.0 from jsDelivr (pinned). Green is going, amber is pending, red is declined, with a legend. Each person's color is set by the three `class ... going`, `class ... pending` and `class ... declined` lines at the bottom of the tree in `index.html`: moving a short name (like `ALEX`) from one line to another changes the color.
+- On a phone the tree keeps a readable size and scrolls sideways inside its box ("Swipe sideways to see the whole tree."); the page itself doesn't scroll sideways. On a wide screen it fits with no scrolling.
+- If Mermaid can't load, the section says "The family tree didn't load. Reload the page to try again." and the rest of the page works as before.
+
+### Tests
+- `tools/page_test.py`: the tree at 360 px and 1280 px (19 boxes, every color, above the hero, scrolling only inside its box at 360 px, no script errors), moving `ALEX` to the going line, and Mermaid blocked (the message, no script errors).
+
 ## [5.4.1] - 2026-11-17
 
 Make Selection: a choice for guest 1's Latitudes Rewards number when a CruiseNext credit is chosen. Built on branch `latitudes-choice-5.4.1`; no NCL calls in the daily jobs (2 public NCL page loads to read NCL's sign-up form while planning). NOTES.md, "Latitudes Rewards choice (5.4.1)".

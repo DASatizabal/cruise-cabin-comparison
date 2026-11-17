@@ -34,6 +34,11 @@ visit, cards in tile order, side by side on a wide screen and stacked on a phone
 return, no sideways scrolling), every cabin list price equal to the card's Total for that cabin in
 every switch combination, and the service charge line below the Total when not prepaid. Every
 other check starts with all three tiles selected (new_page).
+
+Who's coming (5.5.0, NOTES.md "Who's coming"): the family tree above the hero, drawn by Mermaid
+from jsDelivr (needs the internet), at 360 px (the tree scrolls sideways inside its box, the page
+doesn't) and 1280 px (fits with no scrolling), the colors from the three "class" lines, moving a
+name to another line, and the message when Mermaid can't load.
 """
 import datetime as dt
 import functools
@@ -1691,6 +1696,69 @@ with sync_playwright() as pw:
     page.wait_for_selector("#msDialog .ms-status.ok")
     same("Latitudes choice, 8 nights, I have one: the request", (sent[-1]["latitudes_choice"], sent[-1]["guests"][0]["latitudes"]), ("have", "123456789"))
     check("Latitudes choice: the window fits at 360 px, no script errors", dialog_fits(page) and not errs, errs[:3])
+    page.close()
+
+    # Who's coming (5.5.0): the Mermaid family tree above the hero.
+    TREE_INFO = """() => {
+        const box = document.querySelector('.family-tree-scroll');
+        const of = c => [...document.querySelectorAll('#familyTree .node.' + c)].map(n => n.textContent.trim()).sort();
+        return {
+            nodes: document.querySelectorAll('#familyTree svg .node').length,
+            going: of('going'), pending: of('pending'), declined: of('declined'),
+            above: document.querySelector('.family-tree').getBoundingClientRect().bottom <= document.querySelector('.hero').getBoundingClientRect().top + 1,
+            page: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth),
+            boxScroll: box.scrollWidth, boxWidth: box.clientWidth,
+            hint: getComputedStyle(document.getElementById('familyTreeHint')).display !== 'none',
+            error: !document.getElementById('familyTreeError').hidden,
+        };
+    }"""
+    GOING = sorted(["David + Lisa", "Dante", "David Jr", "Clara", "Rosa + Raphael", "Lucia + Efrain", "Anthony + Zin", "Nathaniel", "Noa"])
+    PENDING = sorted(["Alex + Isa", "Heather + Ina", "Kathy + Humberto", "Humberto's parents", "Thomas + family"])
+    DECLINED = sorted(["Daniel", "Jared", "Stephany"])
+    for width in (360, 1280):
+        page = new_page(viewport={"width": width, "height": 800})
+        errs = []
+        page.on("pageerror", lambda e: errs.append(str(e)))
+        page.on("console", lambda m: errs.append(m.text) if console_error(m) else None)
+        page.goto(f"{base}/real/index.html")
+        page.wait_for_selector("#familyTree svg .node")
+        t = page.evaluate(TREE_INFO)
+        same(f"Who's coming at {width} px: 19 boxes", t["nodes"], 19)
+        same(f"Who's coming at {width} px: the colors", (t["going"], t["pending"], t["declined"]), (GOING, PENDING, DECLINED))
+        check(f"Who's coming at {width} px: above the hero", t["above"])
+        check(f"Who's coming at {width} px: no sideways scrolling of the page", t["page"] <= width, t["page"])
+        if width == 360:
+            check("Who's coming at 360 px: the tree scrolls sideways inside its box, with the hint", t["boxScroll"] > t["boxWidth"] and t["hint"], t)
+        else:
+            check("Who's coming at 1280 px: the tree fits, no hint", t["boxScroll"] <= t["boxWidth"] and not t["hint"], t)
+        check(f"Who's coming at {width} px: no message, no script errors", not t["error"] and not errs, errs[:3])
+        if SHOTS:
+            page.screenshot(path=os.path.join(SHOTS, f"family_tree_{width}.png"))
+        page.close()
+    # Moving a name to another of the three lines changes its color.
+    with open(os.path.join(site_root, "real", "index.html"), encoding="utf-8") as f:
+        html = f.read()
+    edited = html.replace("class ALEX,HEATHER,KH,HP,THOMAS pending", "class HEATHER,KH,HP,THOMAS pending").replace(
+        "class DL,DANTE,DJR,CLARA,RR,LE,AZ,NAT,NOA going", "class DL,DANTE,DJR,CLARA,RR,LE,AZ,NAT,NOA,ALEX going")
+    check("Who's coming: the status lines are in the page", edited != html)
+    page = new_page()
+    page.route(f"{base}/real/index.html", lambda r: r.fulfill(status=200, content_type="text/html", body=edited))
+    page.goto(f"{base}/real/index.html")
+    page.wait_for_selector("#familyTree svg .node")
+    t = page.evaluate(TREE_INFO)
+    check("Who's coming: Alex + Isa moved to going", "Alex + Isa" in t["going"] and "Alex + Isa" not in t["pending"], t["going"])
+    page.close()
+    # Mermaid can't load: a short message, the rest of the page as usual.
+    page = new_page()
+    errs = []
+    page.on("pageerror", lambda e: errs.append(str(e)))
+    page.route("https://cdn.jsdelivr.net/**", lambda r: r.abort())
+    page.goto(f"{base}/real/index.html")
+    page.wait_for_selector("#familyTreeError:not([hidden])")
+    page.wait_for_selector(".card .price-total")
+    t = page.evaluate(TREE_INFO)
+    check("Who's coming, Mermaid blocked: the message, no hint, no script errors, no sideways scrolling",
+          t["error"] and not t["hint"] and not errs and t["page"] <= 360, (t, errs[:3]))
     page.close()
 
     browser.close()
