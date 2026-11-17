@@ -592,15 +592,29 @@ function readBooking(b) {
   const g1 = obj(b.guest1), sender = obj(b.sender);
   const g1email = cleanEmail(g1.email), senderEmail = cleanEmail(sender.email);
   if (!g1email || !senderEmail) fail();
+  // 5.4.1: with a CruiseNext credit, whether guest 1 has a Latitudes Rewards number ("have": the
+  // number is required) or needs one ("need": no number, David creates guest 1's NCL account). A
+  // request without the field (a page from before 5.4.1) is read as before.
+  const latChoice = b.latitudes_choice === undefined || b.latitudes_choice === null ? null : oneOf(b.latitudes_choice, ["have", "need"]);
+  if (latChoice) {
+    if (!bookings.some(k => k.credits > 0)) fail();
+    if (latChoice === "have" && !guests[0].latitudes) fail();
+    if (latChoice === "need" && (guests[0].latitudes || !NCL_PHONE.test(str(g1.phone, 30)))) fail();
+  }
   return {
     option, party: { adults, kids }, residents, address, prepay: bool(sw.prepay_gratuities), flSwitch: bool(sw.florida_resident_rate),
-    bookings, guests, g1: { email: g1email, phone: str(g1.phone, 30) },
+    bookings, guests, g1: { email: g1email, phone: str(g1.phone, 30) }, latChoice,
     sender: { isGuest1: bool(sender.is_guest1), name: str(sender.name, 120), email: senderEmail },
     savedAt: str(b.prices_saved_at, 40), version: str(b.page_version, 20),
   };
 }
 
 const yes = v => v ? "yes" : "no";
+// 5.4.1: guest 1 needs a Latitudes Rewards number (NOTES.md, "Latitudes Rewards choice (5.4.1)").
+const NCL_PHONE = /^[0-9 ()-]{1,20}$/;   // NCL's sign-up form: 20 characters or fewer, no special characters
+const LAT_NEED = "Guest 1 needs a Latitudes Rewards number. David creates the NCL account.";
+const LAT_NEED_COPY = "David will create guest 1's free NCL account and Latitudes Rewards number and email it to you before booking.";
+const LAT_PASSWORD = "When David sends guest 1's Latitudes number, guest 1 should set their own password with NCL's \"Forgot password\" link.";
 // CruiseNext credits: $250 toward the cruise, $125 to David each; up to 4 with NCL's QuadUp offer.
 const CREDIT = { value: 250, cost: 125 };
 const NUMBER_WORDS = ["Zero", "One", "Two", "Three", "Four"];
@@ -628,6 +642,12 @@ function bookingText(b, full) {
   const mine = full || b.sender.isGuest1;
   if (full) out.push("Booking request from the cruise page", "", `Sent by: ${b.sender.name} <${b.sender.email}>${b.sender.isGuest1 ? " (guest 1)" : ""}`);
   else out.push(`Hi ${b.sender.name},`, "", "David got your selection and will confirm by email. This is your copy. Dates of birth and Latitudes numbers went only to David.");
+  if (b.latChoice === "need") {
+    const g = b.guests[0];
+    if (full) out.push("", LAT_NEED, "For guest 1's NCL account (NCL's sign-up form; no password was asked for):",
+                       `  First name: ${g.first}`, `  Last name: ${g.last}`, `  Date of birth: ${fmtIso(g.dob)}`, `  Email: ${b.g1.email}`, `  Phone: ${b.g1.phone}`);
+    else out.push("", LAT_NEED_COPY, LAT_PASSWORD);
+  }
   out.push("", CHANGE_TEXT, "", `Option: ${b.option}`, `Party: ${partyText(b.party)}`,
            `Prepay gratuities on the page: ${b.prepay ? "yes" : "no, service charges are paid onboard"}`,
            `Florida resident rate switch on the page: ${b.flSwitch ? "on" : "off"}`,
@@ -642,6 +662,7 @@ function bookingText(b, full) {
     out.push(...k.lines.map(x => `${x.item}: ${x.value}`), `Total: ${amount(k.price)}`);
     if (k.onboard.length) out.push(...k.onboard.map(x => `${x.item}: ${x.value}`), "  Can be removed at Guest Services.");
     out.push(`Deposit: ${depositText(k)}`);
+    if (b.latChoice) out.push(`Guest 1's Latitudes Rewards number: ${b.latChoice === "need" ? "needed, David creates the NCL account" : "guest 1 has one (in the guest details)"}`);
     if (k.credits) out.push(`CruiseNext ${k.credits > 1 ? "credits" : "credit"} toward the cruise: ${amount(k.credit_value)}`);
     out.push(`Paid to NCL at booking: ${amount(k.due)}`, `Balance, ${dueText(k)}: ${amount(k.balance)}`);
     if (k.credits) out.push(`Pay David for the credits: ${amount(k.pay_david)}`);

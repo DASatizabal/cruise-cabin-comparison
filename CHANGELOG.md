@@ -2,6 +2,19 @@
 
 All notable changes to this project are listed here. Versions follow Semantic Versioning (MAJOR.MINOR.PATCH). The version in `index.html` (`APP_VERSION`) must match the newest entry below; `tools/check_release.py` enforces this.
 
+## [5.4.1] - 2026-11-17
+
+Make Selection: a choice for guest 1's Latitudes Rewards number when a CruiseNext credit is chosen. Built on branch `latitudes-choice-5.4.1`; no NCL calls in the daily jobs (2 public NCL page loads to read NCL's sign-up form while planning). NOTES.md, "Latitudes Rewards choice (5.4.1)".
+
+### Added
+- With one or more of David's CruiseNext credits, the window asks "Does guest 1 have a Latitudes Rewards number?" (nothing selected, required): "I have a Latitudes Rewards number" (guest 1's number required, digits only, as before) or "I need a Latitudes Rewards number". With "I need one", guest 1's Latitudes box and the "creates a free NCL account" step are hidden (the box emptied), the first step reads "David will create guest 1's free NCL account and Latitudes Rewards number and email it to you before booking.", the hint under guest 1's email says to use an email without an NCL account (and where an earlier Latitudes number can be found), and guest 1's phone must fit NCL's sign-up form (digits, spaces, dashes and brackets, at most 20 characters). Guest 1's email, name, date of birth and phone are what NCL's form asks for; no password is ever asked for. 8 nights: one answer for guest 1. Without a credit nothing changes.
+- The booking request carries `latitudes_choice` ("have" or "need", only with a credit).
+- Family alerts Worker: David's email starts with "Guest 1 needs a Latitudes Rewards number. David creates the NCL account." and the details for guest 1's NCL account; each booking says whether guest 1 has a number or needs one; the sender's copy says David will create it and that guest 1 should then set their own password with NCL's "Forgot password" link. The Worker checks the choice (need: no number, a phone NCL takes; have: a number; never without a credit) and still accepts requests without it, so the live page works whichever is updated first. Redeploy the Worker before merging.
+
+### Tests
+- Worker tests (36): I need one (David's email, the copy, no password), I have one, 8 nights with the credit on one booking (the answer on both), requests without the field (with and without a credit, 8 nights), and malformed choices. `tools/page_test.py` (Chromium at 360 px): the question only with a credit, required, both answers, the hidden and emptied box, the steps, the hint, NCL's phone rule, the request, no password field, no credit, 8 nights.
+- Test copies: main's `data/prices.json` has been schema 5 since 2026-11-16, so `test_tools.schema4` now starts from it without party size 1 (`without_one_guest`), keeping every test copy the same each day; the Worker and page tests that need a file from before 5.4.0 build one.
+
 ## [5.4.0] - 2026-11-15
 
 Solo travelers: party size 1 (1 adult in a cabin). Built on branch `solo-traveler-5.4.0` in the order the owner set, one item at a time; not merged until the owner approves. NOTES.md, "Solo travelers (5.4.0)".

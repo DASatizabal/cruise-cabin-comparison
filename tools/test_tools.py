@@ -503,7 +503,9 @@ def schema4(data):
     after 5.2.0) gets the payment data fetch_prices.py would write from its price summaries, with
     NCL's rules as the 2026-10-28 research saw them: $50 per guest up to Club Balcony Suite, 10% of
     the cruise fare for Suite and Haven, final payment 120 days before sailing, 2-For-1 Deposits."""
-    d = json.loads(json.dumps(data))
+    # Main's own file is schema 5 since 2026-11-16: start from it without party size 1, so the
+    # test copies (schema4, schema5 and the ones built on them) stay the same every day.
+    d = without_one_guest(data)
     d["schema_version"] = 4
     d.setdefault("warnings", [])
     d["checks"].setdefault("deposits", [])
@@ -648,6 +650,31 @@ def one_guest_counts(counts, prices):
                 elif c["code"] in cats and "2" in cats[c["code"]]["by_guests"]:
                     bg = cats[c["code"]]["by_guests"]
                     cats[c["code"]]["by_guests"] = {"1": dict(bg["2"], same_as="2"), **bg}
+    return d
+
+
+def without_one_guest(data):
+    """A schema 4 copy of a price file (a file from before 5.4.0, no party size 1), as the release
+    check still accepts it. Main's file has had 1 guest prices since 2026-11-16."""
+    d = json.loads(json.dumps(data))
+    if d.get("schema_version") != 5:
+        return d
+    d["schema_version"] = 4
+    d["guest_counts"] = [2, 3, 4, 5]
+    d["checks"].pop("one_guest", None)
+    d["checks"]["formula"] = [c for c in d["checks"]["formula"] if c["guests"] != 1]
+    d["checks"]["deposits"] = [c for c in d["checks"]["deposits"] if c["guests"] != 1]
+    d["deposit_rules"].pop("one_guest_confirmed_on", None)
+    for s in d["sailings"]:
+        s.pop("single_supplement", None)
+        s["party_sizes"].pop("1", None)
+        s["price_summaries"] = [x for x in s["price_summaries"] if x["guests"] != 1]
+        for k in ("solo_1_guest", "standard_deposit_1_guest_ok", "deposit_offer_1_guest"):
+            s["payment"].pop(k, None)
+        s["payment"]["by_guests"].pop("1", None)
+        for t in s["types"]:
+            for c in t["categories"]:
+                c["by_guests"].pop("1", None)
     return d
 
 
@@ -1768,7 +1795,7 @@ def test_one_guest():
         if name == "a schema 4 previous file":
             prev["schema_version"] = 4
             for s in prev["sailings"]:
-                s["party_sizes"].pop("1")
+                s["party_sizes"].pop("1", None)
         if name.startswith("kept"):
             prev = json.loads(json.dumps(data))
             prev["sailings"][0]["party_sizes"]["1"]["as_of"] = "2020-01-01T10:00:00Z"
@@ -1870,6 +1897,7 @@ def test_one_guest():
         real = json.load(f)
     check("format: the schema 5 test copy of today's prices passes", check_prices.check(schema5(real)), [])
     check("format: the not checked test copy passes", check_prices.check(not_checked_1(real)), [])
+    check("format: the schema 4 test copy (no party size 1) passes the release check", check_prices.check(without_one_guest(real), allow_schema_4=True), [])
 
 
 def test_saved_one_guest():
