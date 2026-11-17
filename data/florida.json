@@ -1,10 +1,10 @@
 {
  "schema_version": 1,
- "saved_at": "2026-11-10T14:01:16Z",
+ "saved_at": "2026-11-17T18:01:14Z",
  "guests": 2,
  "source": "NCL price-summary while signed in to a Florida resident NCL account (owner's AI PC)",
  "check": "light",
- "checked_on": "2026-11-10",
+ "checked_on": "2026-11-17",
  "sailings": {
   "getaway-2027-06-11": {
    "package_id": "24223992",
@@ -14,7 +14,7 @@
      "website_fare_pp": 289.0,
      "florida_fare_pp": 289.0,
      "off_pp": 0.0,
-     "checked_at": "2026-11-10T14:00:26Z",
+     "checked_at": "2026-11-17T18:00:28Z",
      "source": "logged-in NCL account"
     },
     "HI": {
@@ -22,7 +22,7 @@
      "website_fare_pp": 1649.0,
      "florida_fare_pp": 1649.0,
      "off_pp": 0.0,
-     "checked_at": "2026-11-10T14:00:40Z",
+     "checked_at": "2026-11-17T18:00:41Z",
      "source": "logged-in NCL account"
     },
     "IF": {
@@ -30,7 +30,7 @@
      "website_fare_pp": 199.0,
      "florida_fare_pp": 199.0,
      "off_pp": 0.0,
-     "checked_at": "2026-11-10T14:00:13Z",
+     "checked_at": "2026-11-17T18:00:15Z",
      "source": "logged-in NCL account"
     },
     "MB": {
@@ -38,7 +38,7 @@
      "website_fare_pp": 339.0,
      "florida_fare_pp": 339.0,
      "off_pp": 0.0,
-     "checked_at": "2026-11-10T14:00:33Z",
+     "checked_at": "2026-11-17T18:00:34Z",
      "source": "logged-in NCL account"
     },
     "OB": {
@@ -46,7 +46,7 @@
      "website_fare_pp": 229.0,
      "florida_fare_pp": 229.0,
      "off_pp": 0.0,
-     "checked_at": "2026-11-10T14:00:20Z",
+     "checked_at": "2026-11-17T18:00:22Z",
      "source": "logged-in NCL account"
     }
    },
@@ -60,7 +60,7 @@
      "website_fare_pp": 1479.0,
      "florida_fare_pp": 1479.0,
      "off_pp": 0.0,
-     "checked_at": "2026-11-10T14:00:58Z",
+     "checked_at": "2026-11-17T18:01:00Z",
      "source": "logged-in NCL account"
     },
     "HE": {
@@ -68,15 +68,15 @@
      "website_fare_pp": 3299.0,
      "florida_fare_pp": 3299.0,
      "off_pp": 0.0,
-     "checked_at": "2026-11-10T14:01:16Z",
+     "checked_at": "2026-11-17T18:01:14Z",
      "source": "logged-in NCL account"
     },
     "IF": {
      "type": "INSIDE",
-     "website_fare_pp": 969.0,
-     "florida_fare_pp": 969.0,
+     "website_fare_pp": 949.0,
+     "florida_fare_pp": 949.0,
      "off_pp": 0.0,
-     "checked_at": "2026-11-10T14:00:46Z",
+     "checked_at": "2026-11-17T18:00:47Z",
      "source": "logged-in NCL account"
     },
     "MB": {
@@ -84,15 +84,15 @@
      "website_fare_pp": 1769.0,
      "florida_fare_pp": 1769.0,
      "off_pp": 0.0,
-     "checked_at": "2026-11-10T14:01:09Z",
+     "checked_at": "2026-11-17T18:01:07Z",
      "source": "logged-in NCL account"
     },
     "OB": {
      "type": "OCEANVIEW",
-     "website_fare_pp": 1099.0,
-     "florida_fare_pp": 1099.0,
+     "website_fare_pp": 1049.0,
+     "florida_fare_pp": 1049.0,
      "off_pp": 0.0,
-     "checked_at": "2026-11-10T14:00:52Z",
+     "checked_at": "2026-11-17T18:00:53Z",
      "source": "logged-in NCL account"
     }
    },
