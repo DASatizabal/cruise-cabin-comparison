@@ -125,6 +125,7 @@ sites["schema3"] = test_tools.schema3(real)   # a file from before 5.2.0 (no pay
 # of 2026-11-15 (test_tools.schema5); the Getaway without usable 1 guest prices; kept 1 guest prices;
 # and a Florida discount on the Getaway BF for 2 guests. "real" is the committed schema 4 file
 # (no 1 guest prices): the adult counter holds at 2 there.
+sites["pre54"] = test_tools.without_one_guest(real)   # a file from before 5.4.0 (main has 1 guest prices since 2026-11-16)
 sites["solo"] = test_tools.schema5(real)
 sites["solo_nc"] = test_tools.not_checked_1(real)
 sites["solo_kept"] = test_tools.schema5(real)
@@ -701,6 +702,7 @@ with sync_playwright() as pw:
           ("Balance, due by Feb 11, 2027", page_money(card_total - 250)), ("Pay David for the credits", "$125")])
     check("Make Selection, credit: CruiseNext steps shown with NCL's sign-up page",
           page.is_visible("#msCn") and page.get_attribute("#msCn a", "href") == "https://www.ncl.com/account-access/register")
+    page.check("input[name='msLat'][value='have']")   # 5.4.1: "I have a Latitudes Rewards number"
     same("Make Selection, credit: Latitudes number required", page.inner_text("#msLatNeed"), "(required for CruiseNext)")
     early = today_e < dt.date(2026, 11, 26)
     same("Make Selection, credit: 'can't be completed before about Nov 26, 2026' only before that date",
@@ -778,6 +780,7 @@ with sync_playwright() as pw:
             page.screenshot(path=os.path.join(SHOTS, f"make_selection_{n}_credits_360.png"), full_page=False)
         if n == 3:   # the request carries the number and the offer's name
             fill_guests(page, [None, None])
+            page.check("input[name='msLat'][value='have']")   # 5.4.1: guest 1 has a Latitudes number
             page.fill("#g0_latitudes", "123456789")
             page.fill("#msName", "Test Sender")
             page.fill("#msEmail", "sender@example.com")
@@ -867,6 +870,7 @@ with sync_playwright() as pw:
     fill_guests(page, [None, None, 15, 7])
     page.fill("#g3_dob", sail_dob(8))
     page.check("#msMe")
+    page.check("input[name='msLat'][value='have']")   # 5.4.1: guest 1 has a Latitudes number
     page.fill("#g0_latitudes", "123456789")
     page.click("#msSend")
     st = page.inner_text("#msStatus")
@@ -883,6 +887,7 @@ with sync_playwright() as pw:
     page.check("input[name='msFl'][value='yes']")
     page.check("input[name='msDepG'][value='credit1']")
     fill_guests(page, [None, None, 15])
+    page.check("input[name='msLat'][value='have']")   # 5.4.1: guest 1 has a Latitudes number
     page.fill("#g0_latitudes", "123456789")
     page.fill("#msStreet", "1 Test Street")
     page.fill("#msCity", "Miami")
@@ -1436,7 +1441,7 @@ with sync_playwright() as pw:
     one_total = lambda s, code: scat(s, code)["by_guests"]["1"]["cabin_total"] + s["gratuities"]["open_bar"]["per_guest"] + s["gratuities"]["specialty_dining"]["per_guest"]
 
     # 1. No usable 1 guest prices (the committed schema 4 file; the Getaway not checked): the counter holds at 2.
-    for site in ("real", "solo_nc"):
+    for site in ("pre54", "solo_nc"):
         page, errs = solo_page(site)
         minus(page)
         same(f"1 guest, {site}: the counter holds at 2 with the message", (page.inner_text("#adultCount"), page.inner_text("#guestMsg")), ("2", ONE_LATER))
@@ -1619,6 +1624,73 @@ with sync_playwright() as pw:
     tot = dict(page.evaluate("[...[...document.querySelectorAll('#msMath .ms-booking')].pop().querySelectorAll('.row')].map(r => [r.querySelector('.k').innerText, r.querySelector('.v').innerText])"))
     same("8 nights, 1 guest: both bookings together (the 8 night Total, $50 to NCL, one credit)", (money(tot["Total"]), tot["Paid to NCL at booking"]), (eight, "$50"))
     check("8 nights, 1 guest: no script errors", not errs, errs[:3])
+    page.close()
+
+    # 8. 5.4.1: the Latitudes Rewards choice with a CruiseNext credit.
+    page, errs, sent = ms_open("ms_api", offers=offers_file())
+    page.click('button[data-select="G"]')
+    page.check("input[name='msFl'][value='no']")
+    check("Latitudes choice: no question without a credit", not page.is_visible("#msLatQ"))
+    page.check("input[name='msDepG'][value='credit1']")
+    page.check("input[name='msDepA'][value='ncl']") if page.query_selector("input[name='msDepA']") else None
+    same("Latitudes choice: the question and both answers, nothing selected",
+         (page.inner_text("#msLatQ legend"), [l.inner_text() for l in page.query_selector_all("#msLatQ .ms-choice")], page.evaluate("MS.latChoice")),
+         ("Does guest 1 have a Latitudes Rewards number?", ["I have a Latitudes Rewards number", "I need a Latitudes Rewards number"], None))
+    fill_guests(page, [None, None])
+    page.check("#msMe")
+    page.click("#msSend")
+    check("Latitudes choice: required with a credit", "Answer whether guest 1 has a Latitudes Rewards number." in page.inner_text("#msStatus"), page.inner_text("#msStatus"))
+    page.check("input[name='msLat'][value='have']")
+    check("Latitudes choice, I have one: the box is shown and required", page.is_visible("#g0_latitudes") and page.inner_text("#msLatNeed") == "(required for CruiseNext)")
+    page.check("input[name='msLat'][value='have']")   # 5.4.1: guest 1 has a Latitudes number
+    page.fill("#g0_latitudes", "123456789")
+    page.check("input[name='msLat'][value='need']")
+    steps = [l.inner_text() for l in page.query_selector_all("#msCn .ms-steps li") if l.is_visible()]
+    same("Latitudes choice, I need one: the steps", steps[0], "David will create guest 1's free NCL account and Latitudes Rewards number and email it to you before booking.")
+    check("Latitudes choice, I need one: no 'creates a free NCL account' step", not any("creates a free NCL account at" in t for t in steps), steps)
+    same("Latitudes choice, I need one: guest 1's Latitudes box hidden and emptied, the email hint shown",
+         (page.is_visible("#g0_latitudes"), page.input_value("#g0_latitudes"), page.inner_text("#msEmailHint")),
+         (False, "", "Use an email that doesn't already have an NCL account. If guest 1 has sailed with NCL before, they already have a Latitudes number: it's on their past booking confirmations."))
+    page.fill("#g0_phone", "305.555.0100 ext 12")
+    page.click("#msSend")
+    check("Latitudes choice, I need one: NCL's phone rule", "For guest 1's NCL account, the phone number can have only digits, spaces, dashes and brackets, at most 20 characters." in page.inner_text("#msStatus"), page.inner_text("#msStatus"))
+    page.fill("#g0_phone", "(305) 555-0100")
+    same("Latitudes choice: no password box and no label asking for one",
+         page.evaluate("[document.querySelectorAll('input[type=password]').length, [...document.querySelectorAll('#msDialog label, #msDialog legend')].filter(l => /password/i.test(l.innerText)).length]"), [0, 0])
+    page.click("#msSend")
+    page.wait_for_selector("#msDialog .ms-status.ok")
+    req = sent[-1]
+    same("Latitudes choice, I need one: the request (no Latitudes number for guest 1)", (req["latitudes_choice"], req["guests"][0]["latitudes"]), ("need", None))
+    page.close()
+    # Without a credit: no question, latitudes_choice null.
+    page, errs, sent = ms_open("ms_api", offers=offers_file())
+    page.click('button[data-select="G"]')
+    page.check("input[name='msFl'][value='no']")
+    page.check("input[name='msDepG'][value='ncl']")
+    same("Latitudes choice: without a credit, no question and guest 1's Latitudes box as before",
+         (page.is_visible("#msLatQ"), page.is_visible("#g0_latitudes"), page.inner_text("#msLatNeed")), (False, True, "(if guest 1 has one)"))
+    fill_guests(page, [None, None])
+    page.check("#msMe")
+    page.click("#msSend")
+    page.wait_for_selector("#msDialog .ms-status.ok")
+    same("Latitudes choice: without a credit, latitudes_choice null", sent[-1]["latitudes_choice"], None)
+    page.close()
+    # 8 nights: one answer for guest 1, the credit on one booking.
+    page, errs, sent = ms_open("ms_api", stored={"adults": 2, "kids": [], "type": "balcony", "mode": "same", "compare": ["8"]}, offers=offers_file())
+    page.click('button[data-select="8"]')
+    page.check("input[name='msFl'][value='no']")
+    page.check("input[name='msDepG'][value='ncl']")
+    page.check("input[name='msDepA'][value='credit1']")
+    same("Latitudes choice, 8 nights: one question", page.locator("#msLatQ").count(), 1)
+    page.check("input[name='msLat'][value='have']")
+    fill_guests(page, [None, None])
+    page.check("input[name='msLat'][value='have']")   # 5.4.1: guest 1 has a Latitudes number
+    page.fill("#g0_latitudes", "123456789")
+    page.check("#msMe")
+    page.click("#msSend")
+    page.wait_for_selector("#msDialog .ms-status.ok")
+    same("Latitudes choice, 8 nights, I have one: the request", (sent[-1]["latitudes_choice"], sent[-1]["guests"][0]["latitudes"]), ("have", "123456789"))
+    check("Latitudes choice: the window fits at 360 px, no script errors", dialog_fits(page) and not errs, errs[:3])
     page.close()
 
     browser.close()

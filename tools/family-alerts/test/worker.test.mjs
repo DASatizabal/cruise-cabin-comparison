@@ -585,6 +585,16 @@ function withOneGuest(over = () => {}) {
   });
 }
 const soloIT = s => cats(s).find(({ c }) => c.code === "IT").c;
+// A file from before 5.4.0 (schema 4): no party size 1. Main's file has 1 guest prices since 2026-11-16.
+function withoutOneGuest() {
+  return pricesWith((p, g, a) => {
+    p.schema_version = 4;
+    for (const s of [g, a]) {
+      delete s.party_sizes["1"];
+      for (const { c } of cats(s)) delete c.by_guests["1"];
+    }
+  });
+}
 
 test("1 guest watch: a solo cabin, the drop per guest is the whole cabin, singular wording; florida true refused", async () => {
   const { db, env } = fresh();
@@ -609,7 +619,7 @@ test("1 guest watch: a solo cabin, the drop per guest is the whole cabin, singul
 
 test("1 guest watch: no usable 1 guest prices (a file from before 5.4.0, or not checked today) is refused, never sold out", async () => {
   const { db, env } = fresh();
-  files();   // the committed schema 4 file: no party size 1
+  files({ prices: withoutOneGuest() });   // a file from before 5.4.0: no party size 1
   let r = await post(worker, env, "/watch", watchBody({ guests: 1, cabin: GB.code }));
   assert.deepEqual([r.status, r.body.error, r.body.message], [400, "unchecked", "Prices for 1 guest show after the next daily refresh."]);
   // A confirmed 1 guest watch, then a day where party size 1 is not checked: skipped, no sold out email.
@@ -624,7 +634,7 @@ test("1 guest watch: no usable 1 guest prices (a file from before 5.4.0, or not 
   files({ prices: notChecked });
   const c = await worker.__t.runChecks(env, NOW);
   assert.deepEqual([c.sent, net.mails.length - sends, db.rows("watches")[0].sold_out_sent], [0, 0, 0], "not checked is never sold out");
-  files({ prices: PRICES });   // back to a file without 1 guest prices: skipped too
+  files({ prices: withoutOneGuest() });   // back to a file without 1 guest prices: skipped too
   assert.equal((await worker.__t.runChecks(env, NOW)).sent, 0);
   assert.equal(db.rows("watches")[0].sold_out_sent, 0);
 });
@@ -677,4 +687,91 @@ test("1 guest booking: one guest, the Florida question in the singular, NCL's de
   // The party must match the guests: 1 adult with 2 guests listed is refused.
   const bad = bookingBody({ party: { adults: 1, kid_ages: [] } });
   assert.equal((await post(worker, env, "/booking", bad)).status, 400);
+});
+
+// ---------- 5.4.1: the Latitudes Rewards choice with a CruiseNext credit ----------
+const LAT_NEED = "Guest 1 needs a Latitudes Rewards number. David creates the NCL account.";
+const LAT_NEED_COPY = "David will create guest 1's free NCL account and Latitudes Rewards number and email it to you before booking.";
+const LAT_PASSWORD = "When David sends guest 1's Latitudes number, guest 1 should set their own password with NCL's \"Forgot password\" link.";
+function needBody(over = {}) {
+  const b = bookingBody({ latitudes_choice: "need", guest1: { email: "ann@example.com", phone: "(305) 555-0100" }, ...over });
+  b.guests = b.guests.map((g, i) => i === 0 ? { ...g, latitudes: null } : g);
+  return b;
+}
+const twoBookings = b => {
+  const g = b.bookings[0];
+  b.option = "Option 3: 8 nights";
+  b.bookings = [g, { ...g, ship: "Norwegian Aura", depart: "2027-06-14", return: "2027-06-19", nights: 5, deposit_choice: "ncl", credits: 0,
+                     credit_value: 0, due_at_booking: 150, balance: 1939.5, balance_due: "2027-02-14", pay_david: 0 }];
+  return b;
+};
+
+test("5.4.1 booking, I need a Latitudes number: David's email says so near the top with guest 1's NCL account details; the copy says David creates it", async () => {
+  const { env } = fresh();
+  files();
+  const sends = net.mails.length;
+  const r = await post(worker, env, "/booking", needBody());
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  const [toDavid, copy] = net.mails.slice(sends);
+  const top = toDavid.body.split("\n").slice(0, 6).join("\n");
+  assert.ok(top.includes(LAT_NEED), top);
+  for (const x of ["For guest 1's NCL account (NCL's sign-up form; no password was asked for):", "  First name: Ann", "  Last name: Tester",
+                   "  Date of birth: Feb 3, 1980", "  Email: ann@example.com", "  Phone: (305) 555-0100",
+                   "Guest 1's Latitudes Rewards number: needed, David creates the NCL account"]) assert.ok(toDavid.body.includes(x), x);
+  for (const x of [LAT_NEED_COPY, LAT_PASSWORD]) assert.ok(copy.body.includes(x), x);
+  for (const x of ["1980", "Feb 3", LAT_NEED + "\nFor guest 1"]) assert.ok(!copy.body.includes(x), "the copy has " + x);
+  for (const m of [toDavid, copy]) assert.ok(!m.body.toLowerCase().includes("password:"), "no password in any email");
+});
+
+test("5.4.1 booking, I have a Latitudes number: the number is required and shown to David; 8 nights shows the answer on both bookings", async () => {
+  const { env } = fresh();
+  files();
+  let sends = net.mails.length;
+  const have = bookingBody({ latitudes_choice: "have" });
+  assert.equal((await post(worker, env, "/booking", have)).status, 200);
+  let [toDavid, copy] = net.mails.slice(sends);
+  assert.ok(toDavid.body.includes("Latitudes number 123456789") && toDavid.body.includes("Guest 1's Latitudes Rewards number: guest 1 has one (in the guest details)"));
+  assert.ok(!toDavid.body.includes(LAT_NEED) && !copy.body.includes(LAT_NEED_COPY));
+  // 8 nights, I need one, the credit on the Getaway only: the answer on both bookings, the top line once.
+  sends = net.mails.length;
+  const eight = twoBookings(needBody());
+  const r = await post(worker, env, "/booking", eight);
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  [toDavid, copy] = net.mails.slice(sends);
+  assert.equal(toDavid.body.split("Guest 1's Latitudes Rewards number: needed, David creates the NCL account").length - 1, 2, "on both bookings");
+  assert.equal(toDavid.body.split(LAT_NEED).length - 1, 1, "the top line once");
+  assert.ok(copy.body.includes(LAT_NEED_COPY));
+  const eightHave = twoBookings(bookingBody({ latitudes_choice: "have" }));
+  assert.equal((await post(worker, env, "/booking", eightHave)).status, 200);
+});
+
+test("5.4.1 booking: requests without latitudes_choice (pages before 5.4.1) work as before; malformed choices send nothing", async () => {
+  const { env } = fresh();
+  files();
+  // Today's live page: no latitudes_choice, with and without a credit, 1 booking and 8 nights.
+  const old = bookingBody();
+  assert.equal(old.latitudes_choice, undefined);
+  for (const b of [old, bookingBody({ bookings: [{ ...old.bookings[0], deposit_choice: "ncl", credits: 0, credit_value: 0, due_at_booking: 150, balance: 1939.5, pay_david: 0 }] }),
+                   twoBookings(bookingBody())]) {
+    const sends = net.mails.length;
+    assert.equal((await post(worker, env, "/booking", b)).status, 200);
+    assert.ok(!net.mails[sends].body.includes("Latitudes Rewards number:") && !net.mails[sends].body.includes(LAT_NEED));
+  }
+  // An old page that sent no Latitudes number with a credit is still accepted (it never checked that here).
+  const noNumber = bookingBody();
+  noNumber.guests = noNumber.guests.map((g, i) => i === 0 ? { ...g, latitudes: null } : g);
+  assert.equal((await post(worker, env, "/booking", noNumber)).status, 200);
+  const sends = net.mails.length;
+  const noCredit = { ...bookingBody({ latitudes_choice: "have" }) };
+  noCredit.bookings = [{ ...noCredit.bookings[0], deposit_choice: "ncl", credits: 0, credit_value: 0, due_at_booking: 150, balance: 1939.5, pay_david: 0 }];
+  for (const [name, b] of [["a choice without any credit", noCredit],
+                           ["have without guest 1's number", (() => { const x = bookingBody({ latitudes_choice: "have" }); x.guests[0] = { ...x.guests[0], latitudes: null }; return x; })()],
+                           ["need with guest 1's number", bookingBody({ latitudes_choice: "need" })],
+                           ["need with a phone NCL won't take", needBody({ guest1: { email: "ann@example.com", phone: "305.555.0100 x12" } })],
+                           ["need with a phone over 20 characters", needBody({ guest1: { email: "ann@example.com", phone: "(305) 555-0100 0100 01" } })],
+                           ["an unknown choice", bookingBody({ latitudes_choice: "maybe" })]]) {
+    const r = await post(worker, env, "/booking", b);
+    assert.deepEqual([r.status, r.body.error], [400, "request"], name);
+  }
+  assert.equal(net.mails.length, sends, "nothing sent for a malformed request");
 });
