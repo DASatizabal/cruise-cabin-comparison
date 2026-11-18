@@ -37,8 +37,9 @@ other check starts with all three tiles selected (new_page).
 
 Who's coming (5.5.0, NOTES.md "Who's coming"): the family tree above the hero, drawn by Mermaid
 from jsDelivr (needs the internet), at 360 px (the tree scrolls sideways inside its box, the page
-doesn't) and 1280 px (fits with no scrolling), the colors from the three "class" lines, moving a
-name to another line, and the message when Mermaid can't load.
+doesn't) and 1280 px (fits with no scrolling), the colors from the three "class" lines (read from
+the page, so a status edit needs no test change), moving a name to another line, and the message
+when Mermaid can't load.
 """
 import datetime as dt
 import functools
@@ -1712,9 +1713,18 @@ with sync_playwright() as pw:
             error: !document.getElementById('familyTreeError').hidden,
         };
     }"""
-    GOING = sorted(["David + Lisa", "Dante", "David Jr", "Clara", "Rosa + Raphael", "Lucia + Efrain", "Anthony + Zin", "Nathaniel", "Noa"])
-    PENDING = sorted(["Alex + Isa", "Heather + Ina", "Kathy + Humberto", "Humberto's parents", "Thomas + family"])
-    DECLINED = sorted(["Daniel", "Jared", "Stephany"])
+    # The expected colors come from the page's own three "class" lines, so editing a status needs no
+    # change here: every box listed on a line has that line's color, and no box is on two lines.
+    with open(os.path.join(REPO, "index.html"), encoding="utf-8") as f:
+        tree_src = re.search(r'<pre class="mermaid" id="familyTree">(.*?)</pre>', f.read(), re.S).group(1)
+    tree_labels = {i: l.replace("&amp;", "&") for i, l in re.findall(r'\b([A-Z][A-Z0-9_]*)\["([^"]+)"\]', tree_src)}
+    tree_lines = {c: re.search(rf"^\s*class ([A-Z0-9_,]+) {c}\s*$", tree_src, re.M) for c in ("going", "pending", "declined")}
+    check("Who's coming: the going, pending and declined lines are in the page", all(tree_lines.values()))
+    tree_ids = {c: m.group(1).split(",") for c, m in tree_lines.items()}
+    every_id = sum(tree_ids.values(), [])
+    check("Who's coming: every name on the three lines is a box in the tree, on one line only",
+          set(every_id) <= set(tree_labels) and len(every_id) == len(set(every_id)), every_id)
+    GOING, PENDING, DECLINED = (sorted(tree_labels[i] for i in tree_ids[c]) for c in ("going", "pending", "declined"))
     for width in (360, 1280):
         page = new_page(viewport={"width": width, "height": 800})
         errs = []
@@ -1723,7 +1733,7 @@ with sync_playwright() as pw:
         page.goto(f"{base}/real/index.html")
         page.wait_for_selector("#familyTree svg .node")
         t = page.evaluate(TREE_INFO)
-        same(f"Who's coming at {width} px: 19 boxes", t["nodes"], 19)
+        same(f"Who's coming at {width} px: every box", t["nodes"], len(tree_labels))
         same(f"Who's coming at {width} px: the colors", (t["going"], t["pending"], t["declined"]), (GOING, PENDING, DECLINED))
         check(f"Who's coming at {width} px: above the hero", t["above"])
         check(f"Who's coming at {width} px: no sideways scrolling of the page", t["page"] <= width, t["page"])
@@ -1735,18 +1745,24 @@ with sync_playwright() as pw:
         if SHOTS:
             page.screenshot(path=os.path.join(SHOTS, f"family_tree_{width}.png"))
         page.close()
-    # Moving a name to another of the three lines changes its color.
+    # Moving a name to another of the three lines changes its color: the first name on the first
+    # line with two or more names goes to the end of the next line.
     with open(os.path.join(site_root, "real", "index.html"), encoding="utf-8") as f:
         html = f.read()
-    edited = html.replace("class ALEX,HEATHER,KH,HP,THOMAS pending", "class HEATHER,KH,HP,THOMAS pending").replace(
-        "class DL,DANTE,DJR,CLARA,RR,LE,AZ,NAT,NOA going", "class DL,DANTE,DJR,CLARA,RR,LE,AZ,NAT,NOA,ALEX going")
+    order = ["going", "pending", "declined"]
+    src_c = next(c for c in order if len(tree_ids[c]) >= 2)
+    dst_c = order[(order.index(src_c) + 1) % 3]
+    moved = tree_ids[src_c][0]
+    edited = html.replace(f"class {','.join(tree_ids[src_c])} {src_c}", f"class {','.join(tree_ids[src_c][1:])} {src_c}").replace(
+        f"class {','.join(tree_ids[dst_c])} {dst_c}", f"class {','.join(tree_ids[dst_c] + [moved])} {dst_c}")
     check("Who's coming: the status lines are in the page", edited != html)
     page = new_page()
     page.route(f"{base}/real/index.html", lambda r: r.fulfill(status=200, content_type="text/html", body=edited))
     page.goto(f"{base}/real/index.html")
     page.wait_for_selector("#familyTree svg .node")
     t = page.evaluate(TREE_INFO)
-    check("Who's coming: Alex + Isa moved to going", "Alex + Isa" in t["going"] and "Alex + Isa" not in t["pending"], t["going"])
+    check(f"Who's coming: {tree_labels[moved]} moved from {src_c} to {dst_c}",
+          tree_labels[moved] in t[dst_c] and tree_labels[moved] not in t[src_c], t[dst_c])
     page.close()
     # Mermaid can't load: a short message, the rest of the page as usual.
     page = new_page()

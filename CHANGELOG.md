@@ -12,7 +12,7 @@ Who's coming: the family tree at the top of the page, above the hero, colored by
 - If Mermaid can't load, the section says "The family tree didn't load. Reload the page to try again." and the rest of the page works as before.
 
 ### Tests
-- `tools/page_test.py`: the tree at 360 px and 1280 px (19 boxes, every color, above the hero, scrolling only inside its box at 360 px, no script errors), moving `ALEX` to the going line, and Mermaid blocked (the message, no script errors).
+- `tools/page_test.py`: the tree at 360 px and 1280 px (every box, each color as the three lines in the page say, above the hero, scrolling only inside its box at 360 px, no script errors), moving a name to another line, and Mermaid blocked (the message, no script errors). The expected colors are read from the page, so changing a status needs no test change.
 
 ## [5.4.1] - 2026-11-17
 
