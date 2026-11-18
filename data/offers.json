@@ -1,7 +1,7 @@
 {
  "schema_version": 2,
- "saved_at": "2026-11-17T10:21:12Z",
- "checked_on": "2026-11-17",
+ "saved_at": "2026-11-18T10:20:57Z",
+ "checked_on": "2026-11-18",
  "source": "https://www.ncl.com/cruise-deals/cruisenext",
  "read_ok": true,
  "warnings": [],
@@ -22,7 +22,7 @@
   ],
   "min_days": 90,
   "min_months": null,
-  "read_on": "2026-11-17",
+  "read_on": "2026-11-18",
   "since": "2026-11-12"
  },
  "last_change": {
