@@ -951,3 +951,14 @@ Request and Worker: `latitudes_choice` "have" or "need" (null without a credit).
 Testing: no preview test of the Worker this time (no Turnstile or `TEST_ORIGIN` change, owner's decision); the Worker tests cover both choices, 1 booking and 8 nights and the old request shape. After the merge the owner sends one real request from the live page with "I need one" and checks both emails.
 
 Test copies: main's `data/prices.json` has been schema 5 since the refresh of 2026-11-16, so `test_tools.schema4` (and everything built on it: `schema5`, `null_copy`, `not_checked_1`) now starts from `without_one_guest()`, and the tests that need a file from before 5.4.0 build one (`pre54` in `tools/page_test.py`, `withoutOneGuest()` in the Worker tests).
+
+## Who's coming (5.5.0, 2026-11-17)
+
+Owner's request: the family tree from his picture at the top of the page, above the hero, as live Mermaid (not a picture) so a status changes by editing one line. Branch `family-tree-5.5.0`, merged only after the owner approves.
+
+- The tree is the `<pre class="mermaid" id="familyTree">` block near the top of `index.html`. The three `class` lines at its bottom are the only place statuses are set: `going` (green), `pending` (amber), `declined` (red). Boxes on none of the three lines (Emilio & Rosa, Jaime) stay white. To change a status, move the box's short name (ALEX, HEATHER, KH for Kathy + Humberto, HP for Humberto's parents, THOMAS, and so on) to another line, commas between names, no spaces.
+- Two labels were cut off in the owner's picture; they are "Humberto's parents" and "Kathy + Humberto". Thomas + family is joined to Anthony + Zin by a dotted "Zin's cousin" line, as in the picture.
+- Mermaid 12.3.0 (published 2026-11-03), loaded as an ES module from jsDelivr with a pinned version, `startOnLoad` off and `mermaid.run` on the one block, `securityLevel` strict, the "base" theme in the page's colors. The source stays hidden until Mermaid has drawn it; if the import or the drawing fails, a one line message shows instead. Nothing else on the page waits for it.
+- Width: Mermaid's own `useMaxWidth` scales the tree down to fit a wide screen; under 760 px the drawing keeps 760 px and scrolls sideways inside `.family-tree-scroll` (the page width stays at the screen width).
+- No service worker or cache version: the Deploy site workflow publishes `index.html` as usual.
+

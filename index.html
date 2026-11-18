@@ -710,10 +710,72 @@
         .solo-note ul { margin: 0; padding-left: 1.1rem; }
         .solo-note li { margin: 0.2rem 0; }
         .solo-line { margin-top: 0.6rem; font-size: 0.85rem; }
+        /* Who's coming (5.5.0): the family tree above the hero, drawn by Mermaid in the browser. */
+        .family-tree { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 1.25rem 0 1rem; }
+        .family-tree-title { font-size: 1.25rem; font-weight: 700; color: var(--deep-ocean); margin-bottom: 0.4rem; }
+        .family-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.85rem; color: var(--gray-700); margin-bottom: 0.75rem; }
+        .family-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+        .family-legend i { width: 0.9rem; height: 0.9rem; border-radius: 3px; border: 2px solid; display: inline-block; }
+        .family-legend .going { background: #c8e6c9; border-color: #2e7d32; }
+        .family-legend .pending { background: #ffe0b2; border-color: #ef6c00; }
+        .family-legend .declined { background: #ffcdd2; border-color: #c62828; }
+        .family-tree-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .family-tree-scroll pre.mermaid { margin: 0; text-align: center; font-family: inherit; }
+        .family-tree-scroll pre.mermaid:not([data-processed]) { visibility: hidden; height: 0; overflow: hidden; }
+        .family-tree-scroll svg { min-width: 760px; height: auto; }
+        .family-tree-hint { font-size: 0.8rem; color: var(--gray-500); margin-top: 0.4rem; }
+        .family-tree-hint[hidden], .family-tree-error[hidden] { display: none; }
+        .family-tree-error { font-size: 0.9rem; color: var(--gray-600); }
+        @media (min-width: 900px) { .family-tree-hint { display: none; } }
     </style>
     <link rel="icon" href="data:,">
 </head>
 <body>
+    <section class="family-tree" aria-labelledby="familyTreeTitle">
+        <div class="wrap">
+            <h2 class="family-tree-title" id="familyTreeTitle">Who's coming</h2>
+            <div class="family-legend" aria-label="Colors">
+                <span><i class="going"></i>Going</span>
+                <span><i class="pending"></i>Pending</span>
+                <span><i class="declined"></i>Declined</span>
+            </div>
+            <div class="family-tree-scroll">
+<pre class="mermaid" id="familyTree">
+flowchart TD
+  GP["Emilio &amp; Rosa"]
+  GP --&gt; DAD["Jaime"]
+  GP --&gt; CLARA["Clara"]
+  GP --&gt; RR["Rosa + Raphael"]
+  GP --&gt; LE["Lucia + Efrain"]
+  DAD --&gt; DL["David + Lisa"]
+  DAD --&gt; DANIEL["Daniel"]
+  DL --&gt; ALEX["Alex + Isa"]
+  DL --&gt; DANTE["Dante"]
+  DL --&gt; DJR["David Jr"]
+  DL --&gt; HEATHER["Heather + Ina"]
+  RR --&gt; JARED["Jared"]
+  RR --&gt; STEPH["Stephany"]
+  LE --&gt; AZ["Anthony + Zin"]
+  LE --&gt; KH["Kathy + Humberto"]
+  AZ --&gt; NAT["Nathaniel"]
+  AZ --&gt; NOA["Noa"]
+  HP["Humberto's parents"] --&gt; KH
+  AZ -. "Zin's cousin" .- THOMAS["Thomas + family"]
+  classDef going fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000
+  classDef pending fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px,color:#000
+  classDef declined fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000
+  %% WHO'S COMING: to change someone's color, move their short name (like ALEX or THOMAS)
+  %% from one of the three lines below to another. Names are separated by commas, no spaces.
+  class DL,DANTE,DJR,CLARA,RR,LE,AZ,NAT,NOA going
+  class ALEX,HEATHER,KH,HP pending
+  class DANIEL,JARED,STEPH,THOMAS declined
+</pre>
+            </div>
+            <p class="family-tree-hint" id="familyTreeHint">Swipe sideways to see the whole tree.</p>
+            <p class="family-tree-error" id="familyTreeError" hidden>The family tree didn't load. Reload the page to try again.</p>
+        </div>
+    </section>
+
     <header class="hero">
         <div class="hero-content">
             <span class="version-badge" id="versionBadge"></span>
@@ -788,7 +850,7 @@
     </footer>
 
     <script>
-        const APP_VERSION = "5.4.1";
+        const APP_VERSION = "5.5.0";
         const DATA_URL = "data/prices.json";
         const COUNTS_URL = "data/counts.json";
         const COUNTS_MAX_AGE_DAYS = 7;
@@ -2724,6 +2786,36 @@
                 document.getElementById("asOf").textContent = "unavailable";
                 document.getElementById("app").innerHTML = `<div class="load-error">The prices could not be loaded (${esc(err.message)}). Please refresh the page.</div>`;
             });
+    </script>
+    <script type="module">
+        // Who's coming (5.5.0): Mermaid draws the family tree above the hero in the browser. The
+        // statuses are the three "class ... going/pending/declined" lines in #familyTree.
+        const tree = document.getElementById("familyTree");
+        const failed = () => {
+            document.getElementById("familyTreeError").hidden = false;
+            document.getElementById("familyTreeHint").hidden = true;
+        };
+        try {
+            const { default: mermaid } = await import("https://cdn.jsdelivr.net/npm/mermaid@12.3.0/dist/mermaid.esm.min.mjs");
+            mermaid.initialize({
+                startOnLoad: false,
+                securityLevel: "strict",
+                theme: "base",
+                themeVariables: {
+                    fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+                    primaryColor: "#ffffff",
+                    primaryBorderColor: "#0a2540",
+                    primaryTextColor: "#111827",
+                    lineColor: "#1e3a5f",
+                    edgeLabelBackground: "#ffffff"
+                },
+                flowchart: { useMaxWidth: true }
+            });
+            await mermaid.run({ nodes: [tree] });
+            if (!tree.querySelector("svg")) failed();
+        } catch (e) {
+            failed();
+        }
     </script>
 </body>
 </html>
