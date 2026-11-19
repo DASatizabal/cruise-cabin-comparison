@@ -1,6 +1,6 @@
 {
  "schema_version": 5,
- "saved_at": "2026-11-18T10:22:34Z",
+ "saved_at": "2026-11-19T10:22:19Z",
  "source": "NCL vacation-builder API (stateroom-types-availability and price-summary)",
  "guest_counts": [
   1,
@@ -15,14 +15,14 @@
    "child_per_day": 40.0,
    "rules": "21 and over pay the adult rate; guests 1 and 2 aged 3 to 20 pay the child rate; 2 and under are not eligible; under 21 in position 3 or later do not get it and are not charged. Includes prepaid service charges.",
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-11-18"
+   "checked_at": "2026-11-19"
   },
   "open_bar": {
    "per_day_2_to_5_nights": 32.0,
    "per_day_6_plus_nights": 28.5,
    "soda_per_day": 12.5,
    "source": "https://www.ncl.com/cruise-deals/promotion-terms",
-   "checked_at": "2026-11-18"
+   "checked_at": "2026-11-19"
   },
   "service_charge": {
    "suite_haven_per_night": 25.0,
@@ -33,7 +33,7 @@
     "HAVEN"
    ],
    "source": "https://www.ncl.com/faq/what-is-ncl-onboard-service-charge",
-   "checked_at": "2026-11-18"
+   "checked_at": "2026-11-19"
   }
  },
  "rate_warnings": [],
@@ -45,7 +45,7 @@
   ],
   "source": "https://www.ncl.com/terms#payment-deposit-schedule",
   "percent_of_fare": 10,
-  "confirmed_on": "2026-11-18",
+  "confirmed_on": "2026-11-19",
   "confirmed_by": "aura-2027-06-14 H6 at 5 guests",
   "one_guest_confirmed_on": null
  },
@@ -111,8 +111,8 @@
     "guests": 2,
     "kind": "regular",
     "category": "IX",
-    "expected": 2558,
-    "ncl_total": 2558,
+    "expected": 2518,
+    "ncl_total": 2518,
     "ok": true
    },
    {
@@ -120,8 +120,8 @@
     "guests": 3,
     "kind": "regular",
     "category": "IX",
-    "expected": 3517,
-    "ncl_total": 3517,
+    "expected": 3477,
+    "ncl_total": 3477,
     "ok": true
    },
    {
@@ -129,8 +129,8 @@
     "guests": 4,
     "kind": "regular",
     "category": "IX",
-    "expected": 4476,
-    "ncl_total": 4476,
+    "expected": 4436,
+    "ncl_total": 4436,
     "ok": true
    },
    {
@@ -147,8 +147,8 @@
     "guests": 1,
     "kind": "regular",
     "category": "IX",
-    "expected": 2198,
-    "ncl_total": 2198,
+    "expected": 2158,
+    "ncl_total": 2158,
     "ok": true
    },
    {
@@ -174,8 +174,8 @@
     "sailing": "aura-2027-06-14",
     "party": "1 adult, 15, 7",
     "category": "IX",
-    "expected": 3219.5,
-    "ncl_total": 3219.5,
+    "expected": 3179.5,
+    "ncl_total": 3179.5,
     "ok": true
    }
   ],
@@ -385,43 +385,43 @@
     ],
     "duration": 3,
     "sail_start": "2027-06-11T00:00:00",
-    "checked_at": "2026-11-18T10:20:58Z"
+    "checked_at": "2026-11-19T10:21:01Z"
    },
    "depart": "2027-06-11",
    "return": "2027-06-14",
    "nights": 3,
    "url": "https://www.ncl.com/cruises/GETAWAY3MIANPINASMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-11-18",
+   "saved_at": "2026-11-19",
    "party_sizes": {
     "1": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-18T10:20:58Z",
+     "as_of": "2026-11-19T10:21:01Z",
      "why": null
     },
     "2": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-18T10:20:58Z",
+     "as_of": "2026-11-19T10:21:01Z",
      "why": null
     },
     "3": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-18T10:20:58Z",
+     "as_of": "2026-11-19T10:21:01Z",
      "why": null
     },
     "4": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-18T10:20:58Z",
+     "as_of": "2026-11-19T10:21:01Z",
      "why": null
     },
     "5": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-18T10:20:58Z",
+     "as_of": "2026-11-19T10:21:01Z",
      "why": null
     }
    },
@@ -433,14 +433,14 @@
      "soda_under_21_position_2": 37.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-11-18"
+     "checked_at": "2026-11-19"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 1 Meal",
      "per_guest": 20,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-11-18"
+     "checked_at": "2026-11-19"
     }
    },
    "kids_sail_free": null,
@@ -478,14 +478,14 @@
     "source": "NCL price-summary paymentOptions",
     "final_payment_due": "2027-02-11",
     "standard_deposit_per_guest": 50.0,
-    "standard_deposit_checked_at": "2026-11-18",
+    "standard_deposit_checked_at": "2026-11-19",
     "by_guests": {
      "1": {
       "deposit": 50.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-18T10:20:58Z",
+      "as_of": "2026-11-19T10:21:01Z",
       "why": null
      },
      "2": {
@@ -493,7 +493,7 @@
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-18T10:20:58Z",
+      "as_of": "2026-11-19T10:21:01Z",
       "why": null
      },
      "3": {
@@ -501,7 +501,7 @@
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-18T10:20:58Z",
+      "as_of": "2026-11-19T10:21:01Z",
       "why": null
      },
      "4": {
@@ -509,7 +509,7 @@
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-18T10:20:58Z",
+      "as_of": "2026-11-19T10:21:01Z",
       "why": null
      },
      "5": {
@@ -517,7 +517,7 @@
       "deposit_type": "OCEANVIEW",
       "deposit_category": "O5",
       "due_hours": 90,
-      "as_of": "2026-11-18T10:20:58Z",
+      "as_of": "2026-11-19T10:21:01Z",
       "why": null
      }
     },
@@ -527,14 +527,14 @@
      "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
      "codes": [],
      "types": [],
-     "checked_at": "2026-11-18T10:20:58Z"
+     "checked_at": "2026-11-19T10:21:01Z"
     },
     "solo_1_guest": {
      "deposit": 50.0,
      "deposit_type": "INSIDE",
      "deposit_category": "IT",
      "due_hours": 90,
-     "as_of": "2026-11-18T10:20:58Z",
+     "as_of": "2026-11-19T10:21:01Z",
      "why": null
     },
     "standard_deposit_1_guest_ok": true,
@@ -544,7 +544,7 @@
      "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
      "codes": [],
      "types": [],
-     "checked_at": "2026-11-18T10:20:58Z"
+     "checked_at": "2026-11-19T10:21:01Z"
     }
    },
    "single_supplement": {
@@ -552,8 +552,8 @@
     "categories": 32,
     "matching": 32,
     "all_match": true,
-    "ncl_fare_line": "Free 2nd Guest",
-    "as_of": "2026-11-18T10:20:58Z"
+    "ncl_fare_line": "50% Off All Cruises",
+    "as_of": "2026-11-19T10:21:01Z"
    },
    "price_summaries": [
     {
@@ -565,7 +565,7 @@
      "fare_per_guest": [
       358
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       150
      ],
@@ -596,7 +596,7 @@
      "fare_per_guest": [
       359
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       150
      ],
@@ -628,7 +628,7 @@
       179,
       179
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       150,
       150
@@ -664,7 +664,7 @@
       179,
       99
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       150,
       150,
@@ -704,7 +704,7 @@
       99,
       99
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       150,
       150,
@@ -748,7 +748,7 @@
       159,
       159
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       150,
       150,
@@ -2644,43 +2644,43 @@
     ],
     "duration": 5,
     "sail_start": "2027-06-14T00:00:00",
-    "checked_at": "2026-11-18T10:21:45Z"
+    "checked_at": "2026-11-19T10:21:31Z"
    },
    "depart": "2027-06-14",
    "return": "2027-06-19",
    "nights": 5,
    "url": "https://www.ncl.com/cruises/AURA5MIAPOPNPIMIA",
    "source": "NCL vacation-builder API",
-   "saved_at": "2026-11-18",
+   "saved_at": "2026-11-19",
    "party_sizes": {
     "1": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-18T10:21:45Z",
+     "as_of": "2026-11-19T10:21:31Z",
      "why": null
     },
     "2": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-18T10:21:45Z",
+     "as_of": "2026-11-19T10:21:31Z",
      "why": null
     },
     "3": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-18T10:21:45Z",
+     "as_of": "2026-11-19T10:21:31Z",
      "why": null
     },
     "4": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-18T10:21:45Z",
+     "as_of": "2026-11-19T10:21:31Z",
      "why": null
     },
     "5": {
      "updated": true,
      "checked": true,
-     "as_of": "2026-11-18T10:21:45Z",
+     "as_of": "2026-11-19T10:21:31Z",
      "why": null
     }
    },
@@ -2692,14 +2692,14 @@
      "soda_under_21_position_2": 62.5,
      "under_21_position_3_plus": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-11-18"
+     "checked_at": "2026-11-19"
     },
     "specialty_dining": {
      "title": "Specialty Dining - 2 Meals",
      "per_guest": 40,
      "under_13": 0,
      "source": "NCL price-summary (age test)",
-     "checked_at": "2026-11-18"
+     "checked_at": "2026-11-19"
     }
    },
    "kids_sail_free": null,
@@ -2745,14 +2745,14 @@
     "source": "NCL price-summary paymentOptions",
     "final_payment_due": "2027-02-14",
     "standard_deposit_per_guest": 50.0,
-    "standard_deposit_checked_at": "2026-11-18",
+    "standard_deposit_checked_at": "2026-11-19",
     "by_guests": {
      "1": {
       "deposit": 50.0,
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-18T10:21:45Z",
+      "as_of": "2026-11-19T10:21:31Z",
       "why": null
      },
      "2": {
@@ -2760,7 +2760,7 @@
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-18T10:21:45Z",
+      "as_of": "2026-11-19T10:21:31Z",
       "why": null
      },
      "3": {
@@ -2768,7 +2768,7 @@
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-18T10:21:45Z",
+      "as_of": "2026-11-19T10:21:31Z",
       "why": null
      },
      "4": {
@@ -2776,7 +2776,7 @@
       "deposit_type": "INSIDE",
       "deposit_category": "IX",
       "due_hours": 90,
-      "as_of": "2026-11-18T10:21:45Z",
+      "as_of": "2026-11-19T10:21:31Z",
       "why": null
      },
      "5": {
@@ -2784,7 +2784,7 @@
       "deposit_type": "HAVEN",
       "deposit_category": "H6",
       "due_hours": 23,
-      "as_of": "2026-11-18T10:21:45Z",
+      "as_of": "2026-11-19T10:21:31Z",
       "why": null
      }
     },
@@ -2794,14 +2794,14 @@
      "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
      "codes": [],
      "types": [],
-     "checked_at": "2026-11-18T10:21:45Z"
+     "checked_at": "2026-11-19T10:21:31Z"
     },
     "solo_1_guest": {
      "deposit": 50.0,
      "deposit_type": "OCEANVIEW",
      "deposit_category": "OT",
      "due_hours": 90,
-     "as_of": "2026-11-18T10:21:45Z",
+     "as_of": "2026-11-19T10:21:31Z",
      "why": null
     },
     "standard_deposit_1_guest_ok": true,
@@ -2811,7 +2811,7 @@
      "description": "Lock-in this vacation today with half off deposits for every two guests on your reservation.",
      "codes": [],
      "types": [],
-     "checked_at": "2026-11-18T10:21:45Z"
+     "checked_at": "2026-11-19T10:21:31Z"
     }
    },
    "single_supplement": {
@@ -2819,8 +2819,8 @@
     "categories": 32,
     "matching": 32,
     "all_match": true,
-    "ncl_fare_line": "Free 2nd Guest",
-    "as_of": "2026-11-18T10:21:45Z"
+    "ncl_fare_line": "50% Off All Cruises",
+    "as_of": "2026-11-19T10:21:31Z"
    },
    "price_summaries": [
     {
@@ -2828,11 +2828,11 @@
      "type": "INSIDE",
      "category": "IX",
      "fare_code": "ALL4CHO",
-     "fare_total": 1838,
+     "fare_total": 1798,
      "fare_per_guest": [
-      1838
+      1798
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       160
      ],
@@ -2848,7 +2848,7 @@
        40
       ]
      },
-     "grand_total": 2198,
+     "grand_total": 2158,
      "deposit": 50.0,
      "deposit_due_hours": 90,
      "final_payment_due": "2027-02-14",
@@ -2863,7 +2863,7 @@
      "fare_per_guest": [
       1889
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       160
      ],
@@ -2890,12 +2890,12 @@
      "type": "INSIDE",
      "category": "IX",
      "fare_code": "ALL4CHO",
-     "fare_total": 1838,
+     "fare_total": 1798,
      "fare_per_guest": [
-      919,
-      919
+      899,
+      899
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       160,
       160
@@ -2914,7 +2914,7 @@
        40
       ]
      },
-     "grand_total": 2558,
+     "grand_total": 2518,
      "deposit": 100.0,
      "deposit_due_hours": 90,
      "final_payment_due": "2027-02-14",
@@ -2925,13 +2925,13 @@
      "type": "INSIDE",
      "category": "IX",
      "fare_code": "ALL4CHO",
-     "fare_total": 2437,
+     "fare_total": 2397,
      "fare_per_guest": [
-      919,
-      919,
+      899,
+      899,
       599
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       160,
       160,
@@ -2953,7 +2953,7 @@
        40
       ]
      },
-     "grand_total": 3517,
+     "grand_total": 3477,
      "deposit": 150.0,
      "deposit_due_hours": 90,
      "final_payment_due": "2027-02-14",
@@ -2964,14 +2964,14 @@
      "type": "INSIDE",
      "category": "IX",
      "fare_code": "ALL4CHO",
-     "fare_total": 3036,
+     "fare_total": 2996,
      "fare_per_guest": [
-      919,
-      919,
+      899,
+      899,
       599,
       599
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       160,
       160,
@@ -2996,7 +2996,7 @@
        40
       ]
      },
-     "grand_total": 4476,
+     "grand_total": 4436,
      "deposit": 200.0,
      "deposit_due_hours": 90,
      "final_payment_due": "2027-02-14",
@@ -3015,7 +3015,7 @@
       599,
       599
      ],
-     "fare_title": "Free 2nd Guest",
+     "fare_title": "50% Off All Cruises",
      "taxes_per_guest": [
       160,
       160,
@@ -3119,27 +3119,27 @@
         "1": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1998.0,
-         "cabin_total": 1998
+         "price_pp": 1958.0,
+         "cabin_total": 1958
         },
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1079.0,
-         "cabin_total": 2158
+         "price_pp": 1059.0,
+         "cabin_total": 2118
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 972.33,
-         "cabin_total": 2917,
+         "price_pp": 959.0,
+         "cabin_total": 2877,
          "added_vs_2": 759
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 919.0,
-         "cabin_total": 3676,
+         "price_pp": 909.0,
+         "cabin_total": 3636,
          "added_vs_2": 1518
         },
         "5": {
@@ -3165,14 +3165,14 @@
         "1": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2098.0,
-         "cabin_total": 2098
+         "price_pp": 2058.0,
+         "cabin_total": 2058
         },
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1129.0,
-         "cabin_total": 2258
+         "price_pp": 1109.0,
+         "cabin_total": 2218
         },
         "3": {
          "available": false,
@@ -3210,14 +3210,14 @@
         "1": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2118.0,
-         "cabin_total": 2118
+         "price_pp": 2078.0,
+         "cabin_total": 2078
         },
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1139.0,
-         "cabin_total": 2278
+         "price_pp": 1119.0,
+         "cabin_total": 2238
         },
         "3": {
          "available": false,
@@ -3255,14 +3255,14 @@
         "1": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2158.0,
-         "cabin_total": 2158
+         "price_pp": 2118.0,
+         "cabin_total": 2118
         },
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1159.0,
-         "cabin_total": 2318
+         "price_pp": 1139.0,
+         "cabin_total": 2278
         },
         "3": {
          "available": false,
@@ -3300,27 +3300,27 @@
         "1": {
          "available": true,
          "sold_out": false,
-         "price_pp": 2318.0,
-         "cabin_total": 2318
+         "price_pp": 2278.0,
+         "cabin_total": 2278
         },
         "2": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1239.0,
-         "cabin_total": 2478
+         "price_pp": 1219.0,
+         "cabin_total": 2438
         },
         "3": {
          "available": true,
          "sold_out": false,
-         "price_pp": 1079.0,
-         "cabin_total": 3237,
+         "price_pp": 1065.66,
+         "cabin_total": 3197,
          "added_vs_2": 759
         },
         "4": {
          "available": true,
          "sold_out": false,
-         "price_pp": 999.0,
-         "cabin_total": 3996,
+         "price_pp": 989.0,
+         "cabin_total": 3956,
          "added_vs_2": 1518
         },
         "5": {
