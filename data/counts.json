@@ -1,13 +1,13 @@
 {
  "schema_version": 1,
- "saved_at": "2026-11-20T10:23:03Z",
- "mode": "light",
- "mode_reason": "last full sweep was 2 day(s) ago",
- "last_full_sweep": "2026-11-18T10:22:48Z",
- "prices_saved_at": "2026-11-20T10:22:48Z",
+ "saved_at": "2026-11-21T10:22:31Z",
+ "mode": "full",
+ "mode_reason": "last full sweep was 3 days ago",
+ "last_full_sweep": "2026-11-21T10:22:31Z",
+ "prices_saved_at": "2026-11-21T10:22:21Z",
  "pause_seconds": 3,
- "calls": 70,
- "rechecked": 50,
+ "calls": 145,
+ "rechecked": 145,
  "unreliable": [
   {
    "sailing": "getaway-2027-06-11",
@@ -86,6 +86,30 @@
    "category": "B6",
    "guests": "4",
    "why": "ties in price with another category"
+  },
+  {
+   "sailing": "getaway-2027-06-11",
+   "category": "M1",
+   "guests": "2",
+   "why": "subtraction gave {}"
+  },
+  {
+   "sailing": "getaway-2027-06-11",
+   "category": "H2",
+   "guests": "2",
+   "why": "subtraction gave {}"
+  },
+  {
+   "sailing": "getaway-2027-06-11",
+   "category": "H2",
+   "guests": "3",
+   "why": "subtraction gave {}"
+  },
+  {
+   "sailing": "getaway-2027-06-11",
+   "category": "H2",
+   "guests": "4",
+   "why": "subtraction gave {}"
   },
   {
    "sailing": "aura-2027-06-14",
@@ -199,7 +223,7 @@
       "cabins_left": 47,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -214,29 +238,29 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 90,
+      "cabins_left": 89,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 90,
+      "cabins_left": 89,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 36,
+      "cabins_left": 35,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Aft': 0, 'Forward': 0, 'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -253,26 +277,26 @@
       "cabins_left": 33,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 33,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 4,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 1,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -291,26 +315,26 @@
       "cabins_left": 74,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 74,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 20,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 12,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -327,23 +351,23 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 78,
+      "cabins_left": 77,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 78,
+      "cabins_left": 77,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 68,
+      "cabins_left": 67,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -363,26 +387,26 @@
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: OA",
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: OA",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 87,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 87,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -400,7 +424,7 @@
       "cabins_left": 10,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -418,14 +442,14 @@
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: IA",
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: IA",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -445,14 +469,14 @@
       "cabins_left": 30,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 30,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -469,26 +493,26 @@
       "cabins_left": 5,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 5,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 5,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: B6",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -505,32 +529,32 @@
       "cabins_left": 33,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 33,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 33,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: B6",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "5": {
       "cabins_left": 33,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -546,7 +570,7 @@
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: IA",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -562,29 +586,29 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 139,
-      "reliable": true,
-      "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
-      "same_as": "2"
-     },
-     "2": {
-      "cabins_left": 139,
-      "reliable": true,
-      "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
-     },
-     "3": {
       "cabins_left": 138,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z",
+      "same_as": "2"
      },
-     "4": {
-      "cabins_left": 70,
+     "2": {
+      "cabins_left": 138,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
+     },
+     "3": {
+      "cabins_left": 137,
+      "reliable": true,
+      "why": null,
+      "checked_at": "2026-11-21T10:22:31Z"
+     },
+     "4": {
+      "cabins_left": 69,
+      "reliable": true,
+      "why": null,
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -600,29 +624,29 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 248,
+      "cabins_left": 247,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 248,
+      "cabins_left": 247,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 195,
+      "cabins_left": 194,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 62,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -642,26 +666,26 @@
       "cabins_left": 320,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 320,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 239,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: O4",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -680,26 +704,26 @@
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: O4",
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: O4",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": null,
       "reliable": false,
       "why": "ties in price with another category",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": null,
       "reliable": false,
       "why": "ties in price with another category",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -715,26 +739,26 @@
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: O4",
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": null,
       "reliable": false,
       "why": "call returned other cabin types: O4",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": null,
       "reliable": false,
       "why": "ties in price with another category",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": null,
       "reliable": false,
       "why": "ties in price with another category",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -755,20 +779,20 @@
       "cabins_left": 29,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 29,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 25,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -786,7 +810,7 @@
       "cabins_left": 16,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -802,29 +826,29 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 47,
+      "cabins_left": 46,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 47,
+      "cabins_left": 46,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 47,
+      "cabins_left": 46,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 1,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -844,26 +868,26 @@
       "cabins_left": 115,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 115,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 104,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 3,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -881,29 +905,29 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 65,
+      "cabins_left": 64,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 65,
+      "cabins_left": 64,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 65,
+      "cabins_left": 64,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
-      "cabins_left": 65,
+      "cabins_left": 64,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -919,49 +943,38 @@
       "cabins_left": 19,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 19,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 19,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 10,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
    "M1": {
-    "open_decks": [
-     10
-    ],
-    "open_locations": [
-     "aft"
-    ],
+    "open_decks": null,
+    "open_locations": null,
     "by_guests": {
-     "1": {
-      "cabins_left": 2,
-      "reliable": true,
-      "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
-      "same_as": "2"
-     },
      "2": {
-      "cabins_left": 2,
-      "reliable": true,
-      "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "cabins_left": null,
+      "reliable": false,
+      "why": "subtraction gave {}",
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -977,14 +990,14 @@
       "cabins_left": 15,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 15,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1004,20 +1017,20 @@
       "cabins_left": 10,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 10,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 10,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1034,20 +1047,20 @@
       "cabins_left": 17,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 17,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 16,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1066,26 +1079,26 @@
       "cabins_left": 8,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 8,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 8,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 8,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1102,26 +1115,26 @@
       "cabins_left": 4,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 4,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 4,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 4,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1138,32 +1151,32 @@
       "cabins_left": 20,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 20,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 20,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 20,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "5": {
       "cabins_left": 20,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1179,61 +1192,57 @@
       "cabins_left": 2,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 2,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 2,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 2,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
    "H2": {
-    "open_decks": [
-     16
-    ],
-    "open_locations": [
-     "forward"
-    ],
+    "open_decks": null,
+    "open_locations": null,
     "by_guests": {
      "1": {
-      "cabins_left": 2,
-      "reliable": true,
-      "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "cabins_left": null,
+      "reliable": false,
+      "why": "subtraction gave {}",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 2,
-      "reliable": true,
-      "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "cabins_left": null,
+      "reliable": false,
+      "why": "subtraction gave {}",
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 2,
-      "reliable": true,
-      "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "cabins_left": null,
+      "reliable": false,
+      "why": "subtraction gave {}",
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
-      "cabins_left": 2,
-      "reliable": true,
-      "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "cabins_left": null,
+      "reliable": false,
+      "why": "subtraction gave {}",
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    }
@@ -1252,7 +1261,7 @@
       "cabins_left": 24,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1264,14 +1273,14 @@
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Forward': 0, 'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Forward': 0, 'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1287,17 +1296,17 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 119,
+      "cabins_left": 117,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 119,
+      "cabins_left": 117,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1315,17 +1324,17 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 103,
+      "cabins_left": 99,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 103,
+      "cabins_left": 99,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1347,29 +1356,29 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 67,
+      "cabins_left": 64,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 67,
+      "cabins_left": 64,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 67,
+      "cabins_left": 64,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
-      "cabins_left": 67,
+      "cabins_left": 64,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1385,14 +1394,14 @@
       "cabins_left": 51,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 51,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1405,23 +1414,23 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 31,
+      "cabins_left": 30,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 31,
+      "cabins_left": 30,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 1,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1434,29 +1443,29 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 28,
+      "cabins_left": 26,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 28,
+      "cabins_left": 26,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 28,
+      "cabins_left": 26,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
-      "cabins_left": 28,
+      "cabins_left": 26,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1472,7 +1481,7 @@
       "cabins_left": 1,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1487,17 +1496,17 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 75,
+      "cabins_left": 77,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 75,
+      "cabins_left": 77,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1513,23 +1522,23 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 248,
+      "cabins_left": 245,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 248,
+      "cabins_left": 245,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 26,
+      "cabins_left": 25,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1550,23 +1559,23 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 265,
+      "cabins_left": 267,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 265,
+      "cabins_left": 267,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 39,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1587,29 +1596,29 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 139,
+      "cabins_left": 135,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 139,
+      "cabins_left": 135,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 139,
+      "cabins_left": 135,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
-      "cabins_left": 139,
+      "cabins_left": 135,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1621,26 +1630,26 @@
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {}",
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1656,7 +1665,7 @@
       "cabins_left": 3,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1674,14 +1683,14 @@
       "cabins_left": 6,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 6,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1699,14 +1708,14 @@
       "cabins_left": 7,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 7,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1724,26 +1733,26 @@
       "cabins_left": 10,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 10,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 10,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 10,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1763,26 +1772,26 @@
       "cabins_left": 9,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 9,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 7,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 5,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1800,26 +1809,26 @@
       "cabins_left": 5,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 5,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 3,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 3,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1839,26 +1848,26 @@
       "cabins_left": 8,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 8,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 8,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 8,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1870,26 +1879,26 @@
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1901,14 +1910,14 @@
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1927,26 +1936,26 @@
       "cabins_left": 4,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 4,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 4,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 4,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1966,20 +1975,20 @@
       "cabins_left": 44,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 44,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 26,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -1996,26 +2005,26 @@
       "cabins_left": 13,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": 13,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": 13,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": 13,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -2027,26 +2036,26 @@
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Aft': 0, 'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Aft': 0, 'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Aft': 0, 'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Aft': 0, 'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -2058,14 +2067,14 @@
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Aft': 0, 'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {'Aft': 0, 'Mid': 0}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -2081,70 +2090,71 @@
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 31,
+      "cabins_left": 32,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 31,
+      "cabins_left": 32,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 31,
+      "cabins_left": 32,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
-      "cabins_left": 31,
+      "cabins_left": 32,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "5": {
-      "cabins_left": 31,
+      "cabins_left": 32,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
    "H4": {
     "open_decks": [
-     10
+     10,
+     12
     ],
     "open_locations": [
      "aft"
     ],
     "by_guests": {
      "1": {
-      "cabins_left": 2,
+      "cabins_left": 3,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
-      "cabins_left": 2,
+      "cabins_left": 3,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
-      "cabins_left": 2,
+      "cabins_left": 3,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
-      "cabins_left": 2,
+      "cabins_left": 3,
       "reliable": true,
       "why": null,
-      "checked_at": "2026-11-20T10:23:03Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    },
@@ -2156,32 +2166,32 @@
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {}",
-      "checked_at": "2026-11-18T10:22:48Z",
+      "checked_at": "2026-11-21T10:22:31Z",
       "same_as": "2"
      },
      "2": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "3": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "4": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      },
      "5": {
       "cabins_left": null,
       "reliable": false,
       "why": "subtraction gave {}",
-      "checked_at": "2026-11-18T10:22:48Z"
+      "checked_at": "2026-11-21T10:22:31Z"
      }
     }
    }
